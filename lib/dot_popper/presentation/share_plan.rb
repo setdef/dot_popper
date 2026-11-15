@@ -143,7 +143,5 @@ module DotPopper
       # Around every block, padded.
       def card(placed) = placed.bounds.inset(-pad)
     end
-
-    ShareScreen = ShareLayout # the old name, until no one uses it
   end
 end
