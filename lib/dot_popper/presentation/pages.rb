@@ -164,7 +164,7 @@ module DotPopper
     # Delete my friend group data, and the line under it.
     class PrivacyPlan < Data.define(:left, :lines, :line_size, :policy, :delete, :note_lines, :note_y); end
 
-    class PrivacyScreen < Data.define(:layout, :measure, :lines, :note, :deletable)
+    class PrivacyLayout < Data.define(:layout, :measure, :lines, :note, :deletable)
       def plan
         area = layout.page
         width = [area.width, 780.0].min
@@ -242,7 +242,7 @@ module DotPopper
       def initialize(left:, width:, lines:, line_size:, now:, now_y:, paste:, status_y:, reset: nil, status: nil) = super
     end
 
-    # Laid out as the Privacy screen is (PrivacyScreen): one column, the
+    # Laid out as the Privacy screen is (PrivacyLayout): one column, the
     # warning first, as the thing to know before choosing (Podmajersky:
     # write for the state the player is in), then what to do, then the
     # buttons, each naming its action.
@@ -270,5 +270,7 @@ module DotPopper
         ServerPlan.new(left:, width:, lines: wrapped, line_size: size, now: shown_now, now_y:, paste:, reset:, status: shown_status, status_y: (reset || paste).bottom + 24)
       end
     end
+
+    PrivacyScreen = PrivacyLayout # the old name, until no one uses it
   end
 end

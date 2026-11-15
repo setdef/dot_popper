@@ -3,11 +3,11 @@
 module DotPopper
   module Presentation
     module Screens
-      # Privacy, over Settings (PrivacyScreen): Read the privacy policy,
+      # Privacy, over Settings (PrivacyLayout): Read the privacy policy,
       # Delete my friend group data for a player the group server knows,
       # and Back.
       class Privacy < Page
-        # Where its lines and buttons go (PrivacyScreen), laid out again
+        # Where its lines and buttons go (PrivacyLayout), laid out again
         # only when the window, the words or the friend-group server's
         # knowing the player changes.
         def plan
@@ -17,7 +17,7 @@ module DotPopper
           (@plan ||= Memo.new).fetch([layout, words, known]) do
             lines = [[:bars, words.button(:privacy_stats)], [:crown, words.button(:privacy_groups)]]
             note = "#{words.button(:privacy_hold)} #{words.button(:privacy_delete_note)}"
-            PrivacyScreen.new(layout:, measure:, lines:, note:, deletable: known).plan
+            PrivacyLayout.new(layout:, measure:, lines:, note:, deletable: known).plan
           end
         end
 
