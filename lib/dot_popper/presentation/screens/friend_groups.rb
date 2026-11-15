@@ -35,6 +35,22 @@ module DotPopper
                                 later_text: word(GroupWords.notice_later), go_text: word(GroupWords.notice_go(panel.asking))).plan
         end
 
+        # Each frame, the panel hears the friend groups' server, and shows
+        # a title change's announcement where the screen on top shows one.
+        def update(_seconds) = show.group_panel.update(now, quiet: !show.playing?, showing: show.screen.announces?)
+
+        # A hold on Leave, or on Privacy's Delete my friend group data,
+        # ends when it is let go.
+        def release(by) = show.group_panel.let_go(by, now)
+
+        def cancel_hold = show.group_panel.cancel_hold
+
+        # As Home shows, they close.
+        def home_shown = (show.group_panel.close if show.group_panel.open?)
+
+        # A game started: the panel waits for its result.
+        def game_started = show.group_panel.game_started
+
         # A friend groups' word (a ByInput), said as the player's input would
         # press it.
         def word(byinput) = byinput.for(show.input)

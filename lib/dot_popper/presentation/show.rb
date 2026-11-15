@@ -158,7 +158,7 @@ module DotPopper
       # The player pressed with +kind+ (InputKind): from now on the words
       # say what to do with it.
       def input=(kind)
-        @screens[:offer].key_hint = nil # a pointer or a controller took over from the keyboard
+        each_screen { it.input_used(kind) }
         return if kind == input
 
         @input = kind
@@ -382,7 +382,7 @@ module DotPopper
         return unless home?
 
         open_layer(name)
-        lists_from_top
+        each_screen(&:page_changed)
         sounds.play(:tick)
       end
 
@@ -391,16 +391,9 @@ module DotPopper
       # Server to Settings, the others to Home.
       def close_page
         close_layer(screen) if screen.is_a?(Screens::Page)
-        @screens[:stats].cancel_hold
-        lists_from_top
+        each_screen(&:page_changed)
         sounds.play(:tick, pitch: 0.8)
       end
-
-      # As a screen over Home opens or closes, the lists start again from
-      # their top: the screen opened, the one returned to, and the friend
-      # groups' list, as when every list shared one scroll. Credits keeps
-      # its own (Screens::Credits#open).
-      def lists_from_top = %i[stats achievements settings friend_groups].each { @screens[it].scroll_from_top }
 
       def open_stats = @screens[:stats].open
 
@@ -534,16 +527,12 @@ module DotPopper
       # which ends with nothing cleared if it was let go too soon.
       def let_go(by)
         screen.let_go(by)
-        @screens[:stats].release(by)
-        @groups.let_go(by, now)
+        each_screen { it.release(by) }
       end
 
       # Whatever holds "Clear my stats…" stops, with nothing cleared, as
       # when the window loses focus and a release may never be heard.
-      def let_go_of_everything
-        @screens[:stats].cancel_hold
-        @groups.cancel_hold
-      end
+      def let_go_of_everything = each_screen(&:cancel_hold)
 
       # Where a press reaches "Clear my stats…" and Undo on the Stats
       # screen, as Home's buttons do.
@@ -666,16 +655,13 @@ module DotPopper
       # size changes with it, as standard dots do.
       def resize(layout, field)
         @layout = layout
-        @screens[:credits].lay_out if credits?
+        each_screen(&:resized)
         @attract = field.radius == attract.field.radius ? attract.refit(field) : Attract.spawn(field, style::HOME)
       end
 
       def update(seconds)
         @now += seconds
-        @groups.update(now, quiet: !playing?, showing: screen.announces?)
-        offer.update(seconds)
-        @screens[:new_theme].update
-        @screens[:stats].update
+        each_screen { it.update(seconds) }
         @hover = hover.at(hovered).update(seconds, style::HOVER)
         effects.update(seconds)
         follow_tutorial(seconds) if tutorial?
@@ -742,6 +728,10 @@ module DotPopper
       end
       private
 
+      # Tells every screen, open or not, what +block+ says
+      # (Screens::Screen#update and the rest).
+      def each_screen(&) = @screens.each_value(&)
+
       # The art of the theme +key+ (Theme), or nil for none.
       def theme_of(key) = key && style::THEMES.find { it.key == key }
 
@@ -783,11 +773,9 @@ module DotPopper
           @hud = Hud.blank(style::HUD, words)
           event.dots.each { animations.spawn(it.id, now) }
         end
-        @groups.game_started
+        each_screen(&:game_started)
         @game_over = nil
-        close_layer(:share_preview)
         @mistake = nil
-        @screens[:stats].forget_undo # the game's records would be lost to an undo
         @clock_highlight = nil
         @beckoned_at = nil
         sounds.play(:start)
@@ -866,12 +854,8 @@ module DotPopper
 
       def home_shown(event)
         @use_theme.refresh
-        @screens[:stats].forget
-        offer.closed_at_home
-        @groups.close if group_open?
+        each_screen(&:home_shown)
         @layers.clear
-        @screens[:credits].forget
-        @screens[:stats].cancel_hold
         effects.clear
         @game_over = nil
         @home_entrance = HomeEntrance.new(style: style::HOME, score_record: event.score_record, at: now)

@@ -57,6 +57,9 @@ module DotPopper
           sounds.play(:tick, pitch: 1.3)
         end
 
+        # A game started: it closes, quietly.
+        def game_started = show.close_layer(self)
+
         # Back to Game Over as it was.
         def close
           show.close_layer(self)

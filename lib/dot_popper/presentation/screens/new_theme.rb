@@ -24,7 +24,7 @@ module DotPopper
         end
 
         # Each frame: the moment the card for a new theme first shows.
-        def update
+        def update(_seconds)
           theme = show.arrival
           @seen = [theme.key, now] if theme && @seen&.first != theme.key
         end

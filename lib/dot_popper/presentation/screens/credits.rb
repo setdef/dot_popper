@@ -29,7 +29,15 @@ module DotPopper
         end
 
         # As Home shows: nothing of it is open.
-        def forget = @scroll = nil
+        def home_shown = @scroll = nil
+
+        # It keeps its own scroll as other screens over Home open and close
+        # (#open starts it at the top).
+        def page_changed = nil
+
+        # The window changed size: while it is on top, its text is broken
+        # into lines again, at the same place on it.
+        def resized = (lay_out if show.credits?)
 
         # What it says (CreditsText), composed once.
         def text = (@text ||= CreditsText.compose(words, @notices))

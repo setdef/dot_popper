@@ -82,7 +82,11 @@ module DotPopper
         end
 
         # As Home shows: nothing of it is open.
-        def closed_at_home = @for_play = false
+        def home_shown = @for_play = false
+
+        # A pointer or a controller took over from the keyboard, or the
+        # keyboard was used again: Buy names no key until #key_hint says.
+        def input_used(_kind) = @key_hint = nil
 
         # The words and parts to lay out (OfferScreen), and where they go.
         def layout_screen

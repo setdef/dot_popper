@@ -140,6 +140,37 @@ module DotPopper
         # (Show#layers).
         def opened? = show.layer?(self)
 
+        # What the Show tells every screen, open or not, as it happens, so
+        # that a screen with state of its own keeps it without the Show
+        # naming it. Each does nothing unless the screen says otherwise.
+
+        # A frame passed, of +seconds+.
+        def update(seconds) = nil
+
+        # +by+ let go of whatever it held, wherever it was held (a hold
+        # ends, with nothing done, if it was let go too soon).
+        def release(by) = nil
+
+        # Every hold stops, with nothing done, as when the window loses
+        # focus and a release may never be heard.
+        def cancel_hold = nil
+
+        # A screen over Home opened or closed (Show#open_page,
+        # Show#close_page).
+        def page_changed = nil
+
+        # Home showed, after a game: the stack is emptied.
+        def home_shown = nil
+
+        # A game started.
+        def game_started = nil
+
+        # The window changed size.
+        def resized = nil
+
+        # The player pressed with +kind+ (InputKind).
+        def input_used(kind) = nil
+
         private
 
         def layout = show.layout
@@ -181,6 +212,10 @@ module DotPopper
         # Its list moved by +pixels+, or to +moved+ (a CreditsScroll).
         def scroll_by(pixels) = @scroll = @scroll&.by(pixels)
         def scroll_to(moved) = @scroll = moved
+
+        # As a screen over Home opens or closes, its list starts again from
+        # its top.
+        def page_changed = scroll_from_top
 
         # Its list goes back to its top, and no press is held on it.
         def scroll_from_top

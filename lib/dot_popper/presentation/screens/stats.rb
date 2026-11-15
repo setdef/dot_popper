@@ -38,8 +38,22 @@ module DotPopper
         # The sheet as the Stats are now.
         def refresh = @sheet = build_sheet
 
-        # As Home shows: it shows nothing until opened again.
+        # As Home shows: it shows nothing until opened again, and nothing
+        # holds "Clear my stats…".
+        def home_shown
+          forget
+          cancel_hold
+        end
+
+        # It shows nothing until opened again.
         def forget = @sheet = nil
+
+        # As a screen over Home opens or closes: its list starts from the
+        # top, and nothing holds "Clear my stats…".
+        def page_changed
+          super
+          cancel_hold
+        end
 
         # Where its parts go (StatsLayout).
         def plan = StatsLayout.measured(layout:, sheet:, style: style::STATS, measure:)
@@ -72,7 +86,7 @@ module DotPopper
         def cancel_hold = @clearing = clearing.cancel
 
         # A game started: its records would be lost to an undo.
-        def forget_undo = @undo = nil
+        def game_started = @undo = nil
 
         def undo
           @keeper.restore(@undo.cleared)
@@ -83,7 +97,7 @@ module DotPopper
 
         # The moving parts of each frame: a hold done clears the Stats, and
         # Undo goes once its time is over.
-        def update
+        def update(_seconds)
           clear if clearing.done?(show.now)
           @undo = nil unless @undo&.open?(show.now)
         end
