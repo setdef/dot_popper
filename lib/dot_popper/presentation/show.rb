@@ -593,7 +593,7 @@ module DotPopper
       def server? = on_top?(:server)
       def server_offered? = @screens[:server].offered?
 
-      # The words and buttons of Change Server (ServerScreen).
+      # The words and buttons of Change Server (ChangeServerLayout).
       def paste_server = @screens[:server].paste_address
 
       def open_policy = @links.open(PRIVACY_URL)

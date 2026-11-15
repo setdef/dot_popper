@@ -4,7 +4,7 @@ module DotPopper
   module Presentation
     module Screens
       # Change Server, over Settings, only while setdef is gone
-      # (ServerScreen; ADR-0011): Paste server address, the reset, and Back.
+      # (ChangeServerLayout; ADR-0011): Paste server address, the reset, and Back.
       class ChangeServer < Page
         # +server_choice+ (DotPopper::ServerChoice) is the server chosen, if any, or
         # nil where there is no choice to make.
@@ -19,7 +19,7 @@ module DotPopper
         # Opens over Settings, where it is offered.
         def open = (show.open_page(:server) if show.settings? && offered?)
 
-        # Where its words and buttons go (ServerScreen).
+        # Where its words and buttons go (ChangeServerLayout).
         # Laid out again only when the window, the words or the choice
         # changes.
         def plan
@@ -29,7 +29,7 @@ module DotPopper
           (@plan ||= Memo.new).fetch([layout, words, choice&.address, choice&.status]) do
             now = format(words.button(:server_now), choice&.address || words.button(:server_setdef))
             status = choice&.status && words.button(:"server_#{choice.status}")
-            ServerScreen.new(layout:, measure:, lines: [[:crown, words.button(:server_warning)], [:copy, words.button(:server_how)]],
+            ChangeServerLayout.new(layout:, measure:, lines: [[:crown, words.button(:server_warning)], [:copy, words.button(:server_how)]],
                              now:, status:, resettable: !choice&.address.nil?).plan
           end
         end

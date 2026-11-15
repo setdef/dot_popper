@@ -2,7 +2,7 @@
 
 module DotPopper
   module Shell
-    # Change Server, as Presentation::ServerScreen lays it out: the warning
+    # Change Server, as Presentation::ChangeServerLayout lays it out: the warning
     # and what to do, each after its sign, which server is in use, Paste
     # server address, Use setdef's server once another is chosen, and how
     # the last paste went.

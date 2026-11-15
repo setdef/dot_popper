@@ -22,7 +22,7 @@ Where the parts go is worked out without Lota in `lib/dot_popper/presentation/` 
 | Settings | Home's Settings | Home | `SettingsLayout`, `Shell::SettingsPainter` |
 | Credits and licenses | Settings | Settings | `CreditsLayout`, `Shell::CreditsPainter` |
 | Privacy | Settings | Settings | `PrivacyLayout`, `Shell::PrivacyPainter` |
-| Change Server | Settings, only while setdef is gone | Settings | `ServerScreen`; see [ADR-0011](../adr/0011-pro-outlives-setdef.md) |
+| Change Server | Settings, only while setdef is gone | Settings | `ChangeServerLayout`; see [ADR-0011](../adr/0011-pro-outlives-setdef.md) |
 | a game | Play, Play again | (none) | [rules.md](rules.md) |
 | Game Over | the clock running out | Home | `GameOverLayout`, `Shell::GameOverPainter` |
 | share preview | Game Over's Share my score, on a computer | Game Over | `ShareLayout`, `Shell::SharePreviewPainter` |

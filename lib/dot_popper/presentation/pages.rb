@@ -246,7 +246,7 @@ module DotPopper
     # warning first, as the thing to know before choosing (Podmajersky:
     # write for the state the player is in), then what to do, then the
     # buttons, each naming its action.
-    class ServerScreen < Data.define(:layout, :measure, :lines, :now, :status, :resettable)
+    class ChangeServerLayout < Data.define(:layout, :measure, :lines, :now, :status, :resettable)
       def plan
         area = layout.page
         width = [area.width, 780.0].min
@@ -276,5 +276,7 @@ module DotPopper
     AchievementsScreen = AchievementsLayout # the old name, until no one uses it
 
     SettingsScreen = SettingsLayout # the old name, until no one uses it
+
+    ServerScreen = ChangeServerLayout # the old name, until no one uses it
   end
 end
