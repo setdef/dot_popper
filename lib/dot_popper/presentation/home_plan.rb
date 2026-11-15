@@ -290,7 +290,5 @@ module DotPopper
       # +height+ tall, with room at either end.
       def self.width_with_icon(word_width, height) = word_width + (height * (GLYPH + GAP + 1.0))
     end
-
-    HomeScreen = HomeLayout # the old name, until no one uses it
   end
 end
