@@ -28,7 +28,7 @@ Every package held the same Ruby, whatever it was sold through: the fake store a
 
 Chosen: option 2, because it alone meets the first driver with released tools. Option 1 ships what the driver forbids. Option 3 was set aside on what `lota fuse` needs: it builds from one lockfile, so a gem per channel would mean a lockfile per channel; `lota fuse --exclude` already leaves out paths, which is all option 2 asks of it. The test build's part is `lib/dot_popper/test_build/`: the test keys and pins, the receipt test key, the fake store, checkout and setdef server, and the settings that grant Pro. The repository's `build.rb` names it, so every playtest kit and CI run is a test build; `script/set_build_channel.rb` stamps a channel's own parts (none, today, for every channel for sale).
 
-Confidence: medium. The Linux packages of every channel for sale and CI's Mac App Store package were measured without the part, and each still plays; the packages were not measured again after the last two moves, and no `app-store` or `google-play` phone build exists yet to measure.
+Confidence: medium. Every channel's Linux package fused by `lota fuse`, measured twice on 2026-11-14, and CI's Mac App Store package hold none of the part and pass both checks, and each check alone fails every one of 30 faults planted in each package; a test build and a build for each channel answer as before the change in what they trust, sell, meter, keep and obey, on five systems. Windows packages were not measured with plants, and no `app-store` or `google-play` phone build exists yet to measure.
 
 ### Consequences
 
@@ -41,7 +41,7 @@ Confidence: medium. The Linux packages of every channel for sale and CI's Mac Ap
 
 ### Confirmation
 
-Every Package job for sale runs `script/channel_contents.rb check` on the package it built, which fails on a file its channel leaves out, or on a word that names a test key, a fake or a test build's setting, and `script/check_build.rb`, which shows the built app refusing the test build's proofs. `test/channel_contents_test.rb` loads each channel's stamped build without the files it leaves out.
+Every Package job for sale runs `script/channel_contents.rb check` on the package it built, which fails on a file its channel leaves out, on a word that names a test key, a fake, signing code or a test build's setting, or on a stamp (`build.rb`) that is not its channel's; and `script/check_build.rb`, which shows the built app refusing the test build's proofs, runs `check` itself, and fails if the app loads anything of the part. Each fails alone what both look for. `test/build_for_sale_test.rb` builds the game from each channel's stamped copy without the part, in a Ruby of its own, and from one that loads the part by mistake with every setting let through, and checks free games, themes, the date, pins and receipts. `test/channel_contents_test.rb` loads each channel's stamped build without the files it leaves out.
 
 ## More Information
 
