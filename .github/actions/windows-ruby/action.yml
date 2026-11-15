@@ -2,7 +2,8 @@
 # release keeps it), for a Windows job: the .7z at mise.toml's URL,
 # refused unless its SHA-256 is mise.toml's, unpacked, and first on the
 # PATH, with RUBY_DLL_PATH naming setup-ruby's MSYS2 UCRT64 bin folder for
-# the zlib1.dll the head build does not carry. It takes the place of
+# the zlib1.dll the head build does not carry, and MSYS2_PATH naming that
+# MSYS2, for building gems' native extensions. It takes the place of
 # setup-ruby's own Ruby, whose head is whatever RubyInstaller built last,
 # as Lota's own Windows jobs do (Lota's .github/actions/windows-ruby at
 # v0.5.2). Call it after ruby/setup-ruby with ruby-version head and
@@ -32,6 +33,13 @@ runs:
         [ ${#folders[@]} = 1 ] || { echo "::error::$url unpacks to ${#folders[@]} folders, not one"; exit 1; }
         cygpath -w "${folders[0]}bin" >> "$GITHUB_PATH"
         echo "RUBY_DLL_PATH=$RI_DEVKIT\\ucrt64\\bin" >> "$GITHUB_ENV"
+        # RubyInstaller's Ruby builds a gem's native extension with the
+        # MSYS2 it finds (RubyInstaller::Runtime.enable_msys_apps): the one
+        # MSYS2_PATH names, else one beside itself, which the unpacked Ruby
+        # has none of, else C:\msys64, the runner's own, without setup-ruby's
+        # toolchain. So MSYS2_PATH names setup-ruby's, as Lota's fuse
+        # workflow points the Ruby in Fledge's runtime there.
+        echo "MSYS2_PATH=$RI_DEVKIT" >> "$GITHUB_ENV"
     - name: Show the Ruby
       shell: bash
       run: |
