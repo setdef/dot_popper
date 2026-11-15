@@ -513,7 +513,7 @@ class ControllerTest < Minitest::Test
     when :settings then show.open_settings
     when :credits then show.open_settings.then { show.open_credits }
     when :privacy then show.open_settings.then { show.open_privacy }
-    when :offer then show.open_offer
+    when :offer then open_offer(show)
     when :groups then show.group_panel.open
     when :group then show.group_panel.open.then { show.group_panel.pad(:rb) }
     when :keypad then open_keypad

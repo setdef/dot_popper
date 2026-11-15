@@ -72,6 +72,15 @@ module PresentationTest
 
   def new_show(**) = PresentationTest.show(**)
 
+  # Opens the offer of Pro on +show+ as a Free player does: Get Pro in
+  # an achievement's dialog (Screens::AchievementDialog#get_pro), so it
+  # opens over Achievements, leading with achievements.
+  def open_offer(show = @show)
+    show.open_achievements
+    show.open_achievement(DotPopper::Achievement::IDS.first)
+    show.achievement_pro
+  end
+
   # Presses Play on Home, or Home on Game Over.
   def press_main(show = @show)
     reach = show.play_reach || show.home_reach

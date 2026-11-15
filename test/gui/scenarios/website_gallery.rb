@@ -24,8 +24,9 @@ module DotPopperGui
     def shots(width, height, gone)
       resize(width, height)
       name = "#{gone ? "gone-" : ""}#{width}x#{height}"
-      show.open_stats
-      show.open_offer
+      show.open_achievements
+      show.open_achievement(DotPopper::Achievement::IDS.first)
+      show.achievement_pro
       wait(0.5)
       keep_screenshot("website-offer-#{name}")
       ::Lota::System.clipboard_text = "not a key"

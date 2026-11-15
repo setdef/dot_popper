@@ -52,25 +52,18 @@ module DotPopper
           sounds.play(:tick, pitch: 1.3) if opened? && granted.by == :receipt
         end
 
-        # Opens over the screen in view, and asks the store for the price,
-        # or asks again if an earlier request was never answered.
-        def open_plainly
-          return unless offered?
-
-          show.open_layer(self)
-          @focus = nil
-          @buy_pro.open
-          sounds.play(:tick)
-        end
-
-        # Opened by Play or Play again with no game left: it leads with
-        # games, and says why.
+        # Opened by Play or Play again with no game left, where Pro is
+        # offered: over the screen in view, leading with games, and saying
+        # why. It asks the store for the price, or asks again if an earlier
+        # request was never answered.
         def open_for_play
           return unless offered?
 
           @for_play = true
-          open_plainly
+          show.open_layer(self)
           @focus = :games
+          @buy_pro.open
+          sounds.play(:tick)
         end
 
         # Back to the screen it was opened over, with a tick unless +quiet+.

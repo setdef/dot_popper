@@ -420,9 +420,6 @@ module DotPopper
       # The offer of Pro (Screens::Offer), open or not.
       def offer = @screens[:offer]
 
-      # Opens the offer over the screen in view (Screens::Offer#open_plainly).
-      def open_offer = offer.open_plainly
-
       # Where the offer's words and buttons go (OfferPlan), or nil while it
       # is closed.
       def offer_plan = (offer.plan if offer?)

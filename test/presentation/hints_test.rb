@@ -156,7 +156,7 @@ class HintsTest < Minitest::Test
     when :dialog then show.open_achievements.then { show.open_achievement(DotPopper::Achievement::IDS.first) }
     when :settings, :phone_settings then show.open_settings
     when :privacy then show.open_settings.then { show.open_privacy }
-    when :offer then show.open_offer
+    when :offer then open_offer(show)
     when :notice then show.group_panel.open.then { show.group_panel.pad(:x) }
     when :tutorial then show.how_to_play
     when :game_over, :share

@@ -440,7 +440,7 @@ class KeyboardTest < Minitest::Test
     when :settings then show.open_settings
     when :credits then show.open_settings.then { show.open_credits }
     when :server then show.open_settings.then { show.open_server }
-    when :offer then show.open_offer
+    when :offer then open_offer(show)
     when :keypad then open_keypad
     when :game then show.play
     when :game_over, :share then game_over(share: at == :share)

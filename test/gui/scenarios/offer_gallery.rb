@@ -17,8 +17,9 @@ module DotPopperGui
       show.input = P::InputKind::TOUCH
       SIZES.each { |width, height| shots(width, height) }
       resize(1200, 800)
-      show.open_stats
-      show.open_offer
+      show.open_themes
+      card = show.themes_layout.cards.last.rect
+      click(card.center_x, card.center_y)
       wait_for("the price", within: 600) { show.offer_price }
       buy = show.reach_of(:buy)
       click(buy.center_x, buy.center_y)
@@ -37,11 +38,6 @@ module DotPopperGui
       show.open_stats
       wait(1.0)
       keep_screenshot("offer-records-#{width}x#{height}")
-      show.open_offer
-      wait_for("the price", within: 600) { show.offer_price }
-      wait(1.0)
-      keep_screenshot("offer-#{width}x#{height}")
-      show.back
       from_a_tap(:themes, width, height)
       from_a_tap(:achievements, width, height)
       show.back

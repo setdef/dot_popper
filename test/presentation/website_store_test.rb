@@ -51,7 +51,7 @@ class WebsiteStoreTest < Minitest::Test
 
   def test_the_offer_has_buy_and_paste_license_key_and_no_restore
     s = show
-    s.open_offer
+    open_offer(s)
 
     assert_equal %i[back buy paste], names(s).sort
     assert_equal "Buy for $1.99", format(s.words.offer[:buy], s.offer_price)
@@ -64,7 +64,7 @@ class WebsiteStoreTest < Minitest::Test
   def test_no_press_that_means_continue_or_back_buys
     s = show
     [-> { s.primary }, -> { s.start }, -> { s.back }].each do |press|
-      s.open_offer
+      open_offer(s)
       press.call
 
       refute s.offer?
@@ -74,7 +74,7 @@ class WebsiteStoreTest < Minitest::Test
 
   def test_a_tap_or_a_click_on_buy_buys
     s = show
-    s.open_offer
+    open_offer(s)
     click(s, :buy)
 
     assert_equal s.words.offer[:copied], s.offer_status
@@ -83,7 +83,7 @@ class WebsiteStoreTest < Minitest::Test
   def test_a_controllers_y_buys_and_the_button_says_so
     s = show
     s.input = InputKind::GAMEPAD
-    s.open_offer
+    open_offer(s)
 
     assert_equal "Buy for $1.99 (Y)", s.buy_label
     s.pad(:y)
@@ -97,7 +97,7 @@ class WebsiteStoreTest < Minitest::Test
     press_key(:b, :ctrl, show: s)
 
     refute s.offer?, "Ctrl+B on Home opens nothing"
-    s.open_offer
+    open_offer(s)
     press_key(:b, :ctrl, show: s)
 
     assert_equal s.words.offer[:copied], s.offer_status
@@ -105,7 +105,7 @@ class WebsiteStoreTest < Minitest::Test
 
   def test_the_buy_label_names_the_keyboards_key_until_a_pointer_or_controller_is_used
     s = show
-    s.open_offer
+    open_offer(s)
     s.keyboard_used("Ctrl+B")
 
     assert_equal "Buy for $1.99 (Ctrl+B)", s.buy_label
@@ -123,14 +123,14 @@ class WebsiteStoreTest < Minitest::Test
 
   def test_the_buy_label_has_no_controller_button_for_a_finger_or_mouse
     s = show
-    s.open_offer
+    open_offer(s)
 
     assert_equal "Buy for $1.99", s.buy_label
   end
 
   def test_buy_then_paste_license_key_makes_the_player_pro
     s = show
-    s.open_offer
+    open_offer(s)
     click(s, :buy)
 
     assert_equal s.words.offer[:copied], s.offer_status
@@ -156,7 +156,7 @@ class WebsiteStoreTest < Minitest::Test
     cabinet = DotPopper::Cabinet.new(field(1200, 800), random: Random.new(2))
     s = new_show(cabinet:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, clipboard: @clipboard, entitlement: @entitlement,
                  storefront: @store, groups:, achievements:)
-    s.open_offer
+    open_offer(s)
     click(s, :buy)
     click(s, :paste)
 
@@ -171,7 +171,7 @@ class WebsiteStoreTest < Minitest::Test
     press_key(:v, :ctrl, show: s)
 
     refute @entitlement.pro?, "nothing to paste into on Home"
-    s.open_offer
+    open_offer(s)
     press_key(:v, :ctrl, show: s)
 
     assert @entitlement.pro?
@@ -179,12 +179,12 @@ class WebsiteStoreTest < Minitest::Test
 
   def test_a_keyboard_types_the_key_ignoring_case_spaces_and_hyphens
     s = show
-    s.open_offer
+    open_offer(s)
     text = C::LicenseKey.issue(C::TestKeys::LICENSE).text
     press_key(:enter, show: s)
 
     refute s.offer?, "Enter with nothing typed is the main button's, Back"
-    s.open_offer
+    open_offer(s)
     text.each_char do |c|
       next if c == " "
 
@@ -202,14 +202,14 @@ class WebsiteStoreTest < Minitest::Test
   def test_typing_does_nothing_on_other_screens
     s = show
     press_key(:a, show: s)
-    s.open_offer
+    open_offer(s)
 
     refute_includes s.offer_status, s.words.offer[:typing]
   end
 
   def test_paste_says_what_was_wrong_and_changes_nothing
     s = show
-    s.open_offer
+    open_offer(s)
     click(s, :paste)
 
     assert_equal s.words.offer[:empty], s.offer_status
@@ -227,7 +227,7 @@ class WebsiteStoreTest < Minitest::Test
   def test_while_setdef_is_gone_buy_goes_and_the_offer_says_pro_is_no_longer_sold
     @gone.heard(:gone, Date.new(2027, 1, 1))
     s = show
-    s.open_offer
+    open_offer(s)
 
     assert_equal %i[back paste], names(s).sort
     assert_equal s.words.offer[:not_sold], s.offer_status
@@ -241,7 +241,7 @@ class WebsiteStoreTest < Minitest::Test
   def test_a_stores_copy_never_shows_paste_license_key
     s = new_show(cabinet: DotPopper::Cabinet.new(field(1200, 800)), layout: layout(1200, 800), sounds: FakeSounds.new, radius: R,
                  storefront: Store.new(port: FakeStore.new(Memory.new), entitlement: DotPopper::Entitlement.free))
-    s.open_offer
+    open_offer(s)
 
     refute_includes names(s), :paste
     assert_includes names(s), :restore

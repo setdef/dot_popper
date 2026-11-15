@@ -259,7 +259,7 @@ class StoreTest < Minitest::Test
 
   def test_a_purchase_landing_while_the_offer_is_open_ticks
     show, = offer_show
-    show.open_offer
+    open_offer(show)
     answer("answer=1\nowned=1\nstate=ready\nreceipt=#{RECEIPT}\n", show)
 
     assert_predicate @entitlement, :pro?
