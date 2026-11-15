@@ -3,8 +3,9 @@
 # A stand-in for a computer's store helper (macos/store/main.swift,
 # windows/store/dot_popper_store.c), for the store contract: it takes one
 # dotpopper-store: URL, answers "loading" or "working" at once and the
-# outcome a moment later, each the whole state followed by an empty line,
-# on its standard output, and exits. What the store knows lives in
+# outcome once the test has read that one (it makes read-N in +folder+
+# for request N), each the whole state followed by an empty line, on its
+# standard output, and exits. What the store knows lives in
 # +folder+ (owned, and whether the price was asked), as a store's own
 # record would. Its receipts are the test build's, as the fake store's
 # are. Run as:
@@ -32,7 +33,16 @@ answer = lambda do |state|
 end
 
 answer.call(action == "open" ? "loading" : "working")
-sleep 0.02
+# The outcome waits for the test to have read the answer before it, so
+# however slow the machine, no read skips it. A test that never reads
+# leaves the stand-in waiting until its folder goes, or a minute.
+read_at = File.join(folder, "read-#{number}")
+deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 60
+until File.exist?(read_at)
+  exit unless Dir.exist?(folder) && Process.clock_gettime(Process::CLOCK_MONOTONIC) < deadline
+
+  sleep 0.005
+end
 
 outcome = if fails == "unavailable" then "unavailable"
           else

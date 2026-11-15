@@ -21,16 +21,25 @@ class StoreHelperContractTest < Minitest::Test
 
   # Reads as the game does, but gives the helper, a separate process, the
   # moment it needs to answer, so the contract's reads land on answers.
+  # Once a read has seen a request under way, it lets the stand-in give
+  # the outcome, as the native contract's host catches up as the game
+  # reads: so the order of the answers never rests on the machine's speed.
   class Polled < Data.define(:helper, :folder, :memo)
     def read
       last = memo[:text]
       deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 5
       loop do
         text = helper.read
-        return memo[:text] = text if text != last || !helper.busy? || Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
+        return release(memo[:text] = text) if text != last || !helper.busy? || Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
 
         sleep 0.005
       end
+    end
+
+    def release(text)
+      number = text.to_s[/^answer=(\d+)$/, 1]
+      FileUtils.touch(File.join(folder, "read-#{number}")) if number && StoreContract::UNDER_WAY.include?(text[/^state=(\w+)$/, 1])
+      text
     end
 
     def open(url) = helper.open(url)
