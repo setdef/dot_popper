@@ -36,7 +36,7 @@ Chosen: option 1. When first run it found two real faults, an integer radius tha
 
 ### Confirmation
 
-`bundle exec rake` runs `test` then `steep` (the `Rakefile`); the `Steepfile` sets `Ruby.strict` and makes `UnsupportedSyntax` an error. `bundle exec rake test` runs without Steep. No CI workflow runs Steep: the Package workflow's test job runs `bundle exec rake test` only, so the check is enforced by the `bundle exec rake` that `AGENTS.md` requires before every push.
+`bundle exec rake` runs `test` then `steep` (the `Rakefile`); the `Steepfile` sets `Ruby.strict` and makes `UnsupportedSyntax` an error. `bundle exec rake test` runs without Steep. The Steep workflow (`.github/workflows/steep.yml`) runs `bundle exec rake steep` on every push to `trunk` and every pull request, and the Package workflow's Test job runs `bundle exec rake`, the tests then Steep. `AGENTS.md` asks for Steep before a push that touches typed code.
 
 ## More Information
 

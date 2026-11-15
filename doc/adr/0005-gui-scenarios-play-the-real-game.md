@@ -37,7 +37,7 @@ Chosen: option 1, because it alone exercises the shell's real calls into Lota wh
 
 ### Confirmation
 
-`.github/workflows/gui.yml` runs `rake test:gui` under `xvfb-run` on every push and pull request; `test/gui/scenarios_test.rb` fails unless each scenario quits with 0 after printing its checks. `AGENTS.md` requires the GUI scenarios before a push that could affect them.
+`.github/workflows/gui.yml` runs `rake test:gui` under `xvfb-run` on every push and pull request; `test/gui/scenarios_test.rb` fails unless each scenario quits with 0 after printing its checks. `AGENTS.md` asks, before a push, for the one GUI scenario for a screen the change touches; the GUI workflow runs every scenario after the push.
 
 ## More Information
 
