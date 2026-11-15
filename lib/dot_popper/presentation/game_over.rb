@@ -10,8 +10,7 @@ module DotPopper
     # is the most impressive record the game set
     # (Stats::Record), or nil, and +goal_met+ whether it was the
     # first game to meet today's goal, which is celebrated once, also when
-    # the score has counted. +screen+ says what screen the game was
-    # played on, for the result to share (Words#played_on), or is nil.
+    # the score has counted.
     # +lesson+ is the mistake to teach the stacking rule from (Mistake,
     # from the Tutor), on the first Game Overs after a mistake with the
     # bright dot hidden beneath, or nil, and +replayed+ how many times it
@@ -22,9 +21,9 @@ module DotPopper
     # Pro hears of in a line after the score, never during the
     # game.
     class GameOver < Data.define(:style, :score, :score_record, :new_score_record, :at, :stats, :record, :goal_met, :ready_at,
-                               :celebrated, :goal_celebrated, :screen, :lesson, :replayed, :first, :achievements)
+                               :celebrated, :goal_celebrated, :lesson, :replayed, :first, :achievements)
       def initialize(style:, score:, score_record:, new_score_record:, at:, stats: GameStats.start, record: nil, goal_met: false,
-                     ready_at: nil, celebrated: false, goal_celebrated: false, screen: nil, lesson: nil, replayed: 0, first: false,
+                     ready_at: nil, celebrated: false, goal_celebrated: false, lesson: nil, replayed: 0, first: false,
                      achievements: [])
         super
       end

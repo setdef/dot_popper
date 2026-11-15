@@ -870,7 +870,7 @@ module DotPopper
         lesson = @tutor.lesson(@mistake) if @mistake&.among(event.dots)
         @game_over = GameOver.new(style: style::GAME_OVER, score: event.score, score_record: event.score_record, new_score_record: event.new_score_record, at: now,
                              stats:, record: result.record, goal_met: result.goal_met, lesson:, achievements: result.achievements,
-                             first: event.first, screen: words.played_on(event.field, standard: event.size_class == SizeClass::STANDARD))
+                             first: event.first)
         sounds.play(event.new_score_record ? :new_score_record : :game_over)
       end
 

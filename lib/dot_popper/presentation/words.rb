@@ -13,8 +13,7 @@ module DotPopper
     # screen's sections
     # and rows, by what they count. +goals+ say each kind of DailyGoal as
     # the end of "Today's goal: ...", with %d for its target. +screen_size+
-    # says how big a screen is, in dots, with %d for its width and height,
-    # and names the choices of dot size (DotSizing) by what they do here.
+    # names the choices of dot size (DotSizing) by what they do here.
     class Words < Data.define(:game_name, :play, :play_again, :time_up, :new_score_record, :score_record, :score, :time,
                               :share, :share_heading, :copied, :copy, :close, :stats, :how_to_play, :go_back,
                               :no_games, :clear, :keep_holding, :hold_to_clear, :cleared, :undo, :labels, :goals, :goal_done, :goal_met,
@@ -155,27 +154,17 @@ module DotPopper
 
       # What "Share my score" offers to share, and its Copy puts on the
       # clipboard: the score, whether it set or tied the player's +score_record+,
-      # the +record+ it set, if any, what the game was made of,
-      # and the +screen+ it was played on (#played_on), since a score
-      # depends on that.
+      # the +record+ it set, if any, and what the game was made of. It
+      # names no dot size: whoever reads it did not play on that screen.
       #
       #   Dot Popper: 25 points, a new record!
       #   New record: 18 dots in a row without a mistake
       #   🟡 27 dots · ⚫ 1 mistake · ⏱ 38 seconds
-      #   Played on a screen about 12 dots wide and 8 dots tall.
-      def share_text(score, stats, score_record:, new_score_record:, record: nil, screen: nil, first: false)
+      def share_text(score, stats, score_record:, new_score_record:, record: nil, first: false)
         ["Dot Popper: #{Words.count(score, "point")}#{score_record_note(score, score_record, new_score_record) unless first}",
          (self.record(record) if record),
          "🟡 #{Words.count(stats.dots_popped, "dot")} · ⚫ #{Words.count(stats.mistakes, "mistake")} · " \
-         "⏱ #{Words.count(stats.duration.round, "second")}",
-         screen].compact.join("\n")
-      end
-
-      # The shared result's last line: "Played on a screen about 12 dots
-      # wide and 8 dots tall.", or, with +standard+ dots, "Played with
-      # standard dots."
-      def played_on(field, standard: false)
-        standard ? screen_size.fetch(:standard_played) : format(screen_size.fetch(:played), *Words.dots_across(field))
+         "⏱ #{Words.count(stats.duration.round, "second")}"].compact.join("\n")
       end
 
       # The name of one choice of dot size, on its segment of Settings'
@@ -195,13 +184,6 @@ module DotPopper
       # dot size where Settings does (Show#stats_note), so this one need
       # not, and it fits across the narrowest card.
       def chart_note = labels.fetch(:chart_note)
-
-      # How many dots fit across +field+ and down it, side by side, to the
-      # nearest whole dot, and never none.
-      def self.dots_across(field)
-        across = 2 * field.radius
-        [field.width, field.height].map { [(it / across).round, 1].max }
-      end
 
       # Seconds to one decimal place: "0.4".
       def self.tenths(seconds) = format("%.1f", seconds)

@@ -30,7 +30,6 @@ A game starts with 10 seconds on the clock. Each dot you pop gives you a point a
   ```text
   Dot Popper: 24 points
   🟡 26 dots · ⚫ 1 mistake · ⏱ 34 seconds
-  Played with standard dots.
   ```
 
 - **Mouse, keyboard, or controller.** Play with whichever is in your hand. The buttons follow what you last pressed: Play becomes "Play (A)" when you pick up a controller, and the tutorial shows each tap with your own pointer, finger, or controller.

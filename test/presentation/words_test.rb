@@ -50,17 +50,14 @@ class WordsTest < Minitest::Test
                  Style::WORDS.share_text(25, stats, score_record: 25, new_score_record: true, record:)
   end
 
-  # A score depends on how crowded the screen gets, so the shared result
-  # says how big the screen was, counted in dots side by side.
-  def test_the_shared_result_can_say_the_screen_it_was_played_on
+  # The shared result ends with what the game was made of, and says
+  # nothing of the dot size or the screen: whoever reads it did not play
+  # on them.
+  def test_the_shared_result_says_nothing_of_the_dot_size
     stats = DotPopper::GameStats.start.with(dots_popped: 27, mistakes: 1, duration: 38.2)
-    screen = Style::WORDS.played_on(DotPopper::Field.new(1200, 800, 50))
 
-    assert_equal "Played on a screen about 12 dots wide and 8 dots tall.", screen
-    assert_equal "Played with standard dots.", Style::WORDS.played_on(DotPopper::Field.new(1200, 800, 50), standard: true)
-    assert_equal "Dot Popper: 25 points\n🟡 27 dots · ⚫ 1 mistake · ⏱ 38 seconds\n#{screen}",
-                 Style::WORDS.share_text(25, stats, score_record: 30, new_score_record: false, screen:)
-    assert_equal [1, 1], Words.dots_across(DotPopper::Field.new(40, 20, 50)), "never no dots at all"
+    assert_equal "Dot Popper: 25 points\n🟡 27 dots · ⚫ 1 mistake · ⏱ 38 seconds",
+                 Style::WORDS.share_text(25, stats, score_record: 30, new_score_record: false)
   end
 
   def test_each_record_reads_as_a_sentence

@@ -71,15 +71,14 @@ class ScreenPlansTest < Minitest::Test
   def test_the_share_preview_never_overlaps_or_runs_off_screen
     stats = DotPopper::GameStats.start.with(dots_popped: 128, mistakes: 11, duration: 141.0)
     record = DotPopper::Stats::Record.new(kind: :longest_time_to_pop, value: 12.3)
-    screen = format(WORDS.screen_size.fetch(:played), 38, 21)
     SIZES.each do |width, height|
       screen_layout = layout(width, height)
-      [InputKind::MOUSE, InputKind::GAMEPAD].product([nil, record], [nil, screen]) do |input, held, played|
+      [InputKind::MOUSE, InputKind::GAMEPAD].product([nil, record]) do |input, held|
         words = WORDS.for(input)
-        text = words.share_text(128, stats, score_record: 128, new_score_record: true, record: held, screen: played)
+        text = words.share_text(128, stats, score_record: 128, new_score_record: true, record: held)
         plan = ShareScreen.new(layout: screen_layout, type: Style::TYPE, words:, measure: RoughMeasure.new,
                                style: Style::SHARE_PREVIEW, lines: text.split("\n")).plan
-        name = "#{width}x#{height} #{input.name}, record #{!held.nil?}, screen #{!played.nil?}"
+        name = "#{width}x#{height} #{input.name}, record #{!held.nil?}"
 
         assert plan.placed.fits?, name
         %i[message note buttons].each { assert plan[it], "#{name}: #{it} always shows" }

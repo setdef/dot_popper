@@ -131,8 +131,7 @@ class ShowTest < Minitest::Test
                  new_show(cabinet: @cabinet, layout:, sounds: @sounds, radius: R, input: InputKind::TOUCH).words.play_again
   end
 
-  RESULT = "Dot Popper: 1 point\n🟡 1 dot · ⚫ 0 mistakes · ⏱ 11 seconds\n" \
-           "Played on a screen about 8 dots wide and 6 dots tall."
+  RESULT = "Dot Popper: 1 point\n🟡 1 dot · ⚫ 0 mistakes · ⏱ 11 seconds"
 
   # "Share my score" only shows the result: the clipboard changes only
   # when the player presses Copy, and then to exactly what was shown.
@@ -432,19 +431,22 @@ class ShowTest < Minitest::Test
                   ["Stats for bigger dots", "Stats for smaller dots", nil]], notes
   end
 
-  # The shared result's last line says "Played with standard dots." for a
-  # Standard game, and how big the screen was for the other size.
-  def test_the_shared_result_ends_with_the_games_dot_size_or_its_screen
+  # The shared result names no dot size and no screen, for a game of
+  # either size: it ends with what the game was made of.
+  def test_the_shared_result_says_nothing_of_either_dot_size
     lines = [DotPopper::DotSizing::STANDARD, DotPopper::DotSizing::BIGGER_OR_SMALLER].map do |sizing|
       @cabinet.sizing = sizing
       finish_game(back_home: false)
-      line = @show.game_over.screen
       @cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
+      @show.update(0.1)
+      @show.tap(*middle(@show.share_reach))
+      line = @show.share_preview.lines.last
+      @show.back
       press_main
       line
     end
 
-    assert_equal ["Played with standard dots.", "Played on a screen about 8 dots wide and 6 dots tall."], lines
+    assert(lines.all? { it.start_with?("🟡 ") }, lines.inspect)
   end
 
   def test_your_stats_opens_over_home_and_back_goes_back

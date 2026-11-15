@@ -126,8 +126,6 @@ module DotPopper
         }.freeze,
         goal_done: "Done today:", goal_met: "You met today's goal!",
         screen_size: {
-          played: "Played on a screen about %d dots wide and %d dots tall.",
-          standard_played: "Played with standard dots.",
           choice: "Dot size", standard: "Standard", smaller: "Smaller", bigger: "Bigger",
           alike: "About the same"
         }.freeze,

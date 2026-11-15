@@ -138,7 +138,7 @@ module DotPopper
         def share_text
           over = show.game_over
           words.share_text(over.score, over.stats, score_record: over.score_record, new_score_record: over.new_score_record?,
-                           record: over.record, screen: over.screen, first: over.first)
+                           record: over.record, first: over.first)
         end
       end
     end
