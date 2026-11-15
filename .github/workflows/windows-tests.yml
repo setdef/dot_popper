@@ -51,10 +51,15 @@ jobs:
 
       # The default toolchain (MSYS2's UCRT64 GCC), since a few gems in
       # the bundle build native extensions; the store helper's test
-      # builds with the same GCC.
+      # builds with the same GCC. Its MSYS2 also has the zlib1.dll the
+      # pinned Windows Ruby does not carry. Then that Ruby, first on the
+      # PATH (mise.toml), and the bundle installed with it.
       - uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
         with:
-          ruby-version: .ruby-version
-          bundler-cache: true
+          ruby-version: head
+          windows-toolchain: default
+          bundler: none
+      - uses: ./.github/actions/windows-ruby
+      - run: bundle install
 
       - run: bundle exec rake test

@@ -1,6 +1,6 @@
 # Builds Dot Popper's playtest kits (PACKAGING.md, "Playtest kits"): one
 # kit in, one results file out, per device. Each desktop kit holds the app
-# `lota fuse` builds with Lota 0.3.1's release gem (.github/actions/fuse),
+# `lota fuse` builds with Lota 0.5.2's release gem (.github/actions/fuse),
 # on its own platform's runner, as the Package workflow builds the apps:
 #
 # - Windows x64: the game, playtest.ps1, which asks the hand checks one at
@@ -14,8 +14,8 @@
 #   which works as playtest.ps1 does, and a README, tested as the Windows
 #   kit is, under Xvfb with Mesa.
 # - iPad and iPhone (experimental): the Xcode project `fledge build ios`
-#   writes, with Lota 0.3.1's experimental iOS engine built from a clone
-#   of Lota at its v0.3.1 tag and Lota's iOS host, by the route of Lota's
+#   writes, with Lota 0.5.2's experimental iOS engine built from a clone
+#   of Lota at its v0.5.2 tag and Lota's iOS host, by the route of Lota's
 #   doc/guide/phones.md, and ios-results.txt to fill in. A second, fresh runner builds that
 #   project for the Simulator and, unsigned, for devices, and runs the
 #   autoplay check of doc/ios.md.
@@ -42,9 +42,9 @@ defaults:
     shell: bash
 
 env:
-  LOTA_VERSION: "0.3.1"
+  LOTA_VERSION: "0.5.2"
   # Only the iOS build names Fledge itself; lota fuse pins its own.
-  FLEDGE_TAG: v0.10.0
+  FLEDGE_TAG: v0.12.0
   IDENTIFIER: com.setdef.DotPopper
   BUNDLE_FROZEN: "true"
 
@@ -58,10 +58,14 @@ jobs:
         with:
           persist-credentials: false
 
+      # setup-ruby's MSYS2, for the zlib1.dll the pinned Windows Ruby does
+      # not carry, and then that Ruby, first on the PATH (mise.toml).
       - uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
         with:
-          ruby-version: .ruby-version
-          windows-toolchain: none
+          ruby-version: head
+          windows-toolchain: default
+          bundler: none
+      - uses: ./.github/actions/windows-ruby
 
       # The fuse action takes the app's version from fledge.yml; a tag's
       # build takes the tag's (playtest/kit.rb's BuildVersion), so the

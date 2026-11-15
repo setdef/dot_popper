@@ -50,12 +50,12 @@ The game finds the server through `Network::Server`: every build uses `SERVER_UR
 
 | You develop on | Lota's gem in `vendor/cache` |
 | --- | --- |
-| macOS 14 or newer on Apple silicon | `lota-0.3.1-arm64-darwin.gem` |
-| Windows on x64, with [RubyInstaller](https://rubyinstaller.org/)'s Ruby | `lota-0.3.1-x64-mingw-ucrt.gem` |
-| Linux on x86_64 with glibc, and an X11 or Wayland desktop with OpenGL | `lota-0.3.1-x86_64-linux-gnu.gem` |
+| macOS 14 or newer on Apple silicon | `lota-0.5.2-arm64-darwin.gem` |
+| Windows on x64, with [RubyInstaller](https://rubyinstaller.org/)'s head build that `mise.toml` pins | `lota-0.5.2-x64-mingw-ucrt.gem` |
+| Linux on x86_64 with glibc, and an X11 or Wayland desktop with OpenGL | `lota-0.5.2-x86_64-linux-gnu.gem` |
 
-- Dot Popper needs Ruby 4.0.9, which `.ruby-version` and `mise.toml` name.
-- Bundler installs Lota 0.3.1 from `vendor/cache`, and [Fledge](https://github.com/setdef/Fledge) v0.10.0 from its Git tag. Fledge is in the `development` group, so it stays out of the app.
+- Dot Popper needs Ruby 4.1, which Lota 0.5 needs and which is not released yet: on macOS and Linux the preview `.ruby-version` and `mise.toml` name, 4.1.0-preview1, and on Windows, where RubyInstaller publishes no preview, RubyInstaller's head build of 2026-11-10 that `mise.toml` pins (Lota's Windows gems are built on it). The Gemfile refuses any other Ruby.
+- Bundler installs Lota 0.5.2 from `vendor/cache`, and [Fledge](https://github.com/setdef/Fledge) v0.12.0 from its Git tag. Fledge is in the `development` group, so it stays out of the app.
 - Other systems, such as Intel Macs, Linux on ARM, and Linux with musl, have no Lota gem in `vendor/cache`.
 
 ## Getting started
@@ -70,7 +70,7 @@ $ bundle install
 $ bundle exec lota run
 ```
 
-`mise install` installs Ruby 4.0.9. Any Ruby version manager that reads `.ruby-version` works as well. `bundle exec lota run` opens the game in a window and prints what it found, such as:
+`mise install` installs Ruby 4.1.0-preview1, or on Windows the head build. Any Ruby version manager that reads `.ruby-version` works as well on macOS and Linux. On Windows, run it from an MSYS2 UCRT64 shell (RubyInstaller's devkit has one): the head build carries no `zlib1.dll`, and `mise.toml` points `RUBY_DLL_PATH` at that MSYS2's UCRT64 `bin` folder, which has one. Without mise, set `RUBY_DLL_PATH` to such a folder yourself before `bundle install`. `bundle exec lota run` opens the game in a window and prints what it found, such as:
 
 ```text
 Dot Popper: a dot's radius is 50 logical pixels
@@ -132,7 +132,7 @@ No type error detected. 🫖
 `lota fuse` builds the app for the computer it runs on. It runs Lota's gem from outside the bundle, so install that gem into your Ruby first, from `vendor/cache`:
 
 ```console
-$ gem install --local vendor/cache/lota-0.3.1-arm64-darwin.gem
+$ gem install --local vendor/cache/lota-0.5.2-arm64-darwin.gem
 $ lota fuse . --identifier com.setdef.DotPopper --app-version 0.9.9 --icon icons/icon
 dist/Dot Popper-arm64-darwin.tar.gz
 dist/Dot Popper-arm64-darwin.dmg

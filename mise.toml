@@ -1,2 +1,27 @@
+# The Ruby Dot Popper runs on. Lota 0.5 needs Ruby 4.1, which is not
+# released yet, so on Linux and macOS it is the preview .ruby-version also
+# names.
+#
+# RubyInstaller publishes no 4.1 preview for Windows, so mise has no
+# Windows Ruby to install for that version. There the Ruby is
+# RubyInstaller's head build of 2026-11-10 (ruby 4.1.0dev, ruby_version
+# 4.1.0+6), the copy Fledge's release inputs-rubyinstaller-head-20261110
+# keeps, on which Lota 0.5.2's Windows gems are built and which Fledge
+# v0.12.0's Windows runtime is made from: Lota's README at v0.5.2 says to
+# use that build, and its .github/windows_ruby.env names this URL and
+# SHA-256. Another day's head build need not load Lota's gem. The Gemfile
+# refuses any other Windows Ruby, and .github/actions/windows-ruby gives
+# CI's Windows jobs the same file, checked the same way.
+#
+# The head build carries no zlib1.dll, which its zlib extension loads, and
+# RubyInstaller's Ruby looks for DLLs it does not carry only in the folders
+# RUBY_DLL_PATH names. So on Windows, run from an MSYS2 UCRT64 shell (such
+# as RubyInstaller's devkit gives, or Git for Windows' bash with MSYS2's
+# UCRT64 on the PATH), RUBY_DLL_PATH names that MSYS2's UCRT64 bin folder,
+# as Lota's own .github/windows_prepush.sh sets it.
 [tools]
-ruby = "4.0.9"
+ruby = { version = "4.1.0-preview1", os = ["linux", "macos"] }
+"http:rubyinstaller-head" = { version = "4.1.0-6-20261110", url = "https://github.com/setdef/Fledge/releases/download/inputs-rubyinstaller-head-20261110/rubyinstaller-head-x64.7z", checksum = "sha256:901473edafd6b174d79978fc109d3df3ab73b1436719233f35c1a31b5b18bf58", strip_components = 1, bin_path = "bin", os = ["windows"] }
+
+[env]
+RUBY_DLL_PATH = "{% if os() == 'windows' %}{{ exec(command='cygpath -w /ucrt64/bin') }}{% endif %}"

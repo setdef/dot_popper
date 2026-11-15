@@ -1,0 +1,37 @@
+# The Windows Ruby mise.toml pins (RubyInstaller's head build as Fledge's
+# release keeps it), for a Windows job: the .7z at mise.toml's URL,
+# refused unless its SHA-256 is mise.toml's, unpacked, and first on the
+# PATH, with RUBY_DLL_PATH naming setup-ruby's MSYS2 UCRT64 bin folder for
+# the zlib1.dll the head build does not carry. It takes the place of
+# setup-ruby's own Ruby, whose head is whatever RubyInstaller built last,
+# as Lota's own Windows jobs do (Lota's .github/actions/windows-ruby at
+# v0.5.2). Call it after ruby/setup-ruby with ruby-version head and
+# windows-toolchain default, which installs that MSYS2.
+name: Set up the pinned Windows Ruby
+description: The Windows Ruby mise.toml pins, checked by its SHA-256, first on the PATH
+runs:
+  using: composite
+  steps:
+    - name: Fetch, check, and unpack the pinned Ruby
+      shell: bash
+      run: |
+        line=$(grep '^"http:rubyinstaller-head"' mise.toml)
+        url=$(sed -n 's/.* url = "\([^"]*\)".*/\1/p' <<< "$line")
+        sha256=$(sed -n 's/.* checksum = "sha256:\([0-9a-f]*\)".*/\1/p' <<< "$line")
+        [ -n "$url" ] && [ ${#sha256} = 64 ] || { echo "::error::mise.toml pins no Windows Ruby"; exit 1; }
+        work=$RUNNER_TEMP/windows-ruby
+        mkdir -p "$work"
+        curl --fail --location --silent --show-error --retry 3 -o "$work/ruby.7z" "$url"
+        actual=$(sha256sum "$work/ruby.7z" | cut -d' ' -f1)
+        echo "pinned: $sha256"; echo "fetched: $actual"
+        [ "$actual" = "$sha256" ]
+        "/c/Program Files/7-Zip/7z.exe" x -y -o"$(cygpath -w "$work/unpacked")" "$(cygpath -w "$work/ruby.7z")" > /dev/null
+        folders=("$work"/unpacked/*/)
+        [ ${#folders[@]} = 1 ] || { echo "::error::$url unpacks to ${#folders[@]} folders, not one"; exit 1; }
+        cygpath -w "${folders[0]}bin" >> "$GITHUB_PATH"
+        echo "RUBY_DLL_PATH=$RI_DEVKIT\\ucrt64\\bin" >> "$GITHUB_ENV"
+    - name: Show the Ruby
+      shell: bash
+      run: |
+        ruby -v
+        ruby -rzlib -e 'puts RbConfig::CONFIG["ruby_version"], Zlib::ZLIB_VERSION'
