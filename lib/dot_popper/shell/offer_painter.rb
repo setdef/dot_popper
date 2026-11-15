@@ -8,7 +8,7 @@ module DotPopper
     # the rest of what Pro adds, each after its sign, the price from the
     # store on Buy, and Restore Purchases; or, once it is the player's,
     # thanks. Calm: no motion, no countdown, and Back always there.
-    # Presentation::OfferScreen decides where each goes; this only draws,
+    # Presentation::OfferLayout decides where each goes; this only draws,
     # on whole device pixels.
     class OfferPainter < Data.define(:pen, :dots)
       G = ::Lota::Graphics
@@ -104,7 +104,7 @@ module DotPopper
       def items(plan, list)
         rect = plan[:items] or return
         font = pen.fonts.semibold(plan.size(:item))
-        line = font.height * Presentation::OfferScreen::LINE
+        line = font.height * Presentation::OfferLayout::LINE
         list.each_with_index do |item, i|
           y = pen.pixels.snap(rect.y + (font.height / 2.0) + (i * line))
           sign = font.height * 1.1

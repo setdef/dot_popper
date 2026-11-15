@@ -3,7 +3,7 @@
 module DotPopper
   module Presentation
     # Where the offer of Pro puts its parts, worked out by
-    # OfferScreen#plan: each block's Rect by name (Stacked), the font size
+    # OfferLayout#plan: each block's Rect by name (Stacked), the font size
     # each is set in, and the note broken into lines.
     class OfferPlan < Data.define(:placed, :sizes, :note_lines)
       def [](name) = placed[name]
@@ -24,7 +24,7 @@ module DotPopper
     # it has nothing left to press here but Back. Buy is there while Pro is
     # +sold+; the second button, +second+, is Restore Purchases on a
     # store's copy and Paste license key (:paste) on a website copy.
-    class OfferScreen < Data.define(:layout, :type, :words, :measure, :offering, :note, :focus, :art, :sold, :second)
+    class OfferLayout < Data.define(:layout, :type, :words, :measure, :offering, :note, :focus, :art, :sold, :second)
       GAPS = { note: 0, art: 14, focus: 10, items: 12, status: 10, buy: 12, restore: 10 }.freeze
       LINE = 1.45 # the items apart, in a line's height
       WIDE = 560.0 # the widest the buttons are
@@ -110,5 +110,7 @@ module DotPopper
         { focus: size[type.new_score_record], item: size[type.hint], note: size[type.summary] }
       end
     end
+
+    OfferScreen = OfferLayout # the old name, until no one uses it
   end
 end

@@ -424,7 +424,7 @@ module DotPopper
       # is closed.
       def offer_plan = (offer.plan if offer?)
 
-      # The offer's words and parts to lay out (OfferScreen).
+      # The offer's words and parts to lay out (OfferLayout).
       def offer_screen = offer.layout_screen
 
 

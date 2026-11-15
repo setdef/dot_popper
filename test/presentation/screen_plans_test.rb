@@ -184,7 +184,7 @@ class ScreenPlansTest < Minitest::Test
       screen_layout = layout(width, height)
       [[:games, "No games left today."], [:themes, nil], [:achievements, nil], [:groups, nil]].each do |focus, note|
         art = { themes: 100.0, achievements: 110.0 }.fetch(focus, 56.0)
-        plan = OfferScreen.new(layout: screen_layout, type: Style::TYPE, words: WORDS, measure: RoughMeasure.new, offering: true, note:, focus:,
+        plan = OfferLayout.new(layout: screen_layout, type: Style::TYPE, words: WORDS, measure: RoughMeasure.new, offering: true, note:, focus:,
                                art:).plan
         name = "#{width}x#{height} #{focus}"
         %i[focus buy restore].each { assert plan[it], "#{name}: #{it} shows" }

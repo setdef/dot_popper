@@ -3,7 +3,7 @@
 module DotPopper
   module Presentation
     module Screens
-      # The offer of Pro, over the screen it was opened from (OfferScreen):
+      # The offer of Pro, over the screen it was opened from (OfferLayout):
       # Buy, Restore Purchases or Paste license key, and Back. It asks
       # everything of +buy_pro+ (UseCases::BuyPro): it sells through it,
       # shows what it says of the store, and thanks the player once it says
@@ -76,9 +76,9 @@ module DotPopper
         # keyboard was used again: Buy names no key until #key_hint says.
         def input_used(_kind) = @key_hint = nil
 
-        # The words and parts to lay out (OfferScreen), and where they go.
+        # The words and parts to lay out (OfferLayout), and where they go.
         def layout_screen
-          OfferScreen.new(layout:, type: style::TYPE, words:, measure:, offering: !thanking?,
+          OfferLayout.new(layout:, type: style::TYPE, words:, measure:, offering: !thanking?,
                           note: (words.offer[:no_games] if for_play), focus:, art:,
                           sold: @buy_pro.sold?, second: keys? ? :paste : :restore)
         end
