@@ -40,6 +40,14 @@ class ThemeRulesTest < Minitest::Test
     assert_equal %i[classic ghost awake], themes.choices, "still there, after a restart, offline"
   end
 
+  def test_a_release_that_leaves_out_one_already_saved_keeps_it
+    t = themes
+    t.release(%w[ghost])
+    assert t.release(%w[santa]), "Santa is new"
+    assert_equal %i[classic ghost santa], t.choices
+    assert_equal %i[classic ghost santa], themes.choices, "both saved"
+  end
+
   def test_keys_the_game_does_not_know_and_the_ordinary_theme_are_ignored
     refute themes.release(%w[zombie classic])
     assert_equal [:classic], themes.choices

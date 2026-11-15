@@ -67,6 +67,34 @@ class ThemesTest < Minitest::Test
     assert_nil @show.arrival, "told once"
   end
 
+  # The theme in use changes only between games: Pro that arrives while a
+  # game plays leaves the ordinary theme on to the game's end, and the
+  # theme the player chose is put on at Home.
+  def test_pro_that_arrives_in_a_game_puts_on_the_chosen_theme_only_at_home
+    pro = false
+    entitlement = DotPopper::Entitlement.free
+    entitlement.define_singleton_method(:pro?) { pro }
+    @themes = DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new)
+    @themes.release(["ghost"])
+    @themes.told(:ghost)
+    @themes.use(:ghost)
+    @cabinet = DotPopper::Cabinet.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new))
+    @show = new_show(cabinet: @cabinet, layout: layout, sounds: @sounds, radius: R, entitlement:, themes: @themes,
+                     use_theme: DotPopper::UseCases::UseTheme.new(themes: @themes, entitlement:))
+    settle
+    press_main
+    @show.skip_tutorial
+    pro = true
+    @cabinet.update(20)
+
+    assert_predicate @show.in_use, :ordinary?, "not in the game it arrived in, nor at its Game Over"
+    @cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
+    press_main
+
+    assert_predicate @show, :on_home?
+    assert_equal :ghost, @show.in_use.key
+  end
+
   def test_not_now_keeps_the_ordinary_theme_and_does_not_ask_again
     show(pro: true, unlocked: ["ghost"])
     later = @show.screens.fetch(:new_theme).plan.later_button

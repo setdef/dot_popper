@@ -274,7 +274,7 @@ class RootTest < Minitest::Test
     BUILDS.compact.each { assert_instance_of C::NoWatch, root(channel: it, env: SETTINGS).watch, it }
   end
 
-  # The root subscribes the theme keeper and the chosen server to what the
+  # The root subscribes the themes and the chosen server to what the
   # watch hears of setdef (Continuity::Gone): gone long enough, themes open
   # by their dates; back again, a server chosen meanwhile is forgotten.
   def test_what_the_watch_hears_of_setdef_reaches_the_themes_and_the_chosen_server
@@ -294,6 +294,16 @@ class RootTest < Minitest::Test
 
     assert_equal "http://localhost:1", game.server_url, "setdef's own again"
     assert_empty engine.file("server.txt").read.to_s
+  end
+
+  # A device that has found setdef gone long enough opens the themes whose
+  # dates have come as the game starts, before the watch's first check.
+  def test_a_game_started_with_setdef_gone_long_enough_opens_the_themes_by_their_dates
+    engine = FakeEngine.new("Linux")
+    engine.file("setdef.txt").write("2030-01-01\n")
+    game = root(engine:, env: SETTINGS.merge("DOT_POPPER_TODAY" => "2030-12-01"))
+
+    assert_includes game.show.themes.map(&:key), :ghost, "opened at launch, with no check yet"
   end
 
   # The cabinet's Starter is UseCases::StartGame's, which the root makes,
@@ -453,6 +463,8 @@ class RootTest < Minitest::Test
     game.watch.define_singleton_method(:start) { asked << :watch }
     game.storefront.define_singleton_method(:connect) { asked << :store }
     game.start
+
+    assert_equal %i[themes store watch], asked, "each asked once as the game starts"
     asked.clear
     now += DotPopper::Refresh::FLOOR
     game.refresh.came_back
