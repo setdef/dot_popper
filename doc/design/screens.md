@@ -15,7 +15,7 @@ Where the parts go is worked out without Lota in `lib/dot_popper/presentation/` 
 | setdef splash | launch | (ends by itself, or on any press) | `Presentation::Splash`, `Shell::SplashPainter` |
 | Home | after the splash; Back from every screen over it; Game Over's Home | (Escape twice quits on a computer; Android's Back leaves the app) | `HomeLayout`, `Shell::HomePainter` |
 | Stats | Home's Stats button | Home | `StatsLayout`, `Shell::StatsPainter` |
-| Achievements | Home's Achievements button; Game Over's new-achievement line | Home | `AchievementsScreen`, `Shell::AchievementsPainter` |
+| Achievements | Home's Achievements button; Game Over's new-achievement line | Home | `AchievementsLayout`, `Shell::AchievementsPainter` |
 | an achievement's dialog | a cell of Achievements | Achievements | `AchievementDialog` |
 | Themes | Home's Themes button | Home | [look-and-sound.md](look-and-sound.md) |
 | Friend groups | Home's Friend groups button; Game Over's title line | Home | [friend-groups.md](friend-groups.md) |
@@ -188,7 +188,7 @@ Stats opens from Home's Stats button. Under its heading, and the dot-size note w
 
 ## Achievements
 
-A grid of icons, each the achievement's sign in a circle and its name under it (`AchievementsScreen`). The radius is 56, 44 on a safe area under 600 wide, 36 on a short window; as many columns as fit at three radii each, at least two, with a short last row centered, scrolling where it is taller than the page. An earned achievement is a gold disc with a cream rim; one not yet earned sits in a dashed ring (`AchievementsPainter#emblem`). For Pro the heading has the count earned under it. With a controller, "How to earn (X)" stands in the bottom right corner and X opens the first.
+A grid of icons, each the achievement's sign in a circle and its name under it (`AchievementsLayout`). The radius is 56, 44 on a safe area under 600 wide, 36 on a short window; as many columns as fit at three radii each, at least two, with a short last row centered, scrolling where it is taller than the page. An earned achievement is a gold disc with a cream rim; one not yet earned sits in a dashed ring (`AchievementsPainter#emblem`). For Pro the heading has the count earned under it. With a controller, "How to earn (X)" stands in the bottom right corner and X opens the first.
 
 A tap opens a dialog over the grid (`AchievementDialog`): the sign, the name, how to earn it, and for Pro either the day it was earned or "Not earned yet", with a progress bar ("Your record", "19 of 20") for the four the game measures (Steady hand, Unshaken, Big score, Long haul; `Show#achievement_progress`). Recognition over recall (Johnson). The card is at most 520 across. Its buttons are Close, and for a Free player a filled "Get Pro" before it; with a controller, LB and RB step to the previous and next achievement. A tap beside the card, Escape or B closes it. What each achievement is and how it is earned is in [progress.md](progress.md).
 

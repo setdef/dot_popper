@@ -3,13 +3,13 @@
 module DotPopper
   module Presentation
     module Screens
-      # Achievements, over Home (AchievementsScreen): a grid of cells that
+      # Achievements, over Home (AchievementsLayout): a grid of cells that
       # scrolls, each opening its achievement's dialog, and Back.
       class Achievements < Page
         include Scrolling
 
-        # Where the grid goes (AchievementsScreen).
-        def grid = AchievementsScreen.new(layout:, ids: DotPopper::Achievement::IDS)
+        # Where the grid goes (AchievementsLayout).
+        def grid = AchievementsLayout.new(layout:, ids: DotPopper::Achievement::IDS)
 
         # Each cell where it is on screen, with the list scrolled to fit its
         # window.
