@@ -15,7 +15,7 @@ These rules lived in the `Show`, the presentation's object that ties the screens
 ## Decision Drivers
 
 * The rules of play never know that Pro exists: `AGENTS.md` says "Pro never changes how the game plays or scores".
-* Every way into a game spends exactly one free game ([ADR-0012](0012-free-games-20-then-3-a-day.md), [the tutorial](../design/tutorial.md#what-spends-a-free-game)), and nothing else may start one.
+* Every way into a game spends exactly one free game ([free games](../design/store-and-pro.md#free-games), [the tutorial](../design/tutorial.md#what-spends-a-free-game)), and nothing else may start one.
 * Rules are tested without a window (`AGENTS.md`), and the typed core stays typed ([development](../design/development.md#steep-in-strict-mode)).
 * The presentation holds no rule and builds nothing of the game: the composition root puts the game together, and a screen carries out an answer it is given (Clean Architecture, as ADR-0019 adopts it).
 * What a player sees, hears, scores or pays does not change.

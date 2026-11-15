@@ -4,7 +4,7 @@
 -->
 # The store and Pro
 
-How Dot Popper sells Pro and decides who has it: Free and Pro, the build's channel, the store port and its adapters, receipts, license keys, free games, the offer, and what happens if setdef is gone. For anyone working on purchases, the store hosts and helpers, or the release checks. The reasons are in [ADR-0008](../adr/0008-native-features-live-outside-the-ruby-process.md), [ADR-0010](../adr/0010-pro-comes-only-from-proof.md), [ADR-0011](../adr/0011-pro-outlives-setdef.md) and [ADR-0012](../adr/0012-free-games-20-then-3-a-day.md). Store accounts, signing and submission are in [doc/publishing.md](../publishing.md).
+How Dot Popper sells Pro and decides who has it: Free and Pro, the build's channel, the store port and its adapters, receipts, license keys, free games, the offer, and what happens if setdef is gone. For anyone working on purchases, the store hosts and helpers, or the release checks. The reasons are in [ADR-0008](../adr/0008-native-features-live-outside-the-ruby-process.md), [ADR-0010](../adr/0010-pro-comes-only-from-proof.md), [ADR-0011](../adr/0011-pro-outlives-setdef.md). Store accounts, signing and submission are in [doc/publishing.md](../publishing.md).
 
 ## Free and Pro
 
@@ -192,6 +192,8 @@ GUI galleries: `test/gui/scenarios/offer_gallery.rb`, `website_gallery.rb`.
 ## Free games
 
 `FreeGames` (`lib/dot_popper/free_games.rb`, Lota-free) counts the games a Free player may still start.
+
+Free play was unlimited in the brief, with Pro adding achievements, themes and friend groups, which gave a player who enjoys the game no reason tied to playing it to buy. The maintainer decided instead on your first 20 games, then 3 a day; he calls both numbers provisional, and no playtest has tested them. The limit is meant to be visible and fair: nothing hides it, nags, expires bought play, or sells a way around it (no dark patterns, `INSIPIRATION.md`), and it applies only where Pro can be bought, since a limit with no way past it is a dead end. It trusts the player's clock and files, as the other saves do, so a changed date or a deleted `games.txt` gives more games; and every way into a game must spend one in one place, since a gap there gives unlimited games.
 
 - A fresh install holds `FreeGames::FIRST_GAMES` (20) games that never refill, and `FreeGames::DAILY` (3) for each local day, which do not carry over. A game spends the day's first, so the first games last. Both numbers are provisional; README.md and doc/publishing.md state them too.
 - Nothing earns more: not ratings, reviews, sharing, nor the daily goal (Apple 3.2.2(x)). Nothing calls Free a trial or a demo.

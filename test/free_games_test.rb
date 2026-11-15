@@ -169,7 +169,7 @@ class FreeGamesTest < Minitest::Test
     refute_predicate FreeGames.unlimited, :metered?
   end
 
-  # Who is counted (ADR-0012): a player, not the autoplay bot nor a GUI
+  # Who is counted (doc/design/store-and-pro.md): a player, not the autoplay bot nor a GUI
   # scenario unless it sets DOT_POPPER_FREE_GAMES to try the limit; and in
   # a store build everyone, whatever its settings say.
   def test_a_store_build_counts_free_games_even_for_a_bot_or_a_scenario

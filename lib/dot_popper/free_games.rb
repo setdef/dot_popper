@@ -20,7 +20,7 @@ module DotPopper
   # the other saves trust it.
   class FreeGames
     # The first games, for good, and the games each day. Both are
-    # provisional (ADR-0012).
+    # provisional (doc/design/store-and-pro.md).
     FIRST_GAMES = 20
     DAILY = 3
 
