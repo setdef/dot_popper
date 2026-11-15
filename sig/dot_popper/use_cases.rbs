@@ -1,7 +1,7 @@
 module DotPopper
   module UseCases
     class StartGame
-      type result = :started | :none_left | :not_home
+      type result = :started | :offer | :not_home
 
       @cabinet: Cabinet
       @starter: Cabinet::Starter

@@ -199,13 +199,14 @@ class GamesTest < Minitest::Test
     end
   end
 
-  # A StartGame that never starts a game: it answers that no game is
-  # left, starts nothing, and counts how often it was asked.
+  # A StartGame that never starts a game: it answers the offer of Pro,
+  # as with no game left, starts nothing, and counts how often it was
+  # asked.
   class NoGameLeft
     attr_reader :asked
 
     def initialize = @asked = 0
-    def call(_opening = nil) = (@asked += 1) && :none_left
+    def call(_opening = nil) = (@asked += 1) && :offer
     def none_left? = true
     def left = 0
     def daily = DotPopper::FreeGames::DAILY

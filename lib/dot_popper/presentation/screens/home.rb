@@ -27,7 +27,7 @@ module DotPopper
           return unless show.on_home?
           return open_tutorial if @tutorial_flag.due?(played: show.stats_offered?)
 
-          offer_play if @start_game.call == :none_left
+          offer_play if @start_game.call == :offer
         end
 
         # How to play, H, or a gamepad's Y: a game with the Tutorial over it,
@@ -168,17 +168,17 @@ module DotPopper
           cabinet = show.cabinet
           opening = TutorialScene.opening(cabinet.field, [layout.center_x, layout.center_y], style:)
           started = @start_game.call(opening)
-          return offer_play if started == :none_left
+          return offer_play if started == :offer
           return unless started == :started
 
           @tutorial_flag.seen!
           show.tutorial_began
         end
 
-        # The offer of Pro, from Play with no game left; Back from it
-        # returns here.
+        # The offer of Pro, from Play with no game left (StartGame#call's
+        # :offer); Back from it returns here.
         def offer_play
-          return unless show.home? && show.offer.offered?
+          return unless show.home?
 
           show.screens.fetch(:stats).refresh
           show.offer.open_for_play

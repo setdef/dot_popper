@@ -417,13 +417,6 @@ module DotPopper
       # they are on, leading with it (Screens::Offer#open_led_by).
       def open_offer_for(feature) = offer.open_led_by(feature)
 
-      # Whether Pro can be offered at all: where there is a store, to a
-      # player who has not bought it. No screen has a button for it. The
-      # offer opens from what Pro brings (an achievement, a theme, a friend
-      # group) and from Play with no game left
-      # (doc/design/store-and-pro.md).
-      def offer_offered? = offer.offered?
-
       # Whether the store takes a license key (WebsiteStore), rather than
       # restoring its purchases.
       def keys? = offer.keys?

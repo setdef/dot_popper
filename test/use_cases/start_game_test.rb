@@ -41,21 +41,34 @@ class StartGameTest < Minitest::Test
     assert_equal 1, @games.left, "play beginning spends no more"
   end
 
-  def test_with_none_left_nothing_starts
+  # With none left, which only a Free player where Pro is offered can
+  # be (FreeGames.metered?), it answers the offer of Pro, which Play and
+  # Play again carry out; nothing starts.
+  def test_with_none_left_nothing_starts_and_it_answers_the_offer
     2.times { @start.call.then { finish_game } }
 
     assert_predicate @start, :none_left?
-    assert_equal :none_left, @start.call
-    assert_equal :none_left, @start.call(DotPopper::Stack.new(dots: [dot(300, 300, id: 0)]))
+    assert_equal :offer, @start.call
+    assert_equal :offer, @start.call(DotPopper::Stack.new(dots: [dot(300, 300, id: 0)]))
     assert_instance_of Cabinet::Home, @cabinet.state
     assert_equal 2, @started.size
   end
 
+  # Away from Home it starts nothing and spends nothing, and says which:
+  # Game Over's Play again goes Home to start one, or opens the offer
+  # over Game Over when none is left.
   def test_away_from_home_it_starts_nothing_and_spends_nothing
     @start.call
 
     assert_equal :not_home, @start.call
     assert_equal 1, @games.left
+    finish_game
+    @start.call
+    @cabinet.update(20)
+
+    assert_equal 0, @games.left
+    assert_equal :offer, @start.call, "at Game Over, with none left"
+    assert_instance_of Cabinet::GameOver, @cabinet.state
   end
 
   def test_a_game_unmetered_costs_nothing

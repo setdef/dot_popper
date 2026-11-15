@@ -3,7 +3,7 @@
 require_relative "../composition/fake_engine"
 
 # The rules of play, the Metagame's objects and the screens never know
-# that Pro exists (ADR-0022). Two guards, the first the one that holds:
+# that Pro exists (ADR-0022). Three guards, the first the one that holds:
 #
 # 1. The structure. The presentation is never handed what decides Pro
 #    (Entitlement, FreeGames, the store and its license keys): only the
@@ -14,8 +14,10 @@ require_relative "../composition/fake_engine"
 #    the panels, and what each block and method it keeps can reach.
 # 2. The names. Only Monetization's own code, the use cases and the
 #    composition root name Pro's objects or ask "pro?".
+# 3. The answers. No public question of the presentation's objects
+#    answers differently for a Free player and a Pro player.
 #
-# Neither sees an object reached through a constant or a global
+# The first two do not see an object reached through a constant or a global
 # (ObjectSpace, Object.const_get with a name built at run time): the
 # scan finds a constant named outright, and nothing finds one spelled
 # at run time.
@@ -83,10 +85,12 @@ class ProKnowledgeTest < Minitest::Test
   end
 
   # Whether the player has Pro, under a use case's other names for it
-  # (locked?, owned?), is asked nowhere in the presentation or the shell:
-  # a screen asks a use case for the answer it carries out (UseTheme#choice,
-  # ViewAchievements#status, BuyPro#status), so the decision stays there.
-  ASKED = /\.(?:locked|owned)\?/
+  # (locked?, owned?), is asked nowhere in the presentation or the shell,
+  # called or sent by name (send(:locked?)): a screen asks a use case for
+  # the answer it carries out (UseTheme#choice, ViewAchievements#status,
+  # BuyPro#status), so the decision stays there. A name spelled at run
+  # time passes.
+  ASKED = /\b(?:locked|owned)\?/
 
   def test_no_screen_asks_a_use_case_whether_the_player_has_pro
     root = File.expand_path("../..", __dir__)
@@ -95,10 +99,70 @@ class ProKnowledgeTest < Minitest::Test
     assert_empty asking.map { it.delete_prefix("#{root}/") }
   end
 
+  # A third line, by behavior: the Show, its screens and the friend
+  # groups' panel, built for a Free player and for a Pro player, answer
+  # every question they ask in public (a method ending in "?" that needs
+  # no argument) the same, on Home, at Game Over and on Home again, so no
+  # screen offers another a Pro question under a name of its own. A use
+  # case's answer carried out (a word, the offer opened) differs, as it
+  # should; a decision made inside a command, or under a name that is not
+  # a question, passes, and only review stops it.
+  def test_no_screen_answers_a_question_that_tells_free_from_pro
+    free = game("DOT_POPPER_FREE_GAMES" => "5", "DOT_POPPER_NO_TUTORIAL" => "1")
+    pro = game("DOT_POPPER_PRO" => "1", "DOT_POPPER_NO_TUTORIAL" => "1")
+    [free, pro].each { it.show.update(1 / 60.0) }
+    3.times do |at|
+      as_free = questions_answered(free.show)
+      as_pro = questions_answered(pro.show)
+      assert_empty as_free.reject { |question, answer| as_pro[question] == answer }.map { |question, answer| "#{question}: #{answer.inspect} for Free, #{as_pro[question].inspect} for Pro" },
+                   "on #{%w[Home Game\ Over Home][at]}"
+      [free, pro].each { at.zero? ? play_out(it) : it.show.screens[:game_over].continue_on }
+    end
+  end
+
   private
 
-  def game = DotPopper::Composition::Root.new(engine: FakeEngine.new("Windows"),
-                                              settings: DotPopper::Composition::DeveloperSettings.new({ "DOT_POPPER_QUIT_AFTER" => "600" }))
+  def game(env = {})
+    DotPopper::Composition::Root.new(engine: FakeEngine.new("Windows"),
+                                     settings: DotPopper::Composition::DeveloperSettings.new({ "DOT_POPPER_QUIT_AFTER" => "600", **env }))
+  end
+
+  # Plays a game from Home to Game Over, ready for a press.
+  def play_out(game)
+    press_main(game.show)
+    game.cabinet.update(30)
+    game.cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
+    game.show.update(1 / 60.0)
+    assert_instance_of DotPopper::Cabinet::GameOver, game.cabinet.state
+  end
+
+  # What +object+ answers to +question+, or the error it raises, as some
+  # do when asked out of turn (NewTheme#settled? with no card up); but a
+  # question that asks its own object something it does not answer (a
+  # forward to one that is gone, Show#offer_offered?) fails.
+  def answer(object, question)
+    object.public_send(question)
+  rescue NoMethodError => e
+    raise if e.receiver.equal?(object)
+
+    e.class
+  rescue StandardError => e
+    e.class
+  end
+
+  # Each public question of the presentation's objects that a player's
+  # screens are made of, by owner and name, with its answer.
+  def questions_answered(show)
+    objects = { "Show" => show, "group panel" => show.group_panel, **show.screens.transform_keys(&:to_s) }
+    objects.flat_map do |name, object|
+      object.public_methods.select { it.end_with?("?") }.filter_map do |question|
+        method = object.method(question)
+        next unless method.owner.name.to_s.start_with?("DotPopper::") && method.parameters.none? { |kind, _| %i[req keyreq].include?(kind) }
+
+        ["#{name}##{question}", answer(object, question)]
+      end
+    end.to_h
+  end
 
   # Everything +from+ holds, and what that holds in turn, each with the
   # owners that reach it ([name, owner]): the presentation's objects'

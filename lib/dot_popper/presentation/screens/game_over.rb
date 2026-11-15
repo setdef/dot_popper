@@ -24,10 +24,11 @@ module DotPopper
 
         # Play again: Home, and at once Play, so another game is one press.
         # With no game left it says Get Pro, and opens the offer over Game
-        # Over, which Back closes to Game Over as it was.
+        # Over, which Back closes to Game Over as it was: what StartGame
+        # answers here (:offer, or :not_home while a game is left).
         def play_again
           return unless show.game_over? && show.cabinet.state.ready?
-          return show.offer.open_for_play if @start_game.none_left? && show.offer_offered?
+          return show.offer.open_for_play if @start_game.call == :offer
 
           continue_on
           show.play

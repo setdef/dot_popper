@@ -40,10 +40,6 @@ module DotPopper
         # with.
         def led_by_achievement(id) = @achievement = id
 
-        # Whether Pro can be offered at all: where there is a store, to a
-        # player who has not bought it.
-        def offered? = @buy_pro.offered?
-
         # Hears the store, +seconds+ on, while no game is in play
         # (UseCases::BuyPro#update).
         def update(seconds) = @buy_pro.update(seconds)
@@ -70,6 +66,8 @@ module DotPopper
         # Opened by Play or Play again with no game left: it leads with
         # games, and says why.
         def open_for_play
+          return unless offered?
+
           @for_play = true
           open_plainly
           @focus = :games
@@ -242,6 +240,11 @@ module DotPopper
         def covers? = true
 
         private
+
+        # Whether Pro can be offered at all: where there is a store, to a
+        # player who has not bought it. The offer's own, so no other screen
+        # asks it.
+        def offered? = @buy_pro.offered?
 
         # Whether it thanks the player (BuyPro#status), in place of selling:
         # no buttons but Back, and not opened over what was tapped.
