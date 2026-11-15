@@ -50,7 +50,7 @@ runs:
       shell: bash
       run: |
         exclude=()
-        for path in test doc sig script playtest android ios macos windows .github Rakefile Steepfile mise.toml mise.android.toml \
+        for path in test doc sig script playtest android ios macos windows .github Rakefile Steepfile mise.toml mise.android.toml mise.ios.toml \
           AGENTS.md GLOSSARY.md INSIPIRATION.md PACKAGING.md README.md .gitignore .gitattributes; do
           exclude+=(--exclude "$path")
         done

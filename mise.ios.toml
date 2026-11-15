@@ -1,0 +1,12 @@
+# The tools the iOS builds need beyond the game's own (mise.toml) and
+# Xcode's: XcodeGen, which writes the Xcode projects of `fledge build ios`
+# and ios/store_check, and the CMake and Ninja Lota's rake ios:sdl3 builds
+# SDL3 with, the versions mise.android.toml pins for Lota. mise reads this
+# file only with MISE_ENV=ios, so an ordinary `mise install` for the
+# desktop game downloads none of it:
+#
+#   MISE_ENV=ios mise install
+[tools]
+xcodegen = "2.46.0"
+cmake = "4.3.2"
+ninja = "1.13.2"
