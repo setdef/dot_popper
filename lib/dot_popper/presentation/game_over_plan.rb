@@ -229,7 +229,5 @@ module DotPopper
         bounds.cut(left: layout.safe.x + edge, right: layout.safe.right - edge)
       end
     end
-
-    GameOverScreen = GameOverLayout # the old name, until no one uses it
   end
 end
