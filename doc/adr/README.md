@@ -8,7 +8,6 @@ Dot Popper's architecturally significant decisions, one per record, in the MADR 
 
 | ADR | Decision | Status |
 | --- | --- | --- |
-| [0004](0004-steep-checks-the-rules-strictly.md) | Steep checks the rules strictly against RBS signatures | accepted |
 | [0007](0007-renderers-per-platform-with-a-relaunch-without-vulkan.md) | Renderers per platform, and a relaunch without Vulkan when it fails | accepted |
 | [0008](0008-native-features-live-outside-the-ruby-process.md) | Native features Lota lacks are reached outside the Ruby process | accepted |
 | [0009](0009-the-store-is-a-port.md) | The store is a port, and the build's channel picks its adapter | accepted |
