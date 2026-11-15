@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Sets Dot Popper up in this clone: the Ruby mise.toml pins for this
+# system, and the bundle. Run it first in a fresh clone, and again
+# whenever the pins or Gemfile.lock change; with nothing to do it says
+# nothing and takes a second or two. It needs mise (https://mise.jdx.dev)
+# on the PATH, asks nothing, and installs nothing outside mise's own
+# folders and the Ruby's gems. Then run the game's Ruby through mise:
+#
+#   script/setup && mise exec -- bundle exec rake test
+#
+# With MISE_ENV=android or MISE_ENV=ios it also installs what
+# mise.android.toml or mise.ios.toml pins for the phone builds.
+#
+# On Windows, run it from an MSYS2 UCRT64 shell (PACKAGING.md says why).
+set -euo pipefail
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+cd "$root"
+
+if ! command -v mise > /dev/null 2>&1; then
+  echo "script/setup: mise is not on the PATH. Install it (https://mise.jdx.dev), then run script/setup again." >&2
+  exit 1
+fi
+
+export MISE_YES=1
+
+# mise reads a project's settings only once they are trusted.
+for config in mise.toml mise.android.toml mise.ios.toml; do
+  mise trust --quiet "$root/$config"
+done
+
+mise install --quiet
+
+if ! mise exec -- bundle check > /dev/null 2>&1; then
+  mise exec -- bundle install --quiet
+fi
