@@ -161,15 +161,16 @@ class PrivacyRequestsTest < Minitest::Test
     banned = %r{\bNet::|\bTCPSocket\b|\bUDPSocket\b|\bUNIXSocket\b|\bSocket\.|\bOpenSSL\b|\bURI\.open\b|\bopen-uri\b|require\s+["'](?:net/|socket|openssl|open-uri)|HTTParty|Faraday|RestClient|Excon|Typhoeus}
 
     # automation.rb only refuses connections (Automation.guard!); it opens none.
-    # continuity/ed25519.rb takes OpenSSL's signatures, and nothing that connects.
-    signatures = File.join(ROOT, "lib/dot_popper/continuity/ed25519.rb")
+    # continuity/ed25519.rb takes OpenSSL's signatures, and the test build's
+    # signing.rb makes them, and nothing that connects.
+    signatures = %w[continuity/ed25519.rb test_build/signing.rb].map { File.join(ROOT, "lib/dot_popper", it) }
     # receipt.rb and receipt/ check stores' signatures and certificates, and
     # the test build's receipt test key signs a fake store's, and nothing
     # that connects.
     receipts = ruby_files.select { it.end_with?("dot_popper/receipt.rb", "test_build/receipt_test_key.rb") || it.include?("dot_popper/receipt/") }
 
-    assert_empty ruby_files.reject { it.end_with?("network/link.rb", "dot_popper/automation.rb") || it == signatures || receipts.include?(it) }.select { uncommented(it).match?(banned) }
-    assert_empty uncommented(signatures).gsub(/OpenSSL::PKey\b|require "openssl"/, "").scan(banned)
+    assert_empty ruby_files.reject { it.end_with?("network/link.rb", "dot_popper/automation.rb") || signatures.include?(it) || receipts.include?(it) }.select { uncommented(it).match?(banned) }
+    signatures.each { assert_empty uncommented(it).gsub(/OpenSSL::PKey\b|require "openssl"/, "").scan(banned), it }
     receipts.each { assert_empty uncommented(it).gsub(/OpenSSL::(?:PKey|X509|ASN1|BN)\b|require "openssl"/, "").scan(banned), it }
     assert_empty native_files.select { File.read(it).match?(/URLSession|NSURLConnection|HttpURLConnection|OkHttp|Volley/) }
   end
