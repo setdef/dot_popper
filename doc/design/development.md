@@ -11,13 +11,14 @@ How Dot Popper is tested and worked on: what each test tier checks and how to ru
 | Tier | What it runs | Command | Needs | In CI |
 | --- | --- | --- | --- | --- |
 | Unit tests | `test/**/*_test.rb` except `test/gui/`: the rules, the presentation, friend groups, privacy, continuity, the kits' renderer, and the shell's tests that need no window | `bundle exec rake test` | Ruby and the bundle | On Linux, the Package workflow's Test job, on every push to `trunk`; on Windows, the Windows tests workflow, on every push to `trunk` and every pull request |
-| Steep | The rules in `lib/dot_popper/*.rb` against `sig/` | `bundle exec rake steep` | The `steep` gem (development group) | No workflow runs it |
-| Both | `test`, then `steep` (`task default: %i[test steep]`) | `bundle exec rake` | Both of the above | |
+| Steep | The rules core, the use cases and friend groups against `sig/` (see [Steep, in strict mode](#steep-in-strict-mode)) | `bundle exec rake steep` | The `steep` gem (development group) | The Steep workflow, on every push to `trunk` and every pull request |
+| Both | `test`, then `steep` (`task default: %i[test steep]`) | `bundle exec rake` | Both of the above | The Package workflow's Test job, on every push to `trunk` |
 | GUI scenarios | The real game in real windows, `test/gui/**/*_test.rb` | `bundle exec rake test:gui` | A display, and Lota | The GUI workflow, on every push to `trunk` and every pull request |
-| Packaged app, Linux | The Linux app this working copy would ship, played by the bot with no Ruby on its `PATH` (see [The packaged app before a push](#the-packaged-app-before-a-push)) | `ruby script/play_packaged_app.rb` | Linux x86_64, Xvfb, Git; the network for its first fuse | The Package workflow's Linux job plays its own build the same way |
-| Packaged app, macOS | The macOS app the commit at HEAD makes for a channel (`test`, `mac-app-store` or `website`), fused and checked as the Package workflow checks its own, but not played (see [The packaged app before a push](#the-packaged-app-before-a-push)) | `script/macos_app.sh CHANNEL` | A Mac with Apple silicon, Xcode's command line tools, Git and the game's Ruby; the network for its first fuse | The Package workflow's macOS, Mac App Store and website jobs build the same apps, check them the same way, and play them |
+| Packaged app, Linux | The Linux app this working copy would ship, played by the bot with no Ruby on its `PATH` (see [Checking the packaged app](#checking-the-packaged-app)) | `ruby script/play_packaged_app.rb` | Linux x86_64, Xvfb, Git; the network for its first fuse | The Package workflow's Linux job plays its own build the same way |
+| Packaged app, macOS | The macOS app the commit at HEAD makes for a channel (`test`, `mac-app-store` or `website`), fused and checked as the Package workflow checks its own, but not played (see [Checking the packaged app](#checking-the-packaged-app)) | `script/macos_app.sh CHANNEL` | A Mac with Apple silicon, Xcode's command line tools, Git and the game's Ruby; the network for its first fuse | The Package workflow's macOS, Mac App Store and website jobs build the same apps, check them the same way, and play them |
 | iPhone and iPad app, built | The iOS app the commit at HEAD makes, built as the Kits workflow builds it and checked short of running it, unsigned ([PACKAGING.md](../../PACKAGING.md#the-ipad-and-iphone-kit)) | `MISE_ENV=ios mise exec -- script/ios_app.sh` | A Mac with Xcode, Git, the game's Ruby and `mise.ios.toml`'s tools; the network | The Kits workflow's iPad jobs build the same app, and its Simulator job plays it |
 | iOS store check, built | `ios/store_check` and its tests, built for the Simulator and not run ([store and Pro](store-and-pro.md#the-store-contract)) | `MISE_ENV=ios mise exec -- script/ios_store_check.sh` | A Mac with Xcode, Git, and XcodeGen (`mise.ios.toml`) | None: `xcodebuild test` on a Simulator is run by hand |
+| Android emulator check | The Android app this commit builds, on an `x86_64` emulator of API 33: the bot's first game, Back, and leaving and coming back ([PACKAGING.md](../../PACKAGING.md#the-android-kit-experimental)) | `MISE_ENV=android mise exec -- script/android_check.sh` | Linux x86_64 with KVM, Git, and `mise.android.toml`'s tools; the network for its first run | The Android workflow, on every push to `trunk`, builds the app in full and runs the same checks on a fresh emulator |
 | Packaged apps | Each built app, played by the bot with no Ruby on its `PATH` | See [PACKAGING.md](../../PACKAGING.md#what-ci-checks) | Each platform's runner | The Package and Kits workflows |
 | Playtest kits | Hand checks on real devices | See [Playtest kits](#playtest-kits) | A person | The Kits workflow builds and plays them |
 
@@ -25,9 +26,9 @@ Every test task runs with Ruby's warnings on (`t.warning = true`), and `test/no_
 
 To run one file: `bundle exec ruby -Ilib -Itest test/rules_fuzz_test.rb`.
 
-[AGENTS.md](../../AGENTS.md) says what to run before each push and where heavy work runs. Tests are fast and reliable, and none reaches the real internet (see [Automated runs stay off the internet](#automated-runs-stay-off-the-internet)).
+Before a push, run the narrowest check that shows the change broke nothing: the tests it reaches, Steep if it touches typed code, and the one GUI scenario for a screen it changes ([AGENTS.md](../../AGENTS.md), which also says where heavy work runs). Then push: every tier above that names a workflow runs in CI after the push, and a red trunk is fixed or reverted at once. Tests are fast and reliable, and none reaches the real internet (see [Automated runs stay off the internet](#automated-runs-stay-off-the-internet)).
 
-## The packaged app before a push
+## Checking the packaged app
 
 What could stop the packaged app starting is checked in two places.
 

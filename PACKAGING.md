@@ -135,14 +135,14 @@ It fuses the commit at HEAD, never other files in the working copy, in a tempora
 
 The [Package workflow](.github/workflows/package.yml) runs on every push to `trunk`, on every tag that starts with `v`, and when started by hand from GitHub's Actions page. Its jobs:
 
-- **Test**, on Ubuntu, runs `bundle exec rake test`.
+- **Test**, on Ubuntu, runs `bundle exec rake`: the tests, then Steep.
 - **Windows x64**, on `windows-latest`; **macOS arm64**, on `macos-15`; and **Linux x86_64**, on `ubuntu-24.04` (its glibc is 2.39, Fledge's Linux floor), each run `lota fuse`, unpack the app under a folder with a space in its name, play it with the autoplay bot for 20 seconds with no Ruby on its `PATH` and an all but empty environment, and upload the `dot-popper-windows-x64`, `dot-popper-macos-arm64`, or `dot-popper-linux-x86_64` artifact. GitHub's Windows and Linux runners have no graphics card, so the game draws there with Mesa's software OpenGL (llvmpipe): on Windows, Mesa's `opengl32.dll` from the runner's MSYS2 goes beside the program, and on Linux it draws on Xvfb. The run must exit with status 0 and print its frame rate. The Windows job then plays the app again allowed only Vulkan (`DOT_POPPER_RENDERERS=vulkan`), which the runner can't start, and checks that the game ran its own `Dot Popper.exe` again without Vulkan, drew with OpenGL, and exited with status 0 ([ADR-0007](doc/adr/0007-renderers-per-platform-with-a-relaunch-without-vulkan.md)).
 - **What this run releases** asks `script/release_kind.rb` about the tag, if any, and gives the other jobs the version the apps must have.
 - **Website build**, on each of the same three runners, sets the `website` channel, fuses, checks the app in every file it made with `script/check_build.rb`, plays it with the bot as above, and uploads `website-windows-x64`, `website-macos-arm64` or `website-linux-x86_64`. The **Windows MSIX** and **Mac App Store** jobs, the stores' own builds, run the same check on their apps ([doc/publishing.md](doc/publishing.md)).
 - **Release** runs only for a playtest tag. It attaches the test builds and the MSIX to a GitHub prerelease for the tag. It requires the Windows job to have passed. Nothing is published to RubyGems.
 - **Release the website builds** runs only for a website tag, once the tests and every website build have passed. It makes the tag's release with the website builds alone.
 
-The [Kits workflow](.github/workflows/kits.yml), on `v*` tags and by hand, builds the playtest kits and attaches them to a playtest tag's release too, never to a website release. The [Android workflow](.github/workflows/android.yml) does the same for the experimental Android kit. Both are described below.
+The [Kits workflow](.github/workflows/kits.yml), on `v*` tags and by hand, builds the playtest kits and attaches them to a playtest tag's release too, never to a website release. The [Android workflow](.github/workflows/android.yml) does the same for the experimental Android kit, and also builds and checks it on every push to `trunk`. Both are described below. The GUI scenarios, the tests on Windows and Steep have workflows of their own, on every push to `trunk` ([development](doc/design/development.md#the-tiers)).
 
 ## Playtest kits
 
@@ -210,7 +210,7 @@ A second, fresh `macos-15` runner, with no Lota, Fledge, or bundle, unzips the k
 
 ### The Android kit (experimental)
 
-This kit is **experimental**, as Lota's phone route is. The [Android workflow](.github/workflows/android.yml) takes the Android route of the same guide at Lota's `v0.3.1` tag; by hand (workflow_dispatch) it takes another Lota tag or commit, to try an engine fix. It runs on `v*` tags and by hand, on `ubuntu-latest`, and the build itself is [`script/android_build.sh`](script/android_build.sh), which builds the same APK on any Linux x86_64 computer (below):
+This kit is **experimental**, as Lota's phone route is. The [Android workflow](.github/workflows/android.yml) takes the Android route of the same guide at Lota's `v0.3.1` tag; by hand (workflow_dispatch) it takes another Lota tag or commit, to try an engine fix. It runs on every push to `trunk`, on `v*` tags and by hand, on `ubuntu-latest` (a run in progress finishes, and of the pushes' runs waiting behind it only the newest is kept; by hand, `commit` builds another commit than the branch's tip), and the build itself is [`script/android_build.sh`](script/android_build.sh), which builds the same APK on any Linux x86_64 computer (below):
 
 1. clone Lota at `v0.3.1`, with the `vendor/love` submodule, and install its bundle;
 2. install the Android SDK with [`script/android_sdk.sh`](script/android_sdk.sh) (Google's command-line tools 20.0, checked by SHA-256, then `platforms;android-36`, `build-tools;36.0.0` and NDK r30, `30.0.16248370`, each checked to be the pinned revision) and use Java 21, then, in the clone, `bundle exec rake android:deps`, which builds LÖVE's libraries (zlib, Ogg, Vorbis, Theora, ModPlug, FreeType, HarfBuzz, and OpenAL Soft as a shared `libopenal.so`) and SDL 3.4.10 as `libSDL3.so`, for `arm64-v8a` and `x86_64`;

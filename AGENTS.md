@@ -28,7 +28,7 @@ These rules bind every agent working on Dot Popper. The maintainer set each of t
 ## Trunk-based development
 
 - Work straight on `trunk` in small green commits, rebasing first. Branches are rare, last minutes, and are never built on.
-- Never push to find out whether CI passes. Before each push, run what CI runs that your change could affect: `bundle exec rake`, the GUI scenarios, and for startup, the shell or the bot, the packaged-app playthrough and the Android emulator check.
+- Never push-and-poll, in CI or anywhere else. Before each push, run the narrowest check that shows your change broke nothing: the tests it reaches, Steep if it touches typed code, and the one GUI scenario for a screen it changes. Then push and carry on. CI runs everything else after the push.
 - A red trunk comes first. Fix it within minutes, or revert the commit that broke it.
 - Before 1.0.0, a green trunk may be tagged as a playtest release (`v0.X.Y`) without asking: bump `fledge.yml`'s version in the tagged commit. From 1.0.0 on, tag only when the maintainer says so.
 - Commits are Conventional Commits with a prose body, ending with your `Co-Authored-By` line.
