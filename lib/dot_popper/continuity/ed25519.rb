@@ -9,10 +9,9 @@ module DotPopper
     # first use, so a game that never checks a key never loads it. Anything
     # that goes wrong is a signature that does not verify, never an error.
     module Ed25519
-      # The DER prefixes of a raw 32-byte public key (SubjectPublicKeyInfo)
-      # and a raw 32-byte private seed (PKCS #8), as OpenSSL reads them.
+      # The DER prefix of a raw 32-byte public key (SubjectPublicKeyInfo),
+      # as OpenSSL reads one.
       PUBLIC_DER = ["302a300506032b6570032100"].pack("H*").freeze
-      PRIVATE_DER = ["302e020100300506032b657004220420"].pack("H*").freeze
 
       module_function
 
@@ -25,19 +24,6 @@ module DotPopper
         OpenSSL::PKey.read(PUBLIC_DER + public_key.b).verify(nil, signature.b, message.b)
       rescue StandardError, ScriptError
         false
-      end
-
-      # +seed+'s (32 bytes) signature over +message+. Only a test build
-      # signs; a build for sale never holds a private key.
-      def sign(seed, message)
-        require "openssl"
-        OpenSSL::PKey.read(PRIVATE_DER + seed.b).sign(nil, message.b)
-      end
-
-      # The public key of +seed+.
-      def public_key(seed)
-        require "openssl"
-        OpenSSL::PKey.read(PRIVATE_DER + seed.b).public_to_der[-32..].to_s
       end
 
       # Whether this Ruby verifies Ed25519 at all: the server's published

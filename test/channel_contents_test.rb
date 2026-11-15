@@ -169,6 +169,19 @@ class ChannelContentsTest < Minitest::Test
     assert_match %r{FAIL .* holds lib/dot_popper/stray\.rb, which names the test keys \(TestKeys\?\)}, out
   end
 
+  # A build for sale verifies and signs nothing: the code that issues
+  # license keys and certificates and signs is the test build's part's.
+  def test_a_build_for_sale_holds_no_signing_code
+    ChannelContents.left_out("website").each { FileUtils.rm_rf(File.join(@game, it)) }
+    _, out = run_script("list", "website", @app)
+
+    refute_match(/^signing/, out)
+    File.write(File.join(@game, "lib/dot_popper/continuity/license_key.rb"), "def self.issue(seed) = Ed25519.sign(seed, LABEL)\n", mode: "a")
+    _, out = run_script("check", "website", @app)
+
+    assert_match(%r{FAIL .* holds lib/dot_popper/continuity/license_key\.rb, which names signing}, out)
+  end
+
   def test_an_unknown_channel_or_a_missing_folder_is_refused
     refute run_script("list", "steam", @app).first
     refute run_script("list", "website", File.join(@app, "nowhere")).first

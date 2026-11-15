@@ -62,6 +62,8 @@ module ChannelContents
     Piece.new(name: "the fake setdef server", needed_by: [TEST], apart: :all, marks: [/FakeSetdef/, /DOT_POPPER_FAKE_SETDEF/, /fake_setdef\.txt/]),
     Piece.new(name: "the test keys", needed_by: [TEST], apart: :all,
               marks: [/BEGIN PRIVATE KEY/, /\bTestKeys?\b/, /TEST_PINS/, /Receipt::TEST\b/]),
+    Piece.new(name: "signing, which only the test build's fakes do", needed_by: [TEST], apart: :all,
+              marks: [/\.sign\(/, /PRIVATE_DER/, /def self\.issue\b/]),
     Piece.new(name: "the test build's settings that grant Pro or skip the free-game limit", needed_by: [TEST], apart: :all,
               marks: [/DOT_POPPER_PRO\b/, /DOT_POPPER_FREE_GAMES/, /DOT_POPPER_TODAY/, /DOT_POPPER_THEME_UNLOCKS/]),
     Piece.new(name: "the website checkout", needed_by: [TEST, Build::WEBSITE],
