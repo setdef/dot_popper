@@ -110,7 +110,5 @@ module DotPopper
         { focus: size[type.new_score_record], item: size[type.hint], note: size[type.summary] }
       end
     end
-
-    OfferScreen = OfferLayout # the old name, until no one uses it
   end
 end
