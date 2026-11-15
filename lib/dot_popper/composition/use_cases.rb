@@ -4,7 +4,7 @@ require_relative "../use_cases"
 
 module DotPopper
   module Composition
-    # The use cases (ADR-0017), made from the objects of the game's areas
+    # The use cases (ADR-0022), made from the objects of the game's areas
     # that each joins, and subscribed to what each hears, here and nowhere
     # else: FinishGame hears the rules' events, before anything made after
     # it, and BuyPro hears Pro arrive (Entitlement::ProGranted). Answers

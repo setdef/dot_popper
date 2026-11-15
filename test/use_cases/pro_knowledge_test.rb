@@ -3,7 +3,7 @@
 require_relative "../composition/fake_engine"
 
 # The rules of play, the Metagame's objects and the screens never know
-# that Pro exists (ADR-0017). Two guards, the first the one that holds:
+# that Pro exists (ADR-0022). Two guards, the first the one that holds:
 #
 # 1. The structure. The presentation is never handed what decides Pro
 #    (Entitlement, FreeGames, the store and its license keys): only the

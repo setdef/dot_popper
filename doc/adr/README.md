@@ -23,11 +23,11 @@ Dot Popper's architecturally significant decisions, one per record, in the MADR 
 | [0014](0014-privacy-facts-come-from-the-code.md) | The privacy facts are generated from declarations the tests enforce | accepted |
 | [0015](0015-all-rights-reserved-after-v0-9-9.md) | Dot Popper is all rights reserved after v0.9.9 | accepted |
 | [0016](0016-the-tutorial-is-a-layer-over-a-paused-game.md) | The tutorial is a layer over the first game, paused, and Skip takes the layer away | accepted |
-| [0017](0017-use-cases-hold-the-rules-that-need-two-areas.md) | Use cases hold the rules that need two of the game's areas | accepted |
 | [0018](0018-screens-are-objects-on-a-stack.md) | Screens are objects on a stack, and the one on top answers every input | accepted |
 | [0019](0019-clean-architecture-and-domain-driven-design-in-three-areas.md) | The code follows Clean Architecture and Domain-Driven Design, with the domain in three areas | accepted |
 | [0020](0020-standard-dots-are-sized-to-the-screen-by-default.md) | Standard dots are sized to the screen by default, and Bigger or Smaller is the player's choice (restates the former 0001) | accepted |
 | [0021](0021-a-build-for-sale-carries-only-its-own-parts.md) | A build for sale carries only its own parts, and the test build's code is a part it leaves out | accepted |
+| [0022](0022-use-cases-hold-the-rules-that-need-two-areas.md) | Use cases hold the rules that need two of the game's areas, and the composition root makes them (restates the former 0017) | accepted |
 
 ## Keeping the log
 
