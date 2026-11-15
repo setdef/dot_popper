@@ -763,7 +763,7 @@ class ShowTest < Minitest::Test
     use_cases[:finish_game].subscribe(show)
     [0, 3].each do |taps|
       press_main(show)
-      show.skip_tutorial
+      show.back # Escape skips the Tutorial, if it opened
       taps.times do
         bright = cabinet.game.dots.find(&:bright?)
         clear_around!(live(cabinet), bright)

@@ -28,8 +28,6 @@ module DotPopper
         # Skip: the scene shows at once what it had yet to show of the game,
         # and goes. Nothing starts or ends: the game began when it opened.
         def skip
-          return unless playing?
-
           @scene.catch_up
           finish
         end

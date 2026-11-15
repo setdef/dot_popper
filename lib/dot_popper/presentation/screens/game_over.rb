@@ -27,7 +27,7 @@ module DotPopper
         # Over, which Back closes to Game Over as it was: what StartGame
         # answers here (:offer, or :not_home while a game is left).
         def play_again
-          return unless show.game_over? && show.cabinet.state.ready?
+          return unless show.cabinet.state.ready?
           return show.offer.open_for_play if @start_game.call == :offer
 
           continue_on
@@ -37,7 +37,7 @@ module DotPopper
         # One of its lines that opens something: a new achievement in its
         # dialog, or the friend group whose title the game took.
         def open_from(what)
-          return unless show.game_over? && show.cabinet.state.ready?
+          return unless show.cabinet.state.ready?
 
           achievement = show.game_over.achievements.first
           group = show.group_panel.game_title_taken
@@ -84,8 +84,6 @@ module DotPopper
         # game opens the share preview, and copies nothing yet; on a phone
         # it opens the system's share sheet, and no preview.
         def share
-          return unless show.game_over? && show.game_over
-
           preview = @sharing.offer(share_text, now) or return sounds.play(:tick)
           show.screens.fetch(:share_preview).open_with(preview)
           sounds.play(:tick)

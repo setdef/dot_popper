@@ -28,8 +28,6 @@ module DotPopper
         # are on, leading with it, and Back closes it to that same screen,
         # open as it was, so no one loses their place.
         def open_led_by(feature)
-          return if thanking? || opened?
-
           show.open_layer(self)
           @focus = feature
           @buy_pro.open
@@ -144,8 +142,6 @@ module DotPopper
         # copy that takes one (WebsiteStore). A key that is good is Pro at
         # once, which is announced as Pro arriving (#call).
         def paste_key
-          return unless opened? && keys?
-
           @buy_pro.paste
           sounds.play(:tick)
         end

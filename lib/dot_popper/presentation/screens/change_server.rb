@@ -53,16 +53,12 @@ module DotPopper
         KEY_BINDINGS = [KeyBinding.new(keys: :v, with: KeyBinding::COMMAND, does: :paste)].freeze
 
         def paste_address
-          return unless show.server?
-
           @choice.paste
           sounds.play(:tick)
         end
 
         # Back to setdef's server.
         def reset
-          return unless show.server?
-
           @choice.reset
           sounds.play(:tick, pitch: 0.8)
         end

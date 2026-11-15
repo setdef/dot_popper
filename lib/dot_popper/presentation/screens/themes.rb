@@ -19,8 +19,6 @@ module DotPopper
         # Uses +theme+ from now on, and the whole screen takes its colors at
         # once, so the choice is seen before it is left.
         def use(theme)
-          return unless show.themes?
-
           case @use_theme.call(theme.key)
           in :offer then show.offer.open_led_by(:themes)
           in :same then sounds.play(:tick, pitch: 0.8)

@@ -21,8 +21,6 @@ module DotPopper
 
         # Opens over Settings, at the top.
         def open
-          return unless show.settings?
-
           show.open_page(:credits)
           @scroll = CreditsScroll.at_top(content: 0.0, window: 0.0)
           lay_out

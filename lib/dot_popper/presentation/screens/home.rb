@@ -24,7 +24,6 @@ module DotPopper
         # over it, which is seen from then on. With no game left, the offer
         # of Pro opens, leading with games.
         def play
-          return unless show.on_home?
           return open_tutorial if @tutorial_flag.due?(played: show.stats_offered?)
 
           offer_play if @start_game.call == :offer

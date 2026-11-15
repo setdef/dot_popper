@@ -57,7 +57,6 @@ module DotPopper
         # with it, so the choice shows at once.
         def choose_sizing(sizing)
           cabinet = show.cabinet
-          return unless show.settings? && show.sizing_offered?
           return sounds.play(:tick, pitch: 0.8) if sizing == cabinet.sizing
 
           cabinet.sizing = sizing
@@ -75,8 +74,6 @@ module DotPopper
         # The next of the window's displays, round the end, on a computer.
         def next_display
           window = show.window
-          return unless window.offered?
-
           order = %i[window borderless exclusive]
           window.display = order[(order.index(window.display).to_i + 1) % order.size]
         end

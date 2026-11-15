@@ -83,7 +83,7 @@ class ThemesTest < Minitest::Test
                      use_theme: DotPopper::UseCases::UseTheme.new(themes: @themes, entitlement:))
     settle
     press_main
-    @show.skip_tutorial
+    @show.back # Escape skips the Tutorial, if it opened
     pro = true
     @cabinet.update(20)
 

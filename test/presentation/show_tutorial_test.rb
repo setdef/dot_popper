@@ -208,8 +208,8 @@ class ShowTutorialTest < Minitest::Test
     assert_equal :points, @show.tutorial.beat
 
     @show.primary
-    @show.open_stats
-    @show.choose_sizing(DotPopper::DotSizing::BIGGER_OR_SMALLER)
+    @show.pad(:x)
+    @show.pad(:lb)
     assert @show.tutorial?
     refute @show.stats?
   end

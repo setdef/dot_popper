@@ -29,8 +29,6 @@ module DotPopper
 
         # Opens over Home, from the Stats as they are now.
         def open
-          return unless show.on_home?
-
           refresh
           show.open_page(:stats)
         end

@@ -386,7 +386,7 @@ module DotPopper
       # back to the one it was opened over: Credits, Privacy and Change
       # Server to Settings, the others to Home.
       def close_page
-        close_layer(screen) if screen.is_a?(Screens::Page)
+        close_layer(screen)
         each_screen(&:page_changed)
         sounds.play(:tick, pitch: 0.8)
       end

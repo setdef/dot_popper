@@ -88,6 +88,32 @@ class GamesTest < Minitest::Test
     assert_predicate @show, :game_over?
   end
 
+  # Until Game Over will take a press (Rules::GAME_OVER_GRACE), Play
+  # again, with no game left, opens no offer: a tap meant for a dot in a
+  # game's last instant cannot leave Game Over.
+  def test_get_pro_at_game_over_does_nothing_before_game_over_takes_a_press
+    2.times { @games.spend! }
+    press_main
+    @cabinet.update(20)
+    @show.update(0.016)
+    reach = @show.play_again_reach
+    @show.tap(reach.center_x, reach.center_y)
+
+    refute_predicate @show, :offer?
+    assert_predicate @show, :game_over?
+  end
+
+  # Nor does a line that opens something (Screens::GameOver#open_from).
+  def test_game_overs_lines_open_nothing_before_game_over_takes_a_press
+    press_main
+    @cabinet.update(20)
+    @show.update(0.016)
+    @show.screens.fetch(:game_over).open_from(:group)
+
+    refute_predicate @show, :group_open?
+    assert_predicate @show, :game_over?
+  end
+
   # Buy says "(Y)" with a controller wherever the offer is open, and Y
   # buys there. Shell::App once sent Y over Game Over to Share my score,
   # which does nothing under the offer, before asking the screen on top.

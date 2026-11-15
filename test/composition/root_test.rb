@@ -331,7 +331,7 @@ class RootTest < Minitest::Test
   def test_the_show_the_root_builds_shows_the_game_it_hears
     game = root
     game.show.play
-    game.show.skip_tutorial
+    game.show.back # Escape skips the Tutorial, if it opened
 
     assert_predicate game.cabinet, :playing?
     game.cabinet.update(30)
@@ -346,7 +346,7 @@ class RootTest < Minitest::Test
   def test_a_dot_popped_in_the_game_the_root_builds_sounds_its_pop
     game = root
     game.show.play
-    game.show.skip_tutorial
+    game.show.back # Escape skips the Tutorial, if it opened
     dot = game.cabinet.game.dots.find(&:bright?)
     game.sound_player.played.clear
     game.show.tap(dot.x, dot.y)
