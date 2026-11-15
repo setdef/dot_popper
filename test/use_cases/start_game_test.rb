@@ -82,7 +82,7 @@ class StartGameTest < Minitest::Test
 
   # A cabinet hands out its one Starter once, and the use case takes it as
   # it is made, so nothing else can start a game on that cabinet.
-  def test_a_cabinet_hands_out_its_starts_once_and_the_use_case_holds_them
+  def test_a_cabinet_hands_out_its_starter_once_and_the_use_case_holds_it
     assert_raises(Cabinet::StarterTaken) { @cabinet.starter }
     assert_raises(Cabinet::StarterTaken) { DotPopper::UseCases::StartGame.new(cabinet: @cabinet, free_games: @games) }
   end
