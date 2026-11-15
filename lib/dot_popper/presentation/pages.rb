@@ -270,7 +270,5 @@ module DotPopper
         ServerPlan.new(left:, width:, lines: wrapped, line_size: size, now: shown_now, now_y:, paste:, reset:, status: shown_status, status_y: (reset || paste).bottom + 24)
       end
     end
-
-    AchievementDialog = AchievementDialogLayout # the old name, until no one uses it
   end
 end
