@@ -2,7 +2,7 @@
 
 require_relative "inputs"
 
-# The stack of screens (Show#stack, ADR-0018), as a table: each row goes
+# The stack of screens (Show#stack, ADR-0023), as a table: each row goes
 # somewhere as a finger would, or pushes and pops the stack itself, and
 # says what is then on the stack, bottom first, which screen is on top
 # (Show#screen), and what the Show's questions answer. Some questions ask

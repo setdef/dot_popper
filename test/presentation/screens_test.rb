@@ -2,7 +2,7 @@
 
 require_relative "presentation_helper"
 
-# The screens as objects on a stack (Screens, ADR-0018): the screen on top
+# The screens as objects on a stack (Screens, ADR-0023): the screen on top
 # is the one object for it, each opens over the screen in view, and Back
 # returns to the one it was opened over, as it was.
 class ScreensTest < Minitest::Test

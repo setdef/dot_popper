@@ -50,4 +50,4 @@ The record holds no comparison in his words of option 1 with options 2 and 3, an
 
 ## More Information
 
-The layers, the areas and what each may depend on are in [the architecture](../architecture.md). [ADR-0022](0022-use-cases-hold-the-rules-that-need-two-areas.md) and [ADR-0018](0018-screens-are-objects-on-a-stack.md) are decisions made under this one. Revisit when the folders are divided by area, to say what then enforces the division.
+The layers, the areas and what each may depend on are in [the architecture](../architecture.md). [ADR-0022](0022-use-cases-hold-the-rules-that-need-two-areas.md) and [ADR-0023](0023-screens-are-objects-on-a-stack.md) are decisions made under this one. Revisit when the folders are divided by area, to say what then enforces the division.

@@ -3,7 +3,7 @@
 module DotPopper
   module Presentation
     # Every screen of the game, each an object that answers for itself
-    # (doc/design/screens.md, ADR-0018). The Show makes one of each as it is
+    # (doc/design/screens.md, ADR-0023). The Show makes one of each as it is
     # made, and Show#screen is the one place that says which is on top;
     # every press, button, key and scroll asks that screen.
     module Screens
