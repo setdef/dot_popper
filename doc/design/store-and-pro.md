@@ -55,7 +55,7 @@ In a store build, also:
 - free games are always metered (`FreeGames.player?` is true, so the bot and scenarios do not skip the limit);
 - an automated run still sells through the build's channel and uses the real pins, so a pipeline that wants fakes runs the test build.
 
-Tests: `test/build_test.rb`, `test/composition/root_test.rb`, `test/set_build_channel_test.rb`, `test/check_build_test.rb`, and for the rules' own homes `test/receipt_test.rb` (`Receipt.trusted`), `test/continuity/license_test.rb` (`Continuity.pins_for`, `Continuity::License.kept_in`) and `test/free_games_test.rb` (`FreeGames.metered?`, `.player?`).
+Tests: `test/build_test.rb`, `test/composition/root_test.rb`, `test/set_build_channel_test.rb`, `test/check_build_test.rb`, `test/build_for_sale_test.rb` (each channel's build put together in a Ruby of its own from a copy stamped for it, without what it leaves out, so the shared code's own answers are the ones tested: every other test loads the test build's part), and for the rules' own homes `test/receipt_test.rb` (`Receipt.trusted`), `test/continuity/license_test.rb` (`Continuity.pins_for`, `Continuity::License.kept_in`) and `test/free_games_test.rb` (`FreeGames.metered?`, `.player?`).
 
 ### Which store each build gets
 
