@@ -249,16 +249,15 @@ class WebsiteStoreTest < Minitest::Test
   end
 
   def test_store_for_gives_computers_the_website_and_never_ios
-    made = []
-    website = ->(fake:) { made << fake && :website }
-    args = { native: :native_port, fake: FakeStore.new(Memory.new), entitlement: DotPopper::Entitlement.free, website: }
+    website = -> { :website }
+    args = { native: :native_port, entitlement: DotPopper::Entitlement.free, website: }
+    test_build = { fake: FakeStore.new(Memory.new), entitlement: DotPopper::Entitlement.free, website: }
 
-    assert_equal :website, Store.for(DotPopperTest.platform("Linux"), **args, channel: nil)
-    assert_kind_of Store, Store.for(DotPopperTest.platform("Android"), **args, channel: nil)
+    assert_equal :website, Store.of_test_build(DotPopperTest.platform("Linux"), **test_build)
+    assert_kind_of Store, Store.of_test_build(DotPopperTest.platform("Android"), **test_build)
     assert_equal :website, Store.for(DotPopperTest.platform("Windows"), **args, channel: Store::WEBSITE)
     assert_equal :website, Store.for(DotPopperTest.platform("Android"), **args, channel: Store::WEBSITE)
     refute_equal :website, Store.for(DotPopperTest.platform("iOS"), **args, channel: Store::WEBSITE)
-    assert_equal [true, false, false], made
   end
 
   def test_change_server_appears_only_while_setdef_is_gone

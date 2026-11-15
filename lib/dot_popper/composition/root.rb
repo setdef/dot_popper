@@ -165,11 +165,7 @@ module DotPopper
         unless Presentation::Splash.skipped?(settings.env)
           @splash = Presentation::Splash.start(calm: settings.calm?, sounding: !@sound_player.muted?)
         end
-        @storefront = Store.for(
-          platform, entitlement:, channel: settings.channel, native: native_store,
-                    fake: test_store,
-                    website: ->(fake:) { website_store(clipboard, fake:) }
-        )
+        @storefront = store_for(clipboard)
         games = free_games(entitlement, metered: FreeGames.metered?(settings.env, channel:, offered: storefront.offered?))
         @haptics = platform.buzzes? ? @engine.buzzer : Presentation::NoHaptics.new
         @sharing = Presentation::SheetSharing.for(platform, opener: @engine.opener)
@@ -203,13 +199,17 @@ module DotPopper
         @bot = Presentation::Bot.new(Style::BOT) if flag?("DOT_POPPER_AUTOPLAY")
       end
 
+      # The store for this build, as Store.for chooses it by the channel.
+      def store_for(clipboard)
+        Store.for(platform, entitlement:, channel: settings.channel, native: native_store,
+                            website: -> { website_store(clipboard, BrowserCheckout.new(opener: @engine.opener)) })
+      end
+
       # Where a test build's part (Build::PARTS) answers with its own: its
-      # store, its scenarios' themes, its stand-in for setdef, and its
-      # website checkout. A build for sale has none of them.
-      def test_store = nil
+      # scenarios' themes and its stand-in for setdef, and its store
+      # (#store_for). A build for sale has none of them.
       def use_fixture(_themes, _use_theme) = nil
       def test_watch(_license, _pins) = nil
-      def test_checkout(_clipboard) = nil
 
       # What the player is assumed to hold before they press anything.
       def starting_input
@@ -241,10 +241,9 @@ module DotPopper
         Continuity::NoWatch.new(gone: @gone, license:)
       end
 
-      # The website's store: its real checkout in the browser, or a test
-      # build's (#test_checkout).
-      def website_store(clipboard, fake:)
-        checkout = fake ? test_checkout(clipboard) : BrowserCheckout.new(opener: @engine.opener)
+      # The website's store, with +checkout+: in the browser, in a build
+      # for sale.
+      def website_store(clipboard, checkout)
         WebsiteStore.new(checkout:, entitlement:, gone: @gone, clipboard:, entered: -> { @watch.start })
       end
 

@@ -109,8 +109,11 @@ module Inputs
       @gone.heard(:gone, @day - 200) if gone
       license = DotPopper::Continuity::License.new(Memory.new, pins: DotPopper::Continuity::TEST_PINS)
       @entitlement = DotPopper::Entitlement.new(forced: pro, license:, trust: DotPopper::Receipt::TEST)
-      @storefront = DotPopper::Store.for(platform, entitlement:, native: DotPopper::FakeStore.new(Memory.new), fake: DotPopper::FakeStore.new(Memory.new),
-                                          website: ->(fake:) { website(fake:) }, channel:)
+      @storefront = if channel
+                      DotPopper::Store.for(platform, entitlement:, native: DotPopper::FakeStore.new(Memory.new), website: -> { website(fake: false) }, channel:)
+                    else
+                      DotPopper::Store.of_test_build(platform, entitlement:, fake: DotPopper::FakeStore.new(Memory.new), website: -> { website(fake: true) })
+                    end
       @games = DotPopper::FreeGames.new(Memory.new, today: -> { @day }, entitlement:, metered: storefront.offered?, first_games: [games_left - 3, 0].max)
       (3 - games_left.clamp(0, 3)).times { games.spend! }
       themes = DotPopper::Themes.new(Memory.new)

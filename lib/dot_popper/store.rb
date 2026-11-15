@@ -14,8 +14,7 @@ module DotPopper
   # That URL and that file are the port: +port+ answers open(url) with
   # whether it was taken, and read, remove and path for the answer.
   # NativeStore is the adapter for the app's host, which catches the URL
-  # before it leaves the app and asks StoreKit or Play Billing; a test
-  # build has its own (lib/dot_popper/test_build). Which one
+  # before it leaves the app and asks StoreKit or Play Billing. Which one
   # is chosen once, by Store.for, at the composition root
   # (Composition::Root), from the build; nothing above the port differs
   # between them (the store contract, test/store_contract.rb).
@@ -52,14 +51,8 @@ module DotPopper
     CHANNELS = (
       {} #: Hash[String, ^(entitlement: Entitlement) -> _Store]
     ).freeze
-    # The channel this build is sold through, or nil for a test build.
-    # A build for a store MUST set it, or it ships with the fake store
-    # (ADR-0009).
+    # The channel this build is sold through (Build::CHANNEL).
     BUILD_CHANNEL = Build::CHANNEL
-
-    # Whether this is a build for playtesters rather than a store: one
-    # with no channel, as every CI kit is today.
-    def self.test_build? = BUILD_CHANNEL.nil?
 
     # The channels of the computers' own stores, each sold for the one
     # system whose own store it is (Platform#own_store). Their copies also
@@ -77,24 +70,15 @@ module DotPopper
     # (Apple 3.1.1); an Android build for an APK or another store does.
     WEBSITE = Build::WEBSITE
 
-    # The store for this build on +platform+ (Platform), chosen once:
-    # with no +channel+, a test build, on a phone the +fake+ store port, and on a computer the
-    # +website+ store with its fake checkout, as computers' copies will
-    # mostly be sold. With a channel, the +native+ port where the host
-    # has a store or the channel is that computer's own store's
-    # (Platform#own_store), the website store for WEBSITE where the
-    # platform allows website sales, and else, on a
+    # The store for +channel+'s build on +platform+ (Platform), chosen
+    # once: the +native+ port where the host has a store or the channel is
+    # that computer's own store's (Platform#own_store), the website store
+    # for WEBSITE where the platform allows website sales, and else, on a
     # computer, the channel's own store, or none, which offers nothing, so
     # no one is offered a purchase that cannot complete. A channel nobody
-    # has built is none. +website+ is called for the website store, with
-    # whether the checkout is the test build's (+fake:+).
-    def self.for(platform, native:, fake:, entitlement:, website: nil, channel: BUILD_CHANNEL, channels: CHANNELS)
-      if channel.nil?
-        return new(port: fake, entitlement:) if platform.phone_host? || website.nil?
-
-        return website.call(fake: true)
-      end
-      return website.call(fake: false) if channel == WEBSITE && platform.website_sales? && website
+    # has built is none. +website+ is called for the website store.
+    def self.for(platform, native:, entitlement:, website: nil, channel: BUILD_CHANNEL, channels: CHANNELS)
+      return website.call if channel == WEBSITE && platform.website_sales? && website
       return new(port: native, entitlement:) if platform.phone_host? || platform.own_store == channel
       return NoStore.new if HELPER_CHANNELS.include?(channel)
 

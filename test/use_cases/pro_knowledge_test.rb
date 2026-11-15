@@ -61,6 +61,8 @@ class ProKnowledgeTest < Minitest::Test
     lib/dot_popper/free_games.rb
     lib/dot_popper/store.rb
     lib/dot_popper/test_build/fake_store.rb
+    lib/dot_popper/test_build/root.rb
+    lib/dot_popper/test_build/store.rb
     lib/dot_popper/test_build/switches.rb
     lib/dot_popper/use_cases/buy_pro.rb
     lib/dot_popper/use_cases/finish_game.rb

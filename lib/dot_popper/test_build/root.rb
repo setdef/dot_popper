@@ -3,18 +3,21 @@
 module DotPopper
   module Composition
     class Root
-      # What a test build puts together where a build for sale has nothing
-      # (Root#test_store and the rest): the fake store, its scenarios' themes,
+      # What a test build puts together in place of a build for sale's
+      # (Root#store_for and the rest): the fake store, its scenarios' themes,
       # the fake setdef server and the fake website checkout, each only when
       # the build has no channel: with one, each gives the shared answer, so
       # a part loaded into a build for sale by mistake changes nothing.
       module TestBuildParts
         private
 
-        def test_store
+        # The test build's store (Store.of_test_build): the fake store, or
+        # on a computer the website's with the fake checkout.
+        def store_for(clipboard)
           return super if settings.store_build?
 
-          FakeStore.new(file("fake_store.txt"), fails: FakeStore.failure(settings.env))
+          fake = FakeStore.new(file("fake_store.txt"), fails: FakeStore.failure(settings.env))
+          Store.of_test_build(platform, entitlement:, fake:, website: -> { website_store(clipboard, FakeCheckout.new(clipboard:)) })
         end
 
         # A scenario's unlocks and theme, in place of the server's.
@@ -34,8 +37,6 @@ module DotPopper
           fake = Continuity::FakeSetdef.new(file("fake_setdef.txt"), mode: Continuity::FakeSetdef.mode(settings.env))
           Continuity::Watch.new(server: fake, connectivity: fake, gone: @gone, license:, today: settings.today, pins:)
         end
-
-        def test_checkout(clipboard) = settings.store_build? ? super : FakeCheckout.new(clipboard:)
       end
       prepend TestBuildParts
     end

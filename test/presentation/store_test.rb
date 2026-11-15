@@ -47,12 +47,14 @@ class StoreTest < Minitest::Test
 
   def port = DotPopper::NativeStore.new(opener: @opener, answers: @answers)
 
-  # The two adapters a build chooses between, at the composition root.
+  # The native adapter a build for sale chooses, at the composition root.
   def stores
     @native ||= port
-    @fake ||= DotPopper::FakeStore.new(DotPopper::ScoreRecord::Memory.new)
-    { native: @native, fake: @fake }
+    { native: @native }
   end
+
+  # The fake store's adapter, which only a test build chooses.
+  def fake = @fake ||= DotPopper::FakeStore.new(DotPopper::ScoreRecord::Memory.new)
 
   def hear(text)
     @answers.text = text
@@ -72,9 +74,9 @@ class StoreTest < Minitest::Test
   end
 
   def test_a_phone_test_build_is_metered_like_the_final_game
-    assert_predicate Store, :test_build?
+    assert_nil Store::BUILD_CHANNEL
     %w[iOS Android].each do |os|
-      store = Store.for(DotPopperTest.platform(os), **stores, entitlement: @entitlement)
+      store = Store.of_test_build(DotPopperTest.platform(os), fake:, entitlement: @entitlement)
       games = DotPopper::FreeGames.new(DotPopper::ScoreRecord::Memory.new, today: -> { Date.today }, entitlement: @entitlement,
                                                                          metered: store.offered?)
 
@@ -82,12 +84,12 @@ class StoreTest < Minitest::Test
     end
   end
 
+  # With no website store to give, as in a test of the store alone.
   def test_a_test_build_uses_the_fake_store_on_every_system
-    assert_nil Store::BUILD_CHANNEL
     ["iOS", "Android", "Linux", "Windows", "OS X"].each do |os|
-      store = Store.for(DotPopperTest.platform(os), **stores, entitlement: @entitlement)
+      store = Store.of_test_build(DotPopperTest.platform(os), fake:, entitlement: @entitlement)
 
-      assert_same @fake, store.instance_variable_get(:@port), os
+      assert_same fake, store.instance_variable_get(:@port), os
     end
   end
 

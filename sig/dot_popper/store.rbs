@@ -62,10 +62,8 @@ module DotPopper
 
     attr_reader price: String?
 
-    def self.test_build?: () -> bool
-
-    def self.for: (Platform platform, native: _Port, fake: _Port, entitlement: Entitlement,
-                   ?website: (^(fake: bool) -> _Store)?, ?channel: String?,
+    def self.for: (Platform platform, native: _Port, entitlement: Entitlement,
+                   ?website: (^() -> _Store)?, ?channel: String?,
                    ?channels: Hash[String, ^(entitlement: Entitlement) -> _Store]) -> _Store
 
     def self.url: (Symbol | String action, Integer number, String path) -> String
