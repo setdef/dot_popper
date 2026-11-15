@@ -20,14 +20,27 @@
 # (Android 13, as on the Nord) and checks a bot's 45-second run and what
 # Back does (.github/android_emulator_checks.sh). A v* tag attaches the
 # kit to the tag's GitHub Release.
+#
+# Every push to trunk builds and checks the kit too, so a fault that only
+# a phone shows turns the trunk red after the push. A run takes about a
+# quarter of an hour, so a run in progress finishes, and of the runs
+# waiting behind it only the newest is kept: it checks every commit
+# pushed before it. By hand (workflow_dispatch), `commit` builds and
+# checks any commit GitHub has instead of the branch's tip, such as an
+# older trunk commit, to find which one broke the phones.
 
 name: Android kit (experimental)
 
 on:
   push:
+    branches: [trunk]
     tags: ["v*"]
   workflow_dispatch:
     inputs:
+      commit:
+        description: The commit to build and check (a SHA GitHub has); empty takes the branch's tip
+        required: false
+        default: ""
       lota_ref:
         description: "A Lota tag or commit (full SHA) to build from, to try an engine fix"
         required: false
@@ -37,7 +50,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: android-${{ github.ref }}
+  group: android-${{ github.ref }}-${{ inputs.commit }}
   cancel-in-progress: false
 
 defaults:
@@ -60,6 +73,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.commit }}
           persist-credentials: false
 
       - uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
@@ -92,10 +106,13 @@ jobs:
           echo "CMAKE_C_COMPILER_LAUNCHER=ccache" >> "$GITHUB_ENV"
           echo "CMAKE_CXX_COMPILER_LAUNCHER=ccache" >> "$GITHUB_ENV"
 
+      # Kept once for each Lota commit and NDK, as the libraries below are:
+      # a key for each push would save about 2 GB every run and push the
+      # other caches out of the repository's 10 GB.
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/lota/ccache
-          key: android-ccache-${{ github.sha }}
+          key: android-ccache-${{ env.LOTA_COMMIT }}-${{ env.NDK_REVISION }}
           restore-keys: android-ccache-
 
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -186,7 +203,7 @@ jobs:
       - name: Assemble and zip the kit
         run: |
           {
-            echo "Dot Popper $GITHUB_REF_NAME, commit $GITHUB_SHA, version $APP_VERSION"
+            echo "Dot Popper $GITHUB_REF_NAME, commit $(git rev-parse HEAD), version $APP_VERSION"
             echo "EXPERIMENTAL: built by fledge build android (Fledge $FLEDGE_TAG) with Lota $LOTA_REF (${LOTA_COMMIT:0:7}), by Lota's doc/guide/phones.md"
             echo "NDK $NDK_REVISION; minSdk 26, targetSdk 36; arm64-v8a and x86_64; built $(date -u +%Y-%m-%d)"
             echo "Workflow run $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
@@ -232,6 +249,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.commit }}
           persist-credentials: false
 
       - uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
