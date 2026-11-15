@@ -35,17 +35,6 @@ module DotPopper
       end
     end
 
-    # A labeled choice between options side by side, as a segmented
-    # control: where its label goes, and each option's segment, left to
-    # right.
-    class Segmented < Data.define(:label, :options)
-      # The outline around every segment.
-      def frame
-        first, last = options.first, options.last
-        Rect.new(x: first.x, y: first.y, width: last.right - first.x, height: first.height)
-      end
-    end
-
     # The window's first size on a desktop: a reference play area measured
     # in radii, so the field is about as crowded as on a tablet, shrunk to
     # fit +most+ of the desktop if the desktop is smaller.
