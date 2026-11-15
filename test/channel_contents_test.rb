@@ -33,7 +33,7 @@ class ChannelContentsTest < Minitest::Test
   # stamps a build, and leaves out what that channel's build leaves out.
   def stamp(channel)
     build = File.join(@game, "lib/dot_popper/build.rb")
-    File.binwrite(build, BuildChannel.stamp(File.binread(build), channel))
+    File.write(build, BuildChannel.stamp(File.read(build), channel))
     ChannelContents.left_out(channel).each { FileUtils.rm_rf(File.join(@game, it)) }
   end
 
