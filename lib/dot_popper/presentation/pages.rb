@@ -271,8 +271,6 @@ module DotPopper
       end
     end
 
-    SettingsScreen = SettingsLayout # the old name, until no one uses it
-
     ServerScreen = ChangeServerLayout # the old name, until no one uses it
   end
 end
