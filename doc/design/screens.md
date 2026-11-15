@@ -317,6 +317,6 @@ Home and Game Over, and the share preview, never put a line at a fixed fraction 
 
 ## The GUI scenarios and galleries
 
-The GUI suite (`test/gui/scenarios_test.rb`, run by `rake test:gui`; see [ADR-0005](../adr/0005-gui-scenarios-play-the-real-game.md) and [development.md](development.md)) plays these screens in a real window: `game` (Home to Game Over to Home, Play again and Home), `share` (the preview, at 1200 × 800 and 400 × 850), `credits`, `stats`, `window_buttons` (Display and Quit by the mouse alone, also at 400 × 320), `dot_size` (at 400 × 850), `hover`, `words`, `how_to_play`, `purchase` and `themes`.
+The GUI suite (`test/gui/scenarios_test.rb`, run by `rake test:gui`; see [development.md](development.md#the-gui-scenarios)) plays these screens in a real window: `game` (Home to Game Over to Home, Play again and Home), `share` (the preview, at 1200 × 800 and 400 × 850), `credits`, `stats`, `window_buttons` (Display and Quit by the mouse alone, also at 400 × 320), `dot_size` (at 400 × 850), `hover`, `words`, `how_to_play`, `purchase` and `themes`.
 
 The galleries keep screenshots to look at, and check little: `redesign_gallery` (Home and the screens it opens at 1200 × 800, and at 400 × 850 and 850 × 400 by touch, and Home with a controller), `screens_gallery`, `offer_gallery`, `themes_gallery`, `games_gallery`, `website_gallery` and `home_gallery`. They are not part of `rake test:gui`. Run one with `DOT_POPPER_SCENARIO=<name> DOT_POPPER_GALLERY=<label>`.

@@ -67,7 +67,7 @@ Lota calls `main.rb`'s callbacks; each goes straight to `Shell::App` (`lib/dot_p
 3. **Update.** `App#update` hands the sticks to the `InputHandler`, which moves the gamepad cursor (or scrolls a list), then moves the bot if it plays, `Cabinet`, the `Show` (its effects, animations, HUD, the screens' state, the store's answers through `UseCases::BuyPro`, and the friend-group session), the theme releases' replies (`ThemeReleases#update`) and the setdef watch, then the shell's tilt, drag, pile physics and particles, and, where a development setting asks for them, the screenshots, the quit and the frame meter (`Shell::DevelopmentHooks`).
 4. **Draw.** `Lota.draw` calls `Renderer#draw`, which draws the `Show`'s state through the `Pen` and the painters straight to the window at its own pixels: the night, the dots and their glow (or the pile after time's up), effects, Game Over's words and the HUD, then the screens open over the game's state from the last that covers the rest up to the top one (`Show#stack`), and the gamepad cursor.
 
-The GUI scenarios replace step 2 with a fixed step and push presses onto Lota's event queue, so everything else runs as a player's game does ([ADR-0005](adr/0005-gui-scenarios-play-the-real-game.md)).
+The GUI scenarios replace step 2 with a fixed step and push presses onto Lota's event queue, so everything else runs as a player's game does ([development](design/development.md#the-gui-scenarios)).
 
 ## Composition
 

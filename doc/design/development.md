@@ -117,7 +117,9 @@ It catches a missing method, not a wrong argument to Lota or a callback never wi
 
 ## The GUI scenarios
 
-`bundle exec rake test:gui` plays the real game in real windows. [ADR-0005](../adr/0005-gui-scenarios-play-the-real-game.md) records why.
+`bundle exec rake test:gui` plays the real game in real windows, on a driven clock. The unit suite never runs the shell, and the defined-calls check catches only a missing method: a resize once called a method that was never defined, reached `trunk`, and was caught only when someone ran the game by hand. Only a running game catches a wrong argument to Lota, a callback never wired up, or a screen that fails to draw. A scenario reaches `main.rb`'s callbacks by the path a player's press does, so wiring, drawing and resizing are tested end to end, and its driven clock and fixed settings play the same on a busy machine as on an idle one, so the suite stays fast and reliable, as the maintainer asked of every test. It checks behavior, which stays the same when the art changes, rather than comparing stills with recorded ones; the stills are kept as [galleries](#galleries), outside the suite.
+
+What it costs: it needs a display (Xvfb and Openbox), so `bundle exec rake` leaves it out; what Lota can't queue has to be stood in for (below); and `main.rb`'s last line loads the scenario runner, which never runs in a normal launch.
 
 ### How a run works
 

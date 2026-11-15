@@ -18,7 +18,7 @@ How do the presentation's screens hold their state and answer the player's input
 * Each screen answers for itself what can be pressed and where, what each press does, its main and Back actions, each gamepad button, what scrolls and what a typed key does.
 * Adding a screen names it in as few places as can be, and a test fails for each place left out.
 * Nothing a player sees, hears, presses, scores or pays changes, except where the chains disagreed, each case decided and recorded.
-* No Lota outside the shell; the presentation's tests need no window ([ADR-0005](0005-gui-scenarios-play-the-real-game.md) keeps the GUI scenarios for the window).
+* No Lota outside the shell; the presentation's tests need no window ([the GUI scenarios](../design/development.md#the-gui-scenarios) play the window).
 * No more work per frame than before.
 
 ## Considered Options
