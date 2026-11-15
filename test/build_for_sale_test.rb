@@ -83,14 +83,14 @@ class BuildForSaleTest < Minitest::Test
     Dir.mktmpdir("dot_popper_#{channel}") do |dir|
       FileUtils.cp_r(File.join(ROOT, "lib"), dir)
       build = File.join(dir, "lib/dot_popper/build.rb")
-      source = BuildChannel.stamp(File.binread(build), channel)
+      source = BuildChannel.stamp(File.read(build), channel)
       if kind == :mistaken
         source = source.sub("PARTS = %w[]", "PARTS = %w[test_build]")
                        .sub("HARMLESS = %w[", "HARMLESS = %w[#{EVERY_SETTING.keys.map { it.delete_prefix(B::PREFIX) }.join(" ")} ")
       else
         ChannelContents.left_out(channel).each { FileUtils.rm_rf(File.join(dir, it)) }
       end
-      File.binwrite(build, source)
+      File.write(build, source)
       out, status = Open3.capture2e(RbConfig.ruby, "-I", File.join(dir, "lib"), "-I", File.join(ROOT, "test"), "-e", PROBE,
                                     "--", *proofs, JSON.generate(EVERY_SETTING))
       raise "#{channel}'s build #{KINDS.key(kind)} did not answer:\n#{out}" unless status.success?
