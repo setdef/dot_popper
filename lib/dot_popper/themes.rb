@@ -19,6 +19,8 @@ module DotPopper
     # How long setdef must have been gone before a theme opens by its
     # date alone.
     GONE_DAYS = 180
+    # The saved word for the themes released to this device, from before
+    # themes were said to be released; kept so every saved file reads.
     RELEASED = "unlocked"
     TOLD = "told"
     CHOSEN = "chosen"

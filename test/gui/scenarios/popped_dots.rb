@@ -64,11 +64,11 @@ module DotPopperGui
     NEAREST = 45
 
     def play
-      keeper = show.instance_variable_get(:@themes)
+      player_themes = show.instance_variable_get(:@themes)
       wait(0.5)
-      keeper.release(P::Style::THEMES.map(&:key))
-      keeper.told(keeper.new_theme) until keeper.new_theme.nil?
-      drawn = themes.map { draw(keeper, it) }
+      player_themes.release(P::Style::THEMES.map(&:key))
+      player_themes.told(player_themes.new_theme) until player_themes.new_theme.nil?
+      drawn = themes.map { draw(player_themes, it) }
       drawn.each { alike(it) }
       say "ok - popped dots differ in no color, lightness or size"
       drawn.each { follows(it) }
@@ -93,7 +93,7 @@ module DotPopperGui
 
     # One theme's night, then each dot bright and popped, one at a time,
     # in the middle of a game, as Patches.
-    def draw(keeper, theme)
+    def draw(player_themes, theme)
       show.instance_variable_get(:@use_theme).call(theme.key)
       wait(0.5)
       check(show.in_use.key == theme.key, "#{theme.key} is in use")

@@ -58,8 +58,8 @@ module DotPopper
         build
       end
 
-      # Starts what reaches past this process: the theme feed's first
-      # request, the store's first question, and the watch for setdef.
+      # Starts what reaches past this process: the first request for theme
+      # releases, the store's first question, and the watch for setdef.
       # Only the first and the friend groups' are asked again (Refresh);
       # the rest are once each time the game starts.
       def start
