@@ -4,7 +4,7 @@
 -->
 # Dot Popper: developer guide
 
-[![Package](https://github.com/setdef/dot_popper/actions/workflows/package.yml/badge.svg?branch=trunk)](https://github.com/setdef/dot_popper/actions/workflows/package.yml) [![GUI](https://github.com/setdef/dot_popper/actions/workflows/gui.yml/badge.svg?branch=trunk)](https://github.com/setdef/dot_popper/actions/workflows/gui.yml) [![Windows tests](https://github.com/setdef/dot_popper/actions/workflows/windows-tests.yml/badge.svg?branch=trunk)](https://github.com/setdef/dot_popper/actions/workflows/windows-tests.yml) [![Ruby](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2FKerrick%2Fdot_popper%2Ftrunk%2F.ruby-version&search=(.*)&replace=%241&label=Ruby&logo=ruby&color=ffbf52)](#requirements)
+[![Package](https://github.com/setdef/dot_popper/actions/workflows/package.yml/badge.svg?branch=trunk)](https://github.com/setdef/dot_popper/actions/workflows/package.yml) [![GUI](https://github.com/setdef/dot_popper/actions/workflows/gui.yml/badge.svg?branch=trunk)](https://github.com/setdef/dot_popper/actions/workflows/gui.yml) [![Ruby](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2FKerrick%2Fdot_popper%2Ftrunk%2F.ruby-version&search=(.*)&replace=%241&label=Ruby&logo=ruby&color=ffbf52)](#requirements)
 
 Dot Popper is a 2D arcade game written in Ruby. It runs on [Lota](https://github.com/setdef/Lota), which runs the engine that [LÖVE](https://love2d.org) games run on, with Ruby in place of Lua. [Fledge](https://github.com/setdef/Fledge) packages it into apps for Mac, Windows, and Linux that players run without Ruby. For what the game is and how to install it, see the [README](../README.md).
 
