@@ -596,9 +596,13 @@ jobs:
           check() { ruby script/check_build.rb website "$VERSION" "$1" && ruby script/channel_contents.rb check website "$1"; }
           case "$RUNNER_OS" in
             Windows)
-              7z x -y -bd -o"$temp/zip" "$fuse"/*.zip > /dev/null
+              # The runner's own 7-Zip, by its path and with Windows paths:
+              # MSYS2's 7z, first on the PATH since the Windows Ruby's
+              # toolchain is, takes no path that names a drive.
+              unpack() { "/c/Program Files/7-Zip/7z.exe" x -y -bd -o"$(cygpath -w "$2")" "$(cygpath -w "$1")" > /dev/null; }
+              unpack "$(ls "$fuse"/*.zip)" "$temp/zip"
               check "$temp/zip"
-              7z x -y -bd -o"$temp/installer" "$fuse"/*-setup.exe > /dev/null
+              unpack "$(ls "$fuse"/*-setup.exe)" "$temp/installer"
               check "$temp/installer" ;;
             macOS)
               mkdir -p "$temp/tar"
