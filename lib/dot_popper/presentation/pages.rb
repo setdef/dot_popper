@@ -271,8 +271,6 @@ module DotPopper
       end
     end
 
-    AchievementsScreen = AchievementsLayout # the old name, until no one uses it
-
     SettingsScreen = SettingsLayout # the old name, until no one uses it
 
     ServerScreen = ChangeServerLayout # the old name, until no one uses it
