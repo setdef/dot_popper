@@ -445,7 +445,7 @@ class RootTest < Minitest::Test
 
     assert_equal %i[themes groups], asked
     now += DotPopper::Refresh::FLOOR
-    game.cabinet.announce(DotPopper::Events::HomeShown.new(score_record: 0))
+    game.cabinet.send(:announce, DotPopper::Events::HomeShown.new(score_record: 0)) # as the cabinet does, back on Home
 
     assert_equal %i[themes groups themes groups], asked
   end

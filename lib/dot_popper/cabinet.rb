@@ -29,7 +29,10 @@ module DotPopper
       @random = random
       @listeners = []
       @game = nil # the game in play, paused or just finished, which only the cabinet holds
-      @starts_taken = false
+      @starter_taken = false
+      @transitions = Transitions.new(->(event) { announce(event) },
+                                     ->(game, seed, size_class, tutorial) { finish(game, seed, size_class, tutorial) },
+                                     -> { show_home })
       @state = show_home
     end
 
@@ -51,9 +54,9 @@ module DotPopper
     # the same seed and the same taps give the same dots, whatever else
     # uses randomness meanwhile.
     def starter
-      raise StarterTaken, "a Cabinet hands out its Starter once" if @starts_taken
+      raise StarterTaken, "a Cabinet hands out its Starter once" if @starter_taken
 
-      @starts_taken = true
+      @starter_taken = true
       Starter.new(lambda do |opening, seed|
         seed ||= draw_seed
         next self unless state.is_a?(Home)
@@ -84,8 +87,8 @@ module DotPopper
       self
     end
 
-    def press(x, y) = advance(state.press(self, @game, x, y))
-    def update(seconds) = advance(state.update(self, @game, seconds))
+    def press(x, y) = advance(state.press(@transitions, @game, x, y))
+    def update(seconds) = advance(state.update(@transitions, @game, seconds))
 
     # The game in play or just finished, as it stands (Game::View, which
     # cannot change it), or nil on Home.
@@ -113,20 +116,6 @@ module DotPopper
     # so a game in play keeps the radius it started with.
     def sizing=(sizing)
       @sizing = sizing if state.is_a?(Home)
-    end
-
-    # Tells every listener of +event+; nil is nothing to tell.
-    def announce(event)
-      @listeners.each { |listener| listener.call(event) } if event
-      event
-    end
-
-    # The transitions, each with the event that says it happened.
-
-    def show_home
-      @game = nil
-      announce(Events::HomeShown.new(score_record: score_record.of(size_class)))
-      Home.new
     end
 
     # Whether a game is in play (Playing).
@@ -160,6 +149,25 @@ module DotPopper
       advance(begin_game(game, state.seed, state.size_class, tutorial: true))
     end
 
+    private
+
+    # Tells every listener of +event+; nil is nothing to tell.
+    def announce(event)
+      @listeners.each { |listener| listener.call(event) } if event
+      event
+    end
+
+    # The transitions, each with the event that says it happened. Only the
+    # cabinet and its states make them (Transitions), so what holds the
+    # cabinet can neither finish a game that was never played, nor
+    # announce an event of its own, nor send it Home.
+
+    def show_home
+      @game = nil
+      announce(Events::HomeShown.new(score_record: score_record.of(size_class)))
+      Home.new
+    end
+
     # The game's score counts among the records of +size_class+, the class
     # it started in, even if the window changed size meanwhile. +tutorial+
     # says the tutorial played over its opening (Starter#paused).
@@ -170,8 +178,6 @@ module DotPopper
                                      field: game.field, dots: game.dots, score: game.score, elapsed: game.elapsed, tutorial:))
       GameOver.new(game: game.view, new_score_record:)
     end
-
-    private
 
     # A seed of the game's own randomness, for a game started with none.
     def draw_seed = @random.rand(LARGEST_SEED)
@@ -186,39 +192,54 @@ module DotPopper
       self
     end
 
+    # What a state may do to the cabinet, which hands it only to its own
+    # states, as it passes on a press or an update: announce an event,
+    # finish the game, and go Home. Nothing else holds it.
+    class Transitions
+      def initialize(announce, finish, show_home)
+        @announce = announce
+        @finish = finish
+        @show_home = show_home
+      end
+
+      def announce(event) = @announce.call(event)
+      def finish(game, seed, size_class, tutorial) = @finish.call(game, seed, size_class, tutorial)
+      def show_home = @show_home.call
+    end
+
     # Each state holds the game's Game::View (+game+), and is handed the
-    # game itself (+live+) only as the cabinet passes on a press or an
-    # update.
+    # game itself (+live+) and the cabinet's Transitions (+transitions+)
+    # only as the cabinet passes on a press or an update.
 
     # Waiting to start. A press here reaches no rule: a game begins only
     # when it is started (Starter).
     class Home < Data.define
       def game = nil
-      def press(_cabinet, _live, _x, _y) = self
-      def update(_cabinet, _live, _seconds) = self
+      def press(_transitions, _live, _x, _y) = self
+      def update(_transitions, _live, _seconds) = self
     end
 
     # A game in progress. It ends the moment the clock reaches zero,
     # whether time ran out or a penalty took the last of it. +tutorial+
     # says the tutorial played over its opening, while it was Paused.
     class Playing < Data.define(:game, :seed, :size_class, :tutorial)
-      def press(cabinet, live, x, y)
+      def press(transitions, live, x, y)
         return self unless live
 
-        cabinet.announce(live.tap_at(x, y))
-        settle(cabinet, live)
+        transitions.announce(live.tap_at(x, y))
+        settle(transitions, live)
       end
 
-      def update(cabinet, live, seconds)
+      def update(transitions, live, seconds)
         return self unless live
 
         live.update(seconds)
-        settle(cabinet, live)
+        settle(transitions, live)
       end
 
       private
 
-      def settle(cabinet, live) = live.over? ? cabinet.finish(live, seed, size_class, tutorial) : self
+      def settle(transitions, live) = live.over? ? transitions.finish(live, seed, size_class, tutorial) : self
     end
 
     # A game made but not yet begun: its clock has not run, and while the
@@ -226,8 +247,8 @@ module DotPopper
     # tutorial passes on (Cabinet#press_paused), and its dots move only
     # as the tutorial moves them (Cabinet#move_paused).
     class Paused < Data.define(:game, :seed, :size_class)
-      def press(_cabinet, _live, _x, _y) = self
-      def update(_cabinet, _live, _seconds) = self
+      def press(_transitions, _live, _x, _y) = self
+      def update(_transitions, _live, _seconds) = self
     end
 
     # The game is over and its score is shown. Presses are ignored for a
@@ -239,8 +260,8 @@ module DotPopper
       def score = game.score
       def ready? = shown >= Rules::GAME_OVER_GRACE
 
-      def press(cabinet, _live, _x, _y) = ready? ? cabinet.show_home : self
-      def update(_cabinet, _live, seconds) = with(shown: shown + seconds)
+      def press(transitions, _live, _x, _y) = ready? ? transitions.show_home : self
+      def update(_transitions, _live, seconds) = with(shown: shown + seconds)
     end
   end
 end

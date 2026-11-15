@@ -61,6 +61,8 @@ module DotPopper
         @listeners.each { it.call(finished) }
       end
 
+      private
+
       # +ended+ is the game's Events::GameEnded, +stats+ its numbers
       # (GameStats), and +earned+ the achievements its play earned. A game
       # the tutorial opened never counts in a friend group; any other does,

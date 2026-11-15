@@ -324,6 +324,22 @@ class CabinetTest < Minitest::Test
     assert_instance_of Cabinet::Playing, @cabinet.state
   end
 
+  # A game is finished only by the cabinet's own states, as its clock
+  # reaches zero: what holds the cabinet can neither finish a game that
+  # was never played, so that Stats and friend groups count it, nor
+  # announce an event of its own, nor send it Home.
+  def test_only_the_cabinets_states_finish_a_game_announce_or_go_home
+    unplayed = DotPopper::Game.new(field, random: Random.new(1))
+    assert_raises(NoMethodError) { @cabinet.finish(unplayed, 1, @cabinet.size_class, false) }
+    assert_raises(NoMethodError) { @cabinet.announce(Events::HomeShown.new(score_record: 0)) }
+    assert_raises(NoMethodError) { @cabinet.show_home }
+
+    assert_empty @heard
+    start!(@cabinet)
+    @cabinet.update(11)
+    assert_equal 1, @heard.grep(Events::GameEnded).size, "its own clock still finishes it"
+  end
+
   def test_only_home_makes_a_paused_game_and_only_a_paused_game_unpauses
     @cabinet.unpause
     assert_instance_of Cabinet::Home, @cabinet.state
@@ -341,9 +357,9 @@ class CabinetTest < Minitest::Test
   CHANGES = %i[tap_at update move_dots arrange field=].freeze
 
   # What the cabinet answers without an argument, but what moves it on
-  # (to Home, from a pause, or taking its Starter): every reader there is,
+  # (from a pause, or taking its Starter): every reader there is,
   # or will be.
-  def readers = Cabinet.public_instance_methods(false).select { Cabinet.instance_method(it).arity.zero? } - %i[show_home unpause starter]
+  def readers = Cabinet.public_instance_methods(false).select { Cabinet.instance_method(it).arity.zero? } - %i[unpause starter]
 
   # Only the cabinet holds its game. Nothing it answers, in any state,
   # and nothing its state holds, is the game or can change it: what the

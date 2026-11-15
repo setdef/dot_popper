@@ -22,7 +22,9 @@ module DotPopper
 
     @listeners: Array[_Listener]
 
-    @starts_taken: bool
+    @starter_taken: bool
+
+    @transitions: Transitions
 
     class StarterTaken < StandardError
     end
@@ -59,10 +61,6 @@ module DotPopper
 
     def paused?: () -> bool
 
-    def announce: [E < event] (E? event) -> E?
-
-    def show_home: () -> Home
-
     def playing?: () -> bool
 
     def press_paused: (number x, number y) -> tap_event?
@@ -73,9 +71,13 @@ module DotPopper
 
     def unpause: () -> self
 
-    def finish: (Game game, Integer seed, SizeClass size_class, bool tutorial) -> GameOver
-
     private
+
+    def announce: [E < event] (E? event) -> E?
+
+    def show_home: () -> Home
+
+    def finish: (Game game, Integer seed, SizeClass size_class, bool tutorial) -> GameOver
 
     def draw_seed: () -> Integer
 
@@ -83,14 +85,31 @@ module DotPopper
 
     def advance: (state next_state) -> self
 
+    class Transitions
+      @announce: ^(event? event) -> event?
+
+      @finish: ^(Game game, Integer seed, SizeClass size_class, bool tutorial) -> GameOver
+
+      @show_home: ^() -> Home
+
+      def initialize: (^(event? event) -> event? announce, ^(Game game, Integer seed, SizeClass size_class, bool tutorial) -> GameOver finish,
+                       ^() -> Home show_home) -> void
+
+      def announce: (event? event) -> event?
+
+      def finish: (Game game, Integer seed, SizeClass size_class, bool tutorial) -> GameOver
+
+      def show_home: () -> Home
+    end
+
     class Home < ::Data
       def self.new: () -> instance
 
       def game: () -> nil
 
-      def press: (Cabinet cabinet, Game? live, number x, number y) -> Home
+      def press: (Transitions transitions, Game? live, number x, number y) -> Home
 
-      def update: (Cabinet cabinet, Game? live, number seconds) -> Home
+      def update: (Transitions transitions, Game? live, number seconds) -> Home
     end
 
     class Playing < ::Data
@@ -104,13 +123,13 @@ module DotPopper
 
       def self.new: (game: Game::View, seed: Integer, size_class: SizeClass, tutorial: bool) -> instance
 
-      def press: (Cabinet cabinet, Game? live, number x, number y) -> (Playing | GameOver)
+      def press: (Transitions transitions, Game? live, number x, number y) -> (Playing | GameOver)
 
-      def update: (Cabinet cabinet, Game? live, number seconds) -> (Playing | GameOver)
+      def update: (Transitions transitions, Game? live, number seconds) -> (Playing | GameOver)
 
       private
 
-      def settle: (Cabinet cabinet, Game live) -> (Playing | GameOver)
+      def settle: (Transitions transitions, Game live) -> (Playing | GameOver)
     end
 
     class Paused < ::Data
@@ -122,9 +141,9 @@ module DotPopper
 
       def self.new: (game: Game::View, seed: Integer, size_class: SizeClass) -> instance
 
-      def press: (Cabinet cabinet, Game? live, number x, number y) -> Paused
+      def press: (Transitions transitions, Game? live, number x, number y) -> Paused
 
-      def update: (Cabinet cabinet, Game? live, number seconds) -> Paused
+      def update: (Transitions transitions, Game? live, number seconds) -> Paused
     end
 
     class GameOver < ::Data
@@ -142,9 +161,9 @@ module DotPopper
 
       def ready?: () -> bool
 
-      def press: (Cabinet cabinet, Game? live, number x, number y) -> (GameOver | Home)
+      def press: (Transitions transitions, Game? live, number x, number y) -> (GameOver | Home)
 
-      def update: (Cabinet cabinet, Game? live, number seconds) -> GameOver
+      def update: (Transitions transitions, Game? live, number seconds) -> GameOver
     end
   end
 end

@@ -31,23 +31,31 @@ class FinishGameTest < Minitest::Test
                                                   friend_groups: @groups)
   end
 
+  # Its one way in is an event heard (#call), as the cabinet tells it the
+  # rules' own: nothing finishes a game with numbers of its own choosing.
+  def test_a_game_is_finished_only_as_its_end_is_heard
+    assert_raises(NoMethodError) { @finish.finish(ended, stats: stats) }
+    assert_equal %i[call stats subscribe], DotPopper::UseCases::FinishGame.public_instance_methods(false).sort
+    assert_equal 0, @stats_book.stats.games
+  end
+
   def test_the_game_goes_into_stats
-    @finish.finish(ended, stats: stats(dots_popped: 3))
+    finish(ended, stats: stats(dots_popped: 3))
 
     assert_equal 1, @stats_book.stats.games
     assert_equal 3, @stats_book.stats.dots_popped
   end
 
   def test_game_over_names_the_most_impressive_record_the_game_set
-    assert_nil @finish.finish(ended, stats: stats(most_dots_in_a_row: 2)).record, "a first game has nothing to beat"
+    assert_nil finish(ended, stats: stats(most_dots_in_a_row: 2)).record, "a first game has nothing to beat"
 
-    result = @finish.finish(ended, stats: stats(most_dots_in_a_row: 5))
+    result = finish(ended, stats: stats(most_dots_in_a_row: 5))
     assert_equal :most_dots_in_a_row, result.record.kind
     assert_equal 5, result.record.value
   end
 
   def test_a_free_players_achievements_are_kept_but_not_shown_or_reported
-    result = @finish.finish(ended, stats: stats, earned: %i[big_score])
+    result = finish(ended, stats: stats, earned: %i[big_score])
 
     assert_empty result.achievements
     assert @achievements.earned?(:big_score)
@@ -56,10 +64,10 @@ class FinishGameTest < Minitest::Test
   end
 
   def test_a_pro_player_sees_and_reports_only_those_first_earned_in_this_game
-    @finish.finish(ended, stats: stats, earned: %i[big_score])
+    finish(ended, stats: stats, earned: %i[big_score])
     pro = DotPopper::UseCases::FinishGame.new(stats_book: @stats_book, achievements: @achievements, entitlement: DotPopper::Entitlement.new(forced: true),
                                               friend_groups: @groups)
-    result = pro.finish(ended, stats: stats, earned: %i[big_score blink])
+    result = finish(ended, by: pro, stats: stats, earned: %i[big_score blink])
 
     assert_equal %i[blink], result.achievements
     assert_equal [%i[blink]], @groups.achievements
@@ -70,9 +78,9 @@ class FinishGameTest < Minitest::Test
   # enjoying friend groups." So a game counts whatever its dot size; only
   # the tutorial's never does.
   def test_every_game_but_the_tutorials_counts_in_a_friend_group_whatever_its_dot_size
-    @finish.finish(ended(score: 4), stats: stats)
-    @finish.finish(ended(score: 5, tutorial: true), stats: stats)
-    @finish.finish(ended(score: 6, size_class: DotPopper::SizeClass::SMALL), stats: stats)
+    finish(ended(score: 4), stats: stats)
+    finish(ended(score: 5, tutorial: true), stats: stats)
+    finish(ended(score: 6, size_class: DotPopper::SizeClass::SMALL), stats: stats)
 
     assert_equal [[4, true], [5, false], [6, true]], @groups.games
   end
@@ -121,6 +129,11 @@ class FinishGameTest < Minitest::Test
   end
 
   private
+
+  # Finishes +ended+ with these numbers and achievements, as FinishGame
+  # does when it hears the rules' GameEnded; it is private, so that only
+  # what the rules announce finishes a game.
+  def finish(ended, stats:, earned: [], by: @finish) = by.send(:finish, ended, stats:, earned:)
 
   def ended(score: 3, size_class: DotPopper::SizeClass::STANDARD, tutorial: false)
     DotPopper::Events::GameEnded.new(score_record: score, new_score_record: false, seed: 1, size_class:, field:, dots: DotPopper::Stack.new,
