@@ -122,7 +122,7 @@ class ShareTest < Minitest::Test
   end
 
   def test_the_game_over_starts_the_cue_when_the_score_has_counted
-    game_over = GameOver.new(style: Style::GAME_OVER, score: 9, score_record: 12, new_score_record: false, at: 1.0)
+    game_over = GameOverResult.new(style: Style::GAME_OVER, score: 9, score_record: 12, new_score_record: false, at: 1.0)
 
     assert_in_delta 0.0, game_over.share_button_entrance(1.0 + Style::GAME_OVER.tally.duration).alpha
     assert_in_delta 1.0, game_over.share_button_entrance(1.0 + Style::GAME_OVER.tally.duration + 2.0).alpha

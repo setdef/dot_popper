@@ -373,7 +373,7 @@ class ScreenPlansTest < Minitest::Test
   def middle(rect) = [rect.center_x, rect.center_y]
 
   def game_over(goal_met: false, new_score_record: false, record: false)
-    GameOver.new(style: Style::GAME_OVER, score: 128, score_record: new_score_record ? 128 : 140, new_score_record:, at: 0.0, goal_met:,
+    GameOverResult.new(style: Style::GAME_OVER, score: 128, score_record: new_score_record ? 128 : 140, new_score_record:, at: 0.0, goal_met:,
                record: (DotPopper::Stats::Record.new(kind: :most_dots_in_a_row, value: 31) if record))
   end
 
