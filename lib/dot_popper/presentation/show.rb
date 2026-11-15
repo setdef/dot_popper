@@ -101,7 +101,6 @@ module DotPopper
       # The screens open over the screen for the game's state, the top
       # one last, for the renderer to draw.
       attr_reader :stack
-      alias layers stack # the old name, until no one calls it
 
       # One of each screen, open or not, by its name in Screens.made_for.
       attr_reader :screens
@@ -391,10 +390,6 @@ module DotPopper
         each_screen(&:page_changed)
         sounds.play(:tick, pitch: 0.8)
       end
-
-      # The old names, until no one calls them.
-      alias open_page push_page
-      alias close_page pop_page
 
       def open_stats = @screens[:stats].open
 
@@ -695,11 +690,6 @@ module DotPopper
 
       # Whether +screen+ is open on the stack, on top or under another.
       def open?(screen) = @stack.include?(screen.is_a?(Symbol) ? @screens.fetch(screen) : screen)
-
-      # The old names, until no one calls them.
-      alias open_layer push
-      alias close_layer pop
-      alias layer? open?
 
       # What sizes the screens' words (RoughMeasure's methods).
       attr_reader :measure
