@@ -23,13 +23,11 @@ These rules bind every agent working on Dot Popper. The maintainer set each of t
 - A button names the action it takes.
 - How to play must never depend on reading English.
 - Don't deliver work you can see is flawed. Look at every image at the size it will be seen, and fix it first.
-- When the maintainer complains, ask what he wants before building a fix. When something is already approved, keep going without asking again.
 
 ## Trunk-based development
 
-- Work straight on `trunk` in small green commits, rebasing first. Branches are rare, last minutes, and are never built on.
-- Never push-and-poll, in CI or anywhere else. Before each push, run the narrowest check that shows your change broke nothing: the tests it reaches, Steep if it touches typed code, and the one GUI scenario for a screen it changes. Then push and carry on. CI runs everything else after the push.
-- A red trunk comes first. Fix it within minutes, or revert the commit that broke it.
+- Work on `trunk` as the `trunk-based-development` skill says.
+- The fast build before a push is the tests your change reaches, Steep if it touches typed code, and the one GUI scenario for a screen it changes. CI runs everything else after the push.
 - Before 1.0.0, a green trunk may be tagged as a playtest release (`v0.X.Y`) without asking: bump `fledge.yml`'s version in the tagged commit. From 1.0.0 on, tag only when the maintainer says so.
 - Commits are Conventional Commits with a prose body, ending with your `Co-Authored-By` line.
 
@@ -45,7 +43,6 @@ These rules bind every agent working on Dot Popper. The maintainer set each of t
 - Every check runs locally, so a fresh clone works for anyone. Heavy work (test suites, builds, GUI runs, renders) may be run on another machine, but nothing committed may depend on one.
 - Every background job and game run has a hard timeout (`timeout N`, and `DOT_POPPER_QUIT_AFTER` for the game). No process of yours may outlive its job. Kill only what you started.
 - Never open a window on a screen someone is using. Run anything that opens a window under a virtual display, with `ALSOFT_DRIVERS=null`.
-- If a permission is refused, stop and report what's needed. Don't route around it, and don't ask another agent to do it for you.
 
 ## Hands off
 
