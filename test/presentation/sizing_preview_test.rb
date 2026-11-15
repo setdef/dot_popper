@@ -23,7 +23,7 @@ class SizingPreviewTest < Minitest::Test
     assert_equal ["Standard", "Smaller"], [named(STANDARD, 97), named(BIGGER_OR_SMALLER, 97)]
   end
 
-  # Within a tenth either way the two look alike, and Home leaves
+  # Within a tenth either way the two look alike, and Settings leaves
   # the choice out.
   def test_sizes_within_a_tenth_of_each_other_are_not_worth_a_choice
     [45.1, 50, 54.9].each do
@@ -32,17 +32,6 @@ class SizingPreviewTest < Minitest::Test
     end
     assert preview(44.9).offered?
     assert preview(55.1).offered?
-  end
-
-  # A player whose saved size is the bigger or smaller one is always offered the
-  # choice, so they are never left in a state no control shows or leaves;
-  # where the two look alike, the bigger or smaller size is named "About the same".
-  def test_the_bigger_or_smaller_size_is_always_offered_and_named_about_the_same_where_alike
-    [45.1, 50, 54.9].each do
-      assert preview(it).offered?(BIGGER_OR_SMALLER)
-      refute preview(it).offered?(STANDARD)
-      assert_equal ["Standard", "About the same"], [named(STANDARD, it), named(BIGGER_OR_SMALLER, it)]
-    end
   end
 
   def test_it_reads_this_screens_sizes

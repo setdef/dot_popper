@@ -173,6 +173,8 @@ module DotPopper
       # +preview+ (SizingPreview) sees it: "Bigger" on a phone, "Smaller"
       # on a big monitor. A player sees only their own two sizes, so the
       # words say what happens on this screen, not how a size is worked out.
+      # Asked only where the two look different (SizingPreview#offered?):
+      # where they look alike, no screen names a size.
       def sizing(sizing, preview) = screen_size.fetch(sizing.standard? ? :standard : effect_of(sizing, preview))
 
       # The control's label: "Dot size".
@@ -264,7 +266,7 @@ module DotPopper
       end
 
       # :smaller or :bigger: what +sizing+ does to the dots here, next to
-      # the other choice; :alike where the two hardly differ.
+      # the other choice.
       def effect_of(sizing, preview)
         effect = preview.effect
         sizing.standard? ? effect : { smaller: :bigger, bigger: :smaller }.fetch(effect, effect)

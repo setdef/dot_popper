@@ -126,8 +126,7 @@ module DotPopper
         }.freeze,
         goal_done: "Done today:", goal_met: "You met today's goal!",
         screen_size: {
-          choice: "Dot size", standard: "Standard", smaller: "Smaller", bigger: "Bigger",
-          alike: "About the same"
+          choice: "Dot size", standard: "Standard", smaller: "Smaller", bigger: "Bigger"
         }.freeze,
         # The redesigned screens' words, said for each input where a
         # controller's button is named.

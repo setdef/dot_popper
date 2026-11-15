@@ -51,23 +51,19 @@ class SettingsTest < Minitest::Test
     assert_nil @sizing_store.read
   end
 
-  # A player who saved the bigger or smaller size there is still offered the choice,
-  # and Standard, once chosen, stays in view until Settings is left; the
-  # next visit leaves the choice out again.
-  def test_where_the_sizes_look_alike_a_saved_bigger_or_smaller_size_is_still_offered
+  # Whatever size is saved: with the bigger or smaller size saved there,
+  # the choice is left out too, and the saved size stands.
+  def test_where_the_sizes_look_alike_the_choice_is_left_out_whatever_size_is_saved
     cabinet = DotPopper::Cabinet.new(field(1200, 800), random: Random.new(2), sizing: DotPopper::DotSizing::BIGGER_OR_SMALLER)
     show = new_show(cabinet:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, sizing_store: @sizing_store)
     show.open_settings
 
-    assert show.reach_of(DotPopper::DotSizing::STANDARD), "the choice shows while the bigger or smaller size is saved"
-    show.tap(*middle(show.reach_of(DotPopper::DotSizing::STANDARD)))
-    assert cabinet.sizing.standard?
-    assert_equal "fitted", @sizing_store.read
-    assert show.reach_of(DotPopper::DotSizing::BIGGER_OR_SMALLER), "the row stays under the finger while Settings is open"
-
-    show.back
-    show.open_settings
-    assert_nil show.reach_of(DotPopper::DotSizing::BIGGER_OR_SMALLER), "the next visit leaves it out"
+    refute show.sizing_offered?
+    assert_nil show.reach_of(DotPopper::DotSizing::STANDARD)
+    assert_nil show.reach_of(DotPopper::DotSizing::BIGGER_OR_SMALLER)
+    show.pad(:lb)
+    refute cabinet.sizing.standard?, "the saved choice stays"
+    assert_nil @sizing_store.read
   end
 
   # Standard, the default, is the first segment, as the default was before

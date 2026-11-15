@@ -260,11 +260,11 @@ module DotPopper
       # afresh each time, so a resized window is always seen as it is now.
       def sizing_preview = SizingPreview.of(cabinet.screen, style::SIZING)
 
-      # Whether Settings offers the choice of dot size: where the two sizes
-      # look different, and wherever the bigger or smaller size is saved
-      # (SizingPreview#offered?). Where they look alike and Standard is
-      # saved, the choice is left out, and games follow it.
-      def sizing_offered? = sizing_preview.offered?(cabinet.sizing)
+      # Whether Settings offers the choice of dot size: only where the two
+      # sizes look different (SizingPreview#offered?). Where they look
+      # alike, the choice is left out, the saved size stands, and games
+      # follow it.
+      def sizing_offered? = sizing_preview.offered?
       def playing? = cabinet.playing?
       def game_over? = cabinet.state.is_a?(Cabinet::GameOver)
 
@@ -613,10 +613,7 @@ module DotPopper
       # (Layout#heading_place).
       def heading_place(text) = layout.heading_place(text, @measure)
 
-      def open_settings
-        @screens[:settings].visit
-        open_page(:settings)
-      end
+      def open_settings = open_page(:settings)
       def open_privacy = open_page(:privacy)
 
       # Change Server, from Settings, only while setdef is gone
