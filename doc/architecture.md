@@ -89,7 +89,7 @@ The game runs on Lota's one thread. Friend groups' requests and the theme releas
 
 ## Platforms
 
-One code base runs on macOS, Windows and Linux (built by `lota fuse`, [ADR-0024](adr/0024-lota-fuse-builds-the-desktop-apps.md)) and on iOS, iPadOS and Android (built by Lota's phone guide with Fledge). The shell makes one `Platform` value from Lota's name for the system (`Shell::Platforms`), and everywhere else the game asks it its own questions (is this a touch device, does it quit itself, does it buzz, which store is its own), so nothing beyond the shell names a system. The differences are in a few places: `DotSize.for`, `Entitlement.forced?`, `Shell::Haptics`, `SheetSharing.for` and `Store.for` by platform; `conf.rb`'s renderers; the phone hosts' native files; and the desktop's window controls (`Shell::DesktopWindow`). [Platforms](design/platforms.md) has the details.
+One code base runs on macOS, Windows and Linux (built by `lota fuse`, [PACKAGING.md](../PACKAGING.md#lota-fuse)) and on iOS, iPadOS and Android (built by Lota's phone guide with Fledge). The shell makes one `Platform` value from Lota's name for the system (`Shell::Platforms`), and everywhere else the game asks it its own questions (is this a touch device, does it quit itself, does it buzz, which store is its own), so nothing beyond the shell names a system. The differences are in a few places: `DotSize.for`, `Entitlement.forced?`, `Shell::Haptics`, `SheetSharing.for` and `Store.for` by platform; `conf.rb`'s renderers; the phone hosts' native files; and the desktop's window controls (`Shell::DesktopWindow`). [Platforms](design/platforms.md) has the details.
 
 ## Design documents
 

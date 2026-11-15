@@ -17,7 +17,6 @@ Dot Popper's architecturally significant decisions, one per record, in the MADR 
 | [0021](0021-a-build-for-sale-carries-only-its-own-parts.md) | A build for sale carries only its own parts, and the test build's code is a part it leaves out | accepted |
 | [0022](0022-use-cases-hold-the-rules-that-need-two-areas.md) | Use cases hold the rules that need two of the game's areas, and the composition root makes them (restates the former 0017) | accepted |
 | [0023](0023-screens-are-objects-on-a-stack.md) | Screens are objects on a stack, and the one on top answers every input (restates the former 0018) | accepted |
-| [0024](0024-lota-fuse-builds-the-desktop-apps.md) | `lota fuse` builds every desktop app, from a released Lota and Fledge and the Ruby that Lota needs (restates the former 0006) | accepted |
 
 ## Keeping the log
 
