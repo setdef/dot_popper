@@ -75,8 +75,14 @@ until rest.empty?
 end
 FileUtils.mkdir_p(out)
 
+# What the device prints is bytes, and its log is not always UTF-8: a
+# byte that isn't fails every match on the line. Each is read as UTF-8
+# with what isn't replaced, so a stray byte can't fail a check.
+def text(bytes) = bytes.dup.force_encoding(Encoding::UTF_8).scrub
+
 def adb(*arguments, allow_failure: false)
   output, status = Open3.capture2e("adb", *arguments)
+  output = text(output)
   abort "adb #{arguments.join(' ')} failed:\n#{output}" unless status.success? || allow_failure
   output
 end
@@ -116,7 +122,7 @@ adb("logcat", "-b", "main,system,crash,events", "-c")
 streamed = []
 stream_in, stream_out, stream = Open3.popen2("adb", "logcat", "-v", "raw", "-s", "#{package}:V")
 stream_in.close
-reader = Thread.new { stream_out.each_line { streamed << it.chomp unless it.start_with?("--------- ") } }
+reader = Thread.new { stream_out.each_line { streamed << text(it).chomp unless it.start_with?("--------- ") } }
 extras = envs.flat_map { |name, value| ["--es", "lota.env.#{name}", value] }
 say adb("shell", "am", "start", "-W", "-n", "#{package}/org.setdef.fledge.host.MainActivity", *extras).strip
 
@@ -246,7 +252,7 @@ if pull
     end
   end
 end
-crashes = File.read(File.join(out, "logcat.txt")).lines.grep(/FATAL|Fatal signal|AndroidRuntime|DEBUG\s*:|libc\s*:|SDL\s*: activity finished|wm_relaunch\w*: .*#{Regexp.escape(package)}/)
+crashes = text(File.binread(File.join(out, "logcat.txt"))).lines.grep(/FATAL|Fatal signal|AndroidRuntime|DEBUG\s*:|libc\s*:|SDL\s*: activity finished|wm_relaunch\w*: .*#{Regexp.escape(package)}/)
 say "crash lines:\n#{crashes.first(80).join}" unless crashes.empty?
 missing = expects.reject { |pattern| lines.any? { pattern.match?(it) } }
 missing.each { say "missing: #{it.source}" }
@@ -261,7 +267,7 @@ unsent.each { say "never sent #{it[:code]}: no line matched #{it[:pattern].sourc
 passed = !probe_failed && missing.empty? && out_of_order.nil? && unsent.empty?
 unless passed
   say "the focused window: #{focused_window}"
-  life = File.read(File.join(out, "logcat.txt")).lines.grep(/#{Regexp.escape(package)}/)
+  life = text(File.binread(File.join(out, "logcat.txt"))).lines.grep(/#{Regexp.escape(package)}/)
               .grep(/am_proc_start|am_proc_died|am_kill|am_crash|am_anr|am_wtf|wm_on_\w+_called|wm_finish_activity|wm_relaunch|ActivityTaskManager|ActivityManager/)
   say "the app's life, from the log:\n#{life.last(40).join}"
 end
