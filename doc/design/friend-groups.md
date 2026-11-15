@@ -82,7 +82,7 @@ A member of a group is a number the server gives, in join order, never reused (`
 
 ## The screens
 
-`Presentation::GroupPanel` (`group_panel.rb`) holds the screens' state and `Presentation::GroupScreen` (`group_screen.rb`) lays them out under their heading and over Back; `Shell::GroupPainter` draws them. Their words are `Presentation::GroupWords`. The panel never waits on the session. Home's large Friend groups button opens them (on a controller, LT); its value is "1 of 2 titles" for a member, or "Join or create". The layout of Home is in [screens.md](screens.md).
+`Presentation::GroupPanel` (`group_panel.rb`) holds the screens' state and `Presentation::GroupLayout` (`group_layout.rb`) lays them out under their heading and over Back; `Shell::GroupPainter` draws them. Their words are `Presentation::GroupWords`. The panel never waits on the session. Home's large Friend groups button opens them (on a controller, LT); its value is "1 of 2 titles" for a member, or "Join or create". The layout of Home is in [screens.md](screens.md).
 
 | Screen | What it shows |
 | --- | --- |

@@ -5,12 +5,12 @@ module DotPopper
     module Screens
       # The friend groups' screens, over Home: the list, a group, its
       # history and the keypad that joins one, each GroupPanel's page, and
-      # the notice a first Join or Create shows over them (GroupScreen,
+      # the notice a first Join or Create shows over them (GroupLayout,
       # GroupNoticeDialog).
       class FriendGroups < Screen
         include Scrolling
 
-        # Where the open page's parts go (GroupScreen), its list fitted to
+        # Where the open page's parts go (GroupLayout), its list fitted to
         # its window, and scrolled back to its top when the page or the
         # group changes.
         def plan
@@ -19,7 +19,7 @@ module DotPopper
           scroll_from_top unless @scrolled_at == where
           @scrolled_at = where
           offset = scroll&.offset || 0.0
-          plan = GroupScreen.new(layout:, style: style::GROUPS, measure:, panel:,
+          plan = GroupLayout.new(layout:, style: style::GROUPS, measure:, panel:,
                                  back_text: words.go_back, offset:, input: show.input).plan
           fit(plan.content, plan.window.height) if plan.window
           plan

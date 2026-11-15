@@ -359,7 +359,7 @@ module DotPopper
       # What the hold's prompt says while one is under way.
       def holding_words = @holding == :delete ? GroupWords.hold_to_delete : GroupWords.hold_to_leave
 
-      # Moves the page of a long list by one, for GroupScreen to bound.
+      # Moves the page of a long list by one, for GroupLayout to bound.
       # Whether the group's code shows: hidden until Show is pressed, and
       # hidden again when the player leaves the group's screen.
       def code_shown? = !@code_shown.nil? && @code_shown == @group_id && page == :group

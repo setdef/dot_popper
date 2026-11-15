@@ -3,7 +3,7 @@
 module DotPopper
   module Shell
     # The friend groups' screens, over Home's dimmed dots, as
-    # Presentation::GroupScreen lays them out, each under its heading with
+    # Presentation::GroupLayout lays them out, each under its heading with
     # Back, and the short announcement a title change shows on Home or at
     # Game Over.
     class GroupPainter < Data.define(:pen, :icons)

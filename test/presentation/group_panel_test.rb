@@ -7,7 +7,7 @@ class GroupPanelTest < Minitest::Test
 
   Groups = DotPopper::Groups
   Reply = DotPopper::Network::Reply
-  Screen = DotPopper::Presentation::GroupScreen
+  Screen = DotPopper::Presentation::GroupLayout
   Words = DotPopper::Presentation::GroupWords
 
   class ManualWorker

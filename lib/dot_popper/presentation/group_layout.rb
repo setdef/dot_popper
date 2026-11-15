@@ -47,7 +47,7 @@ module DotPopper
     # button names the one that presses it, and the list and a group add
     # the buttons that have no place of their own: the list's first group
     # (RB), and the previous and next group (LB, RB).
-    class GroupScreen < Data.define(:layout, :style, :measure, :panel, :back_text, :offset, :input)
+    class GroupLayout < Data.define(:layout, :style, :measure, :panel, :back_text, :offset, :input)
       TALL = 520.0 # the safe height, in points, a keypad column needs
 
       def initialize(layout:, style:, measure:, panel:, back_text:, offset: 0.0, input: InputKind::MOUSE) = super
@@ -253,5 +253,7 @@ module DotPopper
       # rounded ends' room.
       def label(text, height) = measure.width(:bold, (height * 0.36).round, text) + height # as Shell::PrimaryButton sizes it
     end
+
+    GroupScreen = GroupLayout # the old name, until no one uses it
   end
 end

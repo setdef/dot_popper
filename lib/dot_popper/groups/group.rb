@@ -64,7 +64,7 @@ module DotPopper
 
     # A member earning an achievement, as it appears in a group's history.
     # The +key+ is an Achievement's id; a key this game does not know is
-    # kept out of what is shown (Presentation::GroupScreen).
+    # kept out of what is shown (Presentation::GroupLayout).
     class MemberAchievement < Data.define(:id, :member_number, :key, :at)
       def self.parse(data)
         return unless data.is_a?(Hash) && data["kind"] == "achievement" && data["id"].is_a?(Integer) && data["member_number"].is_a?(Integer)
