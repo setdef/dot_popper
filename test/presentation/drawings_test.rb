@@ -154,7 +154,7 @@ class DrawingsTest < Minitest::Test
     fixture = self.fixture
     show = fixture.show
     screen = show.screens.fetch(:share_preview)
-    screen.open_with(SharePreview.open("🟡 27 dots\n⏱ 30s", show.now))
+    screen.open_with(ShareText.open("🟡 27 dots\n⏱ 30s", show.now))
     look = Style::SHARE_PREVIEW
     start = screen.drawing
     assert_equal 0.0, start.shown

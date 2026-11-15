@@ -19,7 +19,7 @@ class ShareTest < Minitest::Test
   end
 
   def test_the_preview_keeps_the_text_and_when_it_was_copied
-    preview = SharePreview.open("Dot Popper: 3 points\n🟡 3 dots · ⚫ 0 mistakes · ⏱ 9 seconds", 2.0)
+    preview = ShareText.open("Dot Popper: 3 points\n🟡 3 dots · ⚫ 0 mistakes · ⏱ 9 seconds", 2.0)
 
     assert_equal ["Dot Popper: 3 points", "🟡 3 dots · ⚫ 0 mistakes · ⏱ 9 seconds"], preview.lines
     refute preview.copied?
@@ -48,7 +48,7 @@ class ShareTest < Minitest::Test
   def test_in_the_game_sharing_opens_the_preview
     preview = InGameSharing.new.offer("Dot Popper: 3 points", 4.0)
 
-    assert_equal SharePreview.open("Dot Popper: 3 points", 4.0), preview
+    assert_equal ShareText.open("Dot Popper: 3 points", 4.0), preview
   end
 
   # An opener that remembers the URLs it was given, and takes them or not.
@@ -90,7 +90,7 @@ class ShareTest < Minitest::Test
   def test_a_sheet_that_will_not_open_falls_back_on_the_preview
     opener = FakeOpener.new(takes: false)
 
-    assert_equal SharePreview.open("Dot Popper: 3 points", 4.0),
+    assert_equal ShareText.open("Dot Popper: 3 points", 4.0),
                  SheetSharing.for(DotPopperTest.platform("Android"), opener:).offer("Dot Popper: 3 points", 4.0)
   end
 

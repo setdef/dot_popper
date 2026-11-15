@@ -12,7 +12,7 @@ module DotPopper
           @clipboard = clipboard
         end
 
-        # What it shows (Presentation::SharePreview): the text, and when it
+        # What it shows (ShareText): the text, and when it
         # was copied.
         attr_reader :preview
 

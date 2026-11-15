@@ -535,7 +535,7 @@ module DotPopper
       # grace counting as ever, and no tap there reaches the game.
       def sharing? = layer?(:share_preview)
 
-      # What the share preview shows (SharePreview), while it is open.
+      # What the share preview shows (ShareText), while it is open.
       def share_preview = (@screens[:share_preview].preview if sharing?)
 
       # Closes the share preview, back to Game Over as it was.
