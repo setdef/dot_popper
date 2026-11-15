@@ -49,7 +49,5 @@ module DotPopper
         end
       end
     end
-
-    ArrivalPainter = NewThemeCardPainter # the old name, until no one uses it
   end
 end

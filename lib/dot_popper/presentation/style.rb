@@ -201,7 +201,6 @@ module DotPopper
       # it appears: one can come while Home is up, under a finger already
       # on its way to Play (DotPopper::Refresh).
       NEW_THEME_CARD_GRACE = 0.5
-      ARRIVAL_GRACE = NEW_THEME_CARD_GRACE # the old name, until no one uses it
 
       # The stacking rule, taught on the first two Game Overs after a wrong
       # tap that had the bright dot hidden under the popped one: the tap's

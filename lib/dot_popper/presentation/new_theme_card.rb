@@ -13,7 +13,6 @@ module DotPopper
     # (+veil+, past the safe area on every side), the heading, the theme's
     # name, the switch's and Not now's words, and how lit each button is.
     class NewThemeCardDrawing < Data.define(:theme, :plan, :veil, :heading, :name, :use, :later, :use_hover, :later_hover); end
-    ArrivalDrawing = NewThemeCardDrawing # the old name, until no one uses it
 
     class NewThemeCardPlan < Data.define(:layout, :word, :measure)
       def initialize(layout:, word: nil, measure: RoughMeasure.new) = super
@@ -63,7 +62,5 @@ module DotPopper
       def gap = card.width * 0.04
       def later_width = card.width * 0.32
     end
-
-    ArrivalPlan = NewThemeCardPlan # the old name, until no one uses it
   end
 end

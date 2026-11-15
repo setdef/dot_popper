@@ -134,8 +134,6 @@ module DotPopper
       # else is asked of them; nil the rest of the time.
       def new_theme = (theme_of(@themes.new_theme) if on_home?)
       def new_theme? = !new_theme.nil?
-      alias arrival new_theme # the old name, until no one calls it
-      alias arrival? new_theme?
 
       def themes = @themes.choices.map { theme_of(it) }
       # The art of the theme in use (UseCases::UseTheme answers its key).
