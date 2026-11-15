@@ -1,0 +1,4 @@
+# Git for Windows checks text files out with CR LF by default
+# (core.autocrlf), but this copy of the server's record is compared byte
+# for byte with the SHA-256 doc/server.md states, so it keeps its bytes.
+test/fixtures/server/exchanges.json -text
