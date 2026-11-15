@@ -47,9 +47,6 @@ module DotPopper
         @arrival = ArrivalPainter.new(pen:, dots: @dots)
         @tutorial = TutorialPainter.new(pen:)
         @at_rest = Presentation::DotAnimations.new(pen.style::MOTION)
-        @pages = { Screens::Stats => @stats,
-                   Screens::Themes => @themes,
-                   Screens::Achievements => @achievements }.freeze
       end
 
       # The frame, with the setdef +splash+ over it while there is one:
@@ -83,38 +80,85 @@ module DotPopper
         (from || 0).upto(layers.size - 1) { draw_screen(layers[it], width, height, layout) }
       end
 
-      # One screen, over the veil it draws over what is under it.
-      def draw_screen(screen, width, height, layout)
-        case screen
-        when Screens::Home, Screens::NewTheme
-          veil(width, height, @pen.style::HOME.dim)
-          @home.draw(@show, layout)
-          @arrival.draw(screen.drawing) if screen.is_a?(Screens::NewTheme)
-        when Screens::Settings
-          veil(width, height, @pen.style::STATS.veil)
-          @settings.draw(screen.drawing)
-        when Screens::Credits
-          veil(width, height, @pen.style::STATS.veil)
-          @credits.draw(screen.drawing)
-        when Screens::ChangeServer
-          veil(width, height, @pen.style::STATS.veil)
-          @server.draw(screen.drawing)
-        when Screens::Privacy
-          veil(width, height, @pen.style::STATS.veil)
-          @privacy.draw(screen.drawing)
-        when Screens::Page
-          veil(width, height, @pen.style::STATS.veil)
-          @pages.fetch(screen.class).draw(@show, layout)
-        when Screens::AchievementDialog then @achievements.dialog(@show, layout)
-        when Screens::FriendGroups
-          veil(width, height, @pen.style::GROUPS.veil)
-          @group.draw(@show, layout)
-        when Screens::Offer
-          veil(width, height, @pen.style::STATS.veil)
-          @offer.draw(@show, layout)
-        when Screens::SharePreview then @share.draw(screen.drawing, width, height)
-        end
+      # One screen, over the veil it draws over what is under it, by its
+      # class (PAINTS).
+      def draw_screen(screen, width, height, layout) = send(PAINTS.fetch(screen.class), screen, width, height, layout)
+
+      # How each screen is drawn, by its class: the veil it lays over what
+      # is under it, and its painter. The Tutorial, a game and Game Over
+      # are drawn with the game under every screen (#draw), so they add
+      # nothing here. test/shell/renderer_screens_test.rb fails for a
+      # screen in Screens::ALL that is missing.
+      PAINTS = { Screens::Home => :home_screen, Screens::NewTheme => :new_theme_screen, Screens::Tutorial => :nothing,
+                 Screens::Game => :nothing, Screens::GameOver => :nothing, Screens::SharePreview => :share_preview_screen,
+                 Screens::Offer => :offer_screen, Screens::Stats => :stats_screen, Screens::Achievements => :achievements_screen,
+                 Screens::AchievementDialog => :achievement_dialog_screen, Screens::Themes => :themes_screen,
+                 Screens::Settings => :settings_screen, Screens::Credits => :credits_screen, Screens::Privacy => :privacy_screen,
+                 Screens::ChangeServer => :change_server_screen, Screens::FriendGroups => :friend_groups_screen }.freeze
+
+      def nothing(_screen, _width, _height, _layout) = nil
+
+      def home_screen(_screen, width, height, layout)
+        veil(width, height, @pen.style::HOME.dim)
+        @home.draw(@show, layout)
       end
+
+      def new_theme_screen(screen, width, height, layout)
+        home_screen(screen, width, height, layout)
+        @arrival.draw(screen.drawing)
+      end
+
+      def settings_screen(screen, width, height, _layout)
+        page_veil(width, height)
+        @settings.draw(screen.drawing)
+      end
+
+      def credits_screen(screen, width, height, _layout)
+        page_veil(width, height)
+        @credits.draw(screen.drawing)
+      end
+
+      def change_server_screen(screen, width, height, _layout)
+        page_veil(width, height)
+        @server.draw(screen.drawing)
+      end
+
+      def privacy_screen(screen, width, height, _layout)
+        page_veil(width, height)
+        @privacy.draw(screen.drawing)
+      end
+
+      def stats_screen(_screen, width, height, layout)
+        page_veil(width, height)
+        @stats.draw(@show, layout)
+      end
+
+      def themes_screen(_screen, width, height, layout)
+        page_veil(width, height)
+        @themes.draw(@show, layout)
+      end
+
+      def achievements_screen(_screen, width, height, layout)
+        page_veil(width, height)
+        @achievements.draw(@show, layout)
+      end
+
+      def achievement_dialog_screen(_screen, _width, _height, layout) = @achievements.dialog(@show, layout)
+
+      def friend_groups_screen(_screen, width, height, layout)
+        veil(width, height, @pen.style::GROUPS.veil)
+        @group.draw(@show, layout)
+      end
+
+      def offer_screen(_screen, width, height, layout)
+        page_veil(width, height)
+        @offer.draw(@show, layout)
+      end
+
+      def share_preview_screen(screen, width, height, _layout) = @share.draw(screen.drawing, width, height)
+
+      # The veil over Home's dots under a screen over Home.
+      def page_veil(width, height) = veil(width, height, @pen.style::STATS.veil)
 
       # A game, and after it, Game Over over its pile: the dots over their
       # glow, the effects, the veil and words of Game Over, the clock highlight
