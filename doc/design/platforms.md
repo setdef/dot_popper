@@ -55,7 +55,7 @@ Lota's dimensions are whole units, rounded down, while the drawable may be a fra
 
 ## Renderers
 
-`conf.rb` decides which of LÖVE's renderers the game allows before the window opens, through `Shell::VulkanRescue.choose`, which asks `Shell::RendererChoice`. [ADR-0007](../adr/0007-renderers-per-platform-with-a-relaunch-without-vulkan.md) records why.
+`conf.rb` decides which of LÖVE's renderers the game allows before the window opens, through `Shell::VulkanRescue.choose`, which asks `Shell::RendererChoice`.
 
 LÖVE tries its renderers in its own fixed order, Vulkan first wherever it may, whatever order a game lists. It falls back to the next only when a renderer cannot be created at all, not when Vulkan is created but finds no GPU it can use (a virtual machine, a remote desktop, old integrated graphics, Xvfb). Lota keeps LÖVE's behavior. So a game can put OpenGL first only by leaving Vulkan out.
 
@@ -66,8 +66,17 @@ LÖVE tries its renderers in its own fixed order, Vulkan first wherever it may, 
 | Android | `nil`, LÖVE's own | Vulkan, then OpenGL ES |
 | macOS, iOS | `nil`, LÖVE's own | Metal, the only one |
 
-- Windows allows Vulkan because, in fullscreen, OpenGL hides the Xbox Game Bar's overlay while it still takes the controller, and Vulkan shows it.
-- Android's Vulkan relies on Lota's Android host holding `surfaceDestroyed` until the game's thread reports it has paused (`GameSurface` in `MainActivity`), without which Vulkan crashed whenever the game went to the background.
+- Windows allows Vulkan because, in fullscreen, OpenGL hides the Xbox Game Bar's overlay while it still takes the controller, and Vulkan shows it. The maintainer tried four combinations on his PC, connected to a TV, and none gave both the TV's game mode and the overlay; he chose the working overlay, so under Vulkan a TV's game mode is lost, borderless or exclusive:
+
+  | | TV's game mode | Xbox overlay | Alt+Tab |
+  |---|---|---|---|
+  | OpenGL, borderless | yes | no | instant |
+  | OpenGL, exclusive | yes | no | disruptive |
+  | Vulkan, borderless | no | yes | instant |
+  | Vulkan, exclusive | no | yes | barely worse |
+
+- Linux keeps OpenGL alone, the renderer LÖVE has supported longest; a game this light gains nothing from Vulkan's speed on a computer, and everyone, store reviewers in virtual machines included, must be able to start it.
+- Android's Vulkan relies on Lota's Android host holding `surfaceDestroyed` until the game's thread reports it has paused (`GameSurface` in `MainActivity`), without which Vulkan crashed whenever the game went to the background. A smoothness run found Vulkan and OpenGL ES tied there; their battery use has not been compared.
 - `DOT_POPPER_RENDERERS=opengl` (or `vulkan`, or `metal`, comma-separated) replaces the list, to compare renderers on a device (`RendererChoice.asked`). `DOT_POPPER_NO_VULKAN=1` leaves Vulkan out, as after it failed. A store build still obeys both (`Build::HARMLESS`).
 - `DOT_POPPER_FULLSCREEN=exclusive` makes the desktop's fullscreen LÖVE's exclusive one (`DesktopWindow`); the usual fullscreen is borderless.
 
@@ -107,11 +116,11 @@ The error handler lives in `conf.rb`, not `main.rb`, because the window opens be
 
 On Windows, Ruby's `exec` runs the new process, waits for it, and exits with its status, so a script that waits for the game, such as `playtest.ps1` or CI, sees the real game end. Where there is no command, or `exec` fails, the game warns and shows one message box, "Dot Popper will use different graphics now. Please start it again." (`VulkanRescue::START_AGAIN`), and ends with status 1; the note makes the next start work. The rescue keeps its own relaunch rather than Lota's `"restart"`, since Lota's restart ends silently on a phone, where the rescue asks the player instead.
 
-**The 30 days.** After them the game tries Vulkan again, and if it still fails, falls back again by itself. A driver update or a move from a virtual machine to real hardware can make Vulkan work, and the Xbox overlay is the reason Vulkan is allowed at all. Deleting `vulkan_failed.txt` tries sooner.
+**The 30 days.** After them the game tries Vulkan again, and if it still fails, falls back again by itself. A driver update or a move from a virtual machine to real hardware can make Vulkan work, and the Xbox overlay is the reason Vulkan is allowed at all. Deleting `vulkan_failed.txt` tries sooner. So a PC where Vulkan still fails pays one slower start a month.
 
 **Where it applies.** On Windows, a PC with a Vulkan driver but no GPU it can use. On Android, a Vulkan failure asks the player to start the game again. Linux allows no Vulkan, and Apple's systems have only Metal, so `#vulkan_allowed?` is false there unless `DOT_POPPER_RENDERERS` names Vulkan.
 
-**Tests.** `test/shell/renderer_choice_test.rb` covers each platform's list, `DOT_POPPER_RENDERERS`, the note's 30 days, and each `Relaunch` command; `test/shell/vulkan_rescue_test.rb` which errors are rescued. The Package workflow's Windows job (`.github/workflows/package.yml`, "Vulkan alone") plays the fused app with `DOT_POPPER_RENDERERS=vulkan` on a runner with no GPU, and requires that it starts again without Vulkan, draws with OpenGL, writes the note, and exits with 0.
+**Tests.** `test/shell/renderer_choice_test.rb` covers each platform's list, `DOT_POPPER_RENDERERS`, the note's 30 days, and each `Relaunch` command; `test/shell/vulkan_rescue_test.rb` which errors are rescued. The Package workflow's Windows job (`.github/workflows/package.yml`, "Vulkan alone") plays the fused app with `DOT_POPPER_RENDERERS=vulkan` on a runner with no GPU, and requires that it starts again without Vulkan, draws with OpenGL, writes the note, and exits with 0. The rescue has worked under Xvfb on Linux, on a Mac and on GitHub's Windows runner; no real Windows PC with a Vulkan driver and no usable GPU has tried it.
 
 ## The iOS host
 

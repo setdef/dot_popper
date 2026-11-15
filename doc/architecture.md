@@ -77,7 +77,7 @@ What only the engine can make or do, the root asks of an engine it is given, who
 
 `Shell::App#load` makes the `Engine` from the `Platform` the shell makes of `Lota::System.os` (`Shell::Platforms`), hands it to the root, and then makes only what carries the game out with Lota: the Game Over `Pile`, `Gamepads`, `Tilting`, `Dragging`, the particles and the `Renderer`, in the styles the root chooses. `test/composition/root_test.rb` builds the root for every system and every channel, with memory stores and a fake engine (`test/composition/fake_engine.rb`), and checks each of those choices; presentation tests build a `Show` as the root does, through `PresentationTest.show`, with memory stores in place of files.
 
-`conf.rb` runs before all of this, and before the window opens: it names the save folder (`t.identity`), sets the window, and chooses the renderers, with the rescue that starts the game again without Vulkan when Vulkan can't start it ([ADR-0007](adr/0007-renderers-per-platform-with-a-relaunch-without-vulkan.md)).
+`conf.rb` runs before all of this, and before the window opens: it names the save folder (`t.identity`), sets the window, and chooses the renderers, with the rescue that starts the game again without Vulkan when Vulkan can't start it ([platforms](design/platforms.md#the-vulkan-rescue)).
 
 ## Saving
 

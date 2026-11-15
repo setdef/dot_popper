@@ -13,7 +13,8 @@ module DotPopper
     #   lota's own program, which took "run" off ARGV, leaving the game's
     #   folder and arguments, and `bundle exec` left its setup in the
     #   environment. (Lota's own restart is the same since 0.3.0, but ends
-    #   with no message when it can't start the game; see ADR-0007.)
+    #   with no message when it can't start the game; see
+    #   doc/design/platforms.md.)
     # - on a phone, not at all: the player starts it again (#command is
     #   nil).
     #
