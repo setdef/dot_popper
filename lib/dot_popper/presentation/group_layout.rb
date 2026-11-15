@@ -253,7 +253,5 @@ module DotPopper
       # rounded ends' room.
       def label(text, height) = measure.width(:bold, (height * 0.36).round, text) + height # as Shell::PrimaryButton sizes it
     end
-
-    GroupScreen = GroupLayout # the old name, until no one uses it
   end
 end
