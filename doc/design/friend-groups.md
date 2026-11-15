@@ -132,7 +132,7 @@ Only the newest change in each group is announced; the rest is in History (Saffe
 After a game that counts, the server's answer to `POST /games` gives each group's result, and Game Over shows one line in a pill with the crown glyph (`GroupPanel#game_line`, `GroupWords.game_line`):
 
 - "You took the Brave Puffins title!" for one group, "You took 2 titles!" for more;
-- "You raised the bar!" when a champion beat their own score, which is no title change;
+- "You raised the top score!" when a champion beat their own top score, which is no title change: the group's top score rises and the title stays (the glossary's words, with no metaphor);
 - "The title stays yours." when the player already holds every title the game could have won;
 - "4 short of the title." for the fewest points short of a title.
 

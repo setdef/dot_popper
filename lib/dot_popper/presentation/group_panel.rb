@@ -103,7 +103,7 @@ module DotPopper
       # Game Over's line for a game (Groups::GameResult).
       def game_line(result)
         if result.won.positive? then result.won == 1 ? took(result) : "You took #{result.won} titles!"
-        elsif result.raised.positive? then "You raised the bar!"
+        elsif result.raised.positive? then "You raised the top score!"
         elsif result.reigning then "The title stays yours."
         elsif result.short then "#{result.short} short of the title."
         end

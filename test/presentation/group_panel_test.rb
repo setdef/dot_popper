@@ -666,7 +666,7 @@ class GroupPanelTest < Minitest::Test
     result = Groups::GameResult
 
     assert_equal "You took 3 titles!", Words.game_line(result.new(won: 3, raised: 0, short: nil, reigning: false))
-    assert_equal "You raised the bar!", Words.game_line(result.new(won: 0, raised: 1, short: nil, reigning: false))
+    assert_equal "You raised the top score!", Words.game_line(result.new(won: 0, raised: 1, short: nil, reigning: false))
     assert_equal "The title stays yours.", Words.game_line(result.new(won: 0, raised: 0, short: nil, reigning: true))
     assert_equal "4 short of the title.", Words.game_line(result.new(won: 0, raised: 0, short: 4, reigning: false))
   end
