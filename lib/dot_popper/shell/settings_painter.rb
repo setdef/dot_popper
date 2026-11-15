@@ -2,7 +2,7 @@
 
 module DotPopper
   module Shell
-    # Settings, as Presentation::SettingsScreen lays it out: each row's
+    # Settings, as Presentation::SettingsLayout lays it out: each row's
     # name and its choices, then Credits and licenses and Privacy, and Back,
     # as the screen hands it (Presentation::SettingsDrawing).
     class SettingsPainter < Data.define(:pen, :dots)

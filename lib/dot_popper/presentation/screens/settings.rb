@@ -3,7 +3,7 @@
 module DotPopper
   module Presentation
     module Screens
-      # Settings, over Home (SettingsScreen): its rows of choices, Credits
+      # Settings, over Home (SettingsLayout): its rows of choices, Credits
       # and licenses, Privacy, Change Server while setdef is gone, and
       # Back. Only the buttons in view take presses.
       class Settings < Page
@@ -29,7 +29,7 @@ module DotPopper
             rows << [:dot_size, words.button(:dot_size), :dot, SIZINGS.map { [words.sizing(it, show.sizing_preview), it == cabinet.sizing, it] }]
           end
           rows << [:display, words.button(:display), :corners, display_choices] if show.window.offered?
-          plan = SettingsScreen.new(layout:, rows:, offset: scroll ? scroll.offset : 0.0, server: show.server_offered?).plan
+          plan = SettingsLayout.new(layout:, rows:, offset: scroll ? scroll.offset : 0.0, server: show.server_offered?).plan
           fit(plan.height, layout.page.height)
           plan
         end

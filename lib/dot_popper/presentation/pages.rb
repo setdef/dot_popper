@@ -25,7 +25,7 @@ module DotPopper
     # narrow screen, then Credits and licenses and Privacy, and under them,
     # while setdef is gone, Change Server (+server+). Where the page is too
     # short for all of it, it scrolls, +offset+ down.
-    class SettingsScreen < Data.define(:layout, :rows, :offset, :server)
+    class SettingsLayout < Data.define(:layout, :rows, :offset, :server)
       def initialize(layout:, rows:, offset: 0.0, server: false) = super
 
       def plan
@@ -274,5 +274,7 @@ module DotPopper
     PrivacyScreen = PrivacyLayout # the old name, until no one uses it
 
     AchievementsScreen = AchievementsLayout # the old name, until no one uses it
+
+    SettingsScreen = SettingsLayout # the old name, until no one uses it
   end
 end
