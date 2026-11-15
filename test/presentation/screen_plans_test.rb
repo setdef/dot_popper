@@ -76,7 +76,7 @@ class ScreenPlansTest < Minitest::Test
       [InputKind::MOUSE, InputKind::GAMEPAD].product([nil, record]) do |input, held|
         words = WORDS.for(input)
         text = words.share_text(128, stats, score_record: 128, new_score_record: true, record: held)
-        plan = ShareScreen.new(layout: screen_layout, type: Style::TYPE, words:, measure: RoughMeasure.new,
+        plan = ShareLayout.new(layout: screen_layout, type: Style::TYPE, words:, measure: RoughMeasure.new,
                                style: Style::SHARE_PREVIEW, lines: text.split("\n")).plan
         name = "#{width}x#{height} #{input.name}, record #{!held.nil?}"
 

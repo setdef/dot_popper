@@ -65,7 +65,7 @@ module DotPopper
         pen.color(pen.palette.ink_bottom, 0.9 * alpha)
         G.rectangle(:fill, x, y, width, height, bubble, bubble, 32)
         font = pen.fonts.semibold(plan.size(:message))
-        step = font.height * Presentation::ShareScreen::LINE
+        step = font.height * Presentation::ShareLayout::LINE
         drawing.runs.each_with_index do |runs, i|
           runs(runs, font, x + plan.side, y + bubble + (font.height / 2.0) + (step * i), alpha)
         end

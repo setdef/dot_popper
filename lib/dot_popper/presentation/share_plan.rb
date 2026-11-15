@@ -2,7 +2,7 @@
 
 module DotPopper
   module Presentation
-    # Where the share preview's parts go, worked out by ShareScreen#plan:
+    # Where the share preview's parts go, worked out by ShareLayout#plan:
     # each block's Rect by name (Stacked), the :heading, the :message
     # holding the result's lines, the :note under it, where "Copied! Paste
     # it anywhere." shows once copied, and the :buttons row; the font size each
@@ -35,7 +35,7 @@ module DotPopper
     # the note's room and the buttons always stay, since they are what the
     # preview is for. Sizes are measured with +measure+ (RoughMeasure's
     # methods).
-    class ShareScreen < Data.define(:layout, :type, :words, :measure, :style, :lines)
+    class ShareLayout < Data.define(:layout, :type, :words, :measure, :style, :lines)
       # The gaps above each block, in graphics units at full size.
       GAPS = { heading: 0, message: 14, note: 12, buttons: 18 }.freeze
       LINE = 1.2 # the message's lines apart, in a line's height
@@ -143,5 +143,7 @@ module DotPopper
       # Around every block, padded.
       def card(placed) = placed.bounds.inset(-pad)
     end
+
+    ShareScreen = ShareLayout # the old name, until no one uses it
   end
 end

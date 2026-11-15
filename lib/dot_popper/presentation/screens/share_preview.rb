@@ -3,7 +3,7 @@
 module DotPopper
   module Presentation
     module Screens
-      # The share preview over Game Over, on a computer (ShareScreen): the
+      # The share preview over Game Over, on a computer (ShareLayout): the
       # game's result as it would be shared, Close, and Copy, the one press
       # that writes the +clipboard+.
       class SharePreview < Screen
@@ -29,7 +29,7 @@ module DotPopper
           words = self.words
           text = preview.text
           (@plan ||= Memo.new).fetch([layout, words, text]) do
-            ShareScreen.new(layout:, type: style::TYPE, words:, measure:, style: style::SHARE_PREVIEW, lines: preview.lines).plan
+            ShareLayout.new(layout:, type: style::TYPE, words:, measure:, style: style::SHARE_PREVIEW, lines: preview.lines).plan
           end
         end
 

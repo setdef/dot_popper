@@ -36,7 +36,7 @@ class ShareTest < Minitest::Test
   # it shows.
   def test_the_card_keeps_room_only_for_the_copied_line
     measure = RoughMeasure.new
-    plan = ShareScreen.new(layout: layout(1200, 800), type: Style::TYPE, words: Style::WORDS, measure:,
+    plan = ShareLayout.new(layout: layout(1200, 800), type: Style::TYPE, words: Style::WORDS, measure:,
                            style: Style::SHARE_PREVIEW, lines: ["Dot Popper: 3 points"]).plan
     size = plan.size(:note)
     copied = measure.width(:semibold, size, Style::WORDS.copied) + (measure.height(:semibold, size) * 0.75)
