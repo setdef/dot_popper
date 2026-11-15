@@ -142,15 +142,15 @@ class PackagedAppTest < Minitest::Test
   end
 
   # The phone apps' game is laid out from `git archive` and then pruned:
-  # the iPhone and iPad kit's in kits.yml, the Android app's in
-  # script/android_game.sh. Each leaves out at least what a computer's
-  # app does.
+  # the iPhone and iPad kit's in kits.yml and script/ios_app.sh, the
+  # Android app's in script/android_game.sh. Each leaves out at least what
+  # a computer's app does.
   def test_the_phone_apps_leave_out_the_repositorys_own_files
     steps = YAML.load_file(File.join(ROOT, ".github/workflows/kits.yml")).dig("jobs", "ipad", "steps")
     ios = steps.find { it["name"] == "Lay out the phone project" }.fetch("run")
-    android = File.read(File.join(ROOT, "script/android_game.sh"))
+    scripts = %w[script/ios_app.sh script/android_game.sh].to_h { [it, File.read(File.join(ROOT, it))] }
 
-    { "kits.yml" => ios, "script/android_game.sh" => android }.each do |name, script|
+    { "kits.yml" => ios, **scripts }.each do |name, script|
       pruned = script[/cd "\$game" && rm -rf (.*?)\)/m, 1].to_s.delete("\\").split
 
       assert_empty PackagedApp::REPOSITORY_ONLY - pruned, "#{name} leaves these in the app"
