@@ -81,9 +81,6 @@ module DotPopper
           sounds.play(:tick, pitch: 0.8) unless quiet
         end
 
-        # As Home shows: nothing of it is open.
-        def home_shown = @for_play = false
-
         # A pointer or a controller took over from the keyboard, or the
         # keyboard was used again: Buy names no key until #key_hint says.
         def input_used(_kind) = @key_hint = nil

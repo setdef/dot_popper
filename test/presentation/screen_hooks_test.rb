@@ -8,7 +8,7 @@ require_relative "presentation_helper"
 class ScreenHooksTest < Minitest::Test
   include PresentationTest
 
-  HOOKS = %i[update release cancel_hold page_changed home_shown game_started resized input_used].freeze
+  HOOKS = %i[update release cancel_hold page_changed game_started resized input_used].freeze
 
   def setup
     @cabinet = DotPopper::Cabinet.new(field, random: Random.new(2))
@@ -38,6 +38,30 @@ class ScreenHooksTest < Minitest::Test
     @show.back
 
     assert_equal [2], @heard.values.map { it.count(:page_changed) }.uniq
+  end
+
+  # The window losing focus stops a hold of Privacy's Delete my friend
+  # group data, which is the friend groups' panel's.
+  def test_losing_focus_stops_the_friend_groups_hold
+    @show.open_settings
+    @show.open_privacy
+    @show.pad(:y)
+    assert_predicate @show.group_panel.hold, :held?
+
+    @show.let_go_of_everything
+    refute_predicate @show.group_panel.hold, :held?
+  end
+
+  # A game started: the friend groups forget the last game's result, so
+  # the next Game Over never shows it while its own is on the way.
+  def test_a_game_started_forgets_the_last_games_result_for_the_friend_groups
+    session = DotPopper::Groups::Session.off
+    session.instance_variable_set(:@result_due, true) # as a game that counts finishes
+    show = new_show(cabinet: DotPopper::Cabinet.new(field, random: Random.new(2)), layout:, sounds: FakeSounds.new, radius: R, groups: session)
+    assert_equal " ", show.group_panel.game_line, "a result on its way holds the line's place"
+    press_main(show)
+
+    assert_nil show.group_panel.game_line
   end
 
   private

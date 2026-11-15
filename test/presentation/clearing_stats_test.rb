@@ -86,11 +86,18 @@ class ClearingStatsTest < Minitest::Test
     assert @show.stats?, "where Undo was is empty space, which does nothing"
   end
 
+  # A game started forgets Undo, even one that ends before Undo's time
+  # is over (the Show's clock stands still here while the game plays):
+  # the game's records would be lost to it.
   def test_a_game_ends_the_offer
     clear_by(:mouse)
     @show.back
     press_main
+    @cabinet.update(20)
+    @cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
+    press_main
     @show.open_stats
+    assert @show.stats?
 
     assert_nil @show.undo_offer
   end

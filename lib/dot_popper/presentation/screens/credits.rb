@@ -28,13 +28,6 @@ module DotPopper
           lay_out
         end
 
-        # As Home shows: nothing of it is open.
-        def home_shown = @scroll = nil
-
-        # It keeps its own scroll as other screens over Home open and close
-        # (#open starts it at the top).
-        def page_changed = nil
-
         # The window changed size: while it is on top, its text is broken
         # into lines again, at the same place on it.
         def resized = (lay_out if show.credits?)

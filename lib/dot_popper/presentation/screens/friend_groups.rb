@@ -45,9 +45,6 @@ module DotPopper
 
         def cancel_hold = show.group_panel.cancel_hold
 
-        # As Home shows, they close.
-        def home_shown = (show.group_panel.close if show.group_panel.open?)
-
         # A game started: the panel waits for its result.
         def game_started = show.group_panel.game_started
 

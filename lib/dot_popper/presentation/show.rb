@@ -845,7 +845,6 @@ module DotPopper
 
       def home_shown(event)
         @use_theme.refresh
-        each_screen(&:home_shown)
         @layers.clear
         effects.clear
         @game_over = nil

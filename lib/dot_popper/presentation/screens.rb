@@ -150,9 +150,6 @@ module DotPopper
         # Show#close_page).
         def page_changed = nil
 
-        # Home showed, after a game: the stack is emptied.
-        def home_shown = nil
-
         # A game started.
         def game_started = nil
 

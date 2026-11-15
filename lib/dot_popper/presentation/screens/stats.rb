@@ -38,16 +38,6 @@ module DotPopper
         # The sheet as the Stats are now.
         def refresh = @sheet = build_sheet
 
-        # As Home shows: it shows nothing until opened again, and nothing
-        # holds "Clear my stats…".
-        def home_shown
-          forget
-          cancel_hold
-        end
-
-        # It shows nothing until opened again.
-        def forget = @sheet = nil
-
         # As a screen over Home opens or closes: its list starts from the
         # top, and nothing holds "Clear my stats…".
         def page_changed
