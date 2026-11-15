@@ -271,8 +271,6 @@ module DotPopper
       end
     end
 
-    PrivacyScreen = PrivacyLayout # the old name, until no one uses it
-
     AchievementsScreen = AchievementsLayout # the old name, until no one uses it
 
     SettingsScreen = SettingsLayout # the old name, until no one uses it
