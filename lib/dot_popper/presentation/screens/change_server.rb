@@ -35,12 +35,12 @@ module DotPopper
         end
 
         # Everything its painter draws (ServerDrawing), made again only when
-        # the plan, the words or a button's light changes.
+        # the window, the plan, the words or a button's light changes.
         def drawing
           plan = self.plan
           hover = show.hover
           words = self.words
-          (@drawing ||= Memo.new).fetch([plan, words, hover]) do
+          drawn(plan, words, hover) do
             ServerDrawing.new(header: HeaderDrawing.for(words.button(:server_heading), layout:, measure:, words:, hover:), plan:,
                               paste: words.button(:server_paste), reset: words.button(:server_reset),
                               paste_hover: hover.level(:server_paste), reset_hover: hover.level(:server_reset))

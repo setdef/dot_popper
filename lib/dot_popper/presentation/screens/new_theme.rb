@@ -38,13 +38,14 @@ module DotPopper
         def plan = NewThemeCardPlan.new(layout:, word: (use_word if show.new_theme?), measure:)
 
         # Everything its painter draws (NewThemeCardDrawing), made again only
-        # when the theme, the plan, the words or a button's light changes.
+        # when the window, the theme, the plan, the words or a button's light
+        # changes.
         def drawing
           theme = show.new_theme
           plan = self.plan
           words = self.words
           hover = show.hover
-          (@drawing ||= Memo.new).fetch([theme, plan, words, hover]) do
+          drawn(theme, plan, words, hover) do
             safe = layout.safe
             themes = words.themes
             NewThemeCardDrawing.new(theme:, plan:, veil: Rect.new(x: safe.x - 400, y: safe.y - 400, width: safe.width + 800, height: safe.height + 800),

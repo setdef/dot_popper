@@ -35,13 +35,13 @@ module DotPopper
         end
 
         # Everything its painter draws (SettingsDrawing), made again only
-        # when the plan, the words or a button's light changes.
+        # when the window, the plan, the words or a button's light changes.
         def drawing
           plan = self.plan
           words = self.words
           hover = show.hover
           preview = show.sizing_preview
-          (@drawing ||= Memo.new).fetch([plan, words, hover, preview]) do
+          drawn(plan, words, hover, preview) do
             page = layout.page
             safe = layout.safe
             SettingsDrawing.new(header: HeaderDrawing.for(words.button(:settings_heading), layout:, measure:, words:, hover:), plan:,

@@ -44,15 +44,15 @@ module DotPopper
         end
 
         # Everything its painter draws (CreditsDrawing), made again only
-        # when the page, its lines, the scroll, the words or Back's light
-        # changes.
+        # when the window, the page, its lines, the scroll, the words or
+        # Back's light changes.
         def drawing
           page = plan
           lines = self.lines
           scroll = @scroll
           words = self.words
           hover = show.hover
-          (@drawing ||= Memo.new).fetch([page, lines, scroll, words, hover]) do
+          drawn(page, lines, scroll, words, hover) do
             window = page.window
             CreditsDrawing.new(header: HeaderDrawing.for(words.button(:credits_heading), layout:, measure:, words:, hover:), window:,
                                rows: lines.visible(scroll.offset, window.height, page.line), offset: scroll.offset, size: lines.size,

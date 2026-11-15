@@ -178,6 +178,13 @@ module DotPopper
         def back_button = button(:back, layout.back_button)
 
         def within_safe(reach) = reach.with(height: [reach.height, layout.safe.bottom - reach.y].min)
+
+        # What its painter draws, kept and made by the block again only
+        # when the window's layout or anything in +key+ (compared with ==)
+        # differs from the last call's. The layout is always in the key:
+        # Back, the heading and the page follow the window even where a
+        # plan made for the new size equals the last one.
+        def drawn(*key, &) = (@drawing ||= Memo.new).fetch(key.unshift(layout), &)
       end
 
       # A screen whose list scrolls: by the wheel, the keys, the right stick,

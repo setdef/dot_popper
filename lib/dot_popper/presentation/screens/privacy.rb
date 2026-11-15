@@ -22,14 +22,15 @@ module DotPopper
         end
 
         # Everything its painter draws (PrivacyDrawing), made again only
-        # when the plan, the words, a button's light or the hold changes.
+        # when the window, the plan, the words, a button's light or the hold
+        # changes.
         def drawing
           plan = self.plan
           words = self.words
           hover = show.hover
           hold = show.group_panel.hold
           progress = hold.progress(now)
-          (@drawing ||= Memo.new).fetch([plan, words, hover, hold.held?, progress]) do
+          drawn(plan, words, hover, hold.held?, progress) do
             PrivacyDrawing.new(header: HeaderDrawing.for(words.button(:privacy_heading), layout:, measure:, words:, hover:), plan:,
                                policy: words.button(:privacy_policy), policy_hover: hover.level(:policy),
                                delete: words.button(:privacy_delete), delete_hover: hover.level(:privacy_delete),
