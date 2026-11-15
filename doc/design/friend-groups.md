@@ -4,7 +4,7 @@
 -->
 # Friend groups: the game's side
 
-How the game takes part in friend groups: where the server is, how the client talks to it, how members and groups are shown with no text from any player, the screens, and the announcements of a title change. For anyone working on `lib/dot_popper/groups` or the friend groups' screens. The server's rules (the title, the top score, group sizes, join codes) are summarized in [doc/server.md](../server.md), and its API is the server repository's `docs/api.md`. Why members are drawn icons and codes are digits is [ADR-0013](../adr/0013-players-type-no-text.md). What is sent and kept is declared in [doc/privacy.json](../privacy.json) and described in [privacy.md](privacy.md).
+How the game takes part in friend groups: where the server is, how the client talks to it, how members and groups are shown with no text from any player, the screens, and the announcements of a title change. For anyone working on `lib/dot_popper/groups` or the friend groups' screens. The server's rules (the title, the top score, group sizes, join codes) are summarized in [doc/server.md](../server.md), and its API is the server repository's `docs/api.md`. Why no player writes any text is [No text from any player](#no-text-from-any-player). What is sent and kept is declared in [doc/privacy.json](../privacy.json) and described in [privacy.md](privacy.md).
 
 ## Who can take part
 
@@ -70,6 +70,12 @@ What the game owes the server is `Groups::Outbox` (`lib/dot_popper/groups/outbox
 
 One line each: the token, the unsent score, whether the player was last known to be in a group (`1`, or empty), for each group the newest title change shown and how the group looked then (`id|last|fingerprint`, separated by spaces), and the achievement keys not yet sent (separated by commas). `Groups::GroupFile` reads and writes it, leniently: a line missing or unreadable keeps its starting value, so a file with fewer lines, as only development builds before v0.9.10 wrote, reads too (every release with friend groups writes five). `test/groups/group_file_test.rb` holds it to examples of each line, byte for byte, and `test/groups/session_test.rb` to the files the game writes as it plays. After a launch with no network the groups are unknown, but a member's games still count (`Session#member?`).
 
+## No text from any player
+
+Players type no text, and nothing a player could type is stored or shown to anyone else (`AGENTS.md`). This is the maintainer's decision: any text a player enters is a liability. Text a player writes and other players read brings moderation duties (Apple's guideline 1.2 for user-generated content asks for filtering, reporting, blocking and published contact), risk to players, and a liability for setdef. So a member is a number and a group an id, which the game draws and names ([below](#identity-numbers-drawn)), and a group is joined by a code of digits ([Joining by a seven-digit code](#joining-by-a-seven-digit-code)). There is no name a player chooses, no filter, no blocklist, and no Report or Block. Guideline 1.2 (as read on 2026-11-08) is read here as not applying to an app where a player writes nothing and other players see only what the game draws; that is a reading, not legal advice.
+
+What it costs: players can't choose how they appear, a group's code has to be shared outside the game, and the word lists the names come from must stay free of unkind words and second meanings. A keyboard may type a code's digits, and a website copy's license key may be typed on its offer; neither is shown to anyone else. The game sends no name and the server accepts none: `test/privacy/requests_test.rb` checks every request's fields on the wire, so a field carrying text would show, and the server's API (`docs/api.md` in its repository) accepts no free text.
+
 ## Identity: numbers, drawn
 
 A member of a group is a number the server gives, in join order, never reused (`Groups::Member`). It is the only identity a player has: no name or anything else a player supplies, so there is nothing to filter, report or block. A group is known by its id. The game draws both and names both, from those values alone, so every device shows the same and the server stores no picture and no name.
@@ -97,7 +103,7 @@ Back goes up a level: History to its group, a group or the keypad to the list, t
 
 ### Joining by a seven-digit code
 
-A group's code is seven digits (`GroupWords::CODE_LENGTH`), which the server makes. Digits, not letters, because no digits make a word in any language. The player taps it on a telephone's keypad (`Presentation::CodePad`): 1 to 9 in threes, then Delete, 0 and Join. A phone needs no keyboard, and a controller's cursor presses the keys as it presses any button. Where there is a keyboard, typed digits and Backspace or Delete work too (`GroupPanel#type`). The code box reads the code as it is shared, 482-1073, with a dash for each digit still to come (`CodeText`). Join looks disabled, and only ticks, until all seven digits are in (Podmajersky: say nothing the player can see). On a short window the box and the keypad sit side by side. Copy puts the code on the clipboard as 482-1073.
+A group's code is seven digits (`GroupWords::CODE_LENGTH`), which the server makes. Digits, not letters, because no digits make a word in any language; seven of them give ten million codes, against the server's limit of 20 tries to join an hour for each player. The player taps it on a telephone's keypad (`Presentation::CodePad`): 1 to 9 in threes, then Delete, 0 and Join. A phone needs no keyboard, and a controller's cursor presses the keys as it presses any button. Where there is a keyboard, typed digits and Backspace or Delete work too (`GroupPanel#type`). The code box reads the code as it is shared, 482-1073, with a dash for each digit still to come (`CodeText`). Join looks disabled, and only ticks, until all seven digits are in (Podmajersky: say nothing the player can see). On a short window the box and the keypad sit side by side. Copy puts the code on the clipboard as 482-1073.
 
 ### Before a first Join or Create
 

@@ -18,7 +18,6 @@ Dot Popper's architecturally significant decisions, one per record, in the MADR 
 | [0010](0010-pro-comes-only-from-proof.md) | Pro comes only from proof the game verifies, and a store build ignores developer settings | accepted |
 | [0011](0011-pro-outlives-setdef.md) | Pro outlives setdef: license keys, one device at a time, and one test of setdef being gone | accepted |
 | [0012](0012-free-games-20-then-3-a-day.md) | Free games: your first 20, then 3 a day | accepted |
-| [0013](0013-players-type-no-text.md) | Players type no text: friend-group members are drawn icons, and codes are digits | accepted |
 | [0014](0014-privacy-facts-come-from-the-code.md) | The privacy facts are generated from declarations the tests enforce | accepted |
 | [0015](0015-all-rights-reserved-after-v0-9-9.md) | Dot Popper is all rights reserved after v0.9.9 | accepted |
 | [0016](0016-the-tutorial-is-a-layer-over-a-paused-game.md) | The tutorial is a layer over the first game, paused, and Skip takes the layer away | accepted |
