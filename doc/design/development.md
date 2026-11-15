@@ -94,9 +94,9 @@ The rules' values (fields, dots, stacks, countdowns, events, `DotSize`, `DotSizi
 - `test_the_rule_numbers_can_be_read_from_any_ractor` asserts it for every constant in `Rules`, and every system's `Platform` (`Shell::Platforms::BY_NAME`).
 - `test_a_game_played_in_a_ractor_matches_one_played_here` plays one seeded game here and one in a Ractor (`RactorTest.play_a_game`) and asserts they end with the same score and dots.
 
-### On Windows, the game in a Ractor is skipped
+### On Windows, the game in a Ractor plays with the collector off
 
-On Windows only, the third test skips with `RactorTest::WINDOWS_RACTOR_GC`. On Ruby 4.0.9 (x64-mingw-ucrt), a garbage collection started in a Ractor other than the main one deadlocks while the main Ractor has another thread asleep, and Minitest's worker threads are asleep in every run. The fault is Ruby's, not the rules'; three lines show it with nothing of the game's:
+On Windows only, the third test turns the garbage collector off while the Ractor plays (`RactorTest#played_in_a_ractor`). On Ruby 4.0.9 (x64-mingw-ucrt), a garbage collection started in a Ractor other than the main one deadlocks while the main Ractor has another thread asleep, and Minitest's worker threads are asleep in every run. The fault is Ruby's, not the rules'; three lines show it with nothing of the game's:
 
 ```ruby
 Thread.new { sleep }
@@ -104,7 +104,7 @@ sleep 0.1
 p Ractor.new { 20.times { GC.start }; 1 }.value # never returns on Windows; at once on Linux
 ```
 
-The same lines with no other thread return at once on Windows, as does the game in a Ractor outside Minitest, or inside it with `GC.disable`. The other two Ractor tests run on Windows, and Linux and macOS run all three. Delete the `skip` once a Ruby release runs the three lines on Windows.
+The same lines with no other thread return at once on Windows, as does the game in a Ractor outside Minitest, or inside it with `GC.disable`. The game makes about 4,300 objects, so it needs no collection. Linux and macOS play it with the collector on. Delete the `GC.disable` once a Ruby release runs the three lines on Windows.
 
 ## The defined-calls check
 
