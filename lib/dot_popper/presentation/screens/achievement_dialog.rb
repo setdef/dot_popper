@@ -4,7 +4,7 @@ module DotPopper
   module Presentation
     module Screens
       # An achievement's dialog, over Achievements (the layout is
-      # Presentation::AchievementDialog): how to earn it, for Pro the day it
+      # AchievementDialogLayout): how to earn it, for Pro the day it
       # was earned and how far along the player is, as +view_achievements+
       # (UseCases::ViewAchievements) may show; Close, Get Pro for a Free
       # player, and with a controller the previous and next achievement.
@@ -47,7 +47,7 @@ module DotPopper
 
         # Where its parts go (AchievementDialogPlan).
         def plan
-          Presentation::AchievementDialog.new(layout:, measure:, how: AchievementWords.how(achievement), status: status(achievement),
+          AchievementDialogLayout.new(layout:, measure:, how: AchievementWords.how(achievement), status: status(achievement),
                                               progress: @view.progress(achievement), buttons:).plan
         end
 

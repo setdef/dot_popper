@@ -121,7 +121,7 @@ module DotPopper
       def controls = buttons
     end
 
-    class AchievementDialog < Data.define(:layout, :measure, :how, :status, :progress, :buttons)
+    class AchievementDialogLayout < Data.define(:layout, :measure, :how, :status, :progress, :buttons)
       def plan
         safe = layout.safe
         width = [safe.width - (2 * layout.page_margin), 520.0].min
@@ -270,5 +270,7 @@ module DotPopper
         ServerPlan.new(left:, width:, lines: wrapped, line_size: size, now: shown_now, now_y:, paste:, reset:, status: shown_status, status_y: (reset || paste).bottom + 24)
       end
     end
+
+    AchievementDialog = AchievementDialogLayout # the old name, until no one uses it
   end
 end
