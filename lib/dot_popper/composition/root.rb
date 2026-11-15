@@ -175,7 +175,7 @@ module DotPopper
         @sharing = Presentation::SheetSharing.for(platform, opener: @engine.opener)
         groups = groups_session
         use_cases = Composition.use_cases(cabinet: @cabinet, free_games: games, entitlement:, store: storefront, achievements:,
-                                          stats_book:, friend_groups: groups, use_theme:)
+                                          stats_book:, friend_groups: groups)
         @show = Presentation::Show.new(
           groups:, cabinet: @cabinet, layout: @engine.layout, sounds: @sound_player, radius: dot_size.radius,
           random:, calm: settings.calm?, tutor: Presentation::Tutor.new(file("taught.txt"), times: Style::LESSON.times),
@@ -184,7 +184,7 @@ module DotPopper
           window: @window,
           tutorial_flag: Presentation::TutorialFlag.new(file("tutorial.txt"), mode: Presentation::TutorialFlag.mode(settings.env)),
           group_notice: Presentation::GroupNotice.new(file("group_notice.txt")),
-          themes:, links: @engine.opener, server_choice: @server_choice, **use_cases
+          themes:, links: @engine.opener, server_choice: @server_choice, use_theme:, **use_cases
         )
         # The Show hears the rules' events, and each game as FinishGame
         # finishes it, for Game Over; a store's purchase landing ticks on

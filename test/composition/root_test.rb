@@ -369,11 +369,11 @@ class RootTest < Minitest::Test
     groups = DotPopper::Groups::Session.off
     themes = DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new)
     use_cases = DotPopper::Composition.use_cases(cabinet:, free_games: DotPopper::FreeGames.unlimited, entitlement:, store: NoStore.new,
-                                                 achievements:, stats_book:, friend_groups: groups,
-                                                 use_theme: DotPopper::UseCases::UseTheme.new(themes:, entitlement:))
+                                                 achievements:, stats_book:, friend_groups: groups)
     heard = -> { [cabinet, entitlement, use_cases[:finish_game]].map { it.instance_variable_get(:@listeners).size } }
     before = heard.call
-    Show.new(cabinet:, layout:, sounds: FakeSounds.new, radius: R, stats_book:, achievements:, themes:, groups:, **use_cases)
+    Show.new(cabinet:, layout:, sounds: FakeSounds.new, radius: R, stats_book:, achievements:, themes:, groups:,
+             use_theme: DotPopper::UseCases::UseTheme.new(themes:, entitlement:), **use_cases)
 
     assert_equal before, heard.call
   end

@@ -755,11 +755,11 @@ class ShowTest < Minitest::Test
     themes = DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new)
     groups = DotPopper::Groups::Session.off
     use_cases = DotPopper::Composition.use_cases(cabinet:, free_games: DotPopper::FreeGames.unlimited, entitlement:, store: DotPopper::NoStore.new,
-                                                 achievements:, stats_book:, friend_groups: groups, starter: DotPopperTest.starter_of(cabinet),
-                                                 use_theme: DotPopper::UseCases::UseTheme.new(themes:, entitlement:))
+                                                 achievements:, stats_book:, friend_groups: groups, starter: DotPopperTest.starter_of(cabinet))
     told = []
     use_cases[:finish_game].subscribe(told.method(:<<))
-    show = Show.new(cabinet:, layout:, sounds: FakeSounds.new, radius: R, stats_book:, achievements:, themes:, groups:, **use_cases)
+    show = Show.new(cabinet:, layout:, sounds: FakeSounds.new, radius: R, stats_book:, achievements:, themes:, groups:,
+                    use_theme: DotPopper::UseCases::UseTheme.new(themes:, entitlement:), **use_cases)
     use_cases[:finish_game].subscribe(show)
     [0, 3].each do |taps|
       press_main(show)

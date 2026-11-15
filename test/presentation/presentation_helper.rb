@@ -62,8 +62,8 @@ module PresentationTest
                 themes: DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new), use_theme: DotPopper::UseCases::UseTheme.new(themes:, entitlement:),
                 **options)
     use_cases = DotPopper::Composition.use_cases(cabinet:, free_games: games, entitlement:, store: storefront, achievements:, stats_book:,
-                                                 friend_groups: groups, use_theme:, starter: DotPopperTest.starter_of(cabinet))
-    show = Show.new(cabinet:, stats_book:, achievements:, groups:, themes:, **use_cases, **options)
+                                                 friend_groups: groups, starter: DotPopperTest.starter_of(cabinet))
+    show = Show.new(cabinet:, stats_book:, achievements:, groups:, themes:, use_theme:, **use_cases, **options)
     cabinet.subscribe(show)
     use_cases[:finish_game].subscribe(show)
     entitlement.subscribe(show.offer)
