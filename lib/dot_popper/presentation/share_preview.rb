@@ -24,7 +24,6 @@ module DotPopper
       # How far "Copied!" has come in since the last copy.
       def confirmation(now, style) = copied? ? style.confirm.at(now - copied_at) : 0.0
     end
-    SharePreview = ShareText # the old name, until no one uses it
 
     # How the game offers a result to share: in the game, by opening a
     # ShareText, from which only Copy writes the clipboard. It is the
