@@ -135,7 +135,7 @@ Both ask for owned purchases first (StoreKit's `Transaction.currentEntitlements`
 - `NativeStoreContractTest` runs it on `NativeStore` over a real answer file and a Ruby stand-in for the host, transcribed from `Store.swift` and `ProStore.java`. It shows `NativeStore`'s Ruby half and the suite's fairness, not the hosts.
 - `StoreHelperContractTest` (`test/shell/store_helper_test.rb`) runs it on `StoreHelper` with real processes against a Ruby stand-in for the helper.
 
-`ios/store_check` (XcodeGen, which `mise.ios.toml` pins, then `xcodebuild test` on a Simulator) drives the real `Store.swift` through its URLs and answer file against StoreKit's local test session; it is run by hand, not in CI. Other tests: `test/presentation/store_test.rb`, `test/presentation/website_store_test.rb`, and the GUI scenario `test/gui/scenarios/purchase.rb`.
+`ios/store_check` (XcodeGen, which `mise.ios.toml` pins, then `xcodebuild test` on a Simulator) drives the real `Store.swift` through its URLs and answer file against StoreKit's local test session; it is run by hand, not in CI. `script/ios_store_check.sh` builds it and its tests for the Simulator (`xcodebuild build-for-testing`) without running them, so a Mac with no Simulator that boots still shows they compile with its Xcode. Other tests: `test/presentation/store_test.rb`, `test/presentation/website_store_test.rb`, and the GUI scenario `test/gui/scenarios/purchase.rb`.
 
 ## Receipts
 
