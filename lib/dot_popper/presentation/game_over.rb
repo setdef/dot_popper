@@ -86,7 +86,5 @@ module DotPopper
             ring_alpha: ringing.positive? ? (1 - spread) * (score_record ? style.score_record_ring_alpha : style.ring_alpha) : 0.0)
       end
     end
-
-    GameOver = GameOverResult # the old name, until no one uses it
   end
 end
