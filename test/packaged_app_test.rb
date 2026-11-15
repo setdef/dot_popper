@@ -124,4 +124,36 @@ class PackagedAppTest < Minitest::Test
 
     assert_equal PackagedApp::REPOSITORY_ONLY, listed
   end
+
+  # What the top of the game's folder in an app holds: the game's own
+  # files, and what Lota and the phone guide read there.
+  THE_APPS_OWN = %w[.ruby-version Gemfile Gemfile.lock LICENSE LICENSES assets bin conf.rb fledge.yml icons lib main.rb
+                    vendor].freeze
+
+  # A file added at the top of the repository goes into every app unless
+  # it is listed, so each must be one or the other.
+  def test_every_file_at_the_top_of_the_repository_is_the_apps_or_the_repositorys_own
+    listed, status = Open3.capture2("git", "-C", ROOT, "ls-files", "-z")
+
+    assert status.success?
+    top = listed.split("\0").map { it.split("/").first }.uniq
+
+    assert_empty top - THE_APPS_OWN - PackagedApp::REPOSITORY_ONLY
+  end
+
+  # The phone apps' game is laid out from `git archive` and then pruned:
+  # the iPhone and iPad kit's in kits.yml, the Android app's in
+  # script/android_game.sh. Each leaves out at least what a computer's
+  # app does.
+  def test_the_phone_apps_leave_out_the_repositorys_own_files
+    steps = YAML.load_file(File.join(ROOT, ".github/workflows/kits.yml")).dig("jobs", "ipad", "steps")
+    ios = steps.find { it["name"] == "Lay out the phone project" }.fetch("run")
+    android = File.read(File.join(ROOT, "script/android_game.sh"))
+
+    { "kits.yml" => ios, "script/android_game.sh" => android }.each do |name, script|
+      pruned = script[/cd "\$game" && rm -rf (.*?)\)/m, 1].to_s.delete("\\").split
+
+      assert_empty PackagedApp::REPOSITORY_ONLY - pruned, "#{name} leaves these in the app"
+    end
+  end
 end

@@ -50,8 +50,8 @@ runs:
       shell: bash
       run: |
         exclude=()
-        for path in test doc sig script playtest android ios macos windows .github Rakefile Steepfile mise.toml \
-          AGENTS.md GLOSSARY.md INSIPIRATION.md PACKAGING.md README.md .gitignore; do
+        for path in test doc sig script playtest android ios macos windows .github Rakefile Steepfile mise.toml mise.android.toml \
+          AGENTS.md GLOSSARY.md INSIPIRATION.md PACKAGING.md README.md .gitignore .gitattributes; do
           exclude+=(--exclude "$path")
         done
         channel_excludes=$(ruby script/channel_contents.rb excludes | tr -d '\r')
