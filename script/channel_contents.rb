@@ -10,7 +10,10 @@
 #     files, and the files that name it, with how often. Exits 0.
 #   ruby script/channel_contents.rb check CHANNEL FOLDER
 #     also fails (exit 1) if FOLDER holds a file that CHANNEL's build
-#     leaves out (LEFT_OUT), so what was left out cannot come back.
+#     leaves out (LEFT_OUT), so what was left out cannot come back, or if
+#     the game's own build.rb is not stamped for CHANNEL: its
+#     Build::CHANNEL another channel's, or its Build::PARTS naming a part
+#     CHANNEL's build does not carry. script/check_build.rb runs it too.
 #   ruby script/channel_contents.rb excludes [CHANNEL]
 #     prints, one to a line, the paths CHANNEL's build leaves out, for
 #     `lota fuse --exclude` (.github/actions/fuse). With no CHANNEL, the
@@ -27,7 +30,11 @@
 # looked for in every file of the package. A piece that only some channels
 # need is reported for every other channel, whether or not it could be
 # left out today: PACKAGING.md says which can, and why the rest cannot.
+require "json"
+require "open3"
+require "rbconfig"
 require_relative "../lib/dot_popper/build"
+require_relative "set_build_channel"
 
 module ChannelContents
   Build = DotPopper::Build
@@ -94,6 +101,14 @@ module ChannelContents
     [channel, PIECES.select { it.apart && !it.needed_by.include?(channel) }.freeze]
   end.freeze
 
+  # The parts (lib/dot_popper/PART) each build carries: a test build its
+  # own, and a build for sale its channel's (script/set_build_channel.rb).
+  PARTS = { TEST => %w[test_build], **BuildChannel::PARTS }.freeze
+
+  # Prints, as JSON, the Build::CHANNEL and Build::PARTS of the build.rb
+  # it is given, in a Ruby of its own, so this repository's are untouched.
+  READ_STAMP = 'load ARGV.fetch(0); require "json"; puts JSON.generate([DotPopper::Build::CHANNEL, DotPopper::Build::PARTS])'
+
   module_function
 
   def left_out_pieces(channel) = LEFT_OUT.fetch(channel, [])
@@ -156,6 +171,23 @@ module ChannelContents
     end
   end
 
+  # What is wrong with the stamp of the game in +folder+ for +channel+,
+  # each as a line to print: empty when its build.rb says it is
+  # +channel+'s build (no channel for a test build) and loads no part that
+  # channel's build does not carry.
+  def misstamped(channel, folder)
+    game = game_in(folder) or abort("#{folder} holds no game to check")
+    build = File.join(game, "lib", "dot_popper", "build.rb")
+    out, status = Open3.capture2e(RbConfig.ruby, "-e", READ_STAMP, build)
+    return ["its lib/dot_popper/build.rb does not load: #{out.lines.last&.chomp}"] unless status.success?
+
+    stamped, parts = JSON.parse(out.lines.last)
+    wanted = channel == TEST ? nil : channel
+    extra = parts - PARTS.fetch(channel)
+    [("its Build::CHANNEL is #{stamped.inspect}, where a #{channel} build's is #{wanted.inspect}" unless stamped == wanted),
+     ("its Build::PARTS names #{extra.join(", ")}, which a #{channel} build does not carry" unless extra.empty?)].compact
+  end
+
   def main(argv)
     command, *rest = argv
     case command
@@ -172,7 +204,9 @@ module ChannelContents
       report(channel, folder)
       back = command == "check" ? returned(channel, folder) : []
       back.each { warn "FAIL #{folder} holds #{it}, which a #{channel} build leaves out" }
-      exit(back.empty? ? 0 : 1)
+      stamp = command == "check" ? misstamped(channel, folder) : []
+      stamp.each { warn "FAIL #{folder} is not stamped for #{channel}: #{it}" }
+      exit(back.empty? && stamp.empty? ? 0 : 1)
     else usage
     end
   end

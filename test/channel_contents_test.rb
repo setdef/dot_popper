@@ -29,6 +29,21 @@ class ChannelContentsTest < Minitest::Test
 
   def teardown = FileUtils.rm_rf(@app)
 
+  # Stamps the app's copy for +channel+ as script/set_build_channel.rb
+  # stamps a build, and leaves out what that channel's build leaves out.
+  def stamp(channel)
+    build = File.join(@game, "lib/dot_popper/build.rb")
+    File.binwrite(build, BuildChannel.stamp(File.binread(build), channel))
+    ChannelContents.left_out(channel).each { FileUtils.rm_rf(File.join(@game, it)) }
+  end
+
+  def edit_build(from, to)
+    build = File.join(@game, "lib/dot_popper/build.rb")
+    source = File.binread(build)
+    assert_includes source, from
+    File.binwrite(build, source.sub(from, to))
+  end
+
   def run_script(*args)
     out, status = Open3.capture2e(RbConfig.ruby, SCRIPT, *args)
     [status.success?, out]
@@ -101,8 +116,41 @@ class ChannelContentsTest < Minitest::Test
     refute ok, out
     assert_match %r{FAIL .* holds lib/dot_popper/privacy/declared\.rb \(privacy declarations the game never loads\), which a mac-app-store build leaves out}, out
 
-    ChannelContents.left_out("mac-app-store").each { FileUtils.rm_rf(File.join(@game, it)) }
+    stamp("mac-app-store")
     ok, out = run_script("check", "mac-app-store", @app)
+
+    assert ok, out
+  end
+
+  # The check stands alone: a package of the right files whose build.rb
+  # is not its channel's fails it too, as check_build.rb would fail it.
+  def test_check_fails_when_the_package_is_not_stamped_for_its_channel
+    ChannelContents.left_out("website").each { FileUtils.rm_rf(File.join(@game, it)) }
+    ok, out = run_script("check", "website", @app)
+
+    refute ok, out
+    assert_match(/FAIL .* is not stamped for website: its Build::CHANNEL is nil, where a website build's is "website"/, out)
+    assert_match(/FAIL .* is not stamped for website: its Build::PARTS names test_build, which a website build does not carry/, out)
+
+    stamp("microsoft-store")
+    ok, out = run_script("check", "website", @app)
+
+    refute ok, out
+    assert_match(/its Build::CHANNEL is "microsoft-store", where a website build's is "website"/, out)
+  end
+
+  def test_check_fails_when_a_build_for_sale_names_the_test_builds_part
+    stamp("app-store")
+    edit_build("PARTS = %w[].freeze", "PARTS = %w[test_build].freeze")
+    ok, out = run_script("check", "app-store", @app)
+
+    refute ok, out
+    assert_match(/its Build::PARTS names test_build, which a app-store build does not carry/, out)
+  end
+
+  # A test build is the repository's own build.rb, part and all.
+  def test_a_test_build_passes_the_check_as_it_is
+    ok, out = run_script("check", "test", @app)
 
     assert ok, out
   end
@@ -110,7 +158,7 @@ class ChannelContentsTest < Minitest::Test
   # A build for sale holds no word of what it leaves out whole: a test
   # key's name in a file it carries fails the check.
   def test_check_fails_when_a_build_for_sale_names_a_test_key
-    ChannelContents.left_out("website").each { FileUtils.rm_rf(File.join(@game, it)) }
+    stamp("website")
     ok, out = run_script("check", "website", @app)
 
     assert ok, out

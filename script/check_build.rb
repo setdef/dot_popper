@@ -8,7 +8,11 @@
 # repository's code, in a Ruby of their own, so a build for sale need not
 # carry the test keys to be shown that it refuses what they sign. It asks
 # nothing of the internet. Only CHANNEL's own needs
-# are checked: a website build needs no Play key or store identifier.
+# are checked: a website build needs no Play key or store identifier. It
+# also runs script/channel_contents.rb's check on FOLDER, and fails if the
+# app loads any of the test build's part, so it stands alone: a release
+# that runs only this script still finds a file or a word the channel
+# leaves out.
 # The Package workflow runs it on every build for sale it makes, and
 # Lota must be installed (the shell's code needs it to load).
 #
@@ -58,6 +62,11 @@ made, status = Open3.capture2e(RbConfig.ruby, "-I", File.expand_path("../lib", _
 abort "The repository could not make the test build's proofs:\n#{made}" unless status.success?
 proofs = JSON.parse(made.lines.last)
 
+# What the package holds, checked by this repository's script before the
+# app's code is loaded here.
+contents, status = Open3.capture2e(RbConfig.ruby, File.expand_path("channel_contents.rb", __dir__), "check", channel, folder)
+contents_held = status.success?
+
 $LOAD_PATH.unshift(File.join(game, "lib"))
 require "dot_popper"
 require "lota"
@@ -82,6 +91,14 @@ check.call("every file of the game's code loaded is the app's own") { ours.any? 
 
 build = DotPopper::Build
 c = DotPopper::Continuity
+check.call("it holds nothing a #{channel} build leaves out, and is stamped for it (script/channel_contents.rb check)") do
+  contents.lines.grep(/^FAIL /).each { warn "  #{it.chomp}" }
+  contents_held
+end
+check.call("it loads none of the test build's part") do
+  $LOADED_FEATURES.none? { it.include?("/dot_popper/test_build/") } && !defined?(c::TestKeys) && !defined?(c::TEST_PINS) &&
+    !defined?(DotPopper::FakeStore) && !DotPopper::Receipt.const_defined?(:TEST, false)
+end
 check.call("#{channel.inspect} is a channel the game names (#{build::CHANNEL_NAMES.join(", ")})") { build::CHANNEL_NAMES.include?(channel) }
 check.call("the app was built for #{channel.inspect} (Build::CHANNEL is #{build::CHANNEL.inspect})") { build::CHANNEL == channel }
 

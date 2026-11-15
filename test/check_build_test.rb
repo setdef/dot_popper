@@ -115,6 +115,36 @@ class CheckBuildTest < Minitest::Test
     end
   end
 
+  # The check stands alone: what script/channel_contents.rb check finds
+  # in a package fails it too, as does the test build's part loaded by a
+  # build stamped for sale.
+  def test_a_build_holding_what_its_channel_leaves_out_fails
+    stamp("website")
+    FileUtils.cp_r(File.join(ROOT, "lib/dot_popper/test_build"), File.join(@game, "lib/dot_popper/test_build"))
+    ok, out = check("website")
+
+    refute ok, out
+    assert_match(/FAIL it holds nothing a website build leaves out/, out)
+    assert_match(%r{FAIL .* holds lib/dot_popper/test_build \(the test build's part\)}, out)
+    assert_match(/^ok   it loads none of the test build's part$/, out)
+
+    edit("lib/dot_popper/build.rb", "PARTS = %w[].freeze", "PARTS = %w[test_build].freeze")
+    ok, out = check("website")
+
+    refute ok, out
+    assert_match(/FAIL it loads none of the test build's part/, out)
+    assert_match(/its Build::PARTS names test_build, which a website build does not carry/, out)
+  end
+
+  def test_a_build_naming_a_test_key_fails
+    stamp("mac-app-store")
+    File.write(File.join(@game, "lib/dot_popper/store.rb"), "# Continuity::TestKeys\n", mode: "a")
+    ok, out = check("mac-app-store")
+
+    refute ok, out
+    assert_match(%r{FAIL .* holds lib/dot_popper/store\.rb, which names the test keys}, out)
+  end
+
   def test_a_google_play_build_needs_the_play_key
     stamp("google-play")
     ok, out = check("google-play")
