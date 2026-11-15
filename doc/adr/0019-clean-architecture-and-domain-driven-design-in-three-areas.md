@@ -36,7 +36,7 @@ The record holds no comparison in his words of option 1 with options 2 and 3, an
 
 ### Consequences
 
-* Good, because the rules of play never name Pro, so either area can change without the other, and a rule that needs both has one home ([ADR-0022](0022-use-cases-hold-the-rules-that-need-two-areas.md)).
+* Good, because the rules of play never name Pro, so either area can change without the other, and a rule that needs both has one home, a use case ([the architecture](../architecture.md#use-cases)).
 * Good, because the rules, the use cases, the presentation and the composition root are tested without a window, a store or a network.
 * Good, because one word for one thing is checked (`test/glossary_test.rb`), and a class is named in its area's words.
 * Bad, because the game has more layers and more small objects than its size alone would ask for: use cases, a composition root, a port and a fake for each outside party.
@@ -50,4 +50,4 @@ The record holds no comparison in his words of option 1 with options 2 and 3, an
 
 ## More Information
 
-The layers, the areas and what each may depend on are in [the architecture](../architecture.md). [ADR-0022](0022-use-cases-hold-the-rules-that-need-two-areas.md) and [ADR-0023](0023-screens-are-objects-on-a-stack.md) are decisions made under this one. Revisit when the folders are divided by area, to say what then enforces the division.
+The layers, the areas and what each may depend on are in [the architecture](../architecture.md). The use cases ([the architecture](../architecture.md#use-cases)) and the screens' stack ([screens](../design/screens.md#screens-as-objects)) are designs made under this one. Revisit when the folders are divided by area, to say what then enforces the division.

@@ -26,7 +26,7 @@ module DotPopper
     # Home's "Full screen" and Quit switch and close where it offers them.
     #
     # What a player does that needs two of the game's areas goes through
-    # the use cases it is given, made by the composition root (ADR-0022):
+    # the use cases it is given, made by the composition root (ADR-0019):
     # +start_game+, +finish_game+, +buy_pro+, +use_theme+,
     # +join_or_create_friend_group+ and +view_achievements+. It is never
     # given what decides Pro, the store or the free games, so nothing here

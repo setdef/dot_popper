@@ -12,7 +12,6 @@ Dot Popper's architecturally significant decisions, one per record, in the MADR 
 | [0010](0010-pro-comes-only-from-proof.md) | Pro comes only from proof the game verifies, and a store build ignores developer settings | accepted |
 | [0011](0011-pro-outlives-setdef.md) | Pro outlives setdef: license keys, one device at a time, and one test of setdef being gone | accepted |
 | [0019](0019-clean-architecture-and-domain-driven-design-in-three-areas.md) | The code follows Clean Architecture and Domain-Driven Design, with the domain in three areas | accepted |
-| [0022](0022-use-cases-hold-the-rules-that-need-two-areas.md) | Use cases hold the rules that need two of the game's areas, and the composition root makes them (restates the former 0017) | accepted |
 | [0023](0023-screens-are-objects-on-a-stack.md) | Screens are objects on a stack, and the one on top answers every input (restates the former 0018) | accepted |
 
 ## Keeping the log
