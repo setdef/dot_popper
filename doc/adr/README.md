@@ -15,7 +15,9 @@ Dot Popper's architecturally significant decisions, one per record, in the MADR 
 
 ## Keeping the log
 
-- A new decision gets the next number; numbers are never reused.
+- A decision gets a record only if it resolves an architecturally significant requirement, and undoing it would cost on the scale of a layer of the code rewritten, every build remade, or what players already hold broken. Records are few, and one that no longer passes is deleted.
+- What the game does for a player, what it sells and what it collects are product rules, however firm: they live in the design document for their subject, with the maintainer's words. So do one feature's design, the choice of a tool or a version, and how the project is developed and tested.
+- A new decision gets the next number; numbers are never reused. The highest used so far is 0024.
 - An accepted decision isn't rewritten: a new ADR supersedes it, and a fully superseded one is deleted (git keeps it).
 - Record only the reasons a decision actually had. Alternatives found later are marked as later research, with their date.
 - Detailed design, rules and numbers go in a design document under `doc/design/`, not here.

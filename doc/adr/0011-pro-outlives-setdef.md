@@ -8,7 +8,7 @@ deciders: the maintainer (Kerrick Long), who approved the continuity proposal ("
 
 ## Context and Problem Statement
 
-Copies of Dot Popper reach players that no store controls: setdef's website, itch.io, Homebrew, winget, Linux packages and APKs. Those copies need a way to buy Pro, and a way to keep it on one device at a time without a device identifier. And everything setdef runs (the website, the server that friend groups and license checks use) may one day stop; a player who paid should keep Pro, and the game should keep working, when it does. The continuity proposal the maintainer approved is not in this repository; this ADR records what `doc/decisions.md` recorded of it.
+Copies of Dot Popper reach players that no store controls: setdef's website, itch.io, Homebrew, winget, Linux packages and APKs. Those copies need a way to buy Pro, and a way to keep it on one device at a time without a device identifier. And everything setdef runs (the website, the server that friend groups and license checks use) may one day stop; a player who paid should keep Pro, and the game should keep working, when it does. The continuity proposal the maintainer approved is not in this repository; this ADR records what `doc/decisions.md`, since removed, recorded of it.
 
 ## Decision Drivers
 
@@ -20,7 +20,7 @@ Copies of Dot Popper reach players that no store controls: setdef's website, itc
 
 ## Considered Options
 
-1. License keys signed with Ed25519 and verified offline against two pinned license-signing keys; one key on one device at a time, moved by a signed server answer and never by its absence; and one test of setdef being gone (no valid signed proof from setdef's server, while at least one of Apple's, Google's and Microsoft's connectivity checks answers as expected), on which other rules hang: a theme opens to everyone by date once setdef has been gone 180 days, and a player may choose another friend-group server.
+1. License keys signed with Ed25519 and verified offline against two pinned license-signing keys; one key on one device at a time, moved by a signed server answer and never by its absence; and one test of setdef being gone (no valid signed proof from setdef's server, while at least one of Apple's, Google's and Microsoft's connectivity checks answers as expected), on which other rules hang, such as themes opening by date and the choice of another friend-group server ([store and Pro](../design/store-and-pro.md#when-setdef-is-gone)).
 
 The record names no other option. Later research (2026-11-11), not a reason for the choice: common alternatives are online activation, where each launch or install asks a vendor's server (which fails the first driver); offline keys with no device limit, as many indie desktop apps sell (simpler, but a shared key works everywhere at once); and a promise to release an unlocking update if the vendor stops, which depends on the vendor still being able to ship one. The record compares none of them with option 1.
 
