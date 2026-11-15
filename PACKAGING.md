@@ -121,6 +121,16 @@ Built the app for arm64-darwin only. Run lota fuse on each platform you ship for
 
 Use the gem for your platform: `x64-mingw-ucrt` on Windows with RubyInstaller's Ruby, `x86_64-linux-gnu` on Linux. The first build downloads Fledge's Ruby runtime for your platform, which takes about a minute. The `dist/` folder is ignored by git.
 
+On a Mac with Apple silicon, `script/macos_app.sh` builds and checks the macOS app as the Package workflow does, short of playing it. It needs the game's Ruby (`mise install`), Git, and Xcode's command line tools, and nothing else beyond macOS's own:
+
+```console
+$ script/macos_app.sh test             # the playtest build: the app's Info.plist and program, and the .dmg
+$ script/macos_app.sh mac-app-store    # the store helper built and checked, the app signed ad hoc for the sandbox and verified, its contents checked, the unsigned store package made
+$ script/macos_app.sh website          # the app in the .tar.gz and in the .dmg, each checked for its channel
+```
+
+It fuses the commit at HEAD, never other files in the working copy, in a temporary folder it deletes, with Lota's gem from `vendor/cache` checked against `Gemfile.lock`'s checksum, and leaves out what the fuse action leaves out (`PackagedApp.excludes`). It runs `script/check_build.rb` and `script/channel_contents.rb check` on each build for sale. `--version VERSION` sets the version the app must have, as the workflow's tag does, and `--out DIR` keeps what it built. It signs only ad hoc and plays nothing: CI plays each app after the push.
+
 ## What CI checks
 
 The [Package workflow](.github/workflows/package.yml) runs on every push to `trunk`, on every tag that starts with `v`, and when started by hand from GitHub's Actions page. Its jobs:
