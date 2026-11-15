@@ -10,7 +10,7 @@ How Dot Popper is tested and worked on: what each test tier checks and how to ru
 
 | Tier | What it runs | Command | Needs | In CI |
 | --- | --- | --- | --- | --- |
-| Unit tests | `test/**/*_test.rb` except `test/gui/`: the rules, the presentation, friend groups, privacy, continuity, the kits' renderer, and the shell's tests that need no window | `bundle exec rake test` | Ruby and the bundle | The Package workflow's Test job, on every push to `trunk` |
+| Unit tests | `test/**/*_test.rb` except `test/gui/`: the rules, the presentation, friend groups, privacy, continuity, the kits' renderer, and the shell's tests that need no window | `bundle exec rake test` | Ruby and the bundle | On Linux, the Package workflow's Test job, on every push to `trunk`; on Windows, the Windows tests workflow, on every push to `trunk` and every pull request |
 | Steep | The rules in `lib/dot_popper/*.rb` against `sig/` | `bundle exec rake steep` | The `steep` gem (development group) | No workflow runs it |
 | Both | `test`, then `steep` (`task default: %i[test steep]`) | `bundle exec rake` | Both of the above | |
 | GUI scenarios | The real game in real windows, `test/gui/**/*_test.rb` | `bundle exec rake test:gui` | A display, and Lota | The GUI workflow, on every push to `trunk` and every pull request |

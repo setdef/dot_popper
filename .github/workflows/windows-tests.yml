@@ -1,0 +1,55 @@
+# Runs the unit tests (bundle exec rake test) on Windows, on every push
+# to trunk, so a test that fails only there turns the commit red within
+# minutes. The Package workflow's Test job runs them on Linux; its
+# Windows jobs build and play the app, but run no test. Ruby on Windows
+# differs where tests most often trip: it writes text files with CR LF,
+# and its paths have drive letters and back slashes.
+#
+# Each push gets its own run, none cancelled, so the run that turns red
+# names the commit that broke the tests. By hand (workflow_dispatch),
+# `commit` tests any commit GitHub has instead of the branch's tip, such
+# as an older trunk commit, to find which one broke Windows.
+
+name: Windows tests
+
+on:
+  push:
+    branches: [trunk]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: The commit to test (a SHA GitHub has); empty tests the branch's tip
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  BUNDLE_FROZEN: "true"
+
+jobs:
+  test:
+    name: rake test on Windows
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.commit }}
+          persist-credentials: false
+
+      # The default toolchain (MSYS2's UCRT64 GCC), since a few gems in
+      # the bundle build native extensions; the store helper's test
+      # builds with the same GCC.
+      - uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - run: bundle exec rake test
