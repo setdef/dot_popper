@@ -26,7 +26,7 @@ class ThemesTest < Minitest::Test
   # The card has been up long enough to take a press.
   def settle
     @show.update(0.0)
-    @show.update(Style::ARRIVAL_GRACE)
+    @show.update(Style::NEW_THEME_CARD_GRACE)
   end
 
   # A theme that arrives while Home is up, as one asked for again after a
@@ -43,28 +43,28 @@ class ThemesTest < Minitest::Test
     @show.primary
 
     assert @show.back, "Escape is taken, and goes nowhere"
-    assert_equal :ghost, @show.arrival.key, "still to be told"
+    assert_equal :ghost, @show.new_theme.key, "still to be told"
     assert_predicate @show.in_use, :ordinary?
-    @show.update(Style::ARRIVAL_GRACE)
+    @show.update(Style::NEW_THEME_CARD_GRACE)
     @show.tap(use_key.center_x, use_key.center_y)
 
     assert_equal :ghost, @show.in_use.key
-    assert_nil @show.arrival
+    assert_nil @show.new_theme
   end
 
   def test_nothing_of_a_theme_shows_until_the_server_unlocks_it
     show(pro: true)
-    assert_nil @show.arrival
+    assert_nil @show.new_theme
     refute_predicate @themes, :offered?
   end
 
   def test_a_new_theme_is_told_with_an_immediate_switch
     show(pro: true, unlocked: ["ghost"])
-    assert_equal :ghost, @show.arrival.key
+    assert_equal :ghost, @show.new_theme.key
     use_key = @show.screens.fetch(:new_theme).plan.use_button
     @show.tap(use_key.center_x, use_key.center_y)
     assert_equal :ghost, @show.in_use.key
-    assert_nil @show.arrival, "told once"
+    assert_nil @show.new_theme, "told once"
   end
 
   # The theme in use changes only between games: Pro that arrives while a
@@ -100,13 +100,13 @@ class ThemesTest < Minitest::Test
     later = @show.screens.fetch(:new_theme).plan.later_button
     @show.tap(later.center_x, later.center_y)
     assert_predicate @show.in_use, :ordinary?
-    assert_nil @show.arrival
+    assert_nil @show.new_theme
   end
 
   def test_escape_declines
     show(pro: true, unlocked: ["ghost"])
     assert @show.back
-    assert_nil @show.arrival
+    assert_nil @show.new_theme
   end
 
   # The card waits for its answer by every input: a controller's own
@@ -116,7 +116,7 @@ class ThemesTest < Minitest::Test
     show(pro: true, unlocked: ["ghost"])
     %i[x y lb rb lt select].each { @show.pad(it) }
 
-    assert_equal :ghost, @show.arrival&.key
+    assert_equal :ghost, @show.new_theme&.key
     assert_predicate @show, :on_home?
     refute_predicate @show, :tutorial?
   end
@@ -128,7 +128,7 @@ class ThemesTest < Minitest::Test
     press_key(:h)
 
     refute_predicate @show, :tutorial?
-    assert_equal :ghost, @show.arrival&.key
+    assert_equal :ghost, @show.new_theme&.key
   end
 
   # Home's dots under the card are not Home's toy while it waits.
@@ -139,18 +139,18 @@ class ThemesTest < Minitest::Test
     @show.tap(bright.x, bright.y, by: :mouse)
 
     refute_includes @sounds.names, :pop
-    assert_equal :ghost, @show.arrival&.key
+    assert_equal :ghost, @show.new_theme&.key
   end
 
   def test_the_card_comes_only_on_home
     show(pro: true, unlocked: ["ghost"])
     @show.open_stats rescue nil
-    assert_nil @show.arrival
+    assert_nil @show.new_theme
   end
 
   def test_a_free_player_can_be_told_and_is_led_to_pro
     show(pro: false, unlocked: ["ghost"])
-    assert_equal :ghost, @show.arrival.key
+    assert_equal :ghost, @show.new_theme.key
     assert_equal "Get Pro", @show.screens.fetch(:new_theme).use_word
     assert_predicate @show.in_use, :ordinary?
   end
@@ -164,7 +164,7 @@ class ThemesTest < Minitest::Test
     show(pro: true)
     [[400, 850], [850, 400]].each do |width, height|
       ["Get Pro", format(@show.words.themes.fetch(:use), "Jack-o'-lantern")].each do |word|
-        plan = ArrivalPlan.new(layout: layout(width, height), word:)
+        plan = NewThemeCardPlan.new(layout: layout(width, height), word:)
         card = plan.card
         use = plan.use_button
         later = plan.later_button

@@ -197,10 +197,11 @@ module DotPopper
       # gamepad never does.
       HOVER = HoverStyle.new(seconds: 0.12, fill: hex["#2b2766", 0.9], edge: hex["#fff4de"])
 
-      # How long the card that tells of a new theme takes no press after
+      # How long the new theme card takes no press after
       # it appears: one can come while Home is up, under a finger already
       # on its way to Play (DotPopper::Refresh).
-      ARRIVAL_GRACE = 0.5
+      NEW_THEME_CARD_GRACE = 0.5
+      ARRIVAL_GRACE = NEW_THEME_CARD_GRACE # the old name, until no one uses it
 
       # The stacking rule, taught on the first two Game Overs after a wrong
       # tap that had the bright dot hidden under the popped one: the tap's

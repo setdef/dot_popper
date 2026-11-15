@@ -39,7 +39,7 @@ class UseThemeTest < Minitest::Test
     assert_equal :plain, @themes.chosen
   end
 
-  # What the new-theme card's switch leads to, as choosing the theme
+  # What the new theme card's switch leads to, as choosing the theme
   # would (#call), before it is pressed: using it for Pro, nothing where
   # it is current or not open, and the offer of Pro for a Free player.
   # Whether the player has Pro is not asked of the use case by anyone

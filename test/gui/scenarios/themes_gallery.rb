@@ -26,7 +26,7 @@ module DotPopperGui
       continue_to_home
       themes.instance_variable_set(:@told, [])
       frames(4)
-      keep_screenshot("#{tag}-#{theme}-arrival")
+      keep_screenshot("#{tag}-#{theme}-new-theme-card")
       show.back
       show.open_stats
       show.open_themes

@@ -44,7 +44,7 @@ module DotPopper
         @cursor = CursorPainter.new(pen:)
         @splash = SplashPainter.new(pen:)
         @scene = Scene.new(pen)
-        @arrival = ArrivalPainter.new(pen:, dots: @dots)
+        @new_theme_card = NewThemeCardPainter.new(pen:, dots: @dots)
         @tutorial = TutorialPainter.new(pen:)
         @at_rest = Presentation::DotAnimations.new(pen.style::MOTION)
       end
@@ -105,7 +105,7 @@ module DotPopper
 
       def new_theme_screen(screen, width, height, layout)
         home_screen(screen, width, height, layout)
-        @arrival.draw(screen.drawing)
+        @new_theme_card.draw(screen.drawing)
       end
 
       def settings_screen(screen, width, height, _layout)

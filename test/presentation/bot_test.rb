@@ -98,7 +98,7 @@ class BotTest < Minitest::Test
     themes.release(%w[ghost])
     show = new_show(cabinet:, layout: layout, sounds: FakeSounds.new, radius: R, themes:)
     bot = Bot.new(Style::BOT, random: Random.new(5))
-    assert show.arrival?
+    assert show.new_theme?
     600.times do
       x, y = bot.update(1 / 60.0, cabinet, show)
       show.tap(x, y) if x

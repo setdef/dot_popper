@@ -3,7 +3,7 @@
 module DotPopper
   module Presentation
     module Screens
-      # The card that tells of a new theme, once, over Home (ArrivalPlan):
+      # The new theme card, once, over Home (NewThemeCardPlan):
       # its switch, and Not now. It waits for its answer, so nothing of
       # Home's under it takes a press.
       class NewTheme < Screen
@@ -19,48 +19,48 @@ module DotPopper
         # The switch's word: "Use Ghost", or a Free player's "Get Pro",
         # since it opens the offer.
         def use_word
-          key = show.arrival&.key
+          key = show.new_theme&.key
           @use_theme.choice(key) == :offer ? words.offer.fetch(:entry) : format(words.themes.fetch(:use), words.themes.fetch(key))
         end
 
         # Each frame: the moment the card for a new theme first shows.
         def update(_seconds)
-          theme = show.arrival
+          theme = show.new_theme
           @seen = [theme.key, now] if theme && @seen&.first != theme.key
         end
 
-        # Whether the card for this theme has been up Style::ARRIVAL_GRACE
+        # Whether the card for this theme has been up Style::NEW_THEME_CARD_GRACE
         # since it first showed, so a press meant for Home as it came
         # answers nothing.
-        def settled? = @seen&.first == show.arrival&.key && now - @seen.last >= style::ARRIVAL_GRACE
+        def settled? = @seen&.first == show.new_theme&.key && now - @seen.last >= style::NEW_THEME_CARD_GRACE
 
-        # Where its parts go (ArrivalPlan).
-        def plan = ArrivalPlan.new(layout:, word: (use_word if show.arrival?), measure:)
+        # Where its parts go (NewThemeCardPlan).
+        def plan = NewThemeCardPlan.new(layout:, word: (use_word if show.new_theme?), measure:)
 
-        # Everything its painter draws (ArrivalDrawing), made again only
+        # Everything its painter draws (NewThemeCardDrawing), made again only
         # when the theme, the plan, the words or a button's light changes.
         def drawing
-          theme = show.arrival
+          theme = show.new_theme
           plan = self.plan
           words = self.words
           hover = show.hover
           (@drawing ||= Memo.new).fetch([theme, plan, words, hover]) do
             safe = layout.safe
             themes = words.themes
-            ArrivalDrawing.new(theme:, plan:, veil: Rect.new(x: safe.x - 400, y: safe.y - 400, width: safe.width + 800, height: safe.height + 800),
+            NewThemeCardDrawing.new(theme:, plan:, veil: Rect.new(x: safe.x - 400, y: safe.y - 400, width: safe.width + 800, height: safe.height + 800),
                                heading: themes.fetch(:new), name: themes.fetch(theme.key), use: use_word, later: themes.fetch(:later),
-                               use_hover: hover.level(:arrival_use), later_hover: hover.level(:arrival_later))
+                               use_hover: hover.level(:new_theme_use), later_hover: hover.level(:new_theme_later))
           end
         end
 
         # The player answered: it is told once. A Pro player's switch uses
         # the theme at once; a Free player's opens the offer, the same as
-        # tapping Themes. For its first moments (Style::ARRIVAL_GRACE) it
+        # tapping Themes. For its first moments (Style::NEW_THEME_CARD_GRACE) it
         # answers nothing, so a press meant for Home as it came does not.
         def answer(use:)
           return :waiting unless settled?
 
-          theme = show.arrival or return
+          theme = show.new_theme or return
 
           @themes.told(theme.key)
           return sounds.play(:tick, pitch: 0.8) unless use
@@ -74,7 +74,7 @@ module DotPopper
           return [] unless settled?
 
           plan = self.plan
-          [button(:arrival_later, plan.later_button), button(:arrival_use, plan.use_button)]
+          [button(:new_theme_later, plan.later_button), button(:new_theme_use, plan.use_button)]
         end
 
         def primary = answer(use: true)
@@ -84,12 +84,12 @@ module DotPopper
           true
         end
 
-        def answers = %i[arrival_use arrival_later]
+        def answers = %i[new_theme_use new_theme_later]
 
         def pressed(name, by)
           case name
-          in :arrival_use then answer(use: true)
-          in :arrival_later then answer(use: false)
+          in :new_theme_use then answer(use: true)
+          in :new_theme_later then answer(use: false)
           else nil
           end
         end

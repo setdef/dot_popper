@@ -2,12 +2,12 @@
 
 module DotPopper
   module Shell
-    # The card that tells of a new theme, once, at a calm moment on
+    # The new theme card, once, at a calm moment on
     # Home: the theme's own two dots for a preview, its name, and an
     # immediate switch beside "Not now". Calm, and always answerable.
-    # Presentation::ArrivalPlan decides where each part goes, and the
-    # screen hands it all (Presentation::ArrivalDrawing).
-    class ArrivalPainter < Data.define(:pen, :dots)
+    # Presentation::NewThemeCardPlan decides where each part goes, and the
+    # screen hands it all (Presentation::NewThemeCardDrawing).
+    class NewThemeCardPainter < Data.define(:pen, :dots)
       G = ::Lota::Graphics
 
       def draw(drawing)
@@ -49,5 +49,7 @@ module DotPopper
         end
       end
     end
+
+    ArrivalPainter = NewThemeCardPainter # the old name, until no one uses it
   end
 end

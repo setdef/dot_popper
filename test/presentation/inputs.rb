@@ -94,7 +94,7 @@ module Inputs
     # clipboard, as text the player copied elsewhere.
     # +channel+ is the build's (Build::CHANNEL), nil for a test build.
     # +groups+ is how many friend groups a member is in.
-    def initialize(os:, width:, height:, pro: false, games_left: 20, played: true, member: false, arrival: false, gone: false, to_pop: 3,
+    def initialize(os:, width:, height:, pro: false, games_left: 20, played: true, member: false, new_theme: false, gone: false, to_pop: 3,
                    copied: nil, channel: nil, groups: 2)
       @os = os
       @to_pop = to_pop
@@ -115,7 +115,7 @@ module Inputs
       (3 - games_left.clamp(0, 3)).times { games.spend! }
       themes = DotPopper::Themes.new(Memory.new)
       themes.release(THEMES.map(&:to_s))
-      (arrival ? themes.choices[0...-1] : themes.choices).each { themes.told(it) }
+      (new_theme ? themes.choices[0...-1] : themes.choices).each { themes.told(it) }
       book = DotPopper::StatsBook.new(Memory.new, today: -> { @day })
       book.record(DotPopper::GameStats.start, @cabinet.size_class) if played
       session = DotPopper::Groups::Session.new(store: Memory.new, worker: Server.new(groups:))
@@ -131,8 +131,8 @@ module Inputs
                                      cursor: P::GamepadCursor.centered(show.layout.whole, style: P::Style::GAMEPAD, radius: R))
       join(session) if member
       # A new theme's card takes presses once it has been up a moment
-      # (Style::ARRIVAL_GRACE); at launch that passes during the splash.
-      tick(arrival ? 0.5 + Style::ARRIVAL_GRACE : 0.5)
+      # (Style::NEW_THEME_CARD_GRACE); at launch that passes during the splash.
+      tick(new_theme ? 0.5 + Style::NEW_THEME_CARD_GRACE : 0.5)
     end
 
     def phone? = platform.touch?
@@ -542,7 +542,7 @@ module Inputs
   # it, and which screen the Show has open over it.
   def self.screen(show)
     [show.cabinet.state.class.name.split("::").last, Inputs.page(show), (show.group_panel.page if show.group_open?),
-     (show.group_panel.asking if show.group_open?), show.offer?, !show.dialog.nil?, show.sharing?, show.tutorial?, show.arrival?,
+     (show.group_panel.asking if show.group_open?), show.offer?, !show.dialog.nil?, show.sharing?, show.tutorial?, show.new_theme?,
      show.screen.class]
   end
 
@@ -552,9 +552,9 @@ module Inputs
 
   # A screen as words, for a failure's message: "Home, settings".
   def self.say(screen)
-    state, page, group, asking, offer, dialog, sharing, tutorial, arrival, = screen
+    state, page, group, asking, offer, dialog, sharing, tutorial, new_theme, = screen
     [state, page, (:"groups #{group}" if group), (:"#{asking} notice" if asking), (:offer if offer), (:dialog if dialog),
-     (:share_preview if sharing), (:tutorial if tutorial), (:new_theme if arrival)].compact.join(", ")
+     (:share_preview if sharing), (:tutorial if tutorial), (:new_theme if new_theme)].compact.join(", ")
   end
 
   # Everything one input can find from the Fixture +build+ makes, starting

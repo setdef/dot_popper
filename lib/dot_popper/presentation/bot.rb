@@ -65,7 +65,7 @@ module DotPopper
       end
 
       def home(show)
-        return later_on_arrival(show) if show.arrival?
+        return later_on_new_theme_card(show) if show.new_theme?
         return browse(show) if show.stats? || (@homes == 2 && !@browsed)
         return choose_size(show) if show.settings? || (!@resized && @browsed && show.sizing_offered?)
 
@@ -74,11 +74,11 @@ module DotPopper
 
       # A new theme's card, as a scenario shows it: Play is out
       # of reach (Show#controls) until it is answered, so the bot says "Not now".
-      def later_on_arrival(show)
+      def later_on_new_theme_card(show)
         return if @waited < @style.home_wait / 2
 
         @waited = 0.0
-        middle(show.reach_of(:arrival_later))
+        middle(show.reach_of(:new_theme_later))
       end
 
       # Opens "Your stats" once it is offered, and presses Back after

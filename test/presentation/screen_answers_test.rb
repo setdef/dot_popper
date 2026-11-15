@@ -213,7 +213,7 @@ class ScreenAnswersTest < Minitest::Test
 
   WAYS = {
     home: at,
-    new_theme: at(fixture: { arrival: true }),
+    new_theme: at(fixture: { new_theme: true }),
     tutorial: at(path: [:how_to_play]),
     game: at(path: [:play]),
     game_over: at(path: %i[play play_game]),
@@ -261,7 +261,7 @@ class ScreenAnswersTest < Minitest::Test
   }.freeze
   def test_on_home = check(WAYS.fetch(:home), HOME)
 
-  # The card telling of a new theme, to a Free player: its switch opens the offer. Nothing of Home's under it takes a press (the card is a mode of its own).
+  # The new theme card, to a Free player: its switch opens the offer. Nothing of Home's under it takes a press (the card is a mode of its own).
   NEW_THEME = {
     "A at nothing" => "Home, offer",
     "B" => "Home",

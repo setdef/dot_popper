@@ -119,7 +119,7 @@ Each screen's own buttons (`Show#pad` asks the screen on top, `Show#screen`: `Sc
 | Credits | Left stick, d-pad or right stick: scroll. B: Back |
 | Pro offer | Y: Buy, wherever the offer is open, over Game Over too. X: Paste license key where the copy takes license keys, or else Restore Purchases. A at no button, Start and B: Back, so no one buys by reflex ([store-and-pro.md](store-and-pro.md)) |
 | Tutorial | B: Skip |
-| A new theme's notice | A at no button: Use. B: Not now |
+| The new theme card | A at no button: Use. B: Not now |
 | Friend groups | See [friend-groups.md](friend-groups.md). B is Back on every one of them |
 | A game | Only A and the right trigger, at the cursor |
 

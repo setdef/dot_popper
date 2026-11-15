@@ -44,13 +44,13 @@ class InputsTest < Minitest::Test
   # first launch, at phone and window sizes from the smallest window up.
   FIXTURES = {
     "an upright phone, Free" => { os: "iOS", width: 400, height: 850 },
-    "a phone on its side, Free, no games left, a new theme" => { os: "Android", width: 850, height: 400, games_left: 0, arrival: true },
+    "a phone on its side, Free, no games left, a new theme" => { os: "Android", width: 850, height: 400, games_left: 0, new_theme: true },
     "a small phone, Pro, in friend groups" => { os: "iOS", width: 375, height: 667, pro: true, member: true },
     "a phone's first launch, setdef gone" => { os: "Android", width: 412, height: 832, played: false, gone: true, copied: SERVER },
     "a touchscreen computer, Pro, in friend groups, setdef gone" => { os: "Windows", width: 1200, height: 800, pro: true, member: true,
                                                                       gone: true, to_pop: 20, copied: SERVER },
     "the smallest window, Pro, in friend groups, a new theme" => { os: "Linux", width: 400, height: 320, pro: true, member: true,
-                                                                    arrival: true },
+                                                                    new_theme: true },
     "a computer's first launch, Free, no games left" => { os: "OS X", width: 1920, height: 1080, played: false, games_left: 0 }
   }.freeze
 

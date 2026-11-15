@@ -21,7 +21,7 @@ module DotPopper
       attr_reader :current
 
       # What choosing the theme +key+ would lead to (#call), as the
-      # new-theme card's switch says before it is pressed: :offer for a
+      # new theme card's switch says before it is pressed: :offer for a
       # Free player, the offer of Pro instead; :same when it is already
       # current or not open to use; or :use.
       def choice(key)

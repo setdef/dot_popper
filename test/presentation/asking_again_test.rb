@@ -80,11 +80,11 @@ class AskingAgainTest < Minitest::Test
     tick
 
     assert_equal ["/themes"], @themes_worker.started.map { it.first.path[/\A[^?]*/] }
-    assert_nil @show.arrival
+    assert_nil @show.new_theme
     @themes_worker.answer(Reply.new(status: 200, body: [{ "key" => "ghost" }]))
     tick
 
-    assert_equal :ghost, @show.arrival.key
+    assert_equal :ghost, @show.new_theme.key
   end
 
   def test_coming_back_during_a_game_hands_nothing_to_the_network_until_after_it

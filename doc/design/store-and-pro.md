@@ -169,7 +169,7 @@ The offer of Pro is calm: nothing pushes it, no badge, timer, count or prompt af
 
 **Where it opens.** Over the screen the player was on, and Back closes it to that screen as it was. While it is open nothing under it takes a press.
 
-- A Free player taps Get Pro in an achievement's dialog, a theme, Join or Create, or the new-theme card's Get Pro (`Show#open_offer_for`, focus `:achievements`, `:themes` or `:groups`).
+- A Free player taps Get Pro in an achievement's dialog, a theme, Join or Create, or the new theme card's Get Pro (`Show#open_offer_for`, focus `:achievements`, `:themes` or `:groups`).
 - Home's Play with no game left, which then says Get Pro (`Screens::Offer#open_for_play`, focus `:games`).
 - Game Over's main button with no game left, which says Get Pro (`Screens::Offer#open_for_play`).
 

@@ -106,11 +106,11 @@ module DotPopper
       attr_reader :screens
 
       # The screen for Cabinet's state, under any opened over it: Home,
-      # or the card telling of a new theme over it; the Tutorial over the
+      # or the new theme card over it; the Tutorial over the
       # paused game; a game; or Game Over.
       def state_screen
         if tutorial? then @screens[:tutorial]
-        elsif home? then arrival? ? @screens[:new_theme] : @screens[:home]
+        elsif home? then new_theme? ? @screens[:new_theme] : @screens[:home]
         elsif game_over? then @screens[:game_over]
         else @screens[:game]
         end
@@ -132,8 +132,10 @@ module DotPopper
 
       # The new theme to tell the player of, once, at Home, when nothing
       # else is asked of them; nil the rest of the time.
-      def arrival = (theme_of(@themes.new_theme) if on_home?)
-      def arrival? = !arrival.nil?
+      def new_theme = (theme_of(@themes.new_theme) if on_home?)
+      def new_theme? = !new_theme.nil?
+      alias arrival new_theme # the old name, until no one calls it
+      alias arrival? new_theme?
 
       def themes = @themes.choices.map { theme_of(it) }
       # The art of the theme in use (UseCases::UseTheme answers its key).

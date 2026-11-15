@@ -88,10 +88,10 @@ class StackTest < Minitest::Test
   # A frame passes on every screen: the new theme's card, under no other,
   # takes a press once it has been up a moment.
   def test_the_new_theme_card_hears_the_frames_pass
-    fixture = Fixture.new(os: "Linux", width: 1200, height: 800, arrival: true)
+    fixture = Fixture.new(os: "Linux", width: 1200, height: 800, new_theme: true)
 
     assert_equal :new_theme, fixture.show.screens.key(fixture.show.screen)
-    assert_includes fixture.show.controls.map(&:name), :arrival_use
+    assert_includes fixture.show.controls.map(&:name), :new_theme_use
   end
 
   private

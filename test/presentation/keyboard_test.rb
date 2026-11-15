@@ -235,9 +235,9 @@ class KeyboardTest < Minitest::Test
 
   def test_enter_and_space_press_the_main_button
     { home: -> { show.playing? }, stats: -> { show.on_home? }, game_over: -> { show.playing? }, share: -> { fixture.clipboard.text },
-      new_theme: -> { !show.arrival? }, settings: -> { show.on_home? } }.each do |at, done|
+      new_theme: -> { !show.new_theme? }, settings: -> { show.on_home? } }.each do |at, done|
       %i[enter space].each do |key|
-        given(at:, arrival: at == :new_theme)
+        given(at:, new_theme: at == :new_theme)
         press(key)
 
         assert done.call, "#{key} on #{at}"
@@ -333,10 +333,10 @@ class KeyboardTest < Minitest::Test
 
   def test_escape_goes_back_where_a_screen_has_back
     { stats: -> { show.on_home? }, credits: -> { show.settings? }, game_over: -> { show.on_home? }, offer: -> { !show.offer? },
-      share: -> { !show.sharing? }, tutorial: -> { !show.tutorial? }, new_theme: -> { !show.arrival? },
+      share: -> { !show.sharing? }, tutorial: -> { !show.tutorial? }, new_theme: -> { !show.new_theme? },
       keypad: -> { show.group_panel.page == :list } }.each do |at, done|
       %w[Linux Android].each do |os|
-        given(os:, at:, arrival: at == :new_theme, pro: at == :keypad)
+        given(os:, at:, new_theme: at == :new_theme, pro: at == :keypad)
         press(:escape)
 
         assert done.call, "#{os}: Escape on #{at}"
