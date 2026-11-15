@@ -128,8 +128,8 @@ module DotPopper
         def announces? = false
 
         # Whether this screen is open over the screen for the game's state
-        # (Show#layers).
-        def opened? = show.layer?(self)
+        # (Show#stack).
+        def opened? = show.open?(self)
 
         # What the Show tells every screen, open or not, as it happens, so
         # that a screen with state of its own keeps it without the Show
@@ -146,8 +146,8 @@ module DotPopper
         # focus and a release may never be heard.
         def cancel_hold = nil
 
-        # A screen over Home opened or closed (Show#open_page,
-        # Show#close_page).
+        # A screen over Home opened or closed (Show#push_page,
+        # Show#pop_page).
         def page_changed = nil
 
         # A game started.
@@ -245,19 +245,19 @@ module DotPopper
         end
       end
 
-      # A screen over Home (Show#open_page), with Back in its corner:
+      # A screen over Home (Show#push_page), with Back in its corner:
       # Back, and its main button, close it.
       class Page < Screen
         def covers? = true
 
         def answers = [:back]
 
-        def primary = show.close_page
+        def primary = show.pop_page
 
-        def pressed(name, by) = (show.close_page if name == :back)
+        def pressed(name, by) = (show.pop_page if name == :back)
 
         def back
-          show.close_page
+          show.pop_page
           true
         end
       end

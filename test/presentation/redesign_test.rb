@@ -161,7 +161,7 @@ class RedesignTest < Minitest::Test
       assert_equal %i[over_goal over_achievement], s.game_over_chips.map(&:name)
       refute_includes s.controls.map(&:name), :over_goal
       press.call(s)
-      assert s.layer?(:achievements), "Achievements opens, under the dialog"
+      assert s.open?(:achievements), "Achievements opens, under the dialog"
       assert_equal :blink, s.dialog
     end
   end

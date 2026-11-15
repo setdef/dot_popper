@@ -23,7 +23,7 @@ class ScreensTest < Minitest::Test
     assert_equal Screens::Game, @show.screen.class
     @cabinet.update(30)
     assert_equal Screens::GameOver, @show.screen.class
-    assert_empty @show.layers
+    assert_empty @show.stack
   end
 
   # Back closes the screen on top, and the one under it is on top again;
@@ -43,7 +43,7 @@ class ScreensTest < Minitest::Test
         assert @show.back, walk.inspect
         assert expected.equal?(@show.screen), "#{walk.inspect}: back to #{expected.class}, not #{@show.screen.class}"
       end
-      assert_empty @show.layers, walk.inspect
+      assert_empty @show.stack, walk.inspect
     end
   end
 

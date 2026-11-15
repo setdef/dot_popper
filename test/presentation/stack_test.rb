@@ -2,7 +2,7 @@
 
 require_relative "inputs"
 
-# The stack of screens (Show#layers, ADR-0018), as a table: each row goes
+# The stack of screens (Show#stack, ADR-0018), as a table: each row goes
 # somewhere as a finger would, or pushes and pops the stack itself, and
 # says what is then on the stack, bottom first, which screen is on top
 # (Show#screen), and what the Show's questions answer. Some questions ask
@@ -38,19 +38,19 @@ class StackTest < Minitest::Test
      { stack: %i[friend_groups], top: :friend_groups, friend_groups_open?: true, offer?: false }],
     ["the share preview over Game Over", {}, %i[play play_game share], { stack: %i[share_preview], top: :share_preview, sharing?: true }],
     ["the offer over Game Over", { games_left: 1 }, %i[play play_game play_again], { stack: %i[offer], top: :offer, offer?: true }],
-    ["a screen open already is not pushed again", {}, [->(show) { 2.times { show.open_layer(:offer) } }],
+    ["a screen open already is not pushed again", {}, [->(show) { 2.times { show.push(:offer) } }],
      { stack: %i[offer], top: :offer }],
-    ["a screen under another is not closed", { pro: true, **SMALL }, [:achievements, [:achievement, DIALOG], ->(show) { show.close_layer(:achievements) }],
+    ["a screen under another is not closed", { pro: true, **SMALL }, [:achievements, [:achievement, DIALOG], ->(show) { show.pop(:achievements) }],
      { stack: %i[achievements achievement_dialog], top: :achievement_dialog }],
-    ["the offer is open while a screen is over it", {}, [:stats, ->(show) { show.open_layer(:offer) && show.open_layer(:credits) }],
+    ["the offer is open while a screen is over it", {}, [:stats, ->(show) { show.push(:offer) && show.push(:credits) }],
      { stack: %i[stats offer credits], top: :credits, offer?: true, stats?: false, credits?: true }],
-    ["the share preview is open while a screen is over it", {}, [:play, :play_game, :share, ->(show) { show.open_layer(:offer) }],
+    ["the share preview is open while a screen is over it", {}, [:play, :play_game, :share, ->(show) { show.push(:offer) }],
      { stack: %i[share_preview offer], top: :offer, sharing?: true }],
-    ["the dialog is open while a screen is over it", { pro: true, **SMALL }, [:achievements, [:achievement, DIALOG], ->(show) { show.open_layer(:offer) }],
+    ["the dialog is open while a screen is over it", { pro: true, **SMALL }, [:achievements, [:achievement, DIALOG], ->(show) { show.push(:offer) }],
      { stack: %i[achievements achievement_dialog offer], top: :offer, dialog: DIALOG }],
     ["Home shown empties the stack", {}, [:play, :play_game, :share, ->(show) { show.cabinet.press(show.layout.center_x, show.layout.center_y) }],
      { stack: [], top: :home, on_home?: true, sharing?: false }],
-    ["a game started closes the share preview", {}, [->(show) { show.open_layer(:share_preview) }, ->(show) { DotPopperTest.starter_of(show.cabinet).game }],
+    ["a game started closes the share preview", {}, [->(show) { show.push(:share_preview) }, ->(show) { DotPopperTest.starter_of(show.cabinet).game }],
      { stack: [], top: :game, sharing?: false }]
   ].freeze
 
@@ -99,7 +99,7 @@ class StackTest < Minitest::Test
   def observe(show, keys)
     keys.to_h do |key|
       case key
-      when :stack then [key, show.layers.map { show.screens.key(it) }]
+      when :stack then [key, show.stack.map { show.screens.key(it) }]
       when :top then [key, show.screens.key(show.screen)]
       else [key, show.public_send(key)]
       end

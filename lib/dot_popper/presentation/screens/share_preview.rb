@@ -19,7 +19,7 @@ module DotPopper
         # Opens over Game Over, showing +preview+.
         def open_with(preview)
           @preview = preview
-          show.open_layer(self)
+          show.push(self)
         end
 
         # Where its card, words and buttons go (SharePlan), laid out again
@@ -58,11 +58,11 @@ module DotPopper
         end
 
         # A game started: it closes, quietly.
-        def game_started = show.close_layer(self)
+        def game_started = show.pop(self)
 
         # Back to Game Over as it was.
         def close
-          show.close_layer(self)
+          show.pop(self)
           sounds.play(:tick, pitch: 0.8)
         end
 

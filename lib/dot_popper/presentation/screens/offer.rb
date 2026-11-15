@@ -28,7 +28,7 @@ module DotPopper
         # are on, leading with it, and Back closes it to that same screen,
         # open as it was, so no one loses their place.
         def open_led_by(feature)
-          show.open_layer(self)
+          show.push(self)
           @focus = feature
           @buy_pro.open
           sounds.play(:tick)
@@ -58,7 +58,7 @@ module DotPopper
           return unless offered?
 
           @for_play = true
-          show.open_layer(self)
+          show.push(self)
           @focus = :games
           @buy_pro.open
           sounds.play(:tick)
@@ -67,7 +67,7 @@ module DotPopper
         # Back to the screen it was opened over, with a tick unless +quiet+.
         def close(quiet: false)
           @for_play = false
-          show.close_layer(self)
+          show.pop(self)
           @focus = nil
           sounds.play(:tick, pitch: 0.8) unless quiet
         end

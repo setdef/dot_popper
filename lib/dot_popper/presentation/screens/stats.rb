@@ -30,7 +30,7 @@ module DotPopper
         # Opens over Home, from the Stats as they are now.
         def open
           refresh
-          show.open_page(:stats)
+          show.push_page(:stats)
         end
 
         # The sheet as the Stats are now.

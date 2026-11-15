@@ -59,7 +59,7 @@ module DotPopper
         @finish_game = finish_game
         @use_theme = use_theme
         @view_achievements = view_achievements
-        @layers = [] # the screens open over the game's state, the top one last
+        @stack = [] # the screens open over the game's state, the top one last
         @clock_highlight = nil
         @measure = measure
         @stats_book = stats_book
@@ -96,11 +96,12 @@ module DotPopper
       # (Screens), and the renderer draws: the one place that decides it.
       # It is the last screen opened over the others, or with none open,
       # the screen for the game's state.
-      def screen = @layers.last || state_screen
+      def screen = @stack.last || state_screen
 
       # The screens open over the screen for the game's state, the top
       # one last, for the renderer to draw.
-      attr_reader :layers
+      attr_reader :stack
+      alias layers stack # the old name, until no one calls it
 
       # One of each screen, open or not, by its name in Screens.made_for.
       attr_reader :screens
@@ -146,7 +147,7 @@ module DotPopper
       # Where the Themes screen's cards go (LooksLayout).
       def themes_layout = @screens[:themes].plan
 
-      def open_themes = open_page(:themes)
+      def open_themes = push_page(:themes)
 
       # Uses +theme+ from now on, from Themes (Screens::Themes#use).
       def use(theme) = @screens[:themes].use(theme)
@@ -179,7 +180,7 @@ module DotPopper
       def stats? = on_top?(:stats)
 
       # Home itself, with no other screen open over it.
-      def on_home? = home? && @layers.empty?
+      def on_home? = home? && @stack.empty?
 
       # Whether the screen named +name+ in Screens.made_for is the one on
       # top (#screen): what the questions below ask.
@@ -188,7 +189,7 @@ module DotPopper
       # Whether Achievements, Settings or Privacy is on top, and the
       # achievement open in a dialog (or nil).
       def achievements_open? = on_top?(:achievements)
-      def dialog = (@screens[:achievement_dialog].achievement if layer?(:achievement_dialog))
+      def dialog = (@screens[:achievement_dialog].achievement if open?(:achievement_dialog))
       def settings? = on_top?(:settings)
       def privacy? = on_top?(:privacy)
 
@@ -374,22 +375,26 @@ module DotPopper
       # Opens the screen +name+ (a Screens::Page) over the one on top, at
       # Home: over Home itself, or Credits, Privacy and Change Server over
       # Settings. Its list starts at the top.
-      def open_page(name)
+      def push_page(name)
         return unless home?
 
-        open_layer(name)
+        push(name)
         each_screen(&:page_changed)
         sounds.play(:tick)
       end
 
-      # Closes the screen on top, where it is one over Home (Screens::Page),
-      # back to the one it was opened over: Credits, Privacy and Change
-      # Server to Settings, the others to Home.
-      def close_page
-        close_layer(screen)
+      # Closes the screen on top, one over Home (Screens::Page), back to
+      # the one it was opened over: Credits, Privacy and Change Server to
+      # Settings, the others to Home.
+      def pop_page
+        pop(screen)
         each_screen(&:page_changed)
         sounds.play(:tick, pitch: 0.8)
       end
+
+      # The old names, until no one calls them.
+      alias open_page push_page
+      alias close_page pop_page
 
       def open_stats = @screens[:stats].open
 
@@ -406,16 +411,16 @@ module DotPopper
       def keys? = offer.keys?
 
       # The friend groups' screens opened (+open+) or closed, on the stack.
-      def friend_groups_shown(open) = open ? open_layer(:friend_groups) : close_layer(:friend_groups)
+      def friend_groups_shown(open) = open ? push(:friend_groups) : pop(:friend_groups)
 
       # Whether the friend groups' screens are open, on the stack.
-      def friend_groups_open? = layer?(:friend_groups)
+      def friend_groups_open? = open?(:friend_groups)
 
       # Friend groups, opened from Home.
       def open_groups = (@groups.open if on_home?)
 
       # Whether the offer of Pro is open, over the screen it was opened from.
-      def offer? = layer?(:offer)
+      def offer? = open?(:offer)
 
       # The offer of Pro (Screens::Offer), open or not.
       def offer = @screens[:offer]
@@ -533,7 +538,7 @@ module DotPopper
       # Whether the share preview is open over Game Over. It is the
       # presentation's alone: the game stays on Game Over meanwhile, its
       # grace counting as ever, and no tap there reaches the game.
-      def sharing? = layer?(:share_preview)
+      def sharing? = open?(:share_preview)
 
       # What the share preview shows (ShareText), while it is open.
       def share_preview = (@screens[:share_preview].preview if sharing?)
@@ -583,8 +588,8 @@ module DotPopper
       # (Layout#heading_place).
       def heading_place(text) = layout.heading_place(text, @measure)
 
-      def open_settings = open_page(:settings)
-      def open_privacy = open_page(:privacy)
+      def open_settings = push_page(:settings)
+      def open_privacy = push_page(:privacy)
 
       # Change Server, from Settings, only while setdef is gone
       # (DotPopper::ServerChoice).
@@ -598,7 +603,7 @@ module DotPopper
 
       def open_policy = @links.open(PRIVACY_URL)
 
-      def open_achievements = open_page(:achievements)
+      def open_achievements = push_page(:achievements)
       def achievements_layout = @screens[:achievements].grid
       # How many achievements are earned, or nil where that is Pro's.
       def achievement_count = @view_achievements.count
@@ -676,20 +681,25 @@ module DotPopper
 
       # Pushes +screen+ (a Screens::Screen, or its name in Screens.made_for)
       # on the stack, over the screens open now, unless it is open already.
-      def open_layer(screen)
-        layer = screen.is_a?(Symbol) ? @screens.fetch(screen) : screen
-        @layers << layer unless @layers.include?(layer)
+      def push(screen)
+        screen = @screens.fetch(screen) if screen.is_a?(Symbol)
+        @stack << screen unless @stack.include?(screen)
       end
 
       # Takes +screen+ off the top of the stack, where it is on top; a screen
       # under another stays open until the one over it closes.
-      def close_layer(screen)
-        layer = screen.is_a?(Symbol) ? @screens.fetch(screen) : screen
-        @layers.pop if @layers.last.equal?(layer)
+      def pop(screen)
+        screen = @screens.fetch(screen) if screen.is_a?(Symbol)
+        @stack.pop if @stack.last.equal?(screen)
       end
 
-      # Whether +screen+ is open over the others.
-      def layer?(screen) = @layers.include?(screen.is_a?(Symbol) ? @screens.fetch(screen) : screen)
+      # Whether +screen+ is open on the stack, on top or under another.
+      def open?(screen) = @stack.include?(screen.is_a?(Symbol) ? @screens.fetch(screen) : screen)
+
+      # The old names, until no one calls them.
+      alias open_layer push
+      alias close_layer pop
+      alias layer? open?
 
       # What sizes the screens' words (RoughMeasure's methods).
       attr_reader :measure
@@ -842,7 +852,7 @@ module DotPopper
 
       def home_shown(event)
         @use_theme.refresh
-        @layers.clear
+        @stack.clear
         effects.clear
         @game_over = nil
         @home_entrance = HomeEntrance.new(style: style::HOME, score_record: event.score_record, at: now)

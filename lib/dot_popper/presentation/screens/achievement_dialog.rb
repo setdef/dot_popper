@@ -19,13 +19,13 @@ module DotPopper
 
         # Opens over Achievements, showing +id+.
         def open_at(id)
-          show.open_layer(self)
+          show.push(self)
           @achievement = id
           sounds.play(:tick)
         end
 
         def close
-          show.close_layer(self)
+          show.pop(self)
           sounds.play(:tick, pitch: 0.8)
         end
 
@@ -40,7 +40,7 @@ module DotPopper
         # leading with this achievement, and the dialog closes.
         def get_pro
           id = achievement
-          show.close_layer(self)
+          show.pop(self)
           show.offer.open_led_by(:achievements)
           show.offer.led_by_achievement(id)
         end

@@ -8,7 +8,7 @@ module DotPopper
     # outlines that follow them, which after time's up are the pile's and
     # dim with it, under Game Over's card and buttons, the numbers that
     # float up, the screen's words and HUD on top, the screens open over
-    # the game's state (Show#layers), each by its painter, and over
+    # the game's state (Show#stack), each by its painter, and over
     # everything, the gamepad's cursor when it shows. Only the HUD shakes.
     # The Tutorial is drawn as a game is, from its own dots and HUD, with
     # its spotlight, hand and skip button over them.
@@ -74,10 +74,10 @@ module DotPopper
       # The screens over the game's state, from the last one that covers
       # the rest (or the screen for the state itself) up to the top one.
       def screens(state, width, height, layout)
-        layers = @show.layers
-        from = layers.rindex { it.covers? }
+        stack = @show.stack
+        from = stack.rindex { it.covers? }
         draw_screen(state, width, height, layout) unless from
-        (from || 0).upto(layers.size - 1) { draw_screen(layers[it], width, height, layout) }
+        (from || 0).upto(stack.size - 1) { draw_screen(stack[it], width, height, layout) }
       end
 
       # One screen, over the veil it draws over what is under it, by its
