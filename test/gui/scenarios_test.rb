@@ -127,7 +127,8 @@ class GuiScenariosTest < Minitest::Test
 
   def test_a_free_player_buys_the_pro_version_on_a_test_builds_store
     play("purchase", "the games have run out", "Play leads to the offer", "the store gave its price", "Buy reaches the checkout, which sends a license key",
-         "the Stats screen no longer offers the purchase", "Themes opens", "scenario purchase passed",
+         "the Stats screen no longer offers the purchase", "Themes opens", "a click on Ghost's card uses it: the themes are the player's now",
+         "scenario purchase passed",
          DOT_POPPER_FREE_GAMES: "1", DOT_POPPER_THEME_UNLOCKS: "ghost")
   end
 

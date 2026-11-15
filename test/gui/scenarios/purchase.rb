@@ -50,11 +50,14 @@ module DotPopperGui
       continue_to_home
       show.open_stats
       check(!show.controls.map(&:name).include?(:offer), "the Stats screen no longer offers the purchase")
-      check(pro?, "the player has Pro, so the themes, Join and Create are theirs")
+      check(pro?, "the player has Pro, so Join and Create are theirs")
       show.open_themes
       check(show.themes?, "Themes opens")
       wait(0.5)
       keep_screenshot("purchase-pro-looks")
+      ghost = show.themes_layout.cards.find { it.theme.key == :ghost }.rect
+      click(ghost.center_x, ghost.center_y)
+      check(show.in_use.key == :ghost && !show.offer?, "a click on Ghost's card uses it: the themes are the player's now")
     end
 
     def check_nil_games = check(show.games_line.nil?, "Home no longer counts games")

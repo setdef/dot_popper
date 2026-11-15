@@ -330,6 +330,20 @@ class RootTest < Minitest::Test
     assert_equal game.cabinet.state.score, game.show.game_over&.score
   end
 
+  # The Show hears the rules' events from the cabinet the root builds, so
+  # a dot popped there sounds its pop: Game Over alone would not show it,
+  # since the Show lays that out from what FinishGame tells it.
+  def test_a_dot_popped_in_the_game_the_root_builds_sounds_its_pop
+    game = root
+    game.show.play
+    game.show.skip_tutorial
+    dot = game.cabinet.game.dots.find(&:bright?)
+    game.sound_player.played.clear
+    game.show.tap(dot.x, dot.y)
+
+    assert_includes game.sound_player.names, :pop
+  end
+
   # The root subscribes every listener to the rules' events itself, in the
   # order they hear them, and the Show to each game FinishGame finishes.
   # Making a Show subscribes nothing.
