@@ -2,7 +2,7 @@
 
 module DotPopper
   module Shell
-    # Home, as Presentation::HomeScreen lays it out: the name, the first
+    # Home, as Presentation::HomeLayout lays it out: the name, the first
     # launch's legend, Play with what it leaves to say under it, today's
     # goal and the days in a row on their card, the four large buttons,
     # and the bottom row. Each large button shows one value.

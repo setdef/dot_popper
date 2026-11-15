@@ -4,7 +4,7 @@ module DotPopper
   module Presentation
     module Screens
       # Home: the game's name, Play, today's goal, the large buttons and
-      # the bottom row (HomeScreen lays them out). Play starts a game
+      # the bottom row (HomeLayout lays them out). Play starts a game
       # through +start_game+ (UseCases::StartGame), with the Tutorial over
       # it while +tutorial_flag+ says it is due, and says how many games
       # are left.
@@ -68,7 +68,7 @@ module DotPopper
         # shows has changed, since laying it out measures every line at
         # every size it tries, and a frame asks for it more than once.
         def plan
-          screen = HomeScreen.new(layout:, type: style::TYPE, words:, measure:, played: show.stats_offered?, tile_names:,
+          screen = HomeLayout.new(layout:, type: style::TYPE, words:, measure:, played: show.stats_offered?, tile_names:,
                                   window: show.window.offered?)
           @planned = [screen, screen.plan] unless @planned&.first == screen
           @planned.last

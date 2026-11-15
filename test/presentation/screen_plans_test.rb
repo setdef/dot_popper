@@ -227,7 +227,7 @@ class ScreenPlansTest < Minitest::Test
     (SIZES + DESKTOPS).each do |width, height|
       screen_layout = layout(width, height)
       [true, false].product([3, 4], [true, false]) do |played, tiles, window|
-        plan = HomeScreen.new(layout: screen_layout, type: Style::TYPE, words: WORDS, measure: RoughMeasure.new, played:,
+        plan = HomeLayout.new(layout: screen_layout, type: Style::TYPE, words: WORDS, measure: RoughMeasure.new, played:,
                               tile_names: %i[stats achievements themes groups].first(tiles), window:).plan
         name = "#{width}x#{height} played #{played}, #{tiles} tiles, window #{window}"
         parts = [plan.name, plan.legend, plan.play, plan.goal, *plan.tiles.values, *plan.pills.values].compact
@@ -253,7 +253,7 @@ class ScreenPlansTest < Minitest::Test
     (SIZES + DESKTOPS).each do |width, height|
       screen_layout = layout(width, height)
       [3, 4].product([true, false]) do |tiles, window|
-        rect = HomeScreen.new(layout: screen_layout, type: Style::TYPE, words: WORDS, measure:, played: true,
+        rect = HomeLayout.new(layout: screen_layout, type: Style::TYPE, words: WORDS, measure:, played: true,
                               tile_names: %i[stats achievements themes groups].first(tiles), window:).plan.goal
         assert rect, "#{width}x#{height}, #{tiles} tiles, window #{window}: the card is shown" if kept.include?([width, height])
         next unless rect

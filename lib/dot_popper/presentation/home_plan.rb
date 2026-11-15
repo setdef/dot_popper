@@ -2,7 +2,7 @@
 
 module DotPopper
   module Presentation
-    # Where Home's parts go, worked out by HomeScreen#plan: the name and its
+    # Where Home's parts go, worked out by HomeLayout#plan: the name and its
     # type size, the first launch's +legend+ and its type size (nil after
     # the first game), Play, the daily goal's card, the four large +tiles+
     # by name, the bottom row's +pills+ by name, and +quit_line+, the middle
@@ -78,7 +78,7 @@ module DotPopper
     # false) it is the name, the legend, Play and Settings alone, so
     # nothing has to be read to begin. A short landscape window puts the
     # name and Play on the left and the rest on the right.
-    class HomeScreen < Data.define(:layout, :type, :words, :measure, :played, :tile_names, :window)
+    class HomeLayout < Data.define(:layout, :type, :words, :measure, :played, :tile_names, :window)
       NAME_WIDTH = 615.0 # how wide the name may be on a large window
       PLAY = [560.0, 104.0].freeze
 
@@ -290,5 +290,7 @@ module DotPopper
       # +height+ tall, with room at either end.
       def self.width_with_icon(word_width, height) = word_width + (height * (GLYPH + GAP + 1.0))
     end
+
+    HomeScreen = HomeLayout # the old name, until no one uses it
   end
 end
