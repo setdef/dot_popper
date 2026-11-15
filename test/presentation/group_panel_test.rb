@@ -166,6 +166,23 @@ class GroupPanelTest < Minitest::Test
     assert_empty @worker.started
   end
 
+  # Pro gone while a code is only partly typed: Join is still not ready,
+  # so it plays the low tick and opens nothing, as for anyone; the offer
+  # comes once the code is whole (the test above).
+  def test_joining_with_a_partial_code_after_pro_is_gone_ticks_low_and_opens_nothing
+    license = License.new(true)
+    build(entitlement: DotPopper::Entitlement.new(license:))
+    open_join
+    tap_code("123")
+    license[:pro?] = false
+    @sounds.played.clear
+    tap_control(:code_submit)
+
+    assert_equal [[:tick, 0.8]], @sounds.played
+    refute_predicate @show, :offer?
+    assert_empty @worker.started
+  end
+
   # Pro gone while the friend groups' notice is open: Create sends
   # nothing, and the offer of Pro opens instead.
   def test_creating_after_pro_is_gone_leads_to_the_offer_and_sends_nothing
