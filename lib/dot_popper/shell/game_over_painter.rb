@@ -48,8 +48,8 @@ module DotPopper
           ShareButton.new(pen:).draw(button, words.share, entrance: game_over.share_button_entrance(now), ui: layout.ui, hover: show.hover.level(:share))
         end
         play = plan.play_button or return
-        PrimaryButton.new(pen:).draw(play, show.game_over_screen.play_word, alpha: [shown * 0.35, game_over.prompt(now)].max,
-                                     hover: show.hover.level(:play_again), note: show.game_over_screen.play_note)
+        PrimaryButton.new(pen:).draw(play, show.game_over_layout.play_word, alpha: [shown * 0.35, game_over.prompt(now)].max,
+                                     hover: show.hover.level(:play_again), note: show.game_over_layout.play_note)
       end
 
       # Each of the game's lines in a pill: its mark, its words, and an
@@ -130,7 +130,7 @@ module DotPopper
         game_over = show.game_over
         return if game_over.new_score_record? && !game_over.counted?(now)
 
-        face, size, text = show.game_over_screen.score_record_line(plan.size(:score_record))
+        face, size, text = show.game_over_layout.score_record_line(plan.size(:score_record))
         color = game_over.new_score_record? ? pen.palette.gain : pen.palette.soft
         alpha = 0.85 + (0.15 * Math.sin(now * 6)) if game_over.new_score_record?
         pen.text(text, pen.fonts.public_send(face, size), rect.center_x, rect.center_y, color, alpha)

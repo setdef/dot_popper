@@ -77,13 +77,13 @@ module DotPopper
         def input_used(_kind) = @key_hint = nil
 
         # The words and parts to lay out (OfferLayout), and where they go.
-        def layout_screen
+        def screen_layout
           OfferLayout.new(layout:, type: style::TYPE, words:, measure:, offering: !thanking?,
                           note: (words.offer[:no_games] if for_play), focus:, art:,
                           sold: @buy_pro.sold?, second: keys? ? :paste : :restore)
         end
 
-        def plan = layout_screen.plan
+        def plan = screen_layout.plan
 
         # How tall its picture of what was tapped is: the themes' cards,
         # the achievement's card, or a feature's sign.

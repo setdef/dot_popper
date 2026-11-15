@@ -48,7 +48,7 @@ class GamesTest < Minitest::Test
     assert_predicate @show, :offer?
     assert_equal "Unlimited games", Style::WORDS.offer_items.first
     assert_equal ["No games left today."], @show.offer_plan.note_lines, "the offer says why, and counts nothing"
-    assert_equal "Unlimited games", @show.offer_screen.focus_word
+    assert_equal "Unlimited games", @show.offer_layout.focus_word
     assert_includes @show.controls.map(&:name), :restore
   end
 
@@ -74,7 +74,7 @@ class GamesTest < Minitest::Test
     @show.update(0.016)
 
     assert_predicate @show, :game_over?
-    assert_equal "Get Pro", @show.game_over_screen.play_word
+    assert_equal "Get Pro", @show.game_over_layout.play_word
     @show.primary
 
     assert_predicate @show, :offer?

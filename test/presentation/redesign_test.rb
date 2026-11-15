@@ -168,7 +168,7 @@ class RedesignTest < Minitest::Test
 
   def test_game_overs_play_again_starts_the_next_game_and_home_goes_home
     s = game_over_with
-    assert_equal "Play again", s.game_over_screen.play_word
+    assert_equal "Play again", s.game_over_layout.play_word
     s.tap(*middle(s.play_again_reach))
     assert s.playing?
 

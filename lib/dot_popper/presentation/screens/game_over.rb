@@ -64,7 +64,7 @@ module DotPopper
 
         # Its words to lay out (GameOverLayout), or nil before a game has
         # finished.
-        def layout_screen
+        def screen_layout
           over = show.game_over or return
           GameOverLayout.new(layout:, type: style::TYPE, words:, measure:, scrim: style::GAME_OVER_BACKING, game_over: over,
                              below: layout.safe.y, radius: show.cabinet.game&.field&.radius || show.radius, chips:,
@@ -75,7 +75,7 @@ module DotPopper
         # when what it shows has changed, since laying it out measures every
         # line, and a frame asks for it more than once.
         def plan
-          screen = layout_screen or return
+          screen = screen_layout or return
           @planned = [screen, screen.plan] unless @planned&.first == screen
           @planned.last
         end

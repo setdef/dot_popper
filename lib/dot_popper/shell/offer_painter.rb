@@ -21,8 +21,8 @@ module DotPopper
         Header.new(pen:).draw(show, layout, words[:heading])
         note(plan) if plan.key?(:note)
         art(show, plan[:art]) if plan.key?(:art)
-        centered(plan, :focus, :bold, :focus, show.offer_screen.focus_word, palette.cream)
-        items(plan, show.offer_screen.others)
+        centered(plan, :focus, :bold, :focus, show.offer_layout.focus_word, palette.cream)
+        items(plan, show.offer_layout.others)
         status(plan, show.offer_status)
         buttons(show, plan, words)
       end

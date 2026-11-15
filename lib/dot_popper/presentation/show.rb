@@ -425,7 +425,8 @@ module DotPopper
       def offer_plan = (offer.plan if offer?)
 
       # The offer's words and parts to lay out (OfferLayout).
-      def offer_screen = offer.layout_screen
+      def offer_layout = offer.screen_layout
+      alias offer_screen offer_layout # the old name, until no one calls it
 
 
       # The themes the offer shows: every one but the ordinary, as Pro
@@ -637,7 +638,8 @@ module DotPopper
 
       # Game Over's words to lay out (GameOverLayout), or nil before a game
       # has finished.
-      def game_over_screen = @screens[:game_over].layout_screen
+      def game_over_layout = @screens[:game_over].screen_layout
+      alias game_over_screen game_over_layout # the old name, until no one calls it
 
       # The window changed size. Home's dots are respawned if their
       # size changes with it, as standard dots do.
