@@ -1,0 +1,57 @@
+# Type-checks the rules core, friend groups and the use cases against
+# sig/ (bundle exec rake steep; the Steepfile says what it checks), on
+# every push to trunk, so a type error turns the commit red in a check of
+# its own name. The Package workflow's Test job runs Steep too, after the
+# tests, but a newer push replaces a Package run still waiting, and a
+# failure there reads as a failed test job.
+#
+# A run in progress finishes; of the runs waiting behind it, only the
+# newest is kept, and it checks every commit pushed before it. By hand
+# (workflow_dispatch), `commit` checks any commit GitHub has instead of
+# the branch's tip, such as an older trunk commit, to find which one
+# broke the types.
+
+name: Steep
+
+on:
+  push:
+    branches: [trunk]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: The commit to check (a SHA GitHub has); empty checks the branch's tip
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: steep-${{ github.ref }}-${{ inputs.commit }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  BUNDLE_FROZEN: "true"
+
+jobs:
+  steep:
+    name: steep check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.commit }}
+          persist-credentials: false
+
+      - uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - run: bundle exec rake steep
