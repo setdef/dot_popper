@@ -29,7 +29,7 @@ A dot is a value, `Dot` (`lib/dot_popper/dot.rb`): an `id`, a place, a velocity 
 
 ## Dot size: Standard, and Bigger or Smaller
 
-The default size, Standard, is worked out from the screen, so every screen is about equally crowded; the other, the bigger or smaller size, is the same on every screen, and Settings names it "Bigger" or "Smaller", by what it does on this device next to Standard. Why Standard is worked out from the screen: [ADR-0020](../adr/0020-standard-dots-are-sized-to-the-screen-by-default.md).
+The default size, Standard, is worked out from the screen, so every screen is about equally crowded; the other, the bigger or smaller size, is the same on every screen, and Settings names it "Bigger" or "Smaller", by what it does on this device next to Standard. Why Standard is worked out from the screen is [below](#why-standard-is-worked-out-from-the-screen).
 
 `DotSizing` (`lib/dot_popper/dot_sizing.rb`) holds the player's choice:
 
@@ -54,6 +54,16 @@ On an upright phone the floor applies: the exact fit would be about 29.6, so the
 **What Standard does not do.** Working the size out from the screen narrows the difference that screen size makes to how crowded the field gets. It does not make scores comparable across devices: the same player still scores differently on different screens, and differently again with a mouse, a finger or a controller. Friend groups count every game, whatever its dot size ([friend-groups.md](friend-groups.md)).
 
 Each choice keeps records of its own ([progress.md](progress.md#size-classes)).
+
+### Why Standard is worked out from the screen
+
+Every distance and speed in the rules is a multiple of R, so how many radii fit on a screen sets how crowded a game gets, and crowding is the game's difficulty. With one R for every screen, the screen, not the player, would decide how hard the game is: a failure must feel like the player's own (Juul, *The Art of Failure*), a hidden handicap the player can't see or choose is unfair (Garfield, *Characteristics of Games*), and a phone shouldn't start its difficulty curve far above a monitor's (Koster, *A Theory of Fun*). One formula serves every screen, with no table of devices (Sylvester, *Designing Games*), and the default suits the player who never opens Settings, while a player who prefers a dot of one size everywhere can choose it.
+
+This is the maintainer's decision. He first made sizing to the screen a choice, then, after playing on an iPhone 13 mini, the default: he rated the game 2 of 5 there with the same size everywhere and 4 of 5 with dots worked out from the screen, "far more enjoyable". On an upright phone a dot is at its 30-unit floor, which he found "mostly fine (on the small side)". A field of one size, letterboxed where the screen is bigger, and time rewards scaled by the field's area were named and not pursued. What it does to scores is measured [below](#screen-size-and-dot-size).
+
+The names are the maintainer's too. He put them forward as something he "_could_ however be convinced" of ("\"Standard\" \"Bigger\" \"Smaller\" where one person usually only sees \"Standard\" and \"Bigger\", or sees \"Standard\" and \"Smaller\""), and, asked which size "Standard" would name, answered: "The one that used to be called \"Sized to screen\"". The code's word follows a question of his: "Why not `bigger_or_smaller`".
+
+What it costs: a dot's physical size varies by screen; two sets of records exist, which Stats has to explain; the other size has no one true name, so the screens name it by what it does on the player's device; and the words in players' save files are the reverse of today's names, mapped in one place ([Saving](#dot-size-standard-and-bigger-or-smaller)). If Lota gains a way to report a screen's physical density, the other size could be an exact 8 mm.
 
 ## Resizing during a game
 
