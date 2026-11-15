@@ -321,7 +321,7 @@ class InputsTest < Minitest::Test
   def test_a_controller_alone_pastes_the_server_address_it_was_given
     fixture = Fixture.new(os: "Linux", width: 1200, height: 800, gone: true)
     player = Pad.new(fixture)
-    %i[settings server server_paste].each { assert_equal :pressed, player.press(it) }
+    %i[settings change_server server_paste].each { assert_equal :pressed, player.press(it) }
 
     assert_equal :empty, fixture.server_choice.status
     assert_nil fixture.server_choice.address

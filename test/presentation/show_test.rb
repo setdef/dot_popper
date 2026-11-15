@@ -29,7 +29,7 @@ class ShowTest < Minitest::Test
   # nothing and makes no sound.
   def test_home_dots_pop_only_on_home
     { themes: -> { @show.open_themes }, privacy: -> { @show.open_settings && @show.open_privacy },
-      server: -> { @show.open_settings && @show.push_page(:server) }, offer: -> { @show.open_offer_for(:themes) } }.each do |name, open|
+      change_server: -> { @show.open_settings && @show.push_page(:change_server) }, offer: -> { @show.open_offer_for(:themes) } }.each do |name, open|
       open.call
       dots = @show.attract.dots
       bright = dots.find { it.bright? && dots.top_at(it.x, it.y) == it && @show.control_at(it.x, it.y).nil? }

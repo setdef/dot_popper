@@ -8,8 +8,8 @@ module DotPopper
 
     # Settings laid out: its rows, Credits and licenses, Privacy, and how
     # tall all of it is, for a window too short to show it whole.
-    class SettingsPlan < Data.define(:rows, :credits, :privacy, :server, :height)
-      def initialize(rows:, credits:, privacy:, height:, server: nil) = super
+    class SettingsPlan < Data.define(:rows, :credits, :privacy, :change_server, :height)
+      def initialize(rows:, credits:, privacy:, height:, change_server: nil) = super
     end
 
     # Everything Shell::SettingsPainter draws for Settings: its +header+
@@ -19,14 +19,14 @@ module DotPopper
     # the Dot size choice's bright dots (+sizing_preview+), and the words
     # of Credits and licenses, Privacy and Change Server, and how lit each
     # is (+lit+, by name).
-    class SettingsDrawing < Data.define(:header, :plan, :clip, :choices, :sizing_preview, :credits, :privacy, :server, :lit); end
+    class SettingsDrawing < Data.define(:header, :plan, :clip, :choices, :sizing_preview, :credits, :privacy, :change_server, :lit); end
 
     # Settings: each row's name beside its choices, or above them on a
     # narrow screen, then Credits and licenses and Privacy, and under them,
-    # while setdef is gone, Change Server (+server+). Where the page is too
+    # while setdef is gone, Change Server (+change_server+). Where the page is too
     # short for all of it, it scrolls, +offset+ down.
-    class SettingsLayout < Data.define(:layout, :rows, :offset, :server)
-      def initialize(layout:, rows:, offset: 0.0, server: false) = super
+    class SettingsLayout < Data.define(:layout, :rows, :offset, :change_server)
+      def initialize(layout:, rows:, offset: 0.0, change_server: false) = super
 
       def plan
         area = layout.page
@@ -49,8 +49,8 @@ module DotPopper
         y += 4
         credits = pill(area.x, y, area.width)
         privacy = pill(area.x, y + button + 10, area.width)
-        changing = (pill(area.x, privacy.bottom + 10, area.width) if server)
-        SettingsPlan.new(rows: placed, credits:, privacy:, server: changing, height: (changing || privacy).bottom - top + 8)
+        changing = (pill(area.x, privacy.bottom + 10, area.width) if change_server)
+        SettingsPlan.new(rows: placed, credits:, privacy:, change_server: changing, height: (changing || privacy).bottom - top + 8)
       end
 
       def beside(area)
@@ -58,7 +58,7 @@ module DotPopper
         width = [area.width, 928.0].min
         left = layout.center_x - (width / 2.0)
         tall = button + 14
-        total = (rows.size * (tall + 28)) + button + 8 + (server ? button + 12 : 0)
+        total = (rows.size * (tall + 28)) + button + 8 + (change_server ? button + 12 : 0)
         y = area.y + [(area.height - total) / 2.0, 0.0].max - offset
         placed = rows.map do |key, label, glyph, choices|
           row = SettingsRow.new(key:, label:, glyph:, choices:, label_at: [left, y + (tall / 2.0)], frame: frame = Rect.new(x: left + label_width, y:, width: width - label_width, height: tall), rects: rects(frame, choices))
@@ -66,8 +66,8 @@ module DotPopper
           row
         end
         half = (width - 12) / 2.0
-        changing = (pill(left, y + button + 12, half) if server)
-        SettingsPlan.new(rows: placed, credits: pill(left, y, half), privacy: pill(left + half + 12, y, half), server: changing, height: total)
+        changing = (pill(left, y + button + 12, half) if change_server)
+        SettingsPlan.new(rows: placed, credits: pill(left, y, half), privacy: pill(left + half + 12, y, half), change_server: changing, height: total)
       end
 
       def pill(x, y, width) = Rect.new(x:, y:, width:, height: button)

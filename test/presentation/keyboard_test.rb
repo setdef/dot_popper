@@ -74,12 +74,12 @@ class KeyboardTest < Minitest::Test
       assert fixture.entitlement.pro?, "#{held}+V pastes the license key"
       assert_empty fixture.storefront.typed
 
-      given(at: :server, gone: true, copied: SERVER)
+      given(at: :change_server, gone: true, copied: SERVER)
       press(:v, held)
 
       assert_equal SERVER, fixture.server_choice.address, "#{held}+V pastes the server's address"
     end
-    given(at: :server, gone: true, copied: SERVER)
+    given(at: :change_server, gone: true, copied: SERVER)
     press(:v)
     press(:v, :alt)
 
@@ -289,7 +289,7 @@ class KeyboardTest < Minitest::Test
         assert_equal 0, @shell.quits, "#{held}+#{key} on #{at}"
       end
     end
-    given(at: :server, gone: true, copied: SERVER)
+    given(at: :change_server, gone: true, copied: SERVER)
     press(:v, :ctrl, :alt)
 
     assert_nil fixture.server_choice.address, "Ctrl+Alt+V is no Ctrl+V"
@@ -439,7 +439,7 @@ class KeyboardTest < Minitest::Test
     when :stats then show.open_stats
     when :settings then show.open_settings
     when :credits then show.open_settings.then { show.open_credits }
-    when :server then show.open_settings.then { show.open_server }
+    when :change_server then show.open_settings.then { show.open_change_server }
     when :offer then open_offer(show)
     when :keypad then open_keypad
     when :game then show.play

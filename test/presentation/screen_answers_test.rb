@@ -230,7 +230,7 @@ class ScreenAnswersTest < Minitest::Test
     settings: at(fixture: SMALL, path: [:settings]),
     credits: at(path: %i[settings credits]),
     privacy: at(fixture: { member: true }, path: %i[settings privacy]),
-    change_server: at(fixture: { gone: true, copied: "https://groups.example.org" }, path: %i[settings server]),
+    change_server: at(fixture: { gone: true, copied: "https://groups.example.org" }, path: %i[settings change_server]),
     friend_groups: at(fixture: SMALL.merge(pro: true, member: true), path: [:groups]),
     a_long_list_of_friend_groups: at(fixture: SMALL.merge(pro: true, member: true, groups: 9), path: [:groups]),
     a_friend_group: at(fixture: { pro: true, member: true }, path: [:groups, [:group_show, 1]]),

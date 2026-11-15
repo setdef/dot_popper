@@ -588,13 +588,18 @@ module DotPopper
 
       # Change Server, from Settings, only while setdef is gone
       # (DotPopper::ServerChoice).
-      def open_server = @screens[:server].open
+      def open_change_server = @screens[:change_server].open
 
-      def server? = on_top?(:server)
-      def server_offered? = @screens[:server].offered?
+      def change_server? = on_top?(:change_server)
+      def change_server_offered? = @screens[:change_server].offered?
+
+      # The old names, until no one calls them.
+      alias open_server open_change_server
+      alias server? change_server?
+      alias server_offered? change_server_offered?
 
       # The words and buttons of Change Server (ChangeServerLayout).
-      def paste_server = @screens[:server].paste_address
+      def paste_server = @screens[:change_server].paste_address
 
       def open_policy = @links.open(PRIVACY_URL)
 

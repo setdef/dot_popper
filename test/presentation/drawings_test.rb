@@ -20,7 +20,7 @@ class DrawingsTest < Minitest::Test
     fixture = fixture(gone: true)
     show = fixture.show
     show.open_settings
-    show.screens.fetch(:server).open
+    show.screens.fetch(:change_server).open
     screen = show.screen
     drawing = screen.drawing
     words = show.words
@@ -91,7 +91,7 @@ class DrawingsTest < Minitest::Test
     assert_equal(drawing.plan.rows.map { |row| row.choices.map { it.first(2) } }, drawing.choices.map { |row| row.map { it.first(2) } })
     page = show.layout.page
     assert_equal [page.y, page.height, show.layout.safe.width], [drawing.clip.y, drawing.clip.height, drawing.clip.width]
-    assert_equal({ credits: 0.0, privacy: 0.0, server: 0.0 }, drawing.lit)
+    assert_equal({ credits: 0.0, privacy: 0.0, change_server: 0.0 }, drawing.lit)
 
     off = screen.controls.find { it.name == [:sound, false] }.frame
     show.pointer_at(off.center_x, off.center_y)
@@ -180,7 +180,7 @@ class DrawingsTest < Minitest::Test
     fixture = fixture(gone: true)
     show = fixture.show
     show.open_settings
-    show.screens.fetch(:server).open
+    show.screens.fetch(:change_server).open
     drawing = show.screen.drawing
     fixture.tick(0.5)
     assert_same drawing, show.screen.drawing

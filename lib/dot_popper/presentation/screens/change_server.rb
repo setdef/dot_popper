@@ -17,7 +17,7 @@ module DotPopper
         def offered? = @choice&.offered? || false
 
         # Opens over Settings, where it is offered.
-        def open = (show.push_page(:server) if show.settings? && offered?)
+        def open = (show.push_page(:change_server) if show.settings? && offered?)
 
         # Where its words and buttons go (ChangeServerLayout).
         # Laid out again only when the window, the words or the choice

@@ -29,7 +29,7 @@ module DotPopper
             rows << [:dot_size, words.button(:dot_size), :dot, SIZINGS.map { [words.sizing(it, show.sizing_preview), it == cabinet.sizing, it] }]
           end
           rows << [:display, words.button(:display), :corners, display_choices] if show.window.offered?
-          plan = SettingsLayout.new(layout:, rows:, offset: scroll ? scroll.offset : 0.0, server: show.server_offered?).plan
+          plan = SettingsLayout.new(layout:, rows:, offset: scroll ? scroll.offset : 0.0, change_server: show.change_server_offered?).plan
           fit(plan.height, layout.page.height)
           plan
         end
@@ -48,7 +48,7 @@ module DotPopper
                                 clip: Rect.new(x: safe.x, y: page.y, width: safe.width, height: page.height),
                                 choices: plan.rows.map { |row| row.choices.map { |text, chosen, name| [text, chosen, hover.level(name), name] } },
                                 sizing_preview: preview, credits: words.button(:credits_licenses), privacy: words.button(:privacy),
-                                server: words.button(:server), lit: %i[credits privacy server].to_h { [it, hover.level(it)] })
+                                change_server: words.button(:server), lit: %i[credits privacy change_server].to_h { [it, hover.level(it)] })
           end
         end
 
@@ -82,7 +82,7 @@ module DotPopper
           plan = self.plan
           rows = plan.rows.flat_map { |row| row.choices.zip(row.rects).map { |(_, _, name), rect| button(name, rect) } }
           page = layout.page
-          seen = (rows + [button(:credits, plan.credits), button(:privacy, plan.privacy), *(button(:server, plan.server) if plan.server)])
+          seen = (rows + [button(:credits, plan.credits), button(:privacy, plan.privacy), *(button(:change_server, plan.change_server) if plan.change_server)])
                  .select { it.frame.center_y.between?(page.y, page.bottom) }
           seen.map { it.with(frame: it.frame.cut(top: page.y, bottom: page.bottom), reach: it.reach.cut(top: page.y, bottom: page.bottom)) } <<
             back_button
@@ -112,7 +112,7 @@ module DotPopper
           end
         end
 
-        def answers = [*super, :sound, :dot_size, :display, :credits, :privacy, :server]
+        def answers = [*super, :sound, :dot_size, :display, :credits, :privacy, :change_server]
 
         def pressed(name, by)
           case name
@@ -121,7 +121,7 @@ module DotPopper
           in [:display, mode] then show.window.display = mode
           in :credits then show.open_credits
           in :privacy then show.open_privacy
-          in :server then show.screens.fetch(:server).open
+          in :change_server then show.screens.fetch(:change_server).open
           else super
           end
         end

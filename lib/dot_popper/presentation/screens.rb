@@ -12,7 +12,7 @@ module DotPopper
       ALL = { home: "Home", new_theme: "NewTheme", tutorial: "Tutorial", game: "Game", game_over: "GameOver",
               share_preview: "SharePreview", offer: "Offer", stats: "Stats", achievements: "Achievements",
               achievement_dialog: "AchievementDialog", themes: "Themes", settings: "Settings", credits: "Credits",
-              privacy: "Privacy", server: "ChangeServer", friend_groups: "FriendGroups" }.freeze
+              privacy: "Privacy", change_server: "ChangeServer", friend_groups: "FriendGroups" }.freeze
 
       # One of each screen for +show+, by name, each given the collaborators
       # its constructor names from +collaborators+ (the use cases, the

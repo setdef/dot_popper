@@ -265,11 +265,11 @@ class WebsiteStoreTest < Minitest::Test
     s = show
     click(s, :settings)
 
-    refute_includes names(s), :server
+    refute_includes names(s), :change_server
     @gone.heard(:gone, Date.new(2027, 1, 1))
-    click(s, :server)
+    click(s, :change_server)
 
-    assert s.server?
+    assert s.change_server?
     @clipboard.copy("http://example.com")
     click(s, :server_paste)
 

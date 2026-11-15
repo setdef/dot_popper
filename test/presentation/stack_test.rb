@@ -7,7 +7,7 @@ require_relative "inputs"
 # says what is then on the stack, bottom first, which screen is on top
 # (Show#screen), and what the Show's questions answer. Some questions ask
 # whether a screen is on top (Show#on_top?: #stats?, #settings?, #themes?,
-# #credits?, #server?, #privacy?, #achievements_open?), and some whether
+# #credits?, #change_server?, #privacy?, #achievements_open?), and some whether
 # it is anywhere on the stack (#offer?, #sharing?, #dialog,
 # #friend_groups_open?); the rows say which.
 class StackTest < Minitest::Test

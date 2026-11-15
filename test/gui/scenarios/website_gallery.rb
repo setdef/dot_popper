@@ -14,7 +14,7 @@ module DotPopperGui
     def play
       check(show.home?, "the game opens on Home")
       gone = ENV["DOT_POPPER_FAKE_SETDEF"] == "gone"
-      wait_for("setdef's answer") { !gone || show.server_offered? }
+      wait_for("setdef's answer") { !gone || show.change_server_offered? }
       quick_game
       SIZES.each { |width, height| shots(width, height, gone) }
     end
@@ -42,8 +42,8 @@ module DotPopperGui
       show.open_settings
       wait(0.3)
       keep_screenshot("website-settings-#{name}")
-      show.open_server
-      check(show.server?, "Change Server opens while setdef is gone")
+      show.open_change_server
+      check(show.change_server?, "Change Server opens while setdef is gone")
       wait(0.3)
       keep_screenshot("website-server-#{name}")
       ::Lota::System.clipboard_text = "https://groups.example.org"
