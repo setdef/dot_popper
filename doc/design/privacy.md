@@ -4,7 +4,9 @@
 -->
 # Privacy facts
 
-How the game's privacy facts are declared, generated and enforced: every file it saves, every request it makes, what is shipped and asked of the system, and the iOS privacy manifest. For anyone who adds a save file, a request, a library or a permission. The facts themselves are [doc/privacy.json](../privacy.json); why they come from the code is [ADR-0014](../adr/0014-privacy-facts-come-from-the-code.md).
+How the game's privacy facts are declared, generated and enforced: every file it saves, every request it makes, what is shipped and asked of the system, and the iOS privacy manifest. For anyone who adds a save file, a request, a library or a permission. The facts themselves are [doc/privacy.json](../privacy.json); why they come from the code is below.
+
+The public privacy policy, Apple's privacy labels and manifest, and Google Play's Data safety form must say exactly what the game keeps and sends, and a hand-written list has to be kept current by whoever changes the code, which nobody can be trusted to do. So each fact has one source, a declaration in the code that the code cannot bypass, and everything else is generated from it (Hunt and Thomas, *The Pragmatic Programmer*: DRY, applied to facts); a test fails when reality and a declaration differ. What no test here can check is said plainly, not implied ([declared_but_not_enforced](#declared_but_not_enforced)). The cost: every new save file, request or field takes a declaration, a label or reason for players, and a regenerated `doc/privacy.json` before the suite passes.
 
 ## One source, generated
 
