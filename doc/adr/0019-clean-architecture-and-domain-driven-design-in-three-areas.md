@@ -16,7 +16,7 @@ Two proposals for restructuring the code were written in November 2026, one from
 
 * The maintainer's rule that Pro never changes how the game plays or scores (`AGENTS.md`).
 * His rule that code, screens, documents and the server use the same word for the same thing (`GLOSSARY.md`).
-* Every outside party is tested the same way, with local fakes. The maintainer, on not having chosen a payment company, as that record quotes him: "Why do I have to know to be able to test it? Feathers, Beck, Fowler, Martin, Freeman & Pryce, and others have written about this before." ([ADR-0009](0009-the-store-is-a-port.md))
+* Every outside party is tested the same way, with local fakes. The maintainer, on not having chosen a payment company, as [store and Pro](../design/store-and-pro.md#the-store-port) quotes him: "Why do I have to know to be able to test it? Feathers, Beck, Fowler, Martin, Freeman & Pryce, and others have written about this before."
 * A framework is not part of the domain. The maintainer, on a proposal to count Lota as a bounded context: "Would Eric Evans ever say that Java SpringBoot is a ... context?"
 * Tests are fast and need no window (`AGENTS.md`).
 

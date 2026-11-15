@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DotPopper
-  # The store behind Pro, Monetization's port to it (ADR-0009). Neither
+  # The store behind Pro, Monetization's port to it (doc/design/store-and-pro.md). Neither
   # Lota nor LÖVE knows a store, so this works as sharing does: the game
   # opens a URL in
   # its own SCHEME, and the store's answer comes back in a small file,

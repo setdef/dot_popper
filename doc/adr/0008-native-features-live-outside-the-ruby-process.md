@@ -29,7 +29,7 @@ Chosen: option 1. Against option 2, catching the URL in the host means no other 
 
 ### Consequences
 
-* Good, because one mechanism (a URL out, a whole-state answer back) serves every native feature and every store, so the game's side is the same Ruby on every system ([ADR-0009](0009-the-store-is-a-port.md)).
+* Good, because one mechanism (a URL out, a whole-state answer back) serves every native feature and every store, so the game's side is the same Ruby on every system ([store and Pro](../design/store-and-pro.md#the-store-port)).
 * Good, because if a host won't take the URL, `open_url` answers false and the game falls back (the share preview opens in the game).
 * Bad, because the answer is polled from a file (the store's, four times a second, never during a game) rather than delivered.
 * Bad, because the native code is in Objective-C, Swift, Java and C beside the Ruby, each with its own build, and the Windows helper calls WinRT by hand-worked vtable slots and interface IDs.

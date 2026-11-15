@@ -9,7 +9,6 @@ Dot Popper's architecturally significant decisions, one per record, in the MADR 
 | ADR | Decision | Status |
 | --- | --- | --- |
 | [0008](0008-native-features-live-outside-the-ruby-process.md) | Native features Lota lacks are reached outside the Ruby process | accepted |
-| [0009](0009-the-store-is-a-port.md) | The store is a port, and the build's channel picks its adapter | accepted |
 | [0010](0010-pro-comes-only-from-proof.md) | Pro comes only from proof the game verifies, and a store build ignores developer settings | accepted |
 | [0011](0011-pro-outlives-setdef.md) | Pro outlives setdef: license keys, one device at a time, and one test of setdef being gone | accepted |
 | [0012](0012-free-games-20-then-3-a-day.md) | Free games: your first 20, then 3 a day | accepted |

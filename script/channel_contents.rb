@@ -22,7 +22,7 @@
 #
 # CHANNEL is one of Build::CHANNEL_NAMES, or "test" for a test build (a
 # build with no channel: every playtest kit). A test build needs every
-# fake and test key, and leaves nothing out (ADR-0009).
+# fake and test key, and leaves nothing out (doc/design/store-and-pro.md).
 #
 # Ruby's pieces are looked for only in the game's own folder
 # (game/dot_popper, as `lota fuse` lays it out), so Ruby's and Lota's own

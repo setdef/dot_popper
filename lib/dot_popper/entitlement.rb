@@ -19,7 +19,7 @@ module DotPopper
     class ProGranted < Data.define(:by); end
 
     # Whether a computer's copy has everything for nothing. It does not: a
-    # desktop copy is free until its channel's store sells it (Store; ADR-0009). Set it true to ship a desktop copy
+    # desktop copy is free until its channel's store sells it (Store). Set it true to ship a desktop copy
     # whole. A phone's copy is never pro this way: its host has a store of
     # its own (Platform#phone_host?).
     DESKTOP_PRO = false

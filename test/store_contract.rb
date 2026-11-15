@@ -11,7 +11,7 @@
 # It reads answers only as Store does, through +read+, so the fake
 # cannot drift from the port without failing here. Passing says the
 # adapter speaks the port; it says nothing of Apple's or Google's real
-# stores (ADR-0009).
+# stores (doc/design/store-and-pro.md).
 module StoreContract
   Store = DotPopper::Store
   STATES = %w[loading working ready pending canceled restored none failed unavailable].freeze

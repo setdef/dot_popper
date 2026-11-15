@@ -55,7 +55,7 @@ end
 # The NativeStore adapter, with a real answer file and a fake of the
 # app's host, written from Store.swift and ProStore.java. It runs the
 # contract over the game's half of the native path. It cannot show that
-# the host's real half behaves like this (ADR-0009).
+# the host's real half behaves like this (doc/design/store-and-pro.md).
 class NativeStoreContractTest < Minitest::Test
   include StoreContract
 

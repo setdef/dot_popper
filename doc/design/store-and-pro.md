@@ -4,7 +4,7 @@
 -->
 # The store and Pro
 
-How Dot Popper sells Pro and decides who has it: Free and Pro, the build's channel, the store port and its adapters, receipts, license keys, free games, the offer, and what happens if setdef is gone. For anyone working on purchases, the store hosts and helpers, or the release checks. The reasons are in [ADR-0008](../adr/0008-native-features-live-outside-the-ruby-process.md), [ADR-0009](../adr/0009-the-store-is-a-port.md), [ADR-0010](../adr/0010-pro-comes-only-from-proof.md), [ADR-0011](../adr/0011-pro-outlives-setdef.md) and [ADR-0012](../adr/0012-free-games-20-then-3-a-day.md). Store accounts, signing and submission are in [doc/publishing.md](../publishing.md).
+How Dot Popper sells Pro and decides who has it: Free and Pro, the build's channel, the store port and its adapters, receipts, license keys, free games, the offer, and what happens if setdef is gone. For anyone working on purchases, the store hosts and helpers, or the release checks. The reasons are in [ADR-0008](../adr/0008-native-features-live-outside-the-ruby-process.md), [ADR-0010](../adr/0010-pro-comes-only-from-proof.md), [ADR-0011](../adr/0011-pro-outlives-setdef.md) and [ADR-0012](../adr/0012-free-games-20-then-3-a-day.md). Store accounts, signing and submission are in [doc/publishing.md](../publishing.md).
 
 ## Free and Pro
 
@@ -74,6 +74,10 @@ Tests: `test/build_test.rb`, `test/composition/root_test.rb`, `test/set_build_ch
 `script/check_build.rb` and the release checks are in [Release checks](#release-checks).
 
 ## The store port
+
+Pro is sold through five channels, and none can be reached from a test: no automated check reaches the real internet (`AGENTS.md`), and the real stores need accounts that playtest builds don't have. A playtest must still exercise what a player will see (the offer, buying, restoring, the free-game limit), and a playtest build runs the game exactly as the final game does: a playtest with switches the final game lacks is not a playtest. So every store is behind one port (Freeman and Pryce's ports and adapters; Feathers' seam), and the build's channel alone picks its adapter, once, at the composition root ([Which store each build gets](#which-store-each-build-gets)). Everything above the port (the offer, Buy, Restore, the thanks, `Entitlement`, the free-game count) is one body of code for every store, and a test build sells and limits free games through it, on the same asynchronous road as a build for sale, with nothing on screen saying it is a fake and no setting that selects it. A new channel is a new adapter, with no feature changed, since features ask only `Entitlement#pro?`. The maintainer, on not having chosen a payment company: "Why do I have to know to be able to test it? Feathers, Beck, Fowler, Martin, Freeman & Pryce, and others have written about this before." Choosing a fake by an environment variable (`DOT_POPPER_FAKE_STORE=1`), the earlier design, left playtests unlimited on computers and let a variable change what a build sells.
+
+What it costs: a build for sale must be stamped with its channel, or it is a test build with the fakes; and playtests never touch a real store, so a sandbox purchase on a real phone has to be tried by hand before a store release.
 
 `Store` (`lib/dot_popper/store.rb`, Monetization's, in the core, which Steep checks strictly) is the game's half of every store purchase: the offer, Buy, Restore, the thanks, and proving Pro. Its only way to a store is a port: `open(url)`, answering whether the request was taken, and `read`, `remove` and `path` for the answer.
 
