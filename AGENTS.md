@@ -26,8 +26,7 @@ These rules bind every agent working on Dot Popper. The maintainer set each of t
 
 ## Trunk-based development
 
-- Work on `trunk` as the `trunk-based-development` skill says.
-- The fast build before a push is the tests your change reaches, Steep if it touches typed code, and the one GUI scenario for a screen it changes. CI runs everything else after the push.
+- Work on `trunk`. Before a push, run the tests your change reaches, Steep if it touches typed code, and the one GUI scenario for a screen it changes. CI runs everything else after the push.
 - Before 1.0.0, a green trunk may be tagged as a playtest release (`v0.X.Y`) without asking: bump `fledge.yml`'s version in the tagged commit. From 1.0.0 on, tag only when the maintainer says so.
 - Commits are Conventional Commits with a prose body, ending with your `Co-Authored-By` line.
 

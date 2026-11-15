@@ -37,7 +37,7 @@ class GlossaryTest < Minitest::Test
   GLOSSARY = File.join(ROOT, "GLOSSARY.md")
 
   # Not the game's own words: the glossary, and this test, which name the
-  # words; decisions recorded once and never reworded (the adr skill);
+  # words; decisions recorded once and never reworded (doc/adr/README.md);
   # playtest reports, which quote players and describe the game as it was;
   # and the maintainer's reading list, in the books' words.
   UNCHECKED = [%r{\AGLOSSARY\.md\z}, %r{\Atest/glossary_test\.rb\z}, %r{\Adoc/adr/}, %r{\Adoc/playtests/},
