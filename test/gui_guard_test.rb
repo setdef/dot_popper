@@ -34,7 +34,7 @@ class GuiGuardTest < Minitest::Test
   def test_rake_test_gui_asks_for_the_windows
     rake = Rake::Application.new
     Rake.with_application(rake) do
-      Dir.chdir(ROOT) { rake.load_rakefile }
+      Rake.load_rakefile(File.join(ROOT, "Rakefile"))
       assert_equal ["open_windows"], rake["test:gui"].prerequisites
       before = ENV.delete("DOT_POPPER_OPEN_WINDOWS")
       begin
