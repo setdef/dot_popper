@@ -8,7 +8,7 @@ module DotPopper
     # +glyph+ the mark before its words (:check, :achievement, :crown).
     class GameOverChip < Data.define(:name, :text, :glyph, :opens); end
 
-    # Where Game Over's parts go, worked out by GameOverScreen#plan: each
+    # Where Game Over's parts go, worked out by GameOverLayout#plan: each
     # block's Rect by name (Stacked), the font size each is set in, the
     # backing behind the result, and Play again, Home and Share my score.
     # A line the screen had no room for, or that is not shown, has no
@@ -34,7 +34,7 @@ module DotPopper
     # pile's bottom row, a radius above the window's floor, so the pile
     # still shows. Sizes are measured with +measure+ (RoughMeasure's
     # methods).
-    class GameOverScreen < Data.define(:layout, :type, :words, :measure, :scrim, :game_over, :below, :radius, :chips,
+    class GameOverLayout < Data.define(:layout, :type, :words, :measure, :scrim, :game_over, :below, :radius, :chips,
                                        :play_word, :play_note)
       # The gaps above each line, in graphics units at full size.
       GAPS = { heading: 26, score: 4, score_record: 4, summary: 14, fact: 4, record: 8, chip: 10, play_again: 34, buttons: 14 }.freeze
@@ -229,5 +229,7 @@ module DotPopper
         bounds.cut(left: layout.safe.x + edge, right: layout.safe.right - edge)
       end
     end
+
+    GameOverScreen = GameOverLayout # the old name, until no one uses it
   end
 end

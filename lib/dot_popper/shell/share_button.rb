@@ -11,7 +11,7 @@ module DotPopper
     # over it has made it (Presentation::Hover).
     class ShareButton < Data.define(:pen)
       G = ::Lota::Graphics
-      Plan = Presentation::GameOverScreen
+      Plan = Presentation::GameOverLayout
 
       def draw(rect, text, entrance:, ui:, alpha: 1.0, hover: 0.0)
         shown = entrance.alpha * alpha

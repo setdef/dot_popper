@@ -3,7 +3,7 @@
 module DotPopper
   module Presentation
     module Screens
-      # Game Over, over the finished game's pile (GameOverScreen): Play
+      # Game Over, over the finished game's pile (GameOverLayout): Play
       # again, Home, Share my score, and the lines that open something.
       # Play again starts the next game through +start_game+
       # (UseCases::StartGame); Share my score offers the result through
@@ -62,11 +62,11 @@ module DotPopper
            (GameOverChip.new(name: :over_group, text: group, glyph: :crown, opens: !groups.game_title_taken.nil?) unless group.empty?)].compact
         end
 
-        # Its words to lay out (GameOverScreen), or nil before a game has
+        # Its words to lay out (GameOverLayout), or nil before a game has
         # finished.
         def layout_screen
           over = show.game_over or return
-          GameOverScreen.new(layout:, type: style::TYPE, words:, measure:, scrim: style::GAME_OVER_BACKING, game_over: over,
+          GameOverLayout.new(layout:, type: style::TYPE, words:, measure:, scrim: style::GAME_OVER_BACKING, game_over: over,
                              below: layout.safe.y, radius: show.cabinet.game&.field&.radius || show.radius, chips:,
                              play_word: @start_game.none_left? ? words.button(:get_pro) : words.play_again, play_note: show.play_note)
         end

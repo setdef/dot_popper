@@ -46,7 +46,7 @@ class ScreenPlansTest < Minitest::Test
       screen_layout = layout(width, height)
       radius = DotPopper::DotSize.standard(width, height).radius
       [true, false].repeated_permutation(2).to_a.product([[], CHIPS.first(1), CHIPS]) do |(new_score_record, record), chips|
-        plan = GameOverScreen.new(layout: screen_layout, type: Style::TYPE, words: WORDS, measure: RoughMeasure.new,
+        plan = GameOverLayout.new(layout: screen_layout, type: Style::TYPE, words: WORDS, measure: RoughMeasure.new,
                                   scrim: Style::GAME_OVER_BACKING, game_over: game_over(new_score_record:, record:),
                                   below: screen_layout.safe.y, radius:, chips:, play_note: "22 games left").plan
         name = "#{width}x#{height} new record #{new_score_record}, record #{record}, #{chips.size} chips"
@@ -124,7 +124,7 @@ class ScreenPlansTest < Minitest::Test
   end
 
   def test_short_of_room_game_over_lets_the_record_go_first_and_keeps_the_score
-    plan = GameOverScreen.new(layout: layout(400, 520), type: Style::TYPE, words: WORDS, measure: RoughMeasure.new,
+    plan = GameOverLayout.new(layout: layout(400, 520), type: Style::TYPE, words: WORDS, measure: RoughMeasure.new,
                               scrim: Style::GAME_OVER_BACKING, game_over: game_over(record: true), below: 0, chips: CHIPS).plan
     order = [:record, :summary, [:chip, 2], [:chip, 1], [:chip, 0], :score_record, :heading]
     dropped = order.reject { plan[it] }
@@ -139,9 +139,9 @@ class ScreenPlansTest < Minitest::Test
   # where it does not, every one inside the room.
   def test_game_overs_facts_stack_where_a_row_does_not_fit
     huge = game_over.with(stats: DotPopper::GameStats.start.with(dots_popped: 123_456_789, mistakes: 123_456_789, duration: 123_456_789.0))
-    wide = GameOverScreen.new(layout: layout(1200, 800), type: Style::TYPE, words: WORDS, measure: RoughMeasure.new,
+    wide = GameOverLayout.new(layout: layout(1200, 800), type: Style::TYPE, words: WORDS, measure: RoughMeasure.new,
                               scrim: Style::GAME_OVER_BACKING, game_over:, below: 0).plan
-    narrow = GameOverScreen.new(layout: layout(320, 800), type: Style::TYPE, words: WORDS, measure: RoughMeasure.new,
+    narrow = GameOverLayout.new(layout: layout(320, 800), type: Style::TYPE, words: WORDS, measure: RoughMeasure.new,
                                 scrim: Style::GAME_OVER_BACKING, game_over: huge, below: 0).plan
 
     assert wide[:summary]
@@ -152,7 +152,7 @@ class ScreenPlansTest < Minitest::Test
   end
 
   def test_a_roomy_game_over_shows_every_line_at_full_size
-    plan = GameOverScreen.new(layout: layout(1200, 800), type: Style::TYPE, words: WORDS, measure: RoughMeasure.new,
+    plan = GameOverLayout.new(layout: layout(1200, 800), type: Style::TYPE, words: WORDS, measure: RoughMeasure.new,
                               scrim: Style::GAME_OVER_BACKING, game_over: game_over, below: 0, chips: CHIPS).plan
 
     assert_equal [:heading, :score, :score_record, :summary, [:chip, 0], [:chip, 1], [:chip, 2], :play_again, :buttons], plan.placed.rects.keys

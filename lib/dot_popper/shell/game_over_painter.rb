@@ -93,7 +93,7 @@ module DotPopper
       def facts(show, plan, alpha)
         list = Presentation::Words.facts(show.game_over.stats)
         font = pen.fonts.bold(plan.size(:facts))
-        screen = Presentation::GameOverScreen
+        screen = Presentation::GameOverLayout
         if (row = plan[:summary])
           x = row.x
           list.each { |sign, text| x = fact(sign, text, font, x, row.center_y, alpha) + (font.height * screen::FACTS_APART) }
@@ -104,7 +104,7 @@ module DotPopper
 
       # One fact from +x+, its middle at +y+; where it ends.
       def fact(sign, text, font, x, y, alpha)
-        screen = Presentation::GameOverScreen
+        screen = Presentation::GameOverLayout
         size = font.height * screen::FACT_SIGN
         middle = x + (size / 2.0)
         case sign

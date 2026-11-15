@@ -635,7 +635,7 @@ module DotPopper
       # before a game has finished.
       def game_over_plan = @screens[:game_over].plan
 
-      # Game Over's words to lay out (GameOverScreen), or nil before a game
+      # Game Over's words to lay out (GameOverLayout), or nil before a game
       # has finished.
       def game_over_screen = @screens[:game_over].layout_screen
 
