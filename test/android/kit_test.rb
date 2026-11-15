@@ -47,15 +47,11 @@ class KitTest < Minitest::Test
   def self.project
     @project ||= Dir.mktmpdir("dot-popper-phone").tap do |folder|
       Minitest.after_run { FileUtils.rm_rf(folder) }
-      out, status = Open3.capture2e("bash", File.join(ROOT, "script/android_game.sh"), "--worktree", folder)
+      # From inside the folder, by a relative path: MSYS2's tar on
+      # Windows takes C:/... for a remote host's.
+      out, status = Open3.capture2e("bash", File.join(ROOT, "script/android_game.sh"), "--worktree", ".", chdir: folder)
       raise "script/android_game.sh failed: #{out}" unless status.success?
     end
-  end
-
-  # The Android app is built on Linux, and its game laid out with bash
-  # and tar, which take a Windows path for a remote one.
-  def setup
-    skip "the Android app's game is laid out on Linux or macOS" if Gem.win_platform?
   end
 
   def test_the_checks_script_runs_the_three_checks
