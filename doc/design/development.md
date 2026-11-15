@@ -79,7 +79,7 @@ After each step it checks that:
 - older dots stay above newer ones;
 - a tick changes no dot's place in the stack;
 - a resize keeps every dot, its order, whether it is popped and its velocity, moves each in proportion across the field's room, and changes neither score nor clock;
-- every new dot offers a touch target within the lookahead (`SpawnCheck#exposed_soon?`), or used all `Rules::SPAWN_TRIES` redraws of velocity and of place ([ADR-0002](../adr/0002-a-new-dot-offers-a-touch-target-within-a-second.md)).
+- every new dot offers a touch target within the lookahead (`SpawnCheck#exposed_soon?`), or used all `Rules::SPAWN_TRIES` redraws of velocity and of place ([rules.md](rules.md#the-spawn-check)).
 
 `test_random_presses_change_a_game_only_while_it_is_played` drives a whole `Cabinet` for 3,000 steps of random presses and updates of up to 1.5 s, checks that nothing outside `Cabinet::Playing` changes the score or the clock, and that the run reached all three states (`Home`, `Playing`, `GameOver`).
 

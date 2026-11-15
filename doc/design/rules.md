@@ -78,7 +78,9 @@ When the window changes size or a phone turns (`Shell::App#resize`), `Cabinet#sc
 
 ## The spawn check
 
-Why the rule exists, and the maintainer's words that set its scope: [ADR-0002](../adr/0002-a-new-dot-offers-a-touch-target-within-a-second.md).
+A new bright dot's place and velocity are drawn at random, under every popped dot. In the first iPad playtest ([doc/playtests/2026-11-05-ipad.md](../playtests/2026-11-05-ipad.md)) a bright dot spawned almost wholly under a popped dot moving at nearly the same velocity, and stayed hidden until the clock ran out: nothing the player did could have saved that game. A loss is worth enjoying only when the player can see it was their own (Juul, *The Art of Failure*), and luck the player can respond to is part of the game while luck that decides the outcome alone is not (Garfield, *Characteristics of Games*). Waiting for the bright dot to come out from under the others is the game, so the rule acts only where a dot can't be tapped at all, as narrowly as the maintainer allowed: "The rule change, if we do it, should only apply when velocity and position would cause there to be no HIG-compliant touch target within, say, 1 second."
+
+It uses no randomness unless it redraws, so most seeded games play as without it, and when no gap exists at all the dot spawns where it was first drawn. On a packed screen it does real work, so a crowded field is somewhat kinder than it would be without it ([How often the spawn check acts](#how-often-the-spawn-check-acts)), and every change to movement or stacking must keep its four classes (`Spawner`, `SpawnCheck`, `TouchTarget`, `Spawn`) in step. `Rules::SPAWN_TRIES` set to 0 turns the rule off, as `script/simulate.rb` uses for its comparison.
 
 A bright dot's place and velocity are drawn at random. Then `Spawner` (`lib/dot_popper/spawner.rb`) asks `SpawnCheck` whether the new dot will offer a **touch target** within `Rules::SPAWN_LOOKAHEAD`, one second.
 

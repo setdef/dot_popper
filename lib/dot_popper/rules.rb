@@ -44,8 +44,8 @@ module DotPopper
     # under a mouse. A draw that offers none tries another velocity, up to
     # SPAWN_TRIES times, then another place and velocity, up to SPAWN_TRIES
     # more, and keeps its last draw if every try fails, so a dot always
-    # spawns. See Spawner, ADR-0002, and doc/design/rules.md for how rarely it
-    # applies.
+    # spawns. See Spawner, and doc/design/rules.md for why and how rarely
+    # it applies.
     TOUCH_TARGET = 44
     SPAWN_LOOKAHEAD = 1.0
     SPAWN_TRIES = 4
