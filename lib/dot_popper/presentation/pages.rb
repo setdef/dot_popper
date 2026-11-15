@@ -170,7 +170,10 @@ module DotPopper
         width = [area.width, 780.0].min
         left = layout.center_x - (width / 2.0)
         size = layout.short? ? 17 : (layout.safe.width < 600 ? 18 : 22)
-        y = area.y + (layout.safe.width < 600 ? 8.0 : [(area.height - (2 * 34) - 180) / 2.0, 8.0].max)
+        # A narrow or short page starts at its top, with no room to spare
+        # around its buttons, so Delete and what is said under it fit.
+        tight = layout.safe.width < 600 || layout.short?
+        y = area.y + (tight ? 8.0 : [(area.height - (2 * 34) - 180) / 2.0, 8.0].max)
         wrapped = lines.map do |glyph, text|
           rows = Words.wrap(text, width - 42) { measure.width(:semibold, size, it) }
           entry = [glyph, rows, y]
@@ -178,7 +181,7 @@ module DotPopper
           entry
         end
         y += 16
-        button = layout.control_height + (layout.safe.width < 600 ? 0.0 : 12.0)
+        button = layout.control_height + (tight ? 0.0 : 12.0)
         policy = Rect.new(x: left, y:, width:, height: button)
         delete = (Rect.new(x: left, y: policy.bottom + 16, width:, height: button) if deletable)
         note_top = (delete || policy).bottom + 20
@@ -226,12 +229,11 @@ module DotPopper
     # +header+ (HeaderDrawing), its +plan+ (PrivacyPlan), the words of
     # Read the privacy policy and Delete my friend group data and how lit
     # each is, whether Delete is +held+ and how far (+progress+, 0 to 1),
-    # and under it, centered on +note_x+, the words to hold it by:
-    # +hold_line+ on one line (none while it is held), and +hold_rows+,
-    # those words wrapped to Delete's width where they take more than one
-    # row.
+    # and under it, centered on +note_x+, how to hold it and what stays
+    # (+note_rows+, wrapped to Delete's width), or nothing where there is
+    # no Delete.
     class PrivacyDrawing < Data.define(:header, :plan, :policy, :policy_hover, :delete, :delete_hover, :held, :progress, :note_x,
-                                       :hold_line, :hold_rows); end
+                                       :note_rows); end
 
     # Change Server: its lines of text (a sign and words each), which
     # server is in use, Paste server address, Use setdef's server while a

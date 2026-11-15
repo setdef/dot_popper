@@ -14,7 +14,7 @@ module DotPopper
         lines(plan)
         policy(drawing, plan)
         delete(drawing, plan) if plan.delete
-        note(drawing, plan) unless plan.note_lines.empty?
+        note(drawing, plan) unless drawing.note_rows.empty?
       end
 
       private
@@ -68,8 +68,7 @@ module DotPopper
       def note(drawing, plan)
         font = pen.fonts.semibold(15)
         y = plan.note_y + 6
-        pen.text(drawing.hold_line, font, drawing.note_x, y, pen.palette.soft) if drawing.hold_line
-        drawing.hold_rows.each_with_index { |line, i| pen.text(line, font, drawing.note_x, y + (i * font.height), pen.palette.soft) }
+        drawing.note_rows.each_with_index { |line, i| pen.text(line, font, drawing.note_x, y + (i * font.height), pen.palette.soft) }
       end
     end
   end

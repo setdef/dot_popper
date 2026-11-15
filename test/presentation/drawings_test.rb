@@ -40,11 +40,12 @@ class DrawingsTest < Minitest::Test
   end
 
   # For a player the friend-group server knows: Delete, and under it how
-  # to hold it, on one line where it fits, and wrapped to Delete's width
-  # where it does not; the line goes while Delete is held, which fills.
+  # to hold it and that Stats stay, said once, on one row where it fits
+  # and wrapped to Delete's width where it does not, inside the window,
+  # held or not. Delete fills as it is held.
   def test_privacy_says_how_to_hold_delete_and_how_far_it_is_held
-    { [1200, 800] => false, [400, 850] => true }.each do |(width, height), wraps|
-      fixture = Inputs::Fixture.new(os: "Linux", width:, height:, member: true)
+    { [1200, 800, "Linux"] => false, [400, 850, "iOS"] => true, [850, 400, "iOS"] => false }.each do |(width, height, os), wraps|
+      fixture = Inputs::Fixture.new(os:, width:, height:, member: true)
       show = fixture.show
       show.open_settings
       show.open_privacy
@@ -52,17 +53,19 @@ class DrawingsTest < Minitest::Test
       words = show.words
       assert_equal [words.button(:privacy_heading), words.button(:privacy_policy), words.button(:privacy_delete)],
                    [drawing.header.text, drawing.policy, drawing.delete]
-      assert_equal words.button(:privacy_hold), drawing.hold_line
-      assert_equal wraps, drawing.hold_rows.size > 1, "#{width}x#{height}"
+      said = "#{width}x#{height}"
+      assert_equal "#{words.button(:privacy_hold)} #{words.button(:privacy_delete_note)}", drawing.note_rows.join(" "), said
+      assert_equal wraps, drawing.note_rows.size > 1, said
+      # 15-point rows, each well under 20 units tall, from 6 under the plan's note_y
+      assert_operator drawing.plan.note_y + 6 + (20 * drawing.note_rows.size), :<=, show.layout.safe.bottom, said
       refute drawing.held
 
       show.pad(:y)
       fixture.tick(0.5)
       held = show.screen.drawing
       assert held.held
-      assert_nil held.hold_line
       assert_in_delta 0.5 / GroupPanel::HOLD, held.progress, 0.05
-      assert_equal drawing.hold_rows, held.hold_rows
+      assert_equal drawing.note_rows, held.note_rows
     end
   end
 
@@ -73,8 +76,7 @@ class DrawingsTest < Minitest::Test
     show.open_privacy
     drawing = show.screen.drawing
     assert_nil drawing.plan.delete
-    assert_nil drawing.hold_line
-    assert_empty drawing.hold_rows
+    assert_empty drawing.note_rows
   end
 
   # Settings: each row's choices, which is chosen and how lit each is

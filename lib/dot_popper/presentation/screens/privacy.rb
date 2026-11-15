@@ -16,7 +16,8 @@ module DotPopper
           known = show.group_panel.known?
           (@plan ||= Memo.new).fetch([layout, words, known]) do
             lines = [[:bars, words.button(:privacy_stats)], [:crown, words.button(:privacy_groups)]]
-            PrivacyScreen.new(layout:, measure:, lines:, note: words.button(:privacy_delete_note), deletable: known).plan
+            note = "#{words.button(:privacy_hold)} #{words.button(:privacy_delete_note)}"
+            PrivacyScreen.new(layout:, measure:, lines:, note:, deletable: known).plan
           end
         end
 
@@ -29,14 +30,10 @@ module DotPopper
           hold = show.group_panel.hold
           progress = hold.progress(now)
           (@drawing ||= Memo.new).fetch([plan, words, hover, hold.held?, progress]) do
-            hold_text = words.button(:privacy_hold)
-            noted = !plan.note_lines.empty?
-            rows = noted ? Words.wrap(hold_text, plan.delete.width) { measure.width(:semibold, 15, it) } : []
             PrivacyDrawing.new(header: HeaderDrawing.for(words.button(:privacy_heading), layout:, measure:, words:, hover:), plan:,
                                policy: words.button(:privacy_policy), policy_hover: hover.level(:policy),
                                delete: words.button(:privacy_delete), delete_hover: hover.level(:privacy_delete),
-                               held: hold.held?, progress:, note_x: layout.center_x, hold_line: (hold_text if noted && !hold.held?),
-                               hold_rows: rows.size > 1 ? rows : [])
+                               held: hold.held?, progress:, note_x: layout.center_x, note_rows: plan.note_lines)
           end
         end
 
