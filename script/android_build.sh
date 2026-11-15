@@ -8,7 +8,8 @@
 #   script/android_build.sh --bundle # and the release App Bundle, for Google Play
 #
 # Linux on x86_64 only. The Android SDK and NDK come from
-# script/android_sdk.sh. Lota is cloned at LOTA_REF (default v0.3.1) into
+# script/android_sdk.sh. Lota is cloned at LOTA_REF (by default the tag of
+# the Lota that Gemfile.lock pins, as script/lota_pins.sh reads it) into
 # the cache, unless LOTA_SOURCE names a clone already made, and its
 # rake android:deps builds LÖVE's libraries and SDL3 for arm64-v8a and
 # x86_64 there, once for each Lota commit. Then:
@@ -20,7 +21,8 @@
 #    game/dot_popper, the kit's program (android/android_kit) as main.rb,
 #    and Lota's Android host from the gem in host/android, with Dot
 #    Popper's changed files (android/host) over it;
-# 3. fledge build android (Fledge FLEDGE_TAG) writes the Gradle project,
+# 3. fledge build android (Fledge FLEDGE_TAG, by default the tag that
+#    Gemfile.lock pins) writes the Gradle project,
 #    and Gradle builds the debug APK, signed with a debug key made for
 #    this build, and with --bundle the unsigned release App Bundle.
 #
@@ -29,8 +31,9 @@
 set -euo pipefail
 
 LOTA_REPOSITORY=${LOTA_REPOSITORY:-https://github.com/setdef/Lota.git}
-LOTA_REF=${LOTA_REF:-v0.3.1}
-FLEDGE_TAG=${FLEDGE_TAG:-v0.10.0}
+pins=$("$(dirname "$0")/lota_pins.sh")
+LOTA_REF=${LOTA_REF:-$(sed -n 's/^LOTA_REF=//p' <<< "$pins")}
+FLEDGE_TAG=${FLEDGE_TAG:-$(sed -n 's/^FLEDGE_TAG=//p' <<< "$pins")}
 APP_NAME="Dot Popper"
 
 bundle_too=false

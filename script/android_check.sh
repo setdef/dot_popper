@@ -18,7 +18,8 @@
 #   (script/android_game.sh) come from the game, and they sit, stored, in
 #   one asset, fledge.zip. So the first build for a set of the app's other
 #   inputs (the build scripts, android/host, fledge.yml and the icons,
-#   the pinned tools, and LOTA_REF and FLEDGE_TAG) is a full one, kept in
+#   the pinned tools, and LOTA_REF and FLEDGE_TAG, which default to the
+#   Lota and Fledge Gemfile.lock pins) is a full one, kept in
 #   the cache under a key made of all of them; a later commit with the
 #   same inputs gets that app with its own game laid in
 #   (script/android_patch_apk.rb), aligned and signed as Gradle would.
@@ -48,7 +49,10 @@ started=$(date +%s.%N)
 say() { awk -v t="$started" -v now="$(date +%s.%N)" -v m="$*" 'BEGIN { printf "android check: %s (%.0f s)\n", m, now - t }'; }
 
 export LOTA_REPOSITORY=${LOTA_REPOSITORY:-https://github.com/setdef/Lota.git}
-export LOTA_REF=${LOTA_REF:-v0.3.1} FLEDGE_TAG=${FLEDGE_TAG:-v0.10.0}
+pins=$(script/lota_pins.sh)
+LOTA_REF=${LOTA_REF:-$(sed -n 's/^LOTA_REF=//p' <<< "$pins")}
+FLEDGE_TAG=${FLEDGE_TAG:-$(sed -n 's/^FLEDGE_TAG=//p' <<< "$pins")}
+export LOTA_REF FLEDGE_TAG
 
 emulator_pid=
 cleanup() {
