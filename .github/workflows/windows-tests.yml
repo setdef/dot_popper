@@ -5,10 +5,11 @@
 # differs where tests most often trip: it writes text files with CR LF,
 # and its paths have drive letters and back slashes.
 #
-# Each push gets its own run, none cancelled, so the run that turns red
-# names the commit that broke the tests. By hand (workflow_dispatch),
-# `commit` tests any commit GitHub has instead of the branch's tip, such
-# as an older trunk commit, to find which one broke Windows.
+# A run in progress finishes, and of the pushes made meanwhile only the
+# newest waits, as in the Package workflow, so one run may cover several
+# pushes. By hand (workflow_dispatch), `commit` tests any commit GitHub
+# has instead of the branch's tip, such as one of those pushes, to find
+# which one broke Windows.
 
 name: Windows tests
 
@@ -25,6 +26,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: windows-tests-${{ github.ref }}-${{ inputs.commit }}
+  cancel-in-progress: false
 
 defaults:
   run:
