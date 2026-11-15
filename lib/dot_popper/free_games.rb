@@ -39,7 +39,7 @@ module DotPopper
 
     # The games a developer setting asks a new save to start with, or nil:
     # never in a build for sale.
-    def self.starting(_env) = nil
+    def self.starting(_env, channel:) = nil
 
     # Games that never count and never show: for a Show made without any.
     def self.unlimited = new(ScoreRecord::Memory.new, today: -> { Date.today }, entitlement: Entitlement.free, metered: false)

@@ -192,8 +192,13 @@ class FreeGamesTest < Minitest::Test
   end
 
   def test_a_new_save_can_start_with_the_games_a_developer_asks_for
-    assert_equal 2, FreeGames.starting({ "DOT_POPPER_FREE_GAMES" => "2" })
-    assert_nil FreeGames.starting({ "DOT_POPPER_FREE_GAMES" => "lots" })
-    assert_nil FreeGames.starting({})
+    assert_equal 2, FreeGames.starting({ "DOT_POPPER_FREE_GAMES" => "2" }, channel: nil)
+    assert_nil FreeGames.starting({ "DOT_POPPER_FREE_GAMES" => "lots" }, channel: nil)
+    assert_nil FreeGames.starting({}, channel: nil)
+  end
+
+  # Even with the test build's part loaded and the setting let through.
+  def test_no_setting_changes_the_first_games_of_a_build_for_sale
+    DotPopper::Build::CHANNEL_NAMES.each { assert_nil FreeGames.starting({ "DOT_POPPER_FREE_GAMES" => "2" }, channel: it), it }
   end
 end

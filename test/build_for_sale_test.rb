@@ -16,7 +16,9 @@ require_relative "../script/channel_contents"
 # test build's part, whose answers stand in front of the shared code's,
 # so this is where the shared code's own answers for a build for sale
 # are tested: the free games, the themes, the date, the keys and the
-# receipts it trusts, with no developer setting and with every one.
+# receipts it trusts, with no developer setting and with every one. And
+# a build for sale that loads the test build's part by mistake still
+# answers so: the part gives way to the shared answers for a channel.
 class BuildForSaleTest < Minitest::Test
   ROOT = File.expand_path("..", __dir__)
   B = DotPopper::Build
@@ -65,42 +67,64 @@ class BuildForSaleTest < Minitest::Test
     @proofs ||= [DotPopper::Receipt.issue, C::LicenseKey.issue(C::TestKeys::LICENSE).text]
   end
 
-  # What +channel+'s build answers, built from a copy of lib/ stamped as
-  # the release stamps it and without what the channel leaves out.
-  def self.answers(channel)
+  # How each build is made: as the release makes it, or with the test
+  # build's part loaded by mistake (stamped, but the part named in
+  # Build::PARTS and its folder kept) and the filter on developer
+  # settings letting every one through, so only the part's own deference
+  # to the shared answers keeps it out.
+  KINDS = {
+    "as the release makes it" => :right,
+    "with the test build's part loaded by mistake and every setting let through" => :mistaken
+  }.freeze
+
+  # What +channel+'s build of +kind+ answers, built from a copy of lib/
+  # stamped as the release stamps it.
+  def self.answers(channel, kind)
     Dir.mktmpdir("dot_popper_#{channel}") do |dir|
       FileUtils.cp_r(File.join(ROOT, "lib"), dir)
       build = File.join(dir, "lib/dot_popper/build.rb")
-      File.binwrite(build, BuildChannel.stamp(File.binread(build), channel))
-      ChannelContents.left_out(channel).each { FileUtils.rm_rf(File.join(dir, it)) }
+      source = BuildChannel.stamp(File.binread(build), channel)
+      if kind == :mistaken
+        source = source.sub("PARTS = %w[]", "PARTS = %w[test_build]")
+                       .sub("HARMLESS = %w[", "HARMLESS = %w[#{EVERY_SETTING.keys.map { it.delete_prefix(B::PREFIX) }.join(" ")} ")
+      else
+        ChannelContents.left_out(channel).each { FileUtils.rm_rf(File.join(dir, it)) }
+      end
+      File.binwrite(build, source)
       out, status = Open3.capture2e(RbConfig.ruby, "-I", File.join(dir, "lib"), "-I", File.join(ROOT, "test"), "-e", PROBE,
                                     "--", *proofs, JSON.generate(EVERY_SETTING))
-      raise "#{channel}'s build did not answer:\n#{out}" unless status.success?
+      raise "#{channel}'s build #{KINDS.key(kind)} did not answer:\n#{out}" unless status.success?
 
       JSON.parse(out.lines.last)
     end
   end
 
   # Every channel's answers, made once for all the tests below, each
-  # channel's Ruby beside the others'.
+  # build's Ruby beside the others'.
   def self.all_answers
-    @all_answers ||= B::CHANNEL_NAMES.map { |channel| Thread.new { [channel, answers(channel)] } }.to_h(&:value)
+    @all_answers ||= B::CHANNEL_NAMES.product(KINDS.values).map do |channel, kind|
+      Thread.new { [[channel, kind], answers(channel, kind)] }
+    end.to_h(&:value)
   end
 
   def all_answers = self.class.all_answers
 
   def each_build
-    all_answers.each do |channel, answers|
-      answers.fetch("builds").each { yield channel, it, "#{channel} on #{it["system"]}, #{it["settings"]}" }
+    all_answers.each do |(channel, kind), answers|
+      answers.fetch("builds").each { yield channel, it, "#{channel} #{KINDS.key(kind)}, on #{it["system"]}, #{it["settings"]}" }
     end
   end
 
   def test_each_build_for_sale_is_built_without_the_test_builds_part
-    all_answers.each do |channel, answers|
+    B::CHANNEL_NAMES.each do |channel|
+      answers = all_answers[[channel, :right]]
       assert_equal channel, answers["channel"]
       assert_empty answers["parts"], channel
       assert_empty answers["part loaded"], channel
       assert answers["pins are setdef's"], channel
+      mistaken = all_answers[[channel, :mistaken]]
+      refute_empty mistaken["part loaded"], "#{channel}: the part was to be loaded by mistake"
+      assert mistaken["pins are setdef's"], channel
     end
   end
 
@@ -112,7 +136,7 @@ class BuildForSaleTest < Minitest::Test
       assert_equal "#{first} games left", built["games"], where
     end
     B::CHANNEL_NAMES.each do |channel|
-      assert all_answers[channel]["builds"].any? { it["offered"] }, "#{channel} sells Pro on no system"
+      assert all_answers[[channel, :right]]["builds"].any? { it["offered"] }, "#{channel} sells Pro on no system"
     end
   end
 

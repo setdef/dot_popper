@@ -86,7 +86,7 @@ module DotPopper
       # (FreeGames.metered?), starting as a developer may ask
       # (FreeGames.starting).
       def free_games(entitlement, metered:, store: file("games.txt"))
-        start = FreeGames.starting(settings.env)
+        start = FreeGames.starting(settings.env, channel: settings.channel)
         FreeGames.new(store, today: settings.today, entitlement:, metered:,
                              **(start ? { first_games: start, daily: start } : {}))
       end

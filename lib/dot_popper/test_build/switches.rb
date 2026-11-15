@@ -12,9 +12,12 @@ module DotPopper
     def self.test = new(trust: Receipt::TEST)
 
     # DOT_POPPER_PRO=1 stands in for a purchase, to try Pro out, and
-    # DOT_POPPER_PRO=0 is a free player; unset, as a build for sale.
+    # DOT_POPPER_PRO=0 is a free player; unset, or in a build for sale, as
+    # the shared code answers.
     module ForcedByTestBuild
       def forced?(env, platform: nil)
+        return super if Build.store?
+
         value = env.fetch(FORCED_BY, "")
         value.empty? ? super : value == "1"
       end
@@ -28,7 +31,8 @@ module DotPopper
     STARTING = "DOT_POPPER_FREE_GAMES"
 
     # In a test build, not the autoplay bot, and not a GUI scenario unless
-    # it sets STARTING to try the limit; in a build for sale, everyone.
+    # it sets STARTING to try the limit; in a build for sale, everyone,
+    # and no setting changes the first games, as the shared code answers.
     module PlayersOfTestBuild
       def player?(env, channel:)
         return super if Build.store?(channel)
@@ -37,7 +41,11 @@ module DotPopper
         env.fetch("DOT_POPPER_SCENARIO", "").empty? || env.key?(STARTING)
       end
 
-      def starting(env) = Integer(env.fetch(STARTING, ""), exception: false)
+      def starting(env, channel:)
+        return super if Build.store?(channel)
+
+        Integer(env.fetch(STARTING, ""), exception: false)
+      end
     end
     singleton_class.prepend(PlayersOfTestBuild)
   end
