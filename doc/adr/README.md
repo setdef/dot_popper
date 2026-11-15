@@ -9,7 +9,6 @@ Dot Popper's architecturally significant decisions, one per record, in the MADR 
 | ADR | Decision | Status |
 | --- | --- | --- |
 | [0002](0002-a-new-dot-offers-a-touch-target-within-a-second.md) | A new dot offers a touch target within its first second | accepted |
-| [0003](0003-how-to-play-is-taught-without-words.md) | How to play is taught without words, as the opening of the first game | accepted; Skip and the tutorial's rules superseded by 0016 |
 | [0004](0004-steep-checks-the-rules-strictly.md) | Steep checks the rules strictly against RBS signatures | accepted |
 | [0005](0005-gui-scenarios-play-the-real-game.md) | GUI scenarios play the real game in real windows, on a driven clock | accepted |
 | [0007](0007-renderers-per-platform-with-a-relaunch-without-vulkan.md) | Renderers per platform, and a relaunch without Vulkan when it fails | accepted |
@@ -19,7 +18,6 @@ Dot Popper's architecturally significant decisions, one per record, in the MADR 
 | [0011](0011-pro-outlives-setdef.md) | Pro outlives setdef: license keys, one device at a time, and one test of setdef being gone | accepted |
 | [0012](0012-free-games-20-then-3-a-day.md) | Free games: your first 20, then 3 a day | accepted |
 | [0014](0014-privacy-facts-come-from-the-code.md) | The privacy facts are generated from declarations the tests enforce | accepted |
-| [0016](0016-the-tutorial-is-a-layer-over-a-paused-game.md) | The tutorial is a layer over the first game, paused, and Skip takes the layer away | accepted |
 | [0019](0019-clean-architecture-and-domain-driven-design-in-three-areas.md) | The code follows Clean Architecture and Domain-Driven Design, with the domain in three areas | accepted |
 | [0021](0021-a-build-for-sale-carries-only-its-own-parts.md) | A build for sale carries only its own parts, and the test build's code is a part it leaves out | accepted |
 | [0022](0022-use-cases-hold-the-rules-that-need-two-areas.md) | Use cases hold the rules that need two of the game's areas, and the composition root makes them (restates the former 0017) | accepted |

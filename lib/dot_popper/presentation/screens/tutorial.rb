@@ -3,7 +3,7 @@
 module DotPopper
   module Presentation
     module Screens
-      # The Tutorial over the first game, paused (ADR-0016): its scene
+      # The Tutorial over the first game, paused (doc/design/tutorial.md): its scene
       # (Presentation::TutorialScene), while it plays, and Skip, its only button.
       class Tutorial < Screen
         # The scene playing, or nil.

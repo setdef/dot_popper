@@ -3,7 +3,7 @@
 module DotPopper
   module UseCases
     # Starting a game: Play, and the opening of the tutorial, whose game
-    # begins as it opens (ADR-0016). It is the one way into a game, and it
+    # begins as it opens (doc/design/tutorial.md). It is the one way into a game, and it
     # spends exactly one free game on each (ADR-0012): with none left, no
     # game starts, and it answers the offer of Pro, which the screen
     # carries out. Games run out only where they are counted, which is

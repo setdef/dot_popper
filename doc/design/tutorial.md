@@ -4,13 +4,23 @@
 -->
 # The tutorial and the wordless signs
 
-How Dot Popper teaches itself without a word: the tutorial that opens the first game, and the signs on Home, in a game and at Game Over that teach the same rules elsewhere. It is for anyone changing `Presentation::TutorialScene`, its guide, or the signs. [ADR-0003](../adr/0003-how-to-play-is-taught-without-words.md) records why the game teaches this way. The rules it teaches (points, seconds, the penalty, spawning, the bonus dot) are in [rules.md](rules.md).
+How Dot Popper teaches itself without a word: the tutorial that opens the first game, and the signs on Home, in a game and at Game Over that teach the same rules elsewhere. It is for anyone changing `Presentation::TutorialScene`, its guide, or the signs. Why the game teaches this way is [below](#why-it-teaches-without-words). The rules it teaches (points, seconds, the penalty, spawning, the bonus dot) are in [rules.md](rules.md).
 
 ## What it is
 
 The tutorial is a layer over the first game, played while that game is paused before its clock first runs. There is one game: its dots, score, clock, row and rules are the rules' own, and the tutorial keeps no copy of any of them. It uses the game's real drawing, the slowest real speed for its first dot (`Rules::SPEEDS.min`, 1.2 radii a second), the real HUD with its row of eight dots in a row, and the game's real pop and penalty effects. It says nothing in words: only numbers, the clock's digits, a drawn stopwatch, a small dot and drawn shapes. Nothing in it depends on sound.
 
-While it plays, `Cabinet` holds the game in its `Paused` state ([ADR-0016](../adr/0016-the-tutorial-is-a-layer-over-a-paused-game.md)): the clock does not run, the dots move only as the tutorial moves them, and no press reaches the game except the ones the tutorial passes on. The `Show` draws the tutorial over it (`Show#tutorial?`). When the tutorial ends, or is skipped, it goes, and the same game plays on from the state it is in (see "Play begins").
+While it plays, `Cabinet` holds the game in its `Paused` state: the clock does not run, the dots move only as the tutorial moves them, and no press reaches the game except the ones the tutorial passes on. The `Show` draws the tutorial over it (`Show#tutorial?`). When the tutorial ends, or is skipped, it goes, and the same game plays on from the state it is in (see "Play begins").
+
+### Why it teaches without words
+
+A new player must learn two rules: a bright dot pays a point and a second, and a new dot appears under the popped ones, so a tap on a popped dot is a mistake that costs two of each. In playtests one player ignored the words on Home and asked how to play, and another never noticed that a pop adds a second. How to play must never depend on reading English (`AGENTS.md`); the maintainer's goal is that "a person who can't read English should understand and enjoy it". Players don't read during intense action (Johnson, *Designing with the Mind in Mind*; Hodent, *The Gamer's Brain*), and a penalty is the wrong moment to ask them to (Saffer, *Microinteractions*). A demonstration must show what the game really does (Hodent), since players learn the pattern they see (Koster, *A Theory of Fun*); recognizing something already seen is easier than recalling it (Johnson), and symbols such as ✕ or ✓ are not universal (Westland and Maggio). A first game should start at once, so the lesson is short and skippable.
+
+Sentences (Home's legend in words, a hint under the score on the first mistake, two sentences on Game Over about stacking, a line about dragging the pile) depended on reading, and covered the field mid-game. A wordless tutorial as a separate scene that ended by resetting to a fresh game at 0 points and 10 seconds taught something that never happens: the maintainer saw its dots vanish and the HUD drop from 2 and 12 to 0 and 10. He decided: "The tutorial _is_ the game; the game should be in whatever state the tutorial forces the player through." How well players with no English learn from it has not been measured.
+
+The tutorial then kept a copy of the game of its own, with the rules' sums for a pop and a penalty written again in the presentation, and handed its values to a new game at its end. Every rule and every listener had to agree with that copy, and not all did: the achievement watch counted the row one behind. So there is one game, paused and drawn over, and a learner's tap on a popped dot costs nothing by never reaching it, so the tutorial's rules are a game's rules. The maintainer's words on the copy are under [Play begins](#play-begins), and on Skip under [Skip](#skip).
+
+The cost: the tutorial is the most tuned part of the presentation (its beats, timings and the guide's hand), so every change to the game's feedback is checked in it too, and anything that draws during the tutorial draws the tutorial's view of the game (`TutorialScene#dots`), which runs behind the rules: a popped dot still bright and a spawned one unborn until the tutorial shows them.
 
 | Part | Where |
 | --- | --- |
