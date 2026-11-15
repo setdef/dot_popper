@@ -15,7 +15,7 @@ Every package held the same Ruby, whatever it was sold through: the fake store a
 * A build for sale holds no code that grants Pro without proof, running or not (ADR-0010's rule, applied to what ships as well as to what runs).
 * A test build keeps everything and behaves as before: a playtest runs the game as the final game does (ADR-0009).
 * No condition on the channel may ship for code the build doesn't have: a missing file must not be one `if` away from a crash.
-* Released tools only ([ADR-0006](0006-lota-fuse-builds-the-desktop-apps.md)): what `lota fuse` can do today.
+* Released tools only ([ADR-0024](0024-lota-fuse-builds-the-desktop-apps.md)): what `lota fuse` can do today.
 * A check on the built package, not only on the repository, says whether the rule held.
 
 ## Considered Options
