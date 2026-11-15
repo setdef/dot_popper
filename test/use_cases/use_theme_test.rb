@@ -39,11 +39,15 @@ class UseThemeTest < Minitest::Test
     assert_equal :plain, @themes.chosen
   end
 
-  # What the new-theme card's switch leads to: using the theme for Pro,
-  # the offer of Pro for a Free player. Whether the player has Pro is
-  # not asked of the use case by anyone else.
+  # What the new-theme card's switch leads to, as choosing the theme
+  # would (#call), before it is pressed: using it for Pro, nothing where
+  # it is current or not open, and the offer of Pro for a Free player.
+  # Whether the player has Pro is not asked of the use case by anyone
+  # else.
   def test_the_switch_leads_a_pro_player_to_the_theme_and_a_free_one_to_the_offer
     assert_equal :use, use_theme(pro: true).choice(:ghost)
+    assert_equal :same, use_theme(pro: true).choice(:plain)
+    assert_equal :same, use_theme(pro: true).choice(:eclipse)
     assert_equal :offer, use_theme(pro: false).choice(:ghost)
     refute_respond_to use_theme(pro: false), :locked?
   end
