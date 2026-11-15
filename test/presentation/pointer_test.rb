@@ -92,6 +92,26 @@ class PointerTest < Minitest::Test
     assert show.stats?, "half a second later it counts"
   end
 
+  # The failing mouse's dropped click is dropped as it comes up too, so
+  # nothing of it reaches Game Over's pile.
+  def test_a_dropped_clicks_release_is_dropped_too
+    given(at: :game_over)
+    click(5, 400)
+    click(7, 400)
+
+    assert_equal [[:press, :mouse, 5, 400], [:release, :mouse, 5, 400]], @shell.told
+  end
+
+  # The click SDL makes up for a finger is no click of the mouse's, so a
+  # real click at once after it is no chatter.
+  def test_a_click_sdl_makes_up_is_not_counted_by_the_chatter_filter
+    given
+    click(*place(:stats), made_up: true)
+    click(*place(:stats))
+
+    assert show.stats?
+  end
+
   def test_a_finger_presses_where_it_lands
     given(os: "iOS")
     touch(*place(:stats))
@@ -185,6 +205,53 @@ class PointerTest < Minitest::Test
     assert_equal P::InputKind::MOUSE, show.input
   end
 
+  # A controller's button or a finger starts the mouse's travel afresh:
+  # what it moved before counts for nothing toward taking the words back.
+  def test_a_controller_or_a_finger_starts_the_mouses_travel_afresh
+    { controller: -> { @handler.call(P::ButtonPress.new(button: nil)) }, finger: -> { touch(5, 400) } }.each do |by, press|
+      given(os: "Windows")
+      mouse_move(300, 300)
+      mouse_move(305, 300)
+      press.call
+      used = show.input
+
+      refute_equal P::InputKind::MOUSE, used, by
+      mouse_move(310, 300)
+
+      assert_equal used, show.input, "#{by}: 5 units since, not 10"
+    end
+  end
+
+  # The controller's cursor hides where the mouse moves to, once the
+  # move is deliberate, and as a finger presses.
+  def test_the_mouse_and_a_finger_hide_the_controllers_cursor
+    given
+    @handler.fake_pad(:move, 100, 100)
+    mouse_move(300, 300)
+    mouse_move(330, 330)
+
+    refute cursor.visible
+    assert_equal [330, 330], [cursor.x, cursor.y]
+    given(os: "iOS")
+    @handler.fake_pad(:move, 100, 100)
+    touch(*place(:stats))
+
+    refute cursor.visible
+  end
+
+  # The window settles by real time, not the game's, which a long frame
+  # leaves clamped (Rules::LONGEST_FRAME).
+  def test_the_window_settles_by_real_time
+    given
+    at_time(0.0)
+    @handler.update(1.0, DotPopper::Rules::LONGEST_FRAME, stick: P::Stick.rest, right_stick: P::Stick.rest)
+    show.input = P::InputKind::GAMEPAD
+    mouse_move(300, 300)
+    mouse_move(400, 400)
+
+    assert_equal P::InputKind::MOUSE, show.input
+  end
+
   def test_no_move_counts_while_the_window_settles
     given
     show.input = P::InputKind::GAMEPAD
@@ -210,6 +277,23 @@ class PointerTest < Minitest::Test
     assert_equal P::InputKind::MOUSE, show.input, "settled"
   end
 
+  # A smaller window keeps the controller's cursor inside it.
+  def test_a_resize_keeps_the_cursor_in_the_window
+    given
+    @handler.fake_pad(:move, 1100, 700)
+    @handler.resized(P::Rect.new(x: 0, y: 0, width: 400, height: 300))
+
+    assert_equal [400, 300], [cursor.x, cursor.y]
+  end
+
+  # A click is over what it lands on, with no move before it.
+  def test_a_click_hovers_where_it_lands
+    given(at: :stats)
+    mouse_down(*place(:clear))
+
+    assert_equal :clear, show.hovered
+  end
+
   def test_the_mouse_hovers_and_leaving_the_window_ends_it
     given
     x, y = place(:stats)
@@ -219,6 +303,10 @@ class PointerTest < Minitest::Test
     mouse_left
 
     assert_nil show.hovered
+    mouse_move(x, y)
+    focus_lost
+
+    assert_nil show.hovered, "nor once the window loses focus"
   end
 
   def test_losing_focus_lets_everything_go

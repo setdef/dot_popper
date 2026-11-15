@@ -16,6 +16,7 @@ class LotaInputTest < Minitest::Test
     assert_equal %i[left right middle side4 side5], [1, 2, 3, 4, 5].map { @input.mouse_press(0, 0, it, false).button }
     assert_equal MouseRelease.new(x: 3, y: 4, button: :right, made_up: true), @input.mouse_release(3, 4, 2, true)
     assert_equal MouseMove.new(x: 3, y: 4, made_up: false), @input.mouse_move(3, 4, false)
+    assert @input.mouse_press(3, 4, 1, true).made_up, "SDL's click for a finger"
   end
 
   def test_a_touch_says_whether_a_touchscreens_and_whether_made_up_from_the_mouse
@@ -59,6 +60,7 @@ class LotaInputTest < Minitest::Test
     assert_equal DotPopper::Presentation::KeyPress.new(key: :v, held: []), @input.key_press("v", held.call)
     assert_equal %i[ctrl], @input.key_press("v", held.call(:rctrl)).held
     assert_equal %i[alt command], @input.key_press("return", held.call(:lalt, :rgui)).held
+    assert_equal %i[alt], @input.key_press("return", held.call(:ralt)).held
     assert_nil @input.key_press("tab", held.call(:lctrl)).key
   end
 end

@@ -57,6 +57,13 @@ class KeyboardTest < Minitest::Test
     show.input = P::InputKind::MOUSE
 
     refute_includes show.buy_label, "Ctrl+B", "a pointer takes the words back"
+    %w[iOS Android].each do |os|
+      given(os:, at: :offer)
+      label = show.buy_label
+      press(:tab)
+
+      assert_equal label, show.buy_label, "#{os}: a tablet's keyboard names no key"
+    end
   end
 
   def test_ctrl_or_cmd_v_pastes_where_a_screen_takes_a_paste

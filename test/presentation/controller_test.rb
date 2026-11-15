@@ -399,6 +399,20 @@ class ControllerTest < Minitest::Test
     assert_equal %i[press release], @shell.told.map(&:first)
   end
 
+  # A dot held with A follows the cursor, as each frame asks
+  # (Shell::App#update), until A is let go.
+  def test_a_held_on_the_pile_follows_the_cursor
+    given(at: :game_over)
+    aim(*empty)
+    button("a")
+    aim(60.0, 300.0)
+    @handler.follow_cursor
+    release("a")
+    @handler.follow_cursor
+
+    assert_equal [[:press, :gamepad, 5, 400], [:move, :gamepad, 60, 300], [:release, :gamepad, 60, 300]], @shell.told
+  end
+
   def test_unplugging_lets_a_go
     given(at: :game_over)
     aim(*empty)
