@@ -49,10 +49,10 @@ module DotPopperGui
       group_door
       show.open_stats
       shoot("records")
+      show.back
       show.open_themes
       shoot("themes")
-      show.close_themes
-      show.close_stats
+      show.back
       game_over
     end
 

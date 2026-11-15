@@ -64,9 +64,6 @@ module DotPopper
         # pressed (#pressed): no other press of a control reaches it.
         def answers = []
 
-        # The control +name+ this screen offers was pressed, by +by+.
-        def pressed(name, by) = nil
-
         # A press at +x+, +y+ that reached no button: nothing, unless the
         # screen says otherwise.
         def empty(x, y, by) = nil
@@ -96,20 +93,14 @@ module DotPopper
 
         # The keys this screen takes itself, before those every screen takes
         # (InputHandler::KEY_BINDINGS), in order: the first that answers a key and
-        # takes it wins (KeyBinding).
+        # takes it wins (KeyBinding). Each names what the screen does with
+        # it, which only a screen whose bindings name it answers: +type+
+        # for a key typed (+key+, as Shell::LotaInput names it), +paste+
+        # for the system's paste shortcut (Ctrl+V, or Cmd+V on a Mac), and
+        # +buy+ for Ctrl+B or Cmd+B, each saying whether it took the key.
+        # A screen that answers a kind of control (#answers) says what a
+        # press of one does in its own #pressed.
         def key_bindings = []
-
-        # A key typed on a keyboard (+key+, as Shell::LotaInput names it)
-        # that this screen takes as its own. Says whether it took it.
-        def type(key) = false
-
-        # The system's paste shortcut (Ctrl+V, or Cmd+V on a Mac), where the
-        # screen takes a paste. Says whether it took it.
-        def paste = false
-
-        # Ctrl+B or Cmd+B: Buy, where the screen has it. Says whether it
-        # took it.
-        def buy = false
 
         # Whether this screen's list scrolls, by the wheel, the keys, a
         # drag and the right stick (Scrolling).

@@ -79,7 +79,7 @@ module DotPopperGui
         show.back
         show.open_stats
         shoot("stats-#{name}")
-        show.close_stats
+        show.back
         group(name)
       end
       cabinet.sizing = DEFAULT

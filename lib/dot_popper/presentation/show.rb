@@ -134,9 +134,6 @@ module DotPopper
       # else is asked of them; nil the rest of the time.
       def arrival = (theme_of(@themes.new_theme) if on_home?)
       def arrival? = !arrival.nil?
-      # Whether the card for this theme has been up ARRIVAL_GRACE since it
-      # first appeared, so a press meant for Home as it came answers nothing.
-      def arrival_settled? = @screens[:new_theme].settled?
 
       def themes = @themes.choices.map { theme_of(it) }
       # The art of the theme in use (UseCases::UseTheme answers its key).
@@ -150,7 +147,6 @@ module DotPopper
       def themes_layout = @screens[:themes].plan
 
       def open_themes = open_page(:themes)
-      def close_themes = close_page
 
       # Uses +theme+ from now on, from Themes (Screens::Themes#use).
       def use(theme) = @screens[:themes].use(theme)
@@ -396,11 +392,6 @@ module DotPopper
       end
 
       def open_stats = @screens[:stats].open
-
-      def close_stats
-        close_page
-        offer.close(quiet: true)
-      end
 
       # What the open offer leads with (Screens::Offer#focus).
       def offer_focus = offer.focus

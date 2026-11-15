@@ -23,10 +23,10 @@ require_relative "inputs"
 # NOT_FOUND with the reason no screen offers it.
 #
 # Each input also presses what it has besides a place (Input#presses):
-# a keyboard's keys and Android's Back, handed to Presentation::InputHandler
-# as Shell::App hands them, so the system's rules for keys hold here; and a
-# controller's buttons, handed to the Show by inputs.rb's own copy of what
-# the InputHandler does with each. What this cannot see is the splash.
+# a keyboard's keys, Android's Back and a controller's buttons, each
+# handed to Presentation::InputHandler as Shell::App hands it, so the
+# system's rules for keys and buttons hold here. What this cannot see is
+# the splash.
 class InputsTest < Minitest::Test
   include Inputs
 

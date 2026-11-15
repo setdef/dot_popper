@@ -23,7 +23,7 @@ class ClearingStatsTest < Minitest::Test
 
   def test_clear_is_offered_only_on_a_stats_screen_with_stats
     assert @show.clear_offered?
-    @show.close_stats
+    @show.back
     refute @show.clear_offered?
   end
 
@@ -88,7 +88,7 @@ class ClearingStatsTest < Minitest::Test
 
   def test_a_game_ends_the_offer
     clear_by(:mouse)
-    @show.close_stats
+    @show.back
     press_main
     @show.open_stats
 

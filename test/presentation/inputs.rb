@@ -427,8 +427,9 @@ module Inputs
       @cursor = P::GamepadCursor.centered(show.layout.whole, style: P::Style::GAMEPAD, radius: DotPopperTest::R)
     end
 
-    # The buttons besides A at a place (GamepadButtons): A with the cursor
-    # on no button, B, X, Y, the bumpers, the left trigger, View and Start.
+    # The buttons besides A at a place (GamepadButtons): B, X, Y, the
+    # bumpers, the left trigger, View and Start. A with the cursor on no
+    # button is screen_answers_test.rb's, on every screen.
     BUTTONS = { "B" => :b, "X" => :x, "Y" => :y, "LB" => :lb, "RB" => :rb, "LT" => :lt, "View" => :select, "Start" => :start }.freeze
 
     def kind = P::InputKind::GAMEPAD
@@ -441,8 +442,6 @@ module Inputs
     # stats…, Start's Leave) is held until it is done.
     def act(name)
       fixture.tick(LOOK)
-      return a_at_nothing if name == "A at nothing"
-
       button = BUTTONS.fetch(name)
       fixture.event(button == :lt ? P::TriggerPull.new(trigger: :left, value: 1.0) : P::ButtonPress.new(button:))
       fixture.tick(holding ? holding.seconds + 0.2 : CLICK)
