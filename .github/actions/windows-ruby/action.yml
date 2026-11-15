@@ -22,7 +22,9 @@ runs:
         work=$RUNNER_TEMP/windows-ruby
         mkdir -p "$work"
         curl --fail --location --silent --show-error --retry 3 -o "$work/ruby.7z" "$url"
-        actual=$(sha256sum "$work/ruby.7z" | cut -d' ' -f1)
+        # From standard input: given a path with a backslash in it, sha256sum
+        # escapes the name and puts a backslash before the sum.
+        actual=$(sha256sum < "$work/ruby.7z" | cut -d' ' -f1)
         echo "pinned: $sha256"; echo "fetched: $actual"
         [ "$actual" = "$sha256" ]
         "/c/Program Files/7-Zip/7z.exe" x -y -o"$(cygpath -w "$work/unpacked")" "$(cygpath -w "$work/ruby.7z")" > /dev/null
