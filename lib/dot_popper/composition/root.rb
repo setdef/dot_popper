@@ -205,9 +205,9 @@ module DotPopper
                             website: -> { website_store(clipboard, BrowserCheckout.new(opener: @engine.opener)) })
       end
 
-      # Where a test build's part (Build::PARTS) answers with its own: its
-      # scenarios' themes and its stand-in for setdef, and its store
-      # (#store_for). A build for sale has none of them.
+      # A build for sale releases no theme here and has no stand-in for
+      # setdef; a part (Build::PARTS) may answer these, and #store_for,
+      # for a build with no channel.
       def use_fixture(_themes, _use_theme) = nil
       def test_watch(_license, _pins) = nil
 

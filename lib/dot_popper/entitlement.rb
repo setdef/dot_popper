@@ -7,9 +7,7 @@ module DotPopper
   # receipt, which the store hands over at each launch and #prove verifies
   # (Receipt), or a website copy's license key (+license+,
   # Continuity::License), whose signature is checked against the pinned
-  # keys. Pro features ask +pro?+ and nothing else. A test build has a
-  # developer setting of its own that stands in for a purchase
-  # (lib/dot_popper/test_build).
+  # keys. Pro features ask +pro?+ and nothing else.
   #
   # Pro arriving during a run, by a receipt that verifies or a license key
   # entered through #enter, is announced to every listener (#subscribe)
@@ -21,8 +19,7 @@ module DotPopper
     class ProGranted < Data.define(:by); end
 
     # Whether a computer's copy has everything for nothing. It does not: a
-    # desktop copy is free until a store, a channel's or a test build's fake,
-    # sells it (Store; ADR-0009). Set it true to ship a desktop copy
+    # desktop copy is free until its channel's store sells it (Store; ADR-0009). Set it true to ship a desktop copy
     # whole. A phone's copy is never pro this way: its host has a store of
     # its own (Platform#phone_host?).
     DESKTOP_PRO = false

@@ -5,7 +5,8 @@ require_relative "../../dot_popper"
 module DotPopper
   module Privacy
     # Why players needn't be told about something one by one: its +kind+
-    # (a test build's, a developer's, a diagnostic) and the +reason+.
+    # (whose it is: a developer's, a diagnostic's, another build's) and
+    # the +reason+.
     class Aside < Data.define(:kind, :reason)
       KINDS = %i[test_only developer_only diagnostics].freeze
 

@@ -9,9 +9,7 @@ module DotPopper
   # spends the day's own first, so the first games last. There is no
   # way to earn more. Paying makes play unlimited (+entitlement+), and
   # +metered+ false counts nothing: for a machine playing, and for a build
-  # with no store to pay in, as no one could then get past the limit. A
-  # test build has a store, a fake one, so it is metered like the final
-  # game.
+  # with no store to pay in, as no one could then get past the limit.
   #
   # The store answers +read+ and +write(text)+ as ScoreRecord's does; its
   # lines are +day=2026-11-08+, +spent=2+ and +first_games_used=3+. A
@@ -33,8 +31,7 @@ module DotPopper
     def self.metered?(env, channel:, offered:) = offered && player?(env, channel:)
 
     # Whether someone is playing, not a machine. In a build for sale
-    # everyone is, whatever its settings say (ADR-0010); a test build tells
-    # its bot and scenarios apart (lib/dot_popper/test_build).
+    # everyone is, whatever its settings say (ADR-0010).
     def self.player?(_env, channel:) = true
 
     # The games a developer setting asks a new save to start with, or nil:

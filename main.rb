@@ -20,8 +20,7 @@
 # to Home as it is let go. The words on screen say "tap", "click",
 # or name the button, after whatever the player last pressed with.
 #
-# Development settings, read from the environment (a test build has more
-# of its own, listed in lib/dot_popper/test_build/core.rb):
+# Development settings, read from the environment:
 #
 #   DOT_POPPER_AUTOPLAY=1       a bot plays: Home, a game, Game Over, and
 #                               game again. It mostly taps bright dots and

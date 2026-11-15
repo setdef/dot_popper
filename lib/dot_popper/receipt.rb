@@ -36,11 +36,10 @@ module DotPopper
     PRODUCT_ID = "com.setdef.dotpopper.pro"
 
     # Whose receipts a build for +channel+ (Build::CHANNEL) trusts, by the
-    # channel alone and never by anything set at run time (ADR-0010): in a
-    # test build only the fake store's (TEST); in the Microsoft Store's
-    # build Windows' word (MICROSOFT_STORE), which comes only down the
-    # store helper's pipe; in any other store build the signed receipts of
-    # Apple and Google (STORES).
+    # channel alone and never by anything set at run time (ADR-0010): in
+    # the Microsoft Store's build Windows' word (MICROSOFT_STORE), which
+    # comes only down the store helper's pipe; in any other the signed
+    # receipts of Apple and Google (STORES).
     def self.trusted(channel) = channel == Build::MICROSOFT_STORE ? MICROSOFT_STORE : STORES
 
     # Whether +text+ is a receipt for Pro that +trust+ accepts.

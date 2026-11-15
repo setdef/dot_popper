@@ -182,6 +182,18 @@ class ChannelContentsTest < Minitest::Test
     assert_match(%r{FAIL .* holds lib/dot_popper/continuity/license_key\.rb, which names signing}, out)
   end
 
+  # Nor any prose about the test build, which has other ways to Pro.
+  def test_a_build_for_sale_says_nothing_of_the_test_build
+    ChannelContents.left_out("app-store").each { FileUtils.rm_rf(File.join(@game, it)) }
+    _, out = run_script("list", "app-store", @app)
+
+    refute_match(/^words about the test build/, out)
+    File.write(File.join(@game, "lib/dot_popper/entitlement.rb"), "# A test build has a setting of its own.\n", mode: "a")
+    _, out = run_script("check", "app-store", @app)
+
+    assert_match(%r{FAIL .* holds lib/dot_popper/entitlement\.rb, which names words about the test build}, out)
+  end
+
   def test_an_unknown_channel_or_a_missing_folder_is_refused
     refute run_script("list", "steam", @app).first
     refute run_script("list", "website", File.join(@app, "nowhere")).first

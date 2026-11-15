@@ -62,6 +62,9 @@ module ChannelContents
     Piece.new(name: "the fake setdef server", needed_by: [TEST], apart: :all, marks: [/FakeSetdef/, /DOT_POPPER_FAKE_SETDEF/, /fake_setdef\.txt/]),
     Piece.new(name: "the test keys", needed_by: [TEST], apart: :all,
               marks: [/BEGIN PRIVATE KEY/, /\bTestKeys?\b/, /TEST_PINS/, /Receipt::TEST\b/]),
+    # The shared code's comments describe what it does, so a build for sale
+    # holds no prose about a build with fakes and settings that grant Pro.
+    Piece.new(name: "words about the test build", needed_by: [TEST], apart: :all, marks: [/test build/i]),
     Piece.new(name: "signing, which only the test build's fakes do", needed_by: [TEST], apart: :all,
               marks: [/\.sign\(/, /PRIVATE_DER/, /def self\.issue\b/]),
     Piece.new(name: "the test build's settings that grant Pro or skip the free-game limit", needed_by: [TEST], apart: :all,

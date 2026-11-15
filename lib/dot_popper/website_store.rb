@@ -13,9 +13,9 @@ module DotPopper
   # so, but a key bought earlier still enters.
   #
   # +checkout+ is the port to the seller: #buy answers the state to show
-  # (:browser once a browser took the checkout, :copied when a test build's
-  # checkout puts a key on the clipboard, or :unavailable). BrowserCheckout
-  # is the real adapter; a test build has its own (lib/dot_popper/test_build).
+  # (:browser once a browser took the checkout, :copied when a checkout
+  # puts a key on the clipboard, or :unavailable). BrowserCheckout is the
+  # real adapter.
   # A payment company has not been chosen, and none needs to be for either.
   class WebsiteStore
     # The price as the checkout page sets it. Change both together.

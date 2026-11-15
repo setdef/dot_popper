@@ -5,9 +5,8 @@ module DotPopper
     # The port to setdef's own server, for what only it can answer: the
     # proof that it is itself (GET /proof) and where a license key is
     # (POST /licenses, POST /license_checks). Each answers a Network::Reply.
-    # SetdefServer is the adapter for the real one, by Network::Link; a
-    # test build has its own (lib/dot_popper/test_build). A replacement
-    # server is never asked any
+    # SetdefServer is the adapter for the real one, by Network::Link. A
+    # replacement server is never asked any
     # of this: it is setdef's, whatever server friend groups use.
     class SetdefServer
       # What setdef's server is asked; #proof and #ask make requests only
@@ -41,7 +40,7 @@ module DotPopper
     # Google and Microsoft for exactly this, each answering a fixed reply,
     # so that one answering as expected shows the internet works. #online?
     # asks them in turn and stops at the first that does. Connectivity is
-    # the real adapter, by Network::Link; a test build has its own.
+    # the real adapter, by Network::Link.
     class Connectivity
       # The three checks, each to its own host (+to+), as plain HTTP.
       REQUESTS = [

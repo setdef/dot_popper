@@ -21,7 +21,7 @@ module DotPopper
         @env = Build.settings(env, channel:)
       end
 
-      # Whether this is a store build (a channel), rather than a test build.
+      # Whether this build has a channel (Build.store?).
       def store_build? = Build.store?(channel)
 
       # Whether +name+ is set to 1.
@@ -44,8 +44,7 @@ module DotPopper
       # without it.
       def seed = Integer(fetch("DOT_POPPER_SEED"), exception: false)
 
-      # The player's local date, as a callable; a test build may pretend
-      # another (lib/dot_popper/test_build).
+      # The player's local date, as a callable.
       def today = -> { Date.today }
 
       # The moment the server's dates are told from, in UTC, as a callable.
