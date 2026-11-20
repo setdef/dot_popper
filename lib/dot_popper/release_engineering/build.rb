@@ -46,13 +46,9 @@ module DotPopper
 
       def self.store?(channel = CHANNEL) = !channel.nil?
 
-      # The channels of the app stores, whose copies never accept, keep,
-      # verify or send a website license key (Apple 3.1.1; Google's billing
-      # rules). Every other build, WEBSITE's and one with no channel, may.
+      # The channels of the app stores, and every channel.
       STORES = [APP_STORE, MAC_APP_STORE, GOOGLE_PLAY, MICROSOFT_STORE].freeze
       CHANNEL_NAMES = [*STORES, WEBSITE].freeze
-
-      def self.license_keys?(channel = CHANNEL) = !STORES.include?(channel)
 
       # +env+ as this build lets it be read: with a channel, without the
       # developer settings that affect purchases,

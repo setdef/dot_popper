@@ -257,9 +257,9 @@ class WebsiteStoreTest < Minitest::Test
 
     assert_equal :website, Store.of_test_build(DotPopperTest.platform("Linux"), **test_build)
     assert_kind_of Store, Store.of_test_build(DotPopperTest.platform("Android"), **test_build)
-    assert_equal :website, Store.for(DotPopperTest.platform("Windows"), **args, channel: Store::WEBSITE)
-    assert_equal :website, Store.for(DotPopperTest.platform("Android"), **args, channel: Store::WEBSITE)
-    refute_equal :website, Store.for(DotPopperTest.platform("iOS"), **args, channel: Store::WEBSITE)
+    assert_equal :website, Store.for(DotPopperTest.platform("Windows"), **args, channel: "website")
+    assert_equal :website, Store.for(DotPopperTest.platform("Android"), **args, channel: "website")
+    refute_equal :website, Store.for(DotPopperTest.platform("iOS"), **args, channel: "website")
   end
 
   def test_change_server_appears_only_while_setdef_is_gone

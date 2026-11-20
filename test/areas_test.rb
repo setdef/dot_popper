@@ -50,15 +50,6 @@ class AreasTest < Minitest::Test
   # [file, the constant it names] => [times named, the step of the
   # refactoring list that removes it].
   BREACHES = {
-    # Monetization asks the build's channel at run time, which one
-    # registry of channels and one store per build remove (steps 5.1 to
-    # 5.4), and whether a channel keeps license keys, which goes to the
-    # website's own part (6.2).
-    ["lib/dot_popper/monetization/store.rb", "DotPopper::ReleaseEngineering::Build::CHANNEL"] => [1, "5.4"],
-    ["lib/dot_popper/monetization/store.rb", "DotPopper::ReleaseEngineering::Build::MAC_APP_STORE"] => [1, "5.1"],
-    ["lib/dot_popper/monetization/store.rb", "DotPopper::ReleaseEngineering::Build::MICROSOFT_STORE"] => [1, "5.1"],
-    ["lib/dot_popper/monetization/store.rb", "DotPopper::ReleaseEngineering::Build::WEBSITE"] => [1, "5.1"],
-    ["lib/dot_popper/monetization/continuity/license.rb", "DotPopper::ReleaseEngineering::Build"] => [1, "6.2"]
   }.freeze
 
   def test_each_area_names_only_what_the_context_map_allows

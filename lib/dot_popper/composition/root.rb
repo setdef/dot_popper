@@ -86,6 +86,12 @@ module DotPopper
       # or nil: never in a build for sale.
       def self.starting_free_games(_settings) = nil
 
+      # Whether a build takes website license keys: the website's does; an
+      # app store's copy never accepts, keeps, verifies or sends one (Apple
+      # 3.1.1; Google's billing rules), so it never reads license.txt
+      # (Continuity::License.kept_in).
+      def self.license_keys?(settings) = settings.channel == ReleaseEngineering::Build::WEBSITE
+
       # Starts what reaches past this process: the first request for theme
       # releases, the store's first question, and the watch for setdef.
       # Only the first and the friend groups' are asked again (Refresh);
@@ -172,9 +178,8 @@ module DotPopper
         @gone = Monetization::Continuity::Gone.new(file("setdef.txt"))
         # What this build trusts, and where it keeps a license key, by the
         # channel alone (ADR-0010).
-        channel = settings.channel
         pins = self.class.pins(settings)
-        license = Monetization::Continuity::License.new(Monetization::Continuity::License.kept_in(channel) { file("license.txt") }, pins:)
+        license = Monetization::Continuity::License.new(Monetization::Continuity::License.kept_in(self.class.license_keys?(settings)) { file("license.txt") }, pins:)
         @watch = watch_for(license, pins)
         @entitlement = Monetization::Entitlement.new(forced: self.class.forced_pro?(settings, platform), license:,
                                                      trust: self.class.receipt_trust(settings))
@@ -228,10 +233,12 @@ module DotPopper
         @bot = Presentation::Bot.new(Style::BOT) if flag?("DOT_POPPER_AUTOPLAY")
       end
 
-      # The store for this build, as Store.for chooses it by the channel.
+      # The store for this build, as Store.for chooses it by the channel,
+      # which the website's build sells through its own.
       def store_for(clipboard)
+        website = -> { website_store(clipboard, Monetization::BrowserCheckout.new(opener: @engine.opener)) }
         Monetization::Store.for(platform, entitlement:, channel: settings.channel, native: native_store,
-                            website: -> { website_store(clipboard, Monetization::BrowserCheckout.new(opener: @engine.opener)) })
+                                website: (website if settings.channel == ReleaseEngineering::Build::WEBSITE))
       end
 
       # A build for sale releases no theme here and has no stand-in for

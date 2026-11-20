@@ -138,7 +138,7 @@ if channel == build::GOOGLE_PLAY
   check.call("it pins the app's Play key (Receipt::PLAY_KEYS)") { DotPopper::Monetization::Receipt::PLAY_KEYS.any? }
 end
 if channel == build::WEBSITE
-  check.call("it keeps and checks a license key") { build.license_keys?(build::CHANNEL) }
+  check.call("it keeps and checks a license key") { root.license_keys?(settings) }
 end
 
 if failures.any?

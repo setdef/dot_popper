@@ -45,12 +45,6 @@ module DotPopper
       EVERY: Float
       UNRESERVED: Regexp
       STATES: Hash[String, Symbol]
-      CHANNELS: Hash[String, ^(entitlement: Entitlement) -> _Store]
-      BUILD_CHANNEL: String?
-      MAC_APP_STORE: String
-      MICROSOFT_STORE: String
-      HELPER_CHANNELS: Array[String]
-      WEBSITE: String
 
       @port: _Port
       @entitlement: Entitlement
@@ -64,8 +58,7 @@ module DotPopper
       attr_reader price: String?
 
       def self.for: (Platform platform, native: _Port, entitlement: Entitlement,
-                     ?website: (^() -> _Store)?, ?channel: String?,
-                     ?channels: Hash[String, ^(entitlement: Entitlement) -> _Store]) -> _Store
+                     channel: String?, ?website: (^() -> _Store)?) -> _Store
 
       def self.url: (Symbol | String action, Integer number, String path) -> String
 

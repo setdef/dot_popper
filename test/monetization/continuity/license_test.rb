@@ -37,18 +37,17 @@ class LicenseTest < Minitest::Test
     assert @key.valid?(C::TEST_PINS)
   end
 
-  # An app store's build never reads license.txt, so a key left on disk
-  # grants nothing and is never sent; the website's and a test build keep it.
+  # A build that takes no license keys never reads license.txt, so a key
+  # left on disk grants nothing and is never sent; one that takes them
+  # keeps it there (which build takes them is the composition root's
+  # choice, test/composition/root_test.rb).
   def test_only_a_build_that_takes_license_keys_keeps_one_in_license_txt
     file = Memory.new
-    DotPopper::ReleaseEngineering::Build::STORES.each do |channel|
-      kept = C::License.kept_in(channel) { file }
+    kept = C::License.kept_in(false) { flunk("opened license.txt") }
 
-      assert_instance_of Memory, kept, channel
-      refute_same file, kept, channel
-      refute(C::License.kept_in(channel) { flunk("#{channel} opened license.txt") }.nil?, channel)
-    end
-    [DotPopper::ReleaseEngineering::Build::WEBSITE, nil].each { assert_same file, C::License.kept_in(it) { file }, it.inspect }
+    refute_nil kept
+    refute_same file, kept
+    assert_same file, C::License.kept_in(true) { file }
   end
 
   def test_a_valid_key_is_pro_at_once_offline_and_a_bad_one_is_refused

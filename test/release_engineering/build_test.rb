@@ -33,28 +33,6 @@ class BuildTest < Minitest::Test
     assert_equal SETTINGS, DotPopper::ReleaseEngineering::Build.settings(SETTINGS, channel: nil)
   end
 
-  # Apple's and Google's rules: an app store's copy never takes a website
-  # license key, and each of the four stores is named here.
-  def test_the_app_stores_copies_take_no_license_key_and_the_website_and_a_test_build_do
-    assert_equal %w[app-store mac-app-store google-play microsoft-store], DotPopper::ReleaseEngineering::Build::STORES
-    DotPopper::ReleaseEngineering::Build::STORES.each { refute DotPopper::ReleaseEngineering::Build.license_keys?(it), it }
-    assert DotPopper::ReleaseEngineering::Build.license_keys?("website")
-    assert DotPopper::ReleaseEngineering::Build.license_keys?(nil)
-  end
-
-  def test_every_channel_is_named_once_and_the_store_uses_those_names
-    assert_equal %w[app-store mac-app-store google-play microsoft-store website], DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES
-    store = DotPopper::Monetization::Store
-
-    assert_equal [store::MAC_APP_STORE, store::MICROSOFT_STORE, store::WEBSITE],
-                 [DotPopper::ReleaseEngineering::Build::MAC_APP_STORE, DotPopper::ReleaseEngineering::Build::MICROSOFT_STORE, DotPopper::ReleaseEngineering::Build::WEBSITE]
-    assert_empty store::HELPER_CHANNELS - DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES
-  end
-
-  def test_the_store_takes_its_channel_from_the_build
-    assert_same DotPopper::ReleaseEngineering::Build::CHANNEL,DotPopper::Monetization::Store::BUILD_CHANNEL
-  end
-
   def test_pro_and_the_server_stay_as_they_were_in_a_store_build
     env = DotPopper::ReleaseEngineering::Build.settings(SETTINGS, channel: STORE)
 

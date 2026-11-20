@@ -41,50 +41,22 @@ module DotPopper
 
       attr_reader :status, :price
 
-      # The distribution channels that can sell Pro on a
-      # computer, by name, each a callable that takes +entitlement:+ and
-      # answers a store like this class (offered?, status, price, connect,
-      # buy, restore, update). None is built yet, so every desktop build is
-      # free. To add one: write its store, register it here under its name,
-      # and set BUILD_CHANNEL for the build that ships through it. Nothing
-      # that is pro for needs to change, since features ask only
-      # Entitlement#pro?.
-      CHANNELS = (
-        {} #: Hash[String, ^(entitlement: Entitlement) -> _Store]
-      ).freeze
-      # The channel this build is sold through (Build::CHANNEL).
-      BUILD_CHANNEL = ReleaseEngineering::Build::CHANNEL
-
-      # The channels of the computers' own stores, each sold for the one
-      # system whose own store it is (Platform#own_store). Their copies also
-      # buy through the native port. Its host is a small program shipped beside
-      # the game (Shell::StoreHelper), since neither Lota nor LÖVE can call
-      # StoreKit or Windows.Services.Store: the Mac App Store's uses StoreKit
-      # 2 (macos/store), the Microsoft Store's Windows.Services.Store
-      # (windows/store). On any other system those channels offer nothing.
-      MAC_APP_STORE = ReleaseEngineering::Build::MAC_APP_STORE
-      MICROSOFT_STORE = ReleaseEngineering::Build::MICROSOFT_STORE
-      HELPER_CHANNELS = [MAC_APP_STORE, MICROSOFT_STORE].freeze
-
-      # The channel for copies no store controls: setdef's website, whose
-      # store is a WebsiteStore (license keys). An iOS build never takes it
-      # (Apple 3.1.1); an Android build for an APK or another store does.
-      WEBSITE = ReleaseEngineering::Build::WEBSITE
-
-      # The store for +channel+'s build on +platform+ (Platform), chosen
-      # once: the +native+ port where the host has a store or the channel is
-      # that computer's own store's (Platform#own_store), the website store
-      # for WEBSITE where the platform allows website sales, and else, on a
-      # computer, the channel's own store, or none, which offers nothing, so
-      # no one is offered a purchase that cannot complete. A channel nobody
-      # has built is none. +website+ is called for the website store.
-      def self.for(platform, native:, entitlement:, website: nil, channel: BUILD_CHANNEL, channels: CHANNELS)
-        return website.call if channel == WEBSITE && platform.website_sales? && website
+      # The store for the build sold through +channel+ (a name the
+      # composition root gives) on +platform+ (Platform), chosen once:
+      # +website+, called, for a build sold through setdef's website, where
+      # the platform allows website sales (never iOS, Apple 3.1.1); the
+      # +native+ port where the host has a store, or where the channel is
+      # that computer's own store's (Platform#own_store), whose host is a
+      # small program shipped beside the game (Shell::StoreHelper), since
+      # neither Lota nor LÖVE can call StoreKit or Windows.Services.Store;
+      # and else none, which offers nothing, so no one is offered a purchase
+      # that cannot complete. The composition root gives +website+ only to
+      # the website's build.
+      def self.for(platform, native:, entitlement:, channel:, website: nil)
+        return website.call if website && platform.website_sales?
         return new(port: native, entitlement:) if platform.phone_host? || platform.own_store == channel
-        return NoStore.new if HELPER_CHANNELS.include?(channel)
 
-        sold = channels[channel]
-        sold ? sold.call(entitlement:) : NoStore.new
+        NoStore.new
       end
 
       # The URL asking the host to do +action+ (:open, :buy, :restore) as

@@ -74,7 +74,6 @@ class StoreTest < Minitest::Test
   end
 
   def test_a_phone_test_build_is_metered_like_the_final_game
-    assert_nil Store::BUILD_CHANNEL
     %w[iOS Android].each do |os|
       store = Store.of_test_build(DotPopperTest.platform(os), fake:, entitlement: @entitlement)
       games = DotPopper::Monetization::FreeGames.new(DotPopper::MemoryFile.new, today: -> { Date.today }, entitlement: @entitlement,
@@ -102,7 +101,7 @@ class StoreTest < Minitest::Test
   end
 
   def test_a_computers_own_store_build_uses_the_native_port_on_that_computer_only
-    { Store::MAC_APP_STORE => "OS X", Store::MICROSOFT_STORE => "Windows" }.each do |channel, os|
+    { "mac-app-store" => "OS X", "microsoft-store" => "Windows" }.each do |channel, os|
       store = Store.for(DotPopperTest.platform(os), **stores, entitlement: @entitlement, channel:)
 
       assert_same @native, store.instance_variable_get(:@port), channel
@@ -222,14 +221,9 @@ class StoreTest < Minitest::Test
     assert_predicate @entitlement, :pro?
   end
 
-  def test_a_computer_store_build_uses_its_channel_or_offers_nothing
+  def test_a_computer_build_of_a_store_nobody_has_built_offers_nothing
     refute_predicate Store.for(DotPopperTest.platform("Linux"), **stores, entitlement: @entitlement, channel: "steam"), :offered?
-    made = Object.new
-    channels = { "steam" => ->(entitlement:) { made.tap { @given = entitlement } } }
-
-    assert_same made, Store.for(DotPopperTest.platform("Linux"), **stores, entitlement: @entitlement, channel: "steam", channels:)
-    assert_same @entitlement, @given
-    assert_instance_of Store, Store.for(DotPopperTest.platform("iOS"), **stores, entitlement: @entitlement, channel: "steam", channels:)
+    assert_instance_of Store, Store.for(DotPopperTest.platform("iOS"), **stores, entitlement: @entitlement, channel: "steam")
   end
 
   def test_no_word_of_the_offer_calls_it_a_trial_or_a_demo

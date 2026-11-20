@@ -12,7 +12,6 @@ module DotPopper
       HARMLESS: Array[String]
 
       def self.store?: (?String? channel) -> bool
-      def self.license_keys?: (?String? channel) -> bool
       STORES: Array[String]
       CHANNEL_NAMES: Array[String]
       def self.settings: (?untyped env, ?channel: String?) -> untyped
