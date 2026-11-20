@@ -17,6 +17,7 @@ module DotPopper
       PRODUCT_ID: String
       APPLE_ROOT_G3: String
       PLAY_KEYS: Array[String]
+      NOTHING: Array[String]
       NONE: Trust
       APPLE: Trust
       PLAY: Trust

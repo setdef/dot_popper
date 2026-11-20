@@ -39,7 +39,9 @@ module DotPopper
       # What a build sold through no store trusts: no receipt at all (the
       # website's, whose copies prove Pro by license key). Each store's own
       # is beside its check (APPLE, PLAY, MICROSOFT_STORE).
-      NONE = Trust.new(apple_roots: [].freeze, play_keys: [].freeze, app_id: APP_ID, product_id: PRODUCT_ID, windows_license: false)
+      NOTHING = ([] #: Array[String]
+                ).freeze
+      NONE = Trust.new(apple_roots: NOTHING, play_keys: NOTHING, app_id: APP_ID, product_id: PRODUCT_ID, windows_license: false)
 
       # Whether +text+ is a receipt for Pro that +trust+ accepts.
       def self.valid?(text, trust)
