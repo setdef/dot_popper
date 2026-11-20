@@ -57,20 +57,6 @@ class RecordingContext
     @clip = nil
   end
 
-  # What the painter drew of +kind+, or every text.
-  def of(kind) = marks.select { it.kind == kind }
-  def texts = marks.select { %i[text outlined].include?(it.kind) }
-
-  # The text that says +text+, which must have been drawn once.
-  def said(text)
-    found = texts.select { it.text == text }
-    raise "#{text.inspect} drawn #{found.size} times, among #{texts.map(&:text).inspect}" unless found.size == 1
-
-    found.first
-  end
-
-  def drew?(text) = texts.any? { it.text == text }
-
   def art = nil
   def shader?(_name) = false
   def dot_shader = nil
