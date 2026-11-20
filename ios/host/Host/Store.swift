@@ -3,7 +3,7 @@
 //
 // Buying Pro, with StoreKit 2, which is Swift's alone, so
 // this file is Swift beside main.m. Neither Lota nor LÖVE knows a store,
-// so the game opens a dotpopper-store: URL (Presentation::Storefront) and
+// so the game opens a dotpopper-store: URL (DotPopper::Store) and
 // DotPopperApplication, in main.m, hands it here on the main thread, as
 // it does share URLs. The answer goes into the file the URL names, the
 // whole state each time, written atomically, which the game reads a few

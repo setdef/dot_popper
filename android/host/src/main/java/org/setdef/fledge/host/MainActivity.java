@@ -63,7 +63,7 @@ import org.setdef.fledge.FledgeRuby;
  * refresh rate (preferFastestRefresh). And vibrate buzzes from a thread
  * of its own, so the game's thread never waits for the vibrator. And
  * Buying Pro: the game opens a dotpopper-store: URL
- * (Storefront), and startActivity hands it to ProStore, beside this file,
+ * (DotPopper::Store), and startActivity hands it to ProStore, beside this file,
  * which asks Play Billing.
  */
 public class MainActivity extends SDLActivity {
@@ -74,7 +74,7 @@ public class MainActivity extends SDLActivity {
     private static final String SHARE_SCHEME = "dotpopper-share";
     private static final String SHARE_TEXT = "text";
 
-    // The scheme the game opens to reach the store (Storefront::SCHEME).
+    // The scheme the game opens to reach the store (DotPopper::Store::SCHEME).
     private static final String STORE_SCHEME = "dotpopper-store";
 
     // The meta-data in AndroidManifest.xml that asks SDL to send Back to

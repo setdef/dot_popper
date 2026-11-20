@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Buying Pro, with Play Billing. Neither Lota nor LÖVE knows
  * a store, so the game opens a dotpopper-store: URL
- * (Presentation::Storefront) and MainActivity#startActivity hands it here.
+ * (DotPopper::Store) and MainActivity#startActivity hands it here.
  * The answer goes into the file the URL names, the whole state each time,
  * written by renaming a finished file over it, which the game reads a few
  * times a second (ADR-0008; doc/design/store-and-pro.md):

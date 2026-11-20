@@ -32,7 +32,7 @@
 // real iPad yet, and Dot Popper's has, so Dot Popper's override stays in
 // front of Lota's until an iPad shows Lota's alone gives a landscape game
 // a landscape window. And the store, for buying Pro: the game opens a
-// dotpopper-store: URL (Storefront), and DotPopperApplication hands it to
+// dotpopper-store: URL (DotPopper::Store), and DotPopperApplication hands it to
 // DotPopperStore, in Store.swift beside this file, since StoreKit 2 is
 // Swift's alone. Lota's host already sets the audio session to Ambient
 // (Info.plist's LotaAudioSessionCategory) and
