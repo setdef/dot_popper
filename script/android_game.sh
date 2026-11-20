@@ -5,8 +5,10 @@
 # kit's program, android/android_kit, as PROJECT/main.rb.
 #
 #   script/android_game.sh PROJECT             the commit at HEAD (script/android_build.sh)
-#   script/android_game.sh --worktree PROJECT  the files as they are now, committed or
-#                                              not, that git does not ignore (test/android)
+#   script/android_game.sh --worktree PROJECT  the files git tracks, as they are now,
+#                                              committed or not (test/android); a file
+#                                              not yet added is left out, as the app
+#                                              built from a commit would leave it out
 #
 # This is the one place that says which of the game's files the app
 # carries, so the build and the tests that load the app's game agree.
@@ -27,7 +29,7 @@ mkdir -p "$game"
 if $worktree; then
   (
     cd "$repo"
-    git ls-files -z --cached --others --exclude-standard |
+    git ls-files -z --cached |
       while IFS= read -r -d '' file; do [ -e "$file" ] && printf '%s\0' "$file"; done |
       tar --null -T - -cf -
   ) | tar -x -C "$game"
