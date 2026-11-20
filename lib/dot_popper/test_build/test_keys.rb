@@ -27,13 +27,6 @@ module DotPopper
           @online_certificate ||= Certificate.issue(ROOT, Certificate::PROOF, Ed25519.public_key(ONLINE)).freeze
         end
       end
-
-      # A test build (no channel) trusts the test keys; a build for sale,
-      # setdef's (Continuity.pins_for).
-      module TestBuildPins
-        def pins_for(channel) = ReleaseEngineering::Build.store?(channel) ? super : TEST_PINS
-      end
-      singleton_class.prepend(TestBuildPins)
     end
   end
 end

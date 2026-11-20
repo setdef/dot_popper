@@ -163,9 +163,25 @@ class RootTest < Minitest::Test
     end
   end
 
-  # The keys and receipts a build trusts are Monetization's to decide
-  # (Continuity.pins_for, Receipt.trusted); the root gives what it decides
-  # to the Entitlement, whatever the environment says.
+  # The keys and receipts a build trusts, by its channel alone and never
+  # by anything set at run time (ADR-0010): in a test build the test keys
+  # and the fake store's receipts; in a build for sale setdef's own keys,
+  # and Windows' word in the Microsoft Store's build or else the signed
+  # receipts of Apple and Google.
+  def test_a_build_trusts_keys_and_receipts_by_its_channel_alone
+    trust = ->(channel) { DotPopper::Composition::DeveloperSettings.new(SETTINGS, channel:) }
+
+    assert_same C::TEST_PINS, Root.pins(trust.(nil))
+    assert_same DotPopper::Monetization::Receipt::TEST, Root.receipt_trust(trust.(nil))
+    B::CHANNEL_NAMES.each do |channel|
+      assert_same C::PINNED, Root.pins(trust.(channel)), channel
+      wanted = channel == B::MICROSOFT_STORE ? :MICROSOFT_STORE : :STORES
+      assert_same DotPopper::Monetization::Receipt.const_get(wanted), Root.receipt_trust(trust.(channel)), channel
+    end
+  end
+
+  # The root gives what it trusts to the license and the Entitlement,
+  # whatever the environment says.
   def test_a_test_signed_license_key_unlocks_only_a_test_build
     key = C::LicenseKey.issue(C::TestKeys::LICENSE).text
 

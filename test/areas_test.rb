@@ -61,7 +61,6 @@ class AreasTest < Minitest::Test
     ["lib/dot_popper/monetization/store.rb", "DotPopper::ReleaseEngineering::Build::MAC_APP_STORE"] => [1, "5.1"],
     ["lib/dot_popper/monetization/store.rb", "DotPopper::ReleaseEngineering::Build::MICROSOFT_STORE"] => [1, "5.1"],
     ["lib/dot_popper/monetization/store.rb", "DotPopper::ReleaseEngineering::Build::WEBSITE"] => [1, "5.1"],
-    ["lib/dot_popper/monetization/receipt.rb", "DotPopper::ReleaseEngineering::Build::MICROSOFT_STORE"] => [1, "5.1"],
     ["lib/dot_popper/monetization/continuity/license.rb", "DotPopper::ReleaseEngineering::Build"] => [1, "6.2"]
   }.freeze
 

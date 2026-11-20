@@ -29,13 +29,12 @@ class LicenseTest < Minitest::Test
     watch.verdict
   end
 
-  # The keys a build trusts, by its channel alone: setdef's in a save file
-  # build, the test keys in a test build (ADR-0010).
-  def test_a_build_trusts_setdefs_keys_by_its_channel_alone
-    assert_same C::TEST_PINS, C.pins_for(nil)
-    DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES.each { assert_same C::PINNED, C.pins_for(it), it }
-    refute @key.valid?(C.pins_for(DotPopper::ReleaseEngineering::Build::WEBSITE))
-    assert @key.valid?(C.pins_for(nil))
+  # A key signed by a test key verifies against the test keys and never
+  # against setdef's (which pins a build trusts is the composition root's
+  # choice, test/composition/root_test.rb).
+  def test_a_test_signed_key_verifies_only_against_the_test_keys
+    refute @key.valid?(C::PINNED)
+    assert @key.valid?(C::TEST_PINS)
   end
 
   # An app store's build never reads license.txt, so a key left on disk

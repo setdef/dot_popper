@@ -39,6 +39,15 @@ module DotPopper
         end
       end
       prepend TestBuildParts
+
+      # What a test build trusts in place of a build for sale's (Root.pins,
+      # Root.receipt_trust): the test keys, and only the fake store's
+      # receipts; with a channel, the shared answer.
+      module TestBuildTrust
+        def pins(settings) = settings.store_build? ? super : Monetization::Continuity::TEST_PINS
+        def receipt_trust(settings) = settings.store_build? ? super : Monetization::Receipt::TEST
+      end
+      singleton_class.prepend(TestBuildTrust)
     end
   end
 end

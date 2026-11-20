@@ -41,7 +41,7 @@ class BuildForSaleTest < Minitest::Test
     c = DotPopper::Monetization::Continuity
     answers = { "channel" => DotPopper::ReleaseEngineering::Build::CHANNEL, "parts" => DotPopper::ReleaseEngineering::Build::PARTS,
                 "part loaded" => $LOADED_FEATURES.grep(%r{/test_build/}),
-                "pins are setdef's" => c.pins_for(DotPopper::ReleaseEngineering::Build::CHANNEL).equal?(c::PINNED) && c::PINNED == c::SETDEF_PINS,
+                "pins are setdef's" => DotPopper::Composition::Root.pins(DotPopper::Composition::DeveloperSettings.new).equal?(c::PINNED) && c::PINNED == c::SETDEF_PINS,
                 "builds" => [] }
     #{SYSTEMS.inspect}.product({ "no setting" => {}, "every setting" => JSON.parse(every) }.to_a).each do |system, (label, env)|
       engine = FakeEngine.new(system)

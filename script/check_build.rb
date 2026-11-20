@@ -91,6 +91,10 @@ check.call("every file of the game's code loaded is the app's own") { ours.any? 
 
 build = DotPopper::ReleaseEngineering::Build
 c = DotPopper::Monetization::Continuity
+# What the app's own composition root chooses for a build of its channel,
+# with no developer setting.
+root = DotPopper::Composition::Root
+settings = DotPopper::Composition::DeveloperSettings.new({})
 check.call("it holds nothing a #{channel} build leaves out, and is stamped for it (script/channel_contents.rb check)") do
   contents.lines.grep(/^FAIL /).each { warn "  #{it.chomp}" }
   contents_held
@@ -102,7 +106,7 @@ end
 check.call("#{channel.inspect} is a channel the game names (#{build::CHANNEL_NAMES.join(", ")})") { build::CHANNEL_NAMES.include?(channel) }
 check.call("the app was built for #{channel.inspect} (Build::CHANNEL is #{build::CHANNEL.inspect})") { build::CHANNEL == channel }
 
-pins = c.pins_for(build::CHANNEL)
+pins = root.pins(settings)
 hex = ->(bytes) { bytes.unpack1("H*") }
 check.call("it trusts setdef's own keys (Continuity::SETDEF_PINS)") { pins.equal?(c::PINNED) && c::PINNED == c::SETDEF_PINS && c.live?(pins) }
 check.call("it trusts no test key") do
@@ -119,7 +123,7 @@ check.call("it takes no proof certified by the test root") do
   c::Certificate.verified([proofs.fetch("certificate")].pack("H*"), roots: pins.roots, purpose: c::Certificate::PROOF).nil?
 end
 check.call("the fake store's receipt proves nothing in it") do
-  !DotPopper::Monetization::Entitlement.new(trust: DotPopper::Monetization::Receipt.trusted(build::CHANNEL)).verify_receipt(proofs.fetch("receipt"))
+  !DotPopper::Monetization::Entitlement.new(trust: root.receipt_trust(settings)).verify_receipt(proofs.fetch("receipt"))
 end
 check.call("no setting grants Pro or changes the server in it") do
   env = build.settings({ "DOT_POPPER_PRO" => "1", "DOT_POPPER_SERVER" => "http://localhost:1" })

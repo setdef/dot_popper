@@ -59,6 +59,20 @@ module DotPopper
         build
       end
 
+      # The keys a build with +settings+ (DeveloperSettings) trusts, by its
+      # channel alone and never by anything set at run time (ADR-0010):
+      # setdef's own. script/check_build.rb asks this of each build for
+      # sale. A part (Build::PARTS) answers for its own builds.
+      def self.pins(_settings) = Monetization::Continuity::PINNED
+
+      # Whose receipts it trusts, by its channel alone (ADR-0010): in the
+      # Microsoft Store's build Windows' word, which comes only down the
+      # store helper's pipe; in any other the signed receipts of Apple and
+      # Google.
+      def self.receipt_trust(settings)
+        settings.channel == ReleaseEngineering::Build::MICROSOFT_STORE ? Monetization::Receipt::MICROSOFT_STORE : Monetization::Receipt::STORES
+      end
+
       # Starts what reaches past this process: the first request for theme
       # releases, the store's first question, and the watch for setdef.
       # Only the first and the friend groups' are asked again (Refresh);
@@ -143,13 +157,14 @@ module DotPopper
         achievements = Gameplay::Achievements.new(file("achievements.txt"))
         stats_backup = Gameplay::StatsBackup.new(score_record: @game_flow.score_record, saved_stats:, achievements:, folder: ->(name) { file(name) })
         @gone = Monetization::Continuity::Gone.new(file("setdef.txt"))
-        # What this build trusts, and where it keeps a license key, as
-        # Monetization decides by the channel alone (ADR-0010).
+        # What this build trusts, and where it keeps a license key, by the
+        # channel alone (ADR-0010).
         channel = settings.channel
-        pins = Monetization::Continuity.pins_for(channel)
+        pins = self.class.pins(settings)
         license = Monetization::Continuity::License.new(Monetization::Continuity::License.kept_in(channel) { file("license.txt") }, pins:)
         @watch = watch_for(license, pins)
-        @entitlement = Monetization::Entitlement.new(forced: Monetization::Entitlement.forced?(settings.env, platform:), license:, trust: Monetization::Receipt.trusted(channel))
+        @entitlement = Monetization::Entitlement.new(forced: Monetization::Entitlement.forced?(settings.env, platform:), license:,
+                                                     trust: self.class.receipt_trust(settings))
         clipboard = @engine.clipboard
         @server_choice = Gameplay::ServerChoice.new(file("server.txt"), gone: @gone.gone?, clipboard:)
         saved_themes = Gameplay::SavedThemes.new(file("themes.txt"))

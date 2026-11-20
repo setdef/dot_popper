@@ -57,13 +57,6 @@ module DotPopper
         signature = OpenSSL::PKey.read(key).sign("SHA1", json)
         "play:#{[json].pack("m0")}:#{[signature].pack("m0")}"
       end
-
-      # A test build (no channel) trusts only the fake store's receipts; a
-      # build for sale, its store's (Receipt.trusted).
-      module TrustOfTestBuild
-        def trusted(channel) = ReleaseEngineering::Build.store?(channel) ? super : TEST
-      end
-      singleton_class.prepend(TrustOfTestBuild)
     end
   end
 end

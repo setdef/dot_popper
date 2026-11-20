@@ -27,12 +27,6 @@ module DotPopper
       # What a build for sale trusts: setdef's real keys.
       PINNED = SETDEF_PINS
 
-      # The keys a build for +channel+ (Build::CHANNEL) trusts, by the
-      # channel alone and never by anything set at run time (ADR-0010):
-      # setdef's in a build for sale. script/check_build.rb asks this of
-      # each.
-      def self.pins_for(_channel) = PINNED
-
       # Whether +pins+ are setdef's real keys, so the server may be asked.
       def self.live?(pins = PINNED) = pins.equal?(SETDEF_PINS)
     end
