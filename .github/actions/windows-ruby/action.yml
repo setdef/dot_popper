@@ -6,7 +6,7 @@
 # MSYS2, for building gems' native extensions. It takes the place of
 # setup-ruby's own Ruby, whose head is whatever RubyInstaller built last,
 # as Lota's own Windows jobs do (Lota's .github/actions/windows-ruby at
-# v0.5.2). Call it after ruby/setup-ruby with ruby-version head and
+# v0.5.5). Call it after ruby/setup-ruby with ruby-version head and
 # windows-toolchain default, which installs that MSYS2.
 name: Set up the pinned Windows Ruby
 description: The Windows Ruby mise.toml pins, checked by its SHA-256, first on the PATH

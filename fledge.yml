@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/setdef/Fledge/b18c1859b3a23f9bb3dae67e4e4739abd827cd2b/lib/fledge/config.schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/setdef/Fledge/285ce4b2053b2b14d3787b33afcd83736980d0a0/lib/fledge/config.schema.json
 
 # How `bundle exec fledge build` packages Dot Popper (PACKAGING.md). The
 # program is bin/dot_popper, which starts the game in this folder as a

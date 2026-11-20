@@ -50,12 +50,12 @@ The game finds the server through `Network::Server`: every build uses `SERVER_UR
 
 | You develop on | Lota's gem in `vendor/cache` |
 | --- | --- |
-| macOS 14 or newer on Apple silicon | `lota-0.5.2-arm64-darwin.gem` |
-| Windows on x64, with [RubyInstaller](https://rubyinstaller.org/)'s head build that `mise.toml` pins | `lota-0.5.2-x64-mingw-ucrt.gem` |
-| Linux on x86_64 with glibc, and an X11 or Wayland desktop with OpenGL | `lota-0.5.2-x86_64-linux-gnu.gem` |
+| macOS 14 or newer on Apple silicon | `lota-0.5.5-arm64-darwin.gem` |
+| Windows on x64, with [RubyInstaller](https://rubyinstaller.org/)'s head build that `mise.toml` pins | `lota-0.5.5-x64-mingw-ucrt.gem` |
+| Linux on x86_64 with glibc, and an X11 or Wayland desktop with OpenGL | `lota-0.5.5-x86_64-linux-gnu.gem` |
 
 - Dot Popper needs Ruby 4.1, which Lota 0.5 needs and which is not released yet: on macOS and Linux the preview `.ruby-version` and `mise.toml` name, 4.1.0-preview1, and on Windows, where RubyInstaller publishes no preview, RubyInstaller's head build of 2026-11-10 that `mise.toml` pins (Lota's Windows gems are built on it). The Gemfile refuses any other Ruby.
-- Bundler installs Lota 0.5.2 from `vendor/cache`, and [Fledge](https://github.com/setdef/Fledge) v0.12.0 from its Git tag. Fledge is in the `development` group, so it stays out of the app.
+- Bundler installs Lota 0.5.5 from `vendor/cache`, and [Fledge](https://github.com/setdef/Fledge) v0.14.0 from its Git tag. Fledge is in the `development` group, which `lota fuse` leaves out of the desktop apps. The phone apps carry it: Fledge 0.13 and later ship every group `bundle exec` sets up, and leaving the group out would leave Fledge out of `bundle exec fledge` too (Lota's phone guide).
 - Other systems, such as Intel Macs, Linux on ARM, and Linux with musl, have no Lota gem in `vendor/cache`.
 
 ## Getting started
@@ -131,7 +131,7 @@ No type error detected. 🫖
 `lota fuse` builds the app for the computer it runs on. It runs Lota's gem from outside the bundle, so install that gem into your Ruby first, from `vendor/cache`:
 
 ```console
-$ gem install --local vendor/cache/lota-0.5.2-arm64-darwin.gem
+$ gem install --local vendor/cache/lota-0.5.5-arm64-darwin.gem
 $ lota fuse . --identifier com.setdef.DotPopper --app-version 0.9.9 --icon icons/icon
 dist/Dot Popper-arm64-darwin.tar.gz
 dist/Dot Popper-arm64-darwin.dmg

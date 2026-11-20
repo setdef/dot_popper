@@ -1,8 +1,8 @@
 # Builds Dot Popper's EXPERIMENTAL Android kit (PACKAGING.md, "The Android
 # kit"), for a phone such as a OnePlus Nord N30 5G (Android 13,
-# arm64-v8a), by the route of Lota's doc/guide/phones.md at v0.5.2:
+# arm64-v8a), by the route of Lota's doc/guide/phones.md at v0.5.5:
 #
-# 1. rake android:deps, in a clone of Lota at v0.5.2, builds LÖVE's
+# 1. rake android:deps, in a clone of Lota at v0.5.5, builds LÖVE's
 #    libraries and SDL3 for arm64-v8a and x86_64 with NDK r30, OpenAL Soft
 #    as a shared libopenal.so and SDL3 as libSDL3.so;
 # 2. the files Lota's gem packages, built and unpacked from the clone,
@@ -13,7 +13,7 @@
 #    and Lota's Android host from the gem in host/android, with Dot
 #    Popper's changed files (android/host) over it, Play Billing's Gradle
 #    settings among them;
-# 4. fledge build android (Fledge v0.12.0) writes the Gradle project, and
+# 4. fledge build android (Fledge v0.14.0) writes the Gradle project, and
 #    Gradle builds the debug APK and the release App Bundle.
 #
 # A second job installs the kit's APK on an x86_64 emulator of API 33
@@ -44,7 +44,7 @@ on:
       lota_ref:
         description: "A Lota tag or commit (full SHA) to build from, to try an engine fix"
         required: false
-        default: "v0.5.2"
+        default: "v0.5.5"
 
 permissions:
   contents: read
@@ -59,9 +59,9 @@ defaults:
 
 env:
   LOTA_REPOSITORY: https://github.com/setdef/Lota.git
-  LOTA_REF: ${{ inputs.lota_ref || 'v0.5.2' }}
+  LOTA_REF: ${{ inputs.lota_ref || 'v0.5.5' }}
   NDK_REVISION: 30.0.16248370
-  FLEDGE_TAG: v0.12.0
+  FLEDGE_TAG: v0.14.0
   IDENTIFIER: com.setdef.DotPopper
   APP_NAME: Dot Popper
 
