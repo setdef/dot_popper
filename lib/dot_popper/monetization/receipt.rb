@@ -36,6 +36,11 @@ module DotPopper
       APP_ID = "com.setdef.DotPopper"
       PRODUCT_ID = "com.setdef.dotpopper.pro"
 
+      # What a build sold through no store trusts: no receipt at all (the
+      # website's, whose copies prove Pro by license key). Each store's own
+      # is beside its check (APPLE, PLAY, MICROSOFT_STORE).
+      NONE = Trust.new(apple_roots: [].freeze, play_keys: [].freeze, app_id: APP_ID, product_id: PRODUCT_ID, windows_license: false)
+
       # Whether +text+ is a receipt for Pro that +trust+ accepts.
       def self.valid?(text, trust)
         store, rest = text.to_s.strip.split(":", 2)
@@ -59,4 +64,4 @@ end
 
 # Apple's and Play's checks and the test key need OpenSSL and JSON, and
 # are left out of the rules' type check (Steepfile).
-%w[apple play microsoft pins].each { require_relative "receipt/#{it}" }
+%w[apple play microsoft].each { require_relative "receipt/#{it}" }

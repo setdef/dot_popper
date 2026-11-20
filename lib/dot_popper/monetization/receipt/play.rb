@@ -26,6 +26,17 @@ module DotPopper
           false
         end
       end
+
+      # The app's public key from the Play Console (Monetize, Monetization
+      # setup, Licensing), Base64 as the Console shows it. Empty until the
+      # maintainer pins it, so until then no Google Play purchase verifies;
+      # script/check_build.rb fails a Google Play build while it is.
+      PLAY_KEYS = [].freeze
+
+      # What the Google Play build trusts: purchases signed by the app's
+      # Play key once pinned, and nothing else.
+      PLAY = Trust.new(apple_roots: [].freeze, play_keys: PLAY_KEYS.map { it.unpack1("m") }.freeze, app_id: APP_ID,
+                       product_id: PRODUCT_ID, windows_license: false)
     end
   end
 end

@@ -18,7 +18,7 @@ class ReceiptTest < Minitest::Test
     receipt = Receipt.issue
 
     assert Receipt.valid?(receipt, TEST)
-    refute Receipt.valid?(receipt, Receipt::STORES)
+    [Receipt::NONE, Receipt::APPLE, Receipt::PLAY, Receipt::MICROSOFT_STORE].each { refute Receipt.valid?(receipt, it) }
   end
 
   def test_an_edited_play_purchase_does_not_verify
@@ -51,8 +51,7 @@ class ReceiptTest < Minitest::Test
     word = "microsoft:#{Receipt::PRODUCT_ID}:9NBLGGH4R315/000N"
 
     assert Receipt.valid?(word, Receipt::MICROSOFT_STORE)
-    refute Receipt.valid?(word, Receipt::STORES)
-    refute Receipt.valid?(word, TEST)
+    [Receipt::NONE, Receipt::APPLE, Receipt::PLAY, TEST].each { refute Receipt.valid?(word, it) }
   end
 
   def test_windows_word_for_another_add_on_or_no_sku_proves_nothing
@@ -73,8 +72,7 @@ class ReceiptTest < Minitest::Test
   end
 
   def test_a_transaction_chained_to_any_root_but_apples_proves_nothing_in_a_store_build
-    refute Receipt.valid?(apple, Receipt::STORES)
-    refute Receipt.valid?(apple, TEST)
+    [Receipt::NONE, Receipt::APPLE, Receipt::PLAY, TEST].each { refute Receipt.valid?(apple, it) }
   end
 
   def test_an_edited_transaction_does_not_verify

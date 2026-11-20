@@ -31,6 +31,11 @@ module DotPopper
           token == trust.product_id && SKU.match?(sku.to_s)
         end
       end
+
+      # What the Microsoft Store build trusts: Windows' word for its license,
+      # and nothing that is signed, since no other store sells that build.
+      MICROSOFT_STORE = Trust.new(apple_roots: [].freeze, play_keys: [].freeze, app_id: APP_ID, product_id: PRODUCT_ID,
+                                  windows_license: true)
     end
   end
 end

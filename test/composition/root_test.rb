@@ -166,8 +166,9 @@ class RootTest < Minitest::Test
   # The keys and receipts a build trusts, by its channel alone and never
   # by anything set at run time (ADR-0010): in a test build the test keys
   # and the fake store's receipts; in a build for sale setdef's own keys,
-  # and Windows' word in the Microsoft Store's build or else the signed
-  # receipts of Apple and Google.
+  # and only its own store's receipts: Apple's in the App Store's and the
+  # Mac App Store's, Google's in Google Play's, Windows' word in the
+  # Microsoft Store's, and none in the website's.
   def test_a_build_trusts_keys_and_receipts_by_its_channel_alone
     trust = ->(channel) { DotPopper::Composition::DeveloperSettings.new(SETTINGS, channel:) }
 
@@ -175,7 +176,8 @@ class RootTest < Minitest::Test
     assert_same DotPopper::Monetization::Receipt::TEST, Root.receipt_trust(trust.(nil))
     B::CHANNEL_NAMES.each do |channel|
       assert_same C::PINNED, Root.pins(trust.(channel)), channel
-      wanted = channel == B::MICROSOFT_STORE ? :MICROSOFT_STORE : :STORES
+      wanted = { B::APP_STORE => :APPLE, B::MAC_APP_STORE => :APPLE, B::GOOGLE_PLAY => :PLAY, B::MICROSOFT_STORE => :MICROSOFT_STORE,
+                 B::WEBSITE => :NONE }.fetch(channel)
       assert_same DotPopper::Monetization::Receipt.const_get(wanted), Root.receipt_trust(trust.(channel)), channel
     end
   end

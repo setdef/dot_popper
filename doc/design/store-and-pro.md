@@ -159,7 +159,11 @@ A `Receipt::Trust` holds the Apple roots, the Play keys, the app's ID, the produ
 | --- | --- | --- |
 | test build | `Receipt::TEST` | only Play-form receipts signed by `Receipt::TestKey` |
 | `microsoft-store` | `Receipt::MICROSOFT_STORE` | only Windows' word, which reaches this build only down the helper's pipe, never from a file |
-| any other store build | `Receipt::STORES` | Apple's root, and the Play keys once pinned |
+| `app-store`, `mac-app-store` | `Receipt::APPLE` | only StoreKit's transactions chained to Apple's root |
+| `google-play` | `Receipt::PLAY` | only purchases signed by the app's Play key, once pinned |
+| `website` | `Receipt::NONE` | no receipt: its copies prove Pro by license key |
+
+Each build for sale trusts only its own store's receipts, so the other stores' receipt code is unused in it and can leave it (coding agents decided this on 20 November, as the technical half of the rule that a build for sale carries only its own channel's code; until then every build for sale but the Microsoft Store's trusted both Apple's and Google's). No `website` build is made for iOS, where its store would be the native port with no receipt it trusts.
 
 `Receipt::TestKey` is a throwaway RSA key whose private half ships on purpose, as `Continuity::TestKeys` do. A test receipt proves nothing in a store build, and an edited `store_answer.txt` or ledger proves nothing anywhere (both tested). On Windows, replacing `dot-popper-store.exe` in the package's read-only install folder would grant Pro; that is changing the app's code, which the maintainer accepts as inevitable.
 

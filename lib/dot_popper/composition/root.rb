@@ -65,13 +65,19 @@ module DotPopper
       # sale. A part (Build::PARTS) answers for its own builds.
       def self.pins(_settings) = Monetization::Continuity::PINNED
 
-      # Whose receipts it trusts, by its channel alone (ADR-0010): in the
-      # Microsoft Store's build Windows' word, which comes only down the
-      # store helper's pipe; in any other the signed receipts of Apple and
-      # Google.
-      def self.receipt_trust(settings)
-        settings.channel == ReleaseEngineering::Build::MICROSOFT_STORE ? Monetization::Receipt::MICROSOFT_STORE : Monetization::Receipt::STORES
-      end
+      # Whose receipts it trusts, by its channel alone (ADR-0010): only its
+      # own store's. The App Store's and the Mac App Store's build Apple's,
+      # the Google Play build Google's, the Microsoft Store's Windows' word,
+      # which comes only down the store helper's pipe, and the website's,
+      # which sells through no store, none.
+      def self.receipt_trust(settings) = RECEIPTS.fetch(settings.channel, Monetization::Receipt::NONE)
+
+      RECEIPTS = {
+        ReleaseEngineering::Build::APP_STORE => Monetization::Receipt::APPLE,
+        ReleaseEngineering::Build::MAC_APP_STORE => Monetization::Receipt::APPLE,
+        ReleaseEngineering::Build::GOOGLE_PLAY => Monetization::Receipt::PLAY,
+        ReleaseEngineering::Build::MICROSOFT_STORE => Monetization::Receipt::MICROSOFT_STORE
+      }.freeze
 
       # Whether this build's copy on +platform+ is Pro without a purchase
       # (Entitlement.forced?), which no setting decides in a build for sale.

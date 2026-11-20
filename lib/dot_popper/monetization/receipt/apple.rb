@@ -56,6 +56,29 @@ module DotPopper
           OpenSSL::ASN1::Sequence.new([raw[0, 32], raw[32, 32]].map { OpenSSL::ASN1::Integer.new(OpenSSL::BN.new(it.to_s, 2)) }).to_der
         end
       end
+
+      # Apple Root CA - G3, from https://www.apple.com/certificateauthority/
+      # (SHA-256 63343ABF B89A6A03 EBB57E9B 3F5FA7BE 7C4F5C75 6F3017B3
+      # A8C488C3 653E9179), which certifies StoreKit 2's signed transactions.
+      APPLE_ROOT_G3 = <<~BASE64.unpack1("m").freeze
+        MIICQzCCAcmgAwIBAgIILcX8iNLFS5UwCgYIKoZIzj0EAwMwZzEbMBkGA1UEAwwSQXBwbGUgUm9v
+        dCBDQSAtIEczMSYwJAYDVQQLDB1BcHBsZSBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTETMBEGA1UE
+        CgwKQXBwbGUgSW5jLjELMAkGA1UEBhMCVVMwHhcNMTQwNDMwMTgxOTA2WhcNMzkwNDMwMTgxOTA2
+        WjBnMRswGQYDVQQDDBJBcHBsZSBSb290IENBIC0gRzMxJjAkBgNVBAsMHUFwcGxlIENlcnRpZmlj
+        YXRpb24gQXV0aG9yaXR5MRMwEQYDVQQKDApBcHBsZSBJbmMuMQswCQYDVQQGEwJVUzB2MBAGByqG
+        SM49AgEGBSuBBAAiA2IABJjpLz1AcqTtkyJygRMc3RCV8cWjTnHcFBbZDuWmBSp3ZHtfTjjTuxxE
+        tX/1H7YyYl3J6YRbTzBPEVoA/VhYDKX1DyxNB0cTddqXl5dvMVztK517IDvYuVTZXpmkOlEKMaNC
+        MEAwHQYDVR0OBBYEFLuw3qFYM4iapIqZ3r6966/ayySrMA8GA1UdEwEB/wQFMAMBAf8wDgYDVR0P
+        AQH/BAQDAgEGMAoGCCqGSM49BAMDA2gAMGUCMQCD6cHEFl4aXTQY2e3v9GwOAEZLuN+yRhHFD/3m
+        eoyhpmvOwgPUnPWTxnS4at+qIxUCMG1mihDK1A3UT82NQz60imOlM27jbdoXt2QfyFMm+YhidDkL
+        F1vLUagM6BgD56KyKA==
+      BASE64
+
+      # What a build sold through Apple's stores trusts (the App Store's and
+      # the Mac App Store's): StoreKit 2's transactions chained to Apple's
+      # root, and nothing else.
+      APPLE = Trust.new(apple_roots: [APPLE_ROOT_G3].freeze, play_keys: [].freeze, app_id: APP_ID, product_id: PRODUCT_ID,
+                        windows_license: false)
     end
   end
 end

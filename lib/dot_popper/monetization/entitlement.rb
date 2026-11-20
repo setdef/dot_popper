@@ -34,9 +34,9 @@ module DotPopper
 
       # +license+ (Continuity::License, or anything that answers pro?) is a
       # website copy's. +trust+ (Receipt::Trust) is whose receipts this build
-      # accepts: the stores' in a store build, the fake store's in a test
-      # build.
-      def initialize(forced: false, license: nil, trust: Receipt::STORES)
+      # accepts, as the composition root chooses it: its own store's, and
+      # none by default.
+      def initialize(forced: false, license: nil, trust: Receipt::NONE)
         @forced = forced
         @license = license
         @trust = trust
