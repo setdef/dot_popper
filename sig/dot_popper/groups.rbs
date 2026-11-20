@@ -383,8 +383,6 @@ module DotPopper
 
       USUAL_WAIT: Integer
 
-      HIGHEST_SCORE: Integer
-
       NO_WORKER: NoWorker
 
       @store: ScoreRecord::_Store

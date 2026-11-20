@@ -23,8 +23,6 @@ module DotPopper
     # history is fetched whenever a group's title looks different from when
     # it was last read.
     class Session
-      # The highest score the server takes (the Outbox's).
-      HIGHEST_SCORE = Outbox::HIGHEST_SCORE
       # The longest a Retry-After is believed, in seconds, and how long to
       # wait when a 429 names no time.
       LONGEST_RETRY_WAIT = 3_600
