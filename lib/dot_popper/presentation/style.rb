@@ -24,7 +24,7 @@ module DotPopper
       )
 
       # Every theme's art and sound, the ordinary one first, in the order
-      # of DotPopper::Theme::ALL, which says which a player has. Each is
+      # of DotPopper::Gameplay::Theme::ALL, which says which a player has. Each is
       # its own file in presentation/themes/. Every one keeps a bright dot
       # light against a dark popped one, by shape and lightness, not hue
       # alone.

@@ -143,7 +143,7 @@ class BuildForSaleTest < Minitest::Test
   def test_a_build_for_sale_releases_no_theme_and_uses_the_ordinary_one
     each_build do |_, built, where|
       assert_equal "", built["themes.txt"], where
-      assert_equal DotPopper::Theme::ORDINARY.to_s, built["theme"], where
+      assert_equal DotPopper::Gameplay::Theme::ORDINARY.to_s, built["theme"], where
     end
   end
 

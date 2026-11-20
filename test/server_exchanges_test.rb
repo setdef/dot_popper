@@ -78,7 +78,7 @@ class ServerExchangesTest < Minitest::Test
     values = RECORD.fetch("values")
 
     assert_empty DotPopper::Gameplay::Achievement::IDS.map(&:to_s).grep_v(Regexp.new(values.fetch("achievement_key_format")))
-    assert_empty DotPopper::Theme::ALL.map { it.key.to_s }.grep_v(Regexp.new(values.fetch("theme_key_format")))
+    assert_empty DotPopper::Gameplay::Theme::ALL.map { it.key.to_s }.grep_v(Regexp.new(values.fetch("theme_key_format")))
   end
 
   # The server accepts the privacy document a release publishes only in
@@ -207,7 +207,7 @@ class ServerExchangesTest < Minitest::Test
     asking = exchange("the themes a player who started on a date has")
     started_on = asking.dig("request", "path")[/started_on=([\d-]+)/, 1]
     saved_themes = SavedThemes.new
-    theme_releases = DotPopper::ThemeReleases.new(worker: InlineWorker.new(Network::Link.new(@url)), saved_themes:,
+    theme_releases = DotPopper::Gameplay::ThemeReleases.new(worker: InlineWorker.new(Network::Link.new(@url)), saved_themes:,
                                         file: DotPopper::Gameplay::ScoreRecord::Memory.new, now: -> { Time.utc(*started_on.split("-").map(&:to_i), 12) })
     theme_releases.ask
     theme_releases.update

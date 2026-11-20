@@ -151,7 +151,7 @@ module DotPopper
         @entitlement = Entitlement.new(forced: Entitlement.forced?(settings.env, platform:), license:, trust: Receipt.trusted(channel))
         clipboard = @engine.clipboard
         @server_choice = ServerChoice.new(file("server.txt"), gone: @gone, clipboard:)
-        saved_themes = SavedThemes.new(file("themes.txt"))
+        saved_themes = Gameplay::SavedThemes.new(file("themes.txt"))
         use_theme = UseCases::UseTheme.new(saved_themes:, entitlement:)
         use_fixture(saved_themes, use_theme)
         saved_themes.open_by_date(today.call, @gone.days(today.call))
@@ -251,7 +251,7 @@ module DotPopper
       # server.
       def theme_releases_for(saved_themes)
         url = server_url or return
-        ThemeReleases.new(worker: Network::Worker.new(Network::Link.new(url)), saved_themes:,
+        Gameplay::ThemeReleases.new(worker: Network::Worker.new(Network::Link.new(url)), saved_themes:,
                           file: file("started_on.txt"), now: settings.utc_now)
       end
     end

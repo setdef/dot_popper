@@ -138,7 +138,7 @@ class RedesignTest < Minitest::Test
     entitlement = DotPopper::Entitlement.test
     game_flow = DotPopper::Gameplay::GameFlow.new(field(1200, 800), random: Random.new(2))
     s = new_show(game_flow:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, entitlement:, store:,
-                 saved_themes: DotPopper::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new))
+                 saved_themes: DotPopper::Gameplay::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new))
     s.open_themes
     s.use(s.themes.last)
     assert s.offer?

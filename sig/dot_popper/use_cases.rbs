@@ -113,24 +113,24 @@ module DotPopper
     end
 
     class UseTheme
-      @saved_themes: SavedThemes
+      @saved_themes: Gameplay::SavedThemes
       @entitlement: Entitlement
 
-      attr_reader current: theme_key
+      attr_reader current: Gameplay::theme_key
 
-      def initialize: (saved_themes: SavedThemes, entitlement: Entitlement) -> void
+      def initialize: (saved_themes: Gameplay::SavedThemes, entitlement: Entitlement) -> void
 
-      def choice: (theme_key? key) -> (:use | :same | :offer)
+      def choice: (Gameplay::theme_key? key) -> (:use | :same | :offer)
 
-      def call: (theme_key key) -> (:offer | :same | :used)
+      def call: (Gameplay::theme_key key) -> (:offer | :same | :used)
 
-      def refresh: () -> theme_key
+      def refresh: () -> Gameplay::theme_key
 
       private
 
       def locked?: () -> bool
 
-      def same?: (theme_key key) -> bool
+      def same?: (Gameplay::theme_key key) -> bool
     end
 
     # What a friend group's Join and Create ask of Groups::Session.

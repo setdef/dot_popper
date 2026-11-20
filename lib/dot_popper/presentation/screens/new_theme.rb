@@ -7,7 +7,7 @@ module DotPopper
       # its switch, and Not now. It waits for its answer, so nothing of
       # Home's under it takes a press.
       class NewTheme < Screen
-        # +saved_themes+ (DotPopper::SavedThemes) remembers it was told; +use_theme+
+        # +saved_themes+ (DotPopper::Gameplay::SavedThemes) remembers it was told; +use_theme+
         # (UseCases::UseTheme) says what its switch leads to (#choice) and
         # uses it, or for a Free player leads to Pro.
         def initialize(show, saved_themes:, use_theme:)

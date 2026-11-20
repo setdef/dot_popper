@@ -7,14 +7,14 @@ require "test_helper"
 # has been gone long enough, once its date has passed.
 class SavedThemesTest < Minitest::Test
   Memory = DotPopper::Gameplay::ScoreRecord::Memory
-  Theme = DotPopper::Theme
+  Theme = DotPopper::Gameplay::Theme
   Continuity = DotPopper::Continuity
 
   def setup
     @file = Memory.new
   end
 
-  def saved_themes = DotPopper::SavedThemes.new(@file)
+  def saved_themes = DotPopper::Gameplay::SavedThemes.new(@file)
 
   def test_the_ordinary_theme_comes_first_and_every_key_is_its_own
     assert_predicate Theme::ALL.first, :ordinary?

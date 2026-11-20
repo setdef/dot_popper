@@ -85,10 +85,10 @@ class UseThemeTest < Minitest::Test
   def test_with_the_games_themes_a_choice_lasts_and_a_removed_one_gives_way
     file = DotPopper::Gameplay::ScoreRecord::Memory.new("unlocked: ghost jingle_bell\ntold: ghost\nchosen: jingle_bell\n")
     pro = DotPopper::Entitlement.new(forced: true)
-    theme = DotPopper::UseCases::UseTheme.new(saved_themes: DotPopper::SavedThemes.new(file), entitlement: pro)
+    theme = DotPopper::UseCases::UseTheme.new(saved_themes: DotPopper::Gameplay::SavedThemes.new(file), entitlement: pro)
 
     assert_equal :classic, theme.current
     assert_equal :used, theme.call(:ghost)
-    assert_equal :ghost, DotPopper::UseCases::UseTheme.new(saved_themes: DotPopper::SavedThemes.new(file), entitlement: pro).current
+    assert_equal :ghost, DotPopper::UseCases::UseTheme.new(saved_themes: DotPopper::Gameplay::SavedThemes.new(file), entitlement: pro).current
   end
 end

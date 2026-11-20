@@ -752,7 +752,7 @@ class ShowTest < Minitest::Test
     entitlement = DotPopper::Entitlement.free
     saved_stats = DotPopper::Gameplay::SavedStats.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     achievements = DotPopper::Gameplay::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
-    saved_themes = DotPopper::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
+    saved_themes = DotPopper::Gameplay::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     groups = DotPopper::Groups::Session.off
     use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: DotPopper::FreeGames.unlimited, entitlement:, store: DotPopper::NoStore.new,
                                                  achievements:, saved_stats:, friend_groups: groups, starter: DotPopperTest.starter_of(game_flow))

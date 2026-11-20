@@ -15,7 +15,7 @@ class ThemesTest < Minitest::Test
   def show(pro:, released: [])
     @pro = true if pro
     entitlement = DotPopper::Entitlement.new(forced: @pro)
-    @saved_themes = DotPopper::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
+    @saved_themes = DotPopper::Gameplay::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     @saved_themes.release(released)
     @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::Gameplay::ScoreRecord.new(DotPopper::Gameplay::ScoreRecord::Memory.new))
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, entitlement:, saved_themes: @saved_themes,
@@ -74,7 +74,7 @@ class ThemesTest < Minitest::Test
     pro = false
     entitlement = DotPopper::Entitlement.free
     entitlement.define_singleton_method(:pro?) { pro }
-    @saved_themes = DotPopper::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
+    @saved_themes = DotPopper::Gameplay::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     @saved_themes.release(["ghost"])
     @saved_themes.told(:ghost)
     @saved_themes.use(:ghost)

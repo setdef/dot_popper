@@ -18,11 +18,11 @@ class ThemeTest < Minitest::Test
     THEMES.each { assert_predicate it, :frozen? }
   end
 
-  # Every theme the rules know (DotPopper::Theme::ALL) has its art here,
+  # Every theme the rules know (DotPopper::Gameplay::Theme::ALL) has its art here,
   # in the same order, the ordinary one without, and nothing else has.
   def test_every_theme_the_rules_know_has_its_art_in_the_same_order
-    assert_equal DotPopper::Theme::ALL.map(&:key), THEMES.map(&:key)
-    assert_equal DotPopper::Theme::ALL.map(&:ordinary?), THEMES.map(&:ordinary?)
+    assert_equal DotPopper::Gameplay::Theme::ALL.map(&:key), THEMES.map(&:key)
+    assert_equal DotPopper::Gameplay::Theme::ALL.map(&:ordinary?), THEMES.map(&:ordinary?)
   end
 
   def test_every_style_is_named_in_words

@@ -367,7 +367,7 @@ class RootTest < Minitest::Test
     saved_stats = DotPopper::Gameplay::SavedStats.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     achievements = DotPopper::Gameplay::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     groups = DotPopper::Groups::Session.off
-    saved_themes = DotPopper::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
+    saved_themes = DotPopper::Gameplay::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: DotPopper::FreeGames.unlimited, entitlement:, store: NoStore.new,
                                                  achievements:, saved_stats:, friend_groups: groups)
     heard = -> { [game_flow, entitlement, use_cases[:finish_game]].map { it.instance_variable_get(:@listeners).size } }
@@ -402,7 +402,7 @@ class RootTest < Minitest::Test
       assert_instance_of DotPopper::Gameplay::GameFlow::Home, game.game_flow.state, saved
       assert_equal in_use, game.context.theme.key, saved
       assert_equal in_use, game.sound_player.theme.key, saved
-      assert_equal %i[classic ghost], DotPopper::SavedThemes.new(engine.file("themes.txt")).choices, saved
+      assert_equal %i[classic ghost], DotPopper::Gameplay::SavedThemes.new(engine.file("themes.txt")).choices, saved
     end
   end
 

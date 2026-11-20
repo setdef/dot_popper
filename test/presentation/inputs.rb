@@ -116,7 +116,7 @@ module Inputs
                     end
       @games = DotPopper::FreeGames.new(Memory.new, today: -> { @day }, entitlement:, metered: store.offered?, first_games: [games_left - 3, 0].max)
       (3 - games_left.clamp(0, 3)).times { games.spend! }
-      saved_themes = DotPopper::SavedThemes.new(Memory.new)
+      saved_themes = DotPopper::Gameplay::SavedThemes.new(Memory.new)
       saved_themes.release(THEMES.map(&:to_s))
       (new_theme ? saved_themes.choices[0...-1] : saved_themes.choices).each { saved_themes.told(it) }
       book = DotPopper::Gameplay::SavedStats.new(Memory.new, today: -> { @day })

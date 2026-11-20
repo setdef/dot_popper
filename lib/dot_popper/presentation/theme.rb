@@ -17,11 +17,11 @@ module DotPopper
     end
 
     # A theme's art and sound for the whole game: its +key+ (the theme it
-    # draws, DotPopper::Theme), its +palette+, and its +art+. The ordinary
+    # draws, DotPopper::Gameplay::Theme), its +palette+, and its +art+. The ordinary
     # theme has no art and is always there. Every theme lives in its own
     # file in presentation/themes/ with its shader in
     # assets/shaders/themes/, so one can be swapped alone. Which themes a
-    # player has, and when one opens, is DotPopper::SavedThemes'.
+    # player has, and when one opens, is DotPopper::Gameplay::SavedThemes'.
     class Theme < Data.define(:key, :palette, :art)
       def initialize(key:, palette:, art: nil) = super
 

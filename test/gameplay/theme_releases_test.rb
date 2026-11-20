@@ -21,24 +21,24 @@ class ThemeReleasesTest < Minitest::Test
     @file = Memory.new
     @dated = Memory.new
     @worker = FakeWorker.new
-    @saved_themes = DotPopper::SavedThemes.new(@file)
-    @theme_releases = DotPopper::ThemeReleases.new(worker: @worker, saved_themes: @saved_themes, file: @dated, now: -> { Time.utc(2026, 11, 8, 12) })
+    @saved_themes = DotPopper::Gameplay::SavedThemes.new(@file)
+    @theme_releases = DotPopper::Gameplay::ThemeReleases.new(worker: @worker, saved_themes: @saved_themes, file: @dated, now: -> { Time.utc(2026, 11, 8, 12) })
   end
 
   def test_sends_the_first_play_date_and_keeps_it_for_good
     @theme_releases.ask
     assert_equal "/themes?started_on=2026-11-08", @worker.started.path
-    theme_releases = DotPopper::ThemeReleases.new(worker: @worker, saved_themes: @saved_themes, file: @dated, now: -> { Time.utc(2027, 1, 1, 12) })
+    theme_releases = DotPopper::Gameplay::ThemeReleases.new(worker: @worker, saved_themes: @saved_themes, file: @dated, now: -> { Time.utc(2027, 1, 1, 12) })
     theme_releases.ask
     assert_equal "/themes?started_on=2026-11-08", @worker.started.path
   end
 
   def test_sends_the_utc_date_not_the_local_one
     late_in_los_angeles = Time.new(2026, 11, 8, 20, 0, 0, "-08:00")
-    DotPopper::ThemeReleases.new(worker: @worker, saved_themes: @saved_themes, file: Memory.new, now: -> { late_in_los_angeles }).ask
+    DotPopper::Gameplay::ThemeReleases.new(worker: @worker, saved_themes: @saved_themes, file: Memory.new, now: -> { late_in_los_angeles }).ask
     assert_equal "/themes?started_on=2026-11-09", @worker.started.path
     early_in_auckland = Time.new(2026, 11, 9, 5, 0, 0, "+13:00")
-    DotPopper::ThemeReleases.new(worker: @worker, saved_themes: @saved_themes, file: Memory.new, now: -> { early_in_auckland }).ask
+    DotPopper::Gameplay::ThemeReleases.new(worker: @worker, saved_themes: @saved_themes, file: Memory.new, now: -> { early_in_auckland }).ask
     assert_equal "/themes?started_on=2026-11-08", @worker.started.path
   end
 
