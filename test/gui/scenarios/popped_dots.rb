@@ -98,21 +98,21 @@ module DotPopperGui
       wait(0.5)
       check(show.in_use.key == theme.key, "#{theme.key} is in use")
       start_game
-      live_game.instance_variable_set(:@clock, D::Clock.new(remaining: 999))
+      live_game.instance_variable_set(:@clock, D::Gameplay::Clock.new(remaining: 999))
       radius = game.field.radius # dots are drawn at the field's size
       x = layout.center_x
       y = layout.center_y
       shoot = lambda do |dots|
-        live_game.instance_variable_set(:@dots, D::Stack.new(dots:))
+        live_game.instance_variable_set(:@dots, D::Gameplay::Stack.new(dots:))
         wait(0.3)
         Patch.new(screenshot, x, y, radius)
       end
-      dot = ->(id, popped) { D::Dot.new(id:, x:, y:, velocity_x: 0, velocity_y: 0, radius:, popped:, bonus: false) }
+      dot = ->(id, popped) { D::Gameplay::Dot.new(id:, x:, y:, velocity_x: 0, velocity_y: 0, radius:, popped:, bonus: false) }
       night = shoot.([])
       bright = IDS.map { shoot.([dot.(it, false)]) }
       still(theme, x, y, radius)
       popped = IDS.map { shoot.([dot.(it, true)]) }
-      live_game.instance_variable_set(:@clock, D::Clock.new(remaining: 0.01))
+      live_game.instance_variable_set(:@clock, D::Gameplay::Clock.new(remaining: 0.01))
       run_out_the_clock
       continue_to_home
       Drawn.new(key: theme.key, night:, bright:, popped:)
