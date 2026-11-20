@@ -47,10 +47,6 @@ module DotPopper
 
       private
 
-      def finish_stopped_clear: () -> void
-
-      def backups: () -> Hash[String, String]
-
       def back_up: (Hash[String, String?] texts) -> void
     end
   end
