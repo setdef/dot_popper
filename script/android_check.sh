@@ -230,8 +230,9 @@ flock -u 7
 touch "$avd_home"
 # The snapshots of other pieces, all but the newest one other than this
 # run's, and none that a run holds: each is 9 GB.
-ls -dt "$keep"/avd-*/ 2> /dev/null | sed 's#/$##' | grep -vxF "$avd_home" | tail -n +2 | while read -r old; do
-  ( flock -n -x 9 && rm -rf "$old" ) 9> "$old.lock"
+others=$(ls -dt "$keep"/avd-*/ 2> /dev/null | sed 's#/$##' | grep -vxF "$avd_home" | tail -n +2 || true)
+for old in $others; do
+  ( flock -n -x 9 && rm -rf "$old" ) 9> "$old.lock" || true
 done
 say "the emulator's snapshot is ready"
 
