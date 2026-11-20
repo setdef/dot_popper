@@ -15,9 +15,9 @@ class ShowTutorialTest < Minitest::Test
     @store = DotPopper::ScoreRecord::Memory.new
     @score_record = DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new)
     @stats_book = DotPopper::StatsBook.new(DotPopper::ScoreRecord::Memory.new)
-    @cabinet = DotPopper::Cabinet.new(field, score_record: @score_record, random: Random.new(2))
+    @game_flow = DotPopper::GameFlow.new(field, score_record: @score_record, random: Random.new(2))
     @events = []
-    @cabinet.subscribe { @events << it.class }
+    @game_flow.subscribe { @events << it.class }
     @show = show
   end
 
@@ -27,7 +27,7 @@ class ShowTutorialTest < Minitest::Test
     assert @show.tutorial?
     refute @show.home?
     refute @show.playing?
-    assert_instance_of DotPopper::Cabinet::Paused, @cabinet.state
+    assert_instance_of DotPopper::GameFlow::Paused, @game_flow.state
     assert_empty @events.grep(->(it) { it == DotPopper::Events::GameStarted })
     assert_equal "seen", @store.read, "it is seen from the moment it opens"
   end
@@ -35,11 +35,11 @@ class ShowTutorialTest < Minitest::Test
   def test_the_game_plays_on_as_it_is_with_only_the_clock_starting
     play_through(hand_over: false)
     scene = @show.tutorial
-    paused = @cabinet.game
+    paused = @game_flow.game
     update_for(STEP) while @show.tutorial?
 
     assert @show.playing?
-    game = @cabinet.game
+    game = @game_flow.game
     assert_same paused, game, "the one game, not a copy"
     assert_equal scene.dots.map(&:id), game.dots.map(&:id), "the same dots, in the same order"
     assert_equal [true, true, false], game.dots.map(&:popped?)
@@ -59,8 +59,8 @@ class ShowTutorialTest < Minitest::Test
 
     assert_equal 1, @stats_book.stats.games
     assert_operator @show.game_stats.dots_popped, :>=, 2, "its two dots popped are the game's"
-    assert_equal @cabinet.game.score, @show.game_stats.score
-    assert_equal @cabinet.game.score, @score_record.of(@cabinet.size_class)
+    assert_equal @game_flow.game.score, @show.game_stats.score
+    assert_equal @game_flow.game.score, @score_record.of(@game_flow.size_class)
   end
 
   def test_its_end_starts_the_game_with_the_clock_lit_and_its_first_second_ticking
@@ -81,7 +81,7 @@ class ShowTutorialTest < Minitest::Test
   def test_its_skip_button_takes_the_tutorial_away_and_the_same_game_plays_on
     press_main
     update_for(2.0)
-    paused = @cabinet.game
+    paused = @game_flow.game
     @show.tutorial.tap(*@show.tutorial.dots.first.then { [it.x, it.y] })
     reach = @show.skip_reach
     @show.tap(reach.center_x, reach.center_y)
@@ -89,10 +89,10 @@ class ShowTutorialTest < Minitest::Test
     refute @show.tutorial?
     assert @show.playing?
     assert_nil @show.clock_highlight
-    assert_same paused, @cabinet.game
-    assert_equal [1, 2], [@cabinet.game.score, @cabinet.game.dots.size], "the pop the player made is the game's"
-    assert_in_delta 11.0, @cabinet.game.countdown.remaining
-    assert_equal [true, false], @cabinet.game.dots.map(&:popped?)
+    assert_same paused, @game_flow.game
+    assert_equal [1, 2], [@game_flow.game.score, @game_flow.game.dots.size], "the pop the player made is the game's"
+    assert_in_delta 11.0, @game_flow.game.countdown.remaining
+    assert_equal [true, false], @game_flow.game.dots.map(&:popped?)
     assert_equal [DotPopper::Events::GameStarted], @events.uniq - [DotPopper::Events::HomeShown], "nothing else starts"
     @show.update(0.0)
     assert_equal [1, 11], [@show.hud.score, @show.hud.seconds], "and the HUD shows the game as it is"
@@ -106,7 +106,7 @@ class ShowTutorialTest < Minitest::Test
     @show.back
 
     assert @show.playing?
-    assert_equal [1, 2, 1], [@cabinet.game.score, @cabinet.game.dots.size, @cabinet.game.dots_in_a_row]
+    assert_equal [1, 2, 1], [@game_flow.game.score, @game_flow.game.dots.size, @game_flow.game.dots_in_a_row]
     update_for(STEP)
     assert_equal 1, @show.hud.dots_in_a_row
   end
@@ -114,12 +114,12 @@ class ShowTutorialTest < Minitest::Test
   def test_a_skip_before_any_pop_plays_on_with_the_first_dot
     press_main
     update_for(0.5)
-    first = @cabinet.game.dots.first
+    first = @game_flow.game.dots.first
     @show.back
 
     assert @show.playing?
-    assert_equal [first], @cabinet.game.dots.to_a, "the dot where it was"
-    assert_equal [0, 10.0], [@cabinet.game.score, @cabinet.game.countdown.remaining]
+    assert_equal [first], @game_flow.game.dots.to_a, "the dot where it was"
+    assert_equal [0, 10.0], [@game_flow.game.score, @game_flow.game.countdown.remaining]
   end
 
   # Skipped after the guide's mistake, the game plays on with what it
@@ -131,7 +131,7 @@ class ShowTutorialTest < Minitest::Test
     update_for(0.05) until @show.tutorial.traveling_numbers.any? { it.to.name == :score && it.text.start_with?("−") }
     @show.back
 
-    assert_equal [0, 9.0, 0], [@cabinet.game.score, @cabinet.game.countdown.remaining, @cabinet.game.dots_in_a_row]
+    assert_equal [0, 9.0, 0], [@game_flow.game.score, @game_flow.game.countdown.remaining, @game_flow.game.dots_in_a_row]
     assert_equal [1, 0], [@show.game_stats.dots_popped, @show.game_stats.mistakes]
   end
 
@@ -145,7 +145,7 @@ class ShowTutorialTest < Minitest::Test
     assert_equal 1, @show.tutorial.dots.size
     @show.back
 
-    popped, born = @cabinet.game.dots.map { @show.animations.pose(it, @show.now) }
+    popped, born = @game_flow.game.dots.map { @show.animations.pose(it, @show.now) }
     assert_in_delta 1.0, popped.bright_look, 1e-9, "the popped dot turns from bright to popped from now"
     assert_operator popped.scale_x * popped.scale_y, :>, 1.2, "with its squash"
     assert_in_delta 0.15, born.scale_x, 1e-9, "and the new one grows in from now"
@@ -182,13 +182,13 @@ class ShowTutorialTest < Minitest::Test
     update_for(0.05) until @show.tutorial.beat == :aim_next
     popped = @show.tutorial.dots.find { it.id == TutorialScene::BRIGHT }
     kept = @show.tutorial.hud.then { [it.score, it.seconds] }
-    game = @cabinet.game.then { [it.score, it.countdown.remaining, it.dots_in_a_row] }
+    game = @game_flow.game.then { [it.score, it.countdown.remaining, it.dots_in_a_row] }
     @sounds.played.clear
 
     %i[mouse tap gamepad].each { @show.tap(popped.x, popped.y, by: it) }
 
     assert_equal kept, @show.tutorial.hud.then { [it.score, it.seconds] }
-    assert_equal game, @cabinet.game.then { [it.score, it.countdown.remaining, it.dots_in_a_row] }, "no press reaches the game"
+    assert_equal game, @game_flow.game.then { [it.score, it.countdown.remaining, it.dots_in_a_row] }, "no press reaches the game"
     assert_equal :aim_next, @show.tutorial.beat
     assert_empty @sounds.names
   end
@@ -244,13 +244,13 @@ class ShowTutorialTest < Minitest::Test
     @show.tap(reach.center_x, reach.center_y)
 
     assert @show.tutorial?
-    assert_instance_of DotPopper::Cabinet::Paused, @cabinet.state
+    assert_instance_of DotPopper::GameFlow::Paused, @game_flow.state
     assert_equal "seen", @store.read
     play_through(opened: true)
     assert @show.playing?
-    assert_equal [true, true, false], @cabinet.game.dots.map(&:popped?)
-    assert_equal 1, @cabinet.game.score
-    assert_operator @cabinet.game.countdown.remaining, :>, 9.8, "from what it left, the clock only now running"
+    assert_equal [true, true, false], @game_flow.game.dots.map(&:popped?)
+    assert_equal 1, @game_flow.game.score
+    assert_operator @game_flow.game.countdown.remaining, :>, 9.8, "from what it left, the clock only now running"
     assert @show.clock_highlight
   end
 
@@ -279,8 +279,8 @@ class ShowTutorialTest < Minitest::Test
 
   def test_its_dots_follow_a_resized_window
     press_main
-    @cabinet.screen = DotPopper::Field.new(400, 850, R)
-    @show.resize(layout(400, 850), @cabinet.field)
+    @game_flow.screen = DotPopper::Field.new(400, 850, R)
+    @show.resize(layout(400, 850), @game_flow.field)
 
     dot = @show.tutorial.dots.first
     assert dot.x.between?(R, 400 - R)
@@ -290,13 +290,13 @@ class ShowTutorialTest < Minitest::Test
   private
 
   def show(keeper: DotPopper::StatsBackup.new(score_record: @score_record, stats_book: @stats_book))
-    new_show(cabinet: @cabinet, layout: layout, sounds: @sounds, radius: R, random: Random.new(3), stats_book: @stats_book,
+    new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, random: Random.new(3), stats_book: @stats_book,
              keeper:, tutorial_flag: TutorialFlag.new(@store))
   end
 
   def update_for(seconds)
     (seconds / STEP).ceil.times do
-      @cabinet.update(STEP)
+      @game_flow.update(STEP)
       @show.update(STEP)
     end
   end
@@ -318,7 +318,7 @@ class ShowTutorialTest < Minitest::Test
 
   def finish_game
     update_for(0.1) until @show.game_over?
-    @cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
     press_main
   end
 end

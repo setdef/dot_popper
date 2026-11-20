@@ -13,7 +13,7 @@ module DotPopper
 
       # What the GUI suite's scenario runner (test/gui/scenario_runner.rb) watches as it
       # plays: the rules, the Show, and the game-over pile.
-      attr_reader :cabinet, :show, :pile
+      attr_reader :game_flow, :show, :pile
 
       # +channel+ is the build's (Build::CHANNEL). It, and not the
       # environment, decides which keys and store this run trusts, and
@@ -33,7 +33,7 @@ module DotPopper
         @platform = @game.platform
         @touch = @platform.touch?
         @window = @game.window
-        @cabinet = @game.cabinet
+        @game_flow = @game.game_flow
         @show = @game.show
         @pen = @game.pen
         @sound_player = @game.sound_player
@@ -42,15 +42,15 @@ module DotPopper
         @watch = @game.watch
         @game.start
         @pile = Pile.new(@game.pile_style)
-        @cabinet.subscribe(@pile)
+        @game_flow.subscribe(@pile)
         @gamepads = Gamepads.new(pretend: fake_gamepad?)
         fake = @game.fake_tilt
         @tilting = Tilting.new(pile: @pile, gamepads: @gamepads,
                                accelerometer: fake ? FakeAccelerometer.new(steady: fake) : Accelerometer.new,
                                style: @game.tilt_style, turns: @touch)
-        @cabinet.subscribe(@tilting)
+        @game_flow.subscribe(@tilting)
         @dragging = Dragging.new(pile: @pile, show: @show, style: @game.grab_style)
-        @cabinet.subscribe(@dragging)
+        @game_flow.subscribe(@dragging)
         @particle_systems = ParticleSystems.new(Style)
         @bloom = Bloom.new(@pen, Style::BLOOM)
         @renderer = Renderer.new(@show, @pen, pile: @pile, particle_systems: @particle_systems, bloom: @bloom,
@@ -59,7 +59,7 @@ module DotPopper
         @input = LotaInput.new
         @inputs = Presentation::InputHandler.new(show: @show, platform: @platform, shell: self, pile: @dragging, cursor: @game.cursor)
         @bot = @game.bot
-        @hooks = DevelopmentHooks.for(@settings, cabinet: @cabinet, show: @show, pile: @pile, dragging: @dragging,
+        @hooks = DevelopmentHooks.for(@settings, game_flow: @game_flow, show: @show, pile: @pile, dragging: @dragging,
                                                  pad: ->(action, x, y) { @inputs.fake_pad(action, x, y) })
       end
 
@@ -81,10 +81,10 @@ module DotPopper
         @splash = nil if @splash&.over?
         @inputs.update(elapsed, seconds, stick: @gamepads.stick, right_stick: @gamepads.right_stick)
         if @bot
-          x, y = @bot.update(seconds, @cabinet, @show)
+          x, y = @bot.update(seconds, @game_flow, @show)
           tap(x, y) if x
         end
-        @cabinet.update(seconds)
+        @game_flow.update(seconds)
         @show.update(seconds)
         @theme_releases&.update
         @watch.update # what it found, Continuity::Gone announces
@@ -177,11 +177,11 @@ module DotPopper
         @pen.refresh
         @particle_systems.refresh
         @bloom.refresh
-        @cabinet.screen = screen
-        @show.resize(@engine.layout, @cabinet.field)
+        @game_flow.screen = screen
+        @show.resize(@engine.layout, @game_flow.field)
         # The heap keeps the finished game's dots, and their radius.
-        game = @cabinet.game
-        @pile.refit(game ? Field.new(screen.width, screen.height, game.field.radius) : @cabinet.field)
+        game = @game_flow.game
+        @pile.refit(game ? Field.new(screen.width, screen.height, game.field.radius) : @game_flow.field)
         @renderer.prepare
         @inputs.resized(@show.layout.whole)
       end

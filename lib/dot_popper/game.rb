@@ -4,7 +4,7 @@ module DotPopper
   # One game: the dots, the score, and the clock. It is the one thing in
   # the rules that changes, and it changes by swapping in new values, so a
   # tap changes all three at once and says what it did with an event.
-  # Only Cabinet holds a game; everything else reads it through its #view,
+  # Only GameFlow holds a game; everything else reads it through its #view,
   # which cannot change it.
   class Game
     attr_reader :field, :dots, :score, :countdown, :elapsed, :spawns, :dots_in_a_row, :bonus
@@ -16,7 +16,7 @@ module DotPopper
     # A game as it stands, which answers what the game is now and nothing
     # that changes it, each answer a value frozen all the way down. What
     # the screens, the renderer, the bot and the tutorial read each frame
-    # (Cabinet#game).
+    # (GameFlow#game).
     class View
       def initialize(game) = @game = game
 
@@ -78,7 +78,7 @@ module DotPopper
 
     # Moves the dots +seconds+ on, and only the dots: the clock does not
     # run. A paused game's tutorial moves them at its own pace
-    # (Cabinet::Paused).
+    # (GameFlow::Paused).
     def move_dots(seconds)
       @dots = dots.map_dots { it.move(seconds, field) }
     end
@@ -86,7 +86,7 @@ module DotPopper
     # Puts each of +placed+ in the place of the dot of its id, where it
     # is and going as it goes, at the same depth in the stack. Only a
     # paused game's tutorial arranges its dots, to show them as it
-    # teaches (Cabinet#arrange).
+    # teaches (GameFlow#arrange).
     def arrange(*placed)
       @dots = placed.reduce(dots) { |stack, dot| stack.replace(dot) }
     end

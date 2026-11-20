@@ -53,7 +53,7 @@ A new file in `lib/dot_popper/` needs its signature in `sig/dot_popper/`, or `bu
 Steep 2.1 does not check `case`/`in`. It reports it as unsupported syntax, a diagnostic that is silent by default, and treats everything inside as untyped, so a type error inside such a branch passes. So the `Steepfile` raises `Steep::Diagnostic::Ruby::UnsupportedSyntax` to `:error`, and the rules branch only in forms Steep can narrow:
 
 - `if`/`elsif` on a predicate or `nil?`, as `Game#tap_at` does with `dots.top_at(x, y)`: `nil` is `Events::Missed`, a `bright?` dot is popped, and anything else is a mistake.
-- `is_a?` on a state, after which Steep knows its members: after `state.is_a?(Playing)` in `Cabinet`, `state.game` exists.
+- `is_a?` on a state, after which Steep knows its members: after `state.is_a?(Playing)` in `GameFlow`, `state.game` exists.
 
 Pattern matching is fine wherever Steep does not look: the tests (the fuzz test matches each tap's event), `script/simulate.rb`, `script/playtest_kit.rb` and `playtest/kit.rb`. When Steep checks pattern matching, the branches can be rewritten and the `UnsupportedSyntax` line removed.
 
@@ -81,7 +81,7 @@ After each step it checks that:
 - a resize keeps every dot, its order, whether it is popped and its velocity, moves each in proportion across the field's room, and changes neither score nor clock;
 - every new dot offers a touch target within the lookahead (`SpawnCheck#exposed_soon?`), or used all `Rules::SPAWN_TRIES` redraws of velocity and of place ([rules.md](rules.md#the-spawn-check)).
 
-`test_random_presses_change_a_game_only_while_it_is_played` drives a whole `Cabinet` for 3,000 steps of random presses and updates of up to 1.5 s, checks that nothing outside `Cabinet::Playing` changes the score or the clock, and that the run reached all three states (`Home`, `Playing`, `GameOver`).
+`test_random_presses_change_a_game_only_while_it_is_played` drives a whole `GameFlow` for 3,000 steps of random presses and updates of up to 1.5 s, checks that nothing outside `GameFlow::Playing` changes the score or the clock, and that the run reached all three states (`Home`, `Playing`, `GameOver`).
 
 Both tests start from seed 20,261,105. Every failure message names the seed and the game (`seed 20261105, game 512`). To try other seeds, or replay one that failed:
 

@@ -38,18 +38,18 @@ module DotPopperGui
     def initialize(app)
       @app = app
       @events = []
-      cabinet.subscribe { @events << it }
+      game_flow.subscribe { @events << it }
     end
 
-    def cabinet = app.cabinet
+    def game_flow = app.game_flow
     def show = app.show
     def pile = app.pile
-    def game = cabinet.game
+    def game = game_flow.game
 
-    # The game the cabinet holds itself, which nothing in the game can
-    # reach (Cabinet#game is its read-only Game::View): for a gallery that
+    # The game the game flow holds itself, which nothing in the game can
+    # reach (GameFlow#game is its read-only Game::View): for a gallery that
     # sets up a position by hand.
-    def live_game = cabinet.instance_variable_get(:@game)
+    def live_game = game_flow.instance_variable_get(:@game)
 
     # Whether the player has Pro, which the screens are not told: a
     # scenario asks the game's Entitlement, as the composition root built
@@ -239,7 +239,7 @@ module DotPopperGui
 
     # Waits out Game Over's grace and presses Home.
     def continue_to_home(how = method(:click))
-      wait_for("Game Over ready for a press") { cabinet.state.ready? }
+      wait_for("Game Over ready for a press") { game_flow.state.ready? }
       button = show.home_reach
       how.call(button.center_x, button.center_y)
       wait_for("Home again", within: 5) { show.home? }
@@ -248,7 +248,7 @@ module DotPopperGui
 
     # Waits out Game Over's grace and presses Play again.
     def play_again(how = method(:click))
-      wait_for("Game Over ready for a press") { cabinet.state.ready? }
+      wait_for("Game Over ready for a press") { game_flow.state.ready? }
       button = show.play_again_reach
       how.call(button.center_x, button.center_y)
       check(show.playing?, "Play again starts the next game at once")

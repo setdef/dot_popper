@@ -33,10 +33,10 @@ class WebsiteStoreTest < Minitest::Test
   end
 
   def show
-    cabinet = DotPopper::Cabinet.new(field(1200, 800), random: Random.new(2))
+    game_flow = DotPopper::GameFlow.new(field(1200, 800), random: Random.new(2))
     book = DotPopper::StatsBook.new(Memory.new)
     book.record(DotPopper::GameStats.start, DotPopper::SizeClass::MEDIUM)
-    new_show(cabinet:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, stats_book: book, clipboard: @clipboard,
+    new_show(game_flow:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, stats_book: book, clipboard: @clipboard,
              entitlement: @entitlement, storefront: @store, server_choice: @choice)
   end
 
@@ -153,8 +153,8 @@ class WebsiteStoreTest < Minitest::Test
     groups.define_singleton_method(:report_achievements) { |keys| reported << keys }
     achievements = DotPopper::Achievements.new(Memory.new)
     achievements.award(%i[blink], day: "2026-11-01")
-    cabinet = DotPopper::Cabinet.new(field(1200, 800), random: Random.new(2))
-    s = new_show(cabinet:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, clipboard: @clipboard, entitlement: @entitlement,
+    game_flow = DotPopper::GameFlow.new(field(1200, 800), random: Random.new(2))
+    s = new_show(game_flow:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, clipboard: @clipboard, entitlement: @entitlement,
                  storefront: @store, groups:, achievements:)
     open_offer(s)
     click(s, :buy)
@@ -239,7 +239,7 @@ class WebsiteStoreTest < Minitest::Test
   end
 
   def test_a_stores_copy_never_shows_paste_license_key
-    s = new_show(cabinet: DotPopper::Cabinet.new(field(1200, 800)), layout: layout(1200, 800), sounds: FakeSounds.new, radius: R,
+    s = new_show(game_flow: DotPopper::GameFlow.new(field(1200, 800)), layout: layout(1200, 800), sounds: FakeSounds.new, radius: R,
                  storefront: Store.new(port: FakeStore.new(Memory.new), entitlement: DotPopper::Entitlement.free))
     open_offer(s)
 

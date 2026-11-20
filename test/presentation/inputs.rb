@@ -56,14 +56,14 @@ module Inputs
   # A Show, built as Composition::Root builds it in a test build on +os+ (as
   # Lota::System.os names it, and Shell::Platforms makes its Platform), at +width+ by +height+, with what the game
   # keeps for a player: Pro or not, games left, a friend group, a new theme
-  # to tell, setdef gone. It moves on as frames do: the Cabinet, then the
+  # to tell, setdef gone. It moves on as frames do: the GameFlow, then the
   # Show.
   class Fixture
     include PresentationTest
 
     THEMES = %i[ghost jack_o_lantern].freeze
 
-    attr_reader :os, :show, :cabinet, :sounds, :window, :clipboard, :opener, :entitlement, :games, :storefront, :server_choice, :to_pop,
+    attr_reader :os, :show, :game_flow, :sounds, :window, :clipboard, :opener, :entitlement, :games, :storefront, :server_choice, :to_pop,
                 :shell
 
     # Game Over's pile as Shell::Dragging takes a press on it that drags
@@ -104,7 +104,7 @@ module Inputs
       @clipboard = MemoryClipboard.new
       @clipboard.copy(copied) if copied
       @window = phone? ? NoWindowControl.new : FakeWindow.new
-      @cabinet = DotPopper::Cabinet.new(field(width, height), random: Random.new(5), sizing: DotPopper::DotSizing.parse(nil))
+      @game_flow = DotPopper::GameFlow.new(field(width, height), random: Random.new(5), sizing: DotPopper::DotSizing.parse(nil))
       @gone = DotPopper::Continuity::Gone.new(Memory.new)
       @gone.heard(:gone, @day - 200) if gone
       license = DotPopper::Continuity::License.new(Memory.new, pins: DotPopper::Continuity::TEST_PINS)
@@ -120,10 +120,10 @@ module Inputs
       themes.release(THEMES.map(&:to_s))
       (new_theme ? themes.choices[0...-1] : themes.choices).each { themes.told(it) }
       book = DotPopper::StatsBook.new(Memory.new, today: -> { @day })
-      book.record(DotPopper::GameStats.start, @cabinet.size_class) if played
+      book.record(DotPopper::GameStats.start, @game_flow.size_class) if played
       session = DotPopper::Groups::Session.new(store: Memory.new, worker: Server.new(groups:))
       @server_choice = DotPopper::ServerChoice.new(Memory.new, gone: @gone, clipboard:)
-      @show = new_show(cabinet:, layout: layout(width, height), sounds:, radius: R, random: Random.new(5), clipboard:, window:, stats_book: book,
+      @show = new_show(game_flow:, layout: layout(width, height), sounds:, radius: R, random: Random.new(5), clipboard:, window:, stats_book: book,
                        sharing: P::SheetSharing.for(platform, opener:), links: opener, entitlement:, storefront:, games:,
                        themes:, groups: session, group_notice: P::GroupNotice.new(Memory.new),
                        tutorial_flag: P::TutorialFlag.new(Memory.new((P::TutorialFlag::SEEN if played))), input: P::InputKind.starting(touch: phone?),
@@ -157,7 +157,7 @@ module Inputs
     def tick(seconds)
       while seconds.positive?
         step = [seconds, DotPopper::Rules::LONGEST_FRAME].min
-        cabinet.update(step)
+        game_flow.update(step)
         @handler.update(step, step, stick: P::Stick.rest, right_stick: P::Stick.rest)
         show.update(step)
         seconds -= step
@@ -263,20 +263,20 @@ module Inputs
       end
       return if popped >= fixture.to_pop
 
-      dots = show.cabinet.game.dots
+      dots = show.game_flow.game.dots
       dots.find { it.bright? && dots.top_at(it.x, it.y)&.id == it.id }
     end
 
     # Where the dot +id+ is now, or nil once it is gone.
     def dot(id)
-      dots = show.tutorial? ? show.tutorial.dots : show.cabinet.game&.dots
+      dots = show.tutorial? ? show.tutorial.dots : show.game_flow.game&.dots
       dots&.find { it.id == id }
     end
 
     # Whether a press at +x+, +y+ lands on the dot +id+, not on a dot
     # over it, so a careful player makes no mistake.
     def clear?(id, x, y)
-      dots = show.tutorial? ? show.tutorial.dots : show.cabinet.game&.dots
+      dots = show.tutorial? ? show.tutorial.dots : show.game_flow.game&.dots
       dots&.top_at(x, y)&.id == id
     end
 
@@ -544,7 +544,7 @@ module Inputs
   # What a screen is, as the player sees it: the state of the game under
   # it, and which screen the Show has open over it.
   def self.screen(show)
-    [show.cabinet.state.class.name.split("::").last, Inputs.page(show), (show.group_panel.page if show.group_open?),
+    [show.game_flow.state.class.name.split("::").last, Inputs.page(show), (show.group_panel.page if show.group_open?),
      (show.group_panel.asking if show.group_open?), show.offer?, !show.dialog.nil?, show.sharing?, show.tutorial?, show.new_theme?,
      show.screen.class]
   end

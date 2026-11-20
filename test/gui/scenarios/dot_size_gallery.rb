@@ -20,10 +20,10 @@ module DotPopperGui
       one_game
       share
       continue_to_home
-      cabinet.sizing = DEFAULT.toggled
+      game_flow.sizing = DEFAULT.toggled
       one_game
       continue_to_home
-      cabinet.sizing = DEFAULT
+      game_flow.sizing = DEFAULT
       one_game
       continue_to_home
       join
@@ -44,7 +44,7 @@ module DotPopperGui
     end
 
     def one_game
-      say "a game with #{cabinet.sizing.name}"
+      say "a game with #{game_flow.sizing.name}"
       start_game
       pop_bright
       run_out_the_clock
@@ -72,7 +72,7 @@ module DotPopperGui
     def screens(width, height, phone)
       fit(width, height, phone)
       [DEFAULT, DEFAULT.toggled].each do |sizing|
-        cabinet.sizing = sizing
+        game_flow.sizing = sizing
         name = sizing == DEFAULT ? "default" : "other"
         show.open_settings
         shoot("settings-#{name}")
@@ -82,7 +82,7 @@ module DotPopperGui
         show.back
         group(name)
       end
-      cabinet.sizing = DEFAULT
+      game_flow.sizing = DEFAULT
     end
 
     def group(name)

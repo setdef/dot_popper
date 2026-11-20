@@ -14,16 +14,16 @@ class TutorialTest < Minitest::Test
     @haptics = FakeHaptics.new
     @effects = Effects.new(radius: R)
     @field = DotPopper::Field.new(1200, 800, R)
-    @cabinet = DotPopper::Cabinet.new(@field)
-    @tutorial = tutorial_on(@cabinet, [600.0, 400.0], effects: @effects, sounds: @sounds,
+    @game_flow = DotPopper::GameFlow.new(@field)
+    @tutorial = tutorial_on(@game_flow, [600.0, 400.0], effects: @effects, sounds: @sounds,
                              haptics: @haptics, style: Style)
   end
 
   def test_it_plays_over_a_paused_game_with_its_first_dot
-    assert_instance_of DotPopper::Cabinet::Paused, @cabinet.state
-    assert_equal [TutorialScene::BRIGHT], @cabinet.game.dots.map(&:id)
-    assert_equal @cabinet.game.dots.to_a, @tutorial.dots.to_a, "it draws the game's own dot"
-    assert_same @cabinet.game.field, @tutorial.field
+    assert_instance_of DotPopper::GameFlow::Paused, @game_flow.state
+    assert_equal [TutorialScene::BRIGHT], @game_flow.game.dots.map(&:id)
+    assert_equal @game_flow.game.dots.to_a, @tutorial.dots.to_a, "it draws the game's own dot"
+    assert_same @game_flow.game.field, @tutorial.field
     assert_equal [0, 10, 0], [*shown, @tutorial.hud.dots_in_a_row], "and the HUD shows the game's numbers"
   end
 
@@ -51,7 +51,7 @@ class TutorialTest < Minitest::Test
       field = DotPopper::Field.new(width, height, radius)
       inset = Rect.new(x: 0.0, y: 44.0, width: width.to_f, height: height - 78.0)
       screen = Layout.new(width:, height:, safe: inset, style: Style::LAYOUT)
-      tutorial = tutorial_on(DotPopper::Cabinet.new(field), [screen.center_x, screen.center_y],
+      tutorial = tutorial_on(DotPopper::GameFlow.new(field), [screen.center_x, screen.center_y],
                              effects: Effects.new(radius:), sounds: @sounds, haptics: @haptics, style: Style)
       (((SCRIPT.drift + SCRIPT.stop + 0.2) / STEP).ceil).times { tutorial.update(STEP) }
       dot = tutorial.dots.find { it.id == TutorialScene::BRIGHT }
@@ -208,7 +208,7 @@ class TutorialTest < Minitest::Test
   end
 
   def test_a_calm_guide_wags_gentler
-    calm = tutorial_on(DotPopper::Cabinet.new(@field), [600.0, 400.0], effects: @effects,
+    calm = tutorial_on(DotPopper::GameFlow.new(@field), [600.0, 400.0], effects: @effects,
                         sounds: @sounds, haptics: @haptics, style: Style, calm: true)
     assert_equal Style::CALM_WAG, calm.guide.style.wag
     assert_operator Style::CALM_WAG.angle, :<, SCRIPT.guide.wag.angle
@@ -219,8 +219,8 @@ class TutorialTest < Minitest::Test
   # beside the popped one, never clear. There they part up and down, the
   # new one going down, away from where the guide waits.
   def test_near_a_side_wall_the_dots_part_up_and_down
-    @cabinet = DotPopper::Cabinet.new(DotPopper::Field.new(400, 850, R))
-    @tutorial = tutorial_on(@cabinet, [200.0, 425.0], effects: Effects.new(radius: R), sounds: @sounds,
+    @game_flow = DotPopper::GameFlow.new(DotPopper::Field.new(400, 850, R))
+    @tutorial = tutorial_on(@game_flow, [200.0, 425.0], effects: Effects.new(radius: R), sounds: @sounds,
                              haptics: @haptics, style: Style)
     to_the_peek
     play_until(within: 900) { @tutorial.beat == :aim_next }
@@ -314,8 +314,8 @@ class TutorialTest < Minitest::Test
     assert @tutorial.over?
     assert_in_delta 1.0, @tutorial.rate, 1e-9, "and time flows as the game's does"
     assert_equal [1, 10], shown
-    assert_equal [1, 10.0], [@cabinet.game.score, @cabinet.game.countdown.remaining], "the game's own numbers"
-    assert_equal @cabinet.game.dots.to_a, @tutorial.dots.to_a, "it draws the game's dots, every one as it is"
+    assert_equal [1, 10.0], [@game_flow.game.score, @game_flow.game.countdown.remaining], "the game's own numbers"
+    assert_equal @game_flow.game.dots.to_a, @tutorial.dots.to_a, "it draws the game's dots, every one as it is"
     assert_equal 3, @tutorial.dots.size, "no dot fades or is added"
   end
 
@@ -358,7 +358,7 @@ class TutorialTest < Minitest::Test
     play_until { @tutorial.hud.dots_in_a_row == 1 }
     play_until(within: 900) { @tutorial.over? }
 
-    assert_equal [1, 1], [@tutorial.hud.dots_in_a_row, @cabinet.game.dots_in_a_row]
+    assert_equal [1, 1], [@tutorial.hud.dots_in_a_row, @game_flow.game.dots_in_a_row]
   end
 
   def test_nothing_shows_what_a_full_row_brings
@@ -405,7 +405,7 @@ class TutorialTest < Minitest::Test
   end
 
   def test_a_resized_window_keeps_the_dots_on_it
-    @cabinet.screen = DotPopper::Field.new(400, 850, R)
+    @game_flow.screen = DotPopper::Field.new(400, 850, R)
 
     assert bright.x.between?(R, 400 - R)
     assert_equal 400, @tutorial.field.width
@@ -417,7 +417,7 @@ class TutorialTest < Minitest::Test
   def test_the_game_hears_the_pop_at_the_tap_and_the_tutorial_shows_it_in_turn
     play_for(SCRIPT.drift + 0.5)
     tap_on(bright)
-    game = @cabinet.game
+    game = @game_flow.game
 
     assert_equal [true, false], game.dots.map(&:popped?)
     assert_equal [1, 11.0, 1], [game.score, game.countdown.remaining, game.dots_in_a_row]
@@ -431,21 +431,21 @@ class TutorialTest < Minitest::Test
 
   def test_the_guides_mistake_is_charged_by_the_rules_and_heard_by_nothing_else
     heard = []
-    @cabinet.subscribe { heard << it }
+    @game_flow.subscribe { heard << it }
     to_the_peek
     play_until { @tutorial.traveling_numbers.any? }
 
-    assert_equal [0, 9.0, 0], [@cabinet.game.score, @cabinet.game.countdown.remaining, @cabinet.game.dots_in_a_row]
+    assert_equal [0, 9.0, 0], [@game_flow.game.score, @game_flow.game.countdown.remaining, @game_flow.game.dots_in_a_row]
     assert_empty heard
   end
 
   def test_a_tap_on_the_popped_dot_never_reaches_the_game
     to_the_peek
     play_until { @tutorial.beat == :aim_next }
-    before = @cabinet.game.then { [it.score, it.countdown.remaining, it.dots_in_a_row] }
+    before = @game_flow.game.then { [it.score, it.countdown.remaining, it.dots_in_a_row] }
     2.times { tap_on(bright) }
 
-    assert_equal before, @cabinet.game.then { [it.score, it.countdown.remaining, it.dots_in_a_row] }
+    assert_equal before, @game_flow.game.then { [it.score, it.countdown.remaining, it.dots_in_a_row] }
   end
 
   def test_its_clock_never_runs
@@ -453,8 +453,8 @@ class TutorialTest < Minitest::Test
     play_until(within: 900) { @tutorial.beat == :aim_next }
     play_for(2.0)
 
-    assert_in_delta 9.0, @cabinet.game.countdown.remaining
-    assert_in_delta 0.0, @cabinet.game.elapsed
+    assert_in_delta 9.0, @game_flow.game.countdown.remaining
+    assert_in_delta 0.0, @game_flow.game.elapsed
   end
 
   def test_caught_up_it_shows_every_dot_of_the_game_as_it_is
@@ -463,7 +463,7 @@ class TutorialTest < Minitest::Test
     rings = @effects.rings.size
     @tutorial.catch_up
 
-    assert_equal @cabinet.game.dots.to_a, @tutorial.dots.to_a
+    assert_equal @game_flow.game.dots.to_a, @tutorial.dots.to_a
     assert_equal [true, false], @tutorial.dots.map(&:popped?)
     assert_equal [Style::SPAWN_RIPPLE], @effects.rings.drop(rings).map(&:style), "the new dot is born"
   end
@@ -515,10 +515,10 @@ class TutorialTest < Minitest::Test
     play_until { @tutorial.beat == :warn }
   end
 
-  # The Tutorial over +cabinet+'s game, started paused with its opening
+  # The Tutorial over +game_flow+'s game, started paused with its opening
   # dots from +center+, as the one way into a game starts it.
-  def tutorial_on(cabinet, center, **)
-    start_paused!(cabinet, TutorialScene.opening(cabinet.field, center))
-    TutorialScene.new(cabinet:, **)
+  def tutorial_on(game_flow, center, **)
+    start_paused!(game_flow, TutorialScene.opening(game_flow.field, center))
+    TutorialScene.new(game_flow:, **)
   end
 end

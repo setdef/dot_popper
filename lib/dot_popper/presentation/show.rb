@@ -36,17 +36,17 @@ module DotPopper
       # (Screens::Settings::SIZINGS).
       SIZINGS = Screens::Settings::SIZINGS
 
-      attr_reader :cabinet, :effects, :animations, :hud, :attract, :layout, :home_entrance, :game_over, :sounds, :now, :style,
+      attr_reader :game_flow, :effects, :animations, :hud, :attract, :layout, :home_entrance, :game_over, :sounds, :now, :style,
                   :stats_book, :input, :words, :clock_highlight, :window
 
-      def initialize(cabinet:, layout:, sounds:, radius:, start_game:, finish_game:, buy_pro:, use_theme:, join_or_create_friend_group:,
+      def initialize(game_flow:, layout:, sounds:, radius:, start_game:, finish_game:, buy_pro:, use_theme:, join_or_create_friend_group:,
                      view_achievements:, stats_book:, achievements:, themes:, groups:, style: Style, random: Random.new, calm: false,
                      tutor: Tutor.new(ScoreRecord::Memory.new, times: style::LESSON.times), haptics: NoHaptics.new, clipboard: MemoryClipboard.new,
                      sizing_store: ScoreRecord::Memory.new, input: InputKind::MOUSE, measure: RoughMeasure.new,
-                     keeper: StatsBackup.new(score_record: cabinet.score_record, stats_book:, achievements:), notices: Notices.none,
+                     keeper: StatsBackup.new(score_record: game_flow.score_record, stats_book:, achievements:), notices: Notices.none,
                      sharing: InGameSharing.new, tutorial_flag: TutorialFlag.never, window: NoWindowControl.new,
                      links: NoLinks.new, group_notice: GroupNotice.read, server_choice: nil)
-        @cabinet = cabinet
+        @game_flow = game_flow
         @window = window
         @links = links
         @tutorial_flag = tutorial_flag
@@ -75,9 +75,9 @@ module DotPopper
         @effects = Effects.new(radius:, random:, calm:)
         @animations = DotAnimations.new(style::MOTION)
         @hud = Hud.blank(style::HUD, words)
-        @attract = Attract.spawn(cabinet.field, style::HOME)
+        @attract = Attract.spawn(game_flow.field, style::HOME)
         @now = 0.0
-        @home_entrance = HomeEntrance.new(style: style::HOME, score_record: cabinet.score_record.of(cabinet.size_class), at: @now)
+        @home_entrance = HomeEntrance.new(style: style::HOME, score_record: game_flow.score_record.of(game_flow.size_class), at: @now)
         @game_over = nil
         @tutor = tutor
         @clipboard = clipboard
@@ -105,7 +105,7 @@ module DotPopper
       # One of each screen, open or not, by its name in Screens.made_for.
       attr_reader :screens
 
-      # The screen for Cabinet's state, under any opened over it: Home,
+      # The screen for GameFlow's state, under any opened over it: Home,
       # or the new theme card over it; the Tutorial over the
       # paused game; a game; or Game Over.
       def state_screen
@@ -162,10 +162,10 @@ module DotPopper
       end
 
       # Whether Home is showing.
-      def home? = cabinet.state.is_a?(Cabinet::Home)
+      def home? = game_flow.state.is_a?(GameFlow::Home)
 
       # Whether the Tutorial is playing (#tutorial) over the game, which is
-      # paused meanwhile (Cabinet::Paused), so its clock is not running,
+      # paused meanwhile (GameFlow::Paused), so its clock is not running,
       # and no tap reaches it but the ones the Tutorial passes on; once it
       # ends, or is skipped, the game plays on from the state it is in.
       def tutorial? = @screens[:tutorial].playing?
@@ -242,7 +242,7 @@ module DotPopper
       def stats_note
         return if sizing_preview.alike?
 
-        "Stats for #{words.sizing(cabinet.sizing, sizing_preview).downcase} dots"
+        "Stats for #{words.sizing(game_flow.sizing, sizing_preview).downcase} dots"
       end
 
       # Whether the Stats screen offers "Clear my stats…": while it has
@@ -254,15 +254,15 @@ module DotPopper
 
       # What the choice of dot size would do on this screen, worked out
       # afresh each time, so a resized window is always seen as it is now.
-      def sizing_preview = SizingPreview.of(cabinet.screen, style::SIZING)
+      def sizing_preview = SizingPreview.of(game_flow.screen, style::SIZING)
 
       # Whether Settings offers the choice of dot size: only where the two
       # sizes look different (SizingPreview#offered?). Where they look
       # alike, the choice is left out, the saved size stands, and games
       # follow it.
       def sizing_offered? = sizing_preview.offered?
-      def playing? = cabinet.playing?
-      def game_over? = cabinet.state.is_a?(Cabinet::GameOver)
+      def playing? = game_flow.playing?
+      def game_over? = game_flow.state.is_a?(GameFlow::GameOver)
 
       # A tap at +x+, +y+, by +by+ (a finger's id, :mouse, or :gamepad),
       # which #let_go names when it lets go, on the screen on top
@@ -367,7 +367,7 @@ module DotPopper
       # The player chose another size of dots: Home's dots are spawned
       # afresh at it, and its score record is the size's.
       def sizing_changed
-        @attract = Attract.spawn(cabinet.field, style::HOME)
+        @attract = Attract.spawn(game_flow.field, style::HOME)
         score_record_changed
       end
 
@@ -654,11 +654,11 @@ module DotPopper
         effects.update(seconds)
         follow_tutorial(seconds) if tutorial?
         @attract = attract.update(seconds) if home?
-        follow_game if cabinet.game && !tutorial?
+        follow_game if game_flow.game && !tutorial?
         follow_game_over if game_over?
       end
 
-      # Hears one of the rules' events (Cabinet#subscribe), and each game
+      # Hears one of the rules' events (GameFlow#subscribe), and each game
       # as it is finished (UseCases::FinishGame#subscribe), which Game Over
       # shows: told it, rather than reading it back as the rules' GameEnded
       # is heard, Game Over is the game's own whatever order the listeners
@@ -696,15 +696,15 @@ module DotPopper
 
       # Home's score record shows the records as they are now, as after
       # clearing Stats or an undo.
-      def score_record_changed = @home_entrance = home_entrance.with(score_record: cabinet.score_record.of(cabinet.size_class))
+      def score_record_changed = @home_entrance = home_entrance.with(score_record: game_flow.score_record.of(game_flow.size_class))
 
 
       # The Tutorial opened over a game started paused (Screens::Home):
       # the effects are sized to its dots, and it plays.
       def tutorial_began
         effects.clear
-        effects.scale_to(cabinet.field.radius)
-        @screens[:tutorial].play(TutorialScene.new(cabinet:, effects:, sounds:, haptics: @haptics, style:, now:, calm: @calm, palette:))
+        effects.scale_to(game_flow.field.radius)
+        @screens[:tutorial].play(TutorialScene.new(game_flow:, effects:, sounds:, haptics: @haptics, style:, now:, calm: @calm, palette:))
       end
 
       # One of Home's dots, popped by a tap: its droplets, its ring,
@@ -736,7 +736,7 @@ module DotPopper
       # clock, its first second down ticks, as the urgent ones do.
       def follow_game
         before = hud.seconds
-        @hud = hud.read(cabinet.game, now) { tick(it) if playing? }
+        @hud = hud.read(game_flow.game, now) { tick(it) if playing? }
         beckon
         @clock_highlight = nil if @clock_highlight&.over?(now)
         return unless @clock_highlight && playing? && before && hud.seconds < before && now - @penalized_at >= 0.1
@@ -806,7 +806,7 @@ module DotPopper
       def beckon
         return unless @beckoned_at && playing? && now - @beckoned_at >= style::BONUS_BEACON_EVERY
 
-        dot = cabinet.game.dots.find { it.bright? && it.bonus? } or return @beckoned_at = nil
+        dot = game_flow.game.dots.find { it.bright? && it.bonus? } or return @beckoned_at = nil
         @beckoned_at = now
         effects.ring(dot.x, dot.y, style::BONUS_BEACON, follow: dot.id)
       end
@@ -875,7 +875,7 @@ module DotPopper
       end
 
       def follow_game_over
-        @game_over = game_over.ready(now) if cabinet.state.ready?
+        @game_over = game_over.ready(now) if game_flow.state.ready?
         replay_mistake if game_over.lesson && game_over.counted?(now) &&
                        style::LESSON.replay_due?(game_over.replayed, now - game_over.at - style::GAME_OVER.tally.duration)
         goal_burst if game_over.goal_due?(now)
@@ -894,7 +894,7 @@ module DotPopper
       def replay_mistake
         mistake = game_over.lesson
         @game_over = game_over.replay
-        dots = cabinet.game.dots
+        dots = game_flow.game.dots
         popped, bright = [mistake.popped, mistake.bright].map { |id| dots.find { it.id == id } }
         animations.wobble(popped.id, now)
         effects.ring(popped.x, popped.y, style::ALARM_RING, follow: popped.id)

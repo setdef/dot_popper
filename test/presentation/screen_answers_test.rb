@@ -124,7 +124,7 @@ class ScreenAnswersTest < Minitest::Test
 
     # A finger's tap on the bright dot on top of a game in play.
     def tap_dot_in_play
-      dots = show.cabinet.game&.dots or return :no_game
+      dots = show.game_flow.game&.dots or return :no_game
       dot = dots.find { it.bright? && dots.top_at(it.x, it.y)&.id == it.id } or return :no_dot
       click(dot.x, dot.y, 7)
     end
@@ -142,11 +142,11 @@ class ScreenAnswersTest < Minitest::Test
       { screen: Inputs.say(Inputs.screen(show)), scroll: show.scroll&.offset&.round(1), dialog: show.dialog, theme: show.in_use.key,
         clipboard: fixture.clipboard.paste, opened: fixture.opener.urls.dup, quits: fixture.window.respond_to?(:quits) && fixture.window.quits,
         game_quits: fixture.shell.quits,
-        display: fixture.window.display, muted: sounds.muted?, dot_size: show.words.sizing(show.cabinet.sizing, show.sizing_preview).downcase,
+        display: fixture.window.display, muted: sounds.muted?, dot_size: show.words.sizing(show.game_flow.sizing, show.sizing_preview).downcase,
         holding: [show.clearing, show.group_panel.hold].find(&:held?)&.then { :held }, asked_to_quit: show.quit_prompt.positive?,
         store: fixture.storefront.status, status: show.offer_status, server: fixture.server_choice.address,
         undo: show.undo_offer && :offered, games: show.stats_book.stats.games, code: (show.group_panel.code unless show.group_panel.code.empty?),
-        code_shown: show.group_panel.code_shown?, group: show.group_panel.group_id, score: show.cabinet.game&.score,
+        code_shown: show.group_panel.code_shown?, group: show.group_panel.group_id, score: show.game_flow.game&.score,
         sounds: sounds.played.size, last_sound: sounds.played.last&.then { |name, pitch| "#{name} #{pitch.round(2)}" } }
     end
 

@@ -13,7 +13,7 @@ Every press goes through one path, so every rule about presses holds for every k
 1. `main.rb` hands each of Lota's callbacks to `Shell::App` (`mouse_pressed`, `touch_pressed`, `gamepad_pressed`, `gamepad_axis`, `key_pressed`, `wheel_moved`, and their moves and releases).
 2. `Shell::LotaInput` turns each into the game's own event (`Presentation::MousePress`, `TouchPress`, `ButtonPress`, `TriggerPull`, `KeyPress`, `WheelTurn` and the rest, in `input_events.rb`), by the game's names and as it happened, and `App` hands it to `Presentation::InputHandler#call`. The shell names each input and decides almost nothing about what it means; what it still decides is below, under "What the shell still decides".
 3. The `InputHandler` decides. For a mouse or finger, `InputRouter#tap` leaves out what is no press of the player's own, and a mouse's side buttons, and turns each of the rest into a `Tap` (`x`, `y`, and the `InputKind` that made it), which goes to `Show#tap` on the frame it happens, unless the Show waits for its release (Game Over, below).
-4. `Show#tap` hands it to the screen on top (`Show#screen`; [screens.md](screens.md#screens-as-objects)): a game's sends it to the game (`Cabinet#press`), the Tutorial's to the Tutorial, and every other screen's to the button under it (`Show#controls`, `Show#control_at`), or to its empty space.
+4. `Show#tap` hands it to the screen on top (`Show#screen`; [screens.md](screens.md#screens-as-objects)): a game's sends it to the game (`GameFlow#press`), the Tutorial's to the Tutorial, and every other screen's to the button under it (`Show#controls`, `Show#control_at`), or to its empty space.
 
 The rules:
 

@@ -25,8 +25,8 @@ module DotPopper
           sounds = self.sounds
           rows = [[:sound, words.button(:sound), :speaker, [[words.button(:on), !sounds.muted?, [:sound, true]], [words.button(:off), sounds.muted?, [:sound, false]]]]]
           if show.sizing_offered?
-            cabinet = show.cabinet
-            rows << [:dot_size, words.button(:dot_size), :dot, SIZINGS.map { [words.sizing(it, show.sizing_preview), it == cabinet.sizing, it] }]
+            game_flow = show.game_flow
+            rows << [:dot_size, words.button(:dot_size), :dot, SIZINGS.map { [words.sizing(it, show.sizing_preview), it == game_flow.sizing, it] }]
           end
           rows << [:display, words.button(:display), :corners, display_choices] if show.window.offered?
           plan = SettingsLayout.new(layout:, rows:, offset: scroll ? scroll.offset : 0.0, change_server: show.change_server_offered?).plan
@@ -56,13 +56,13 @@ module DotPopper
         # choice, and remembers it. Home's dots and score record change
         # with it, so the choice shows at once.
         def choose_sizing(sizing)
-          cabinet = show.cabinet
-          return sounds.play(:tick, pitch: 0.8) if sizing == cabinet.sizing
+          game_flow = show.game_flow
+          return sounds.play(:tick, pitch: 0.8) if sizing == game_flow.sizing
 
-          cabinet.sizing = sizing
-          @sizing_store.write(cabinet.sizing.to_text)
+          game_flow.sizing = sizing
+          @sizing_store.write(game_flow.sizing.to_text)
           show.sizing_changed
-          sounds.play(:tick, pitch: cabinet.sizing.standard? ? 1.2 : 0.9)
+          sounds.play(:tick, pitch: game_flow.sizing.standard? ? 1.2 : 0.9)
         end
 
         # Sound on or off, as +on+ says.
@@ -103,7 +103,7 @@ module DotPopper
         # X Credits and licenses, Y Privacy.
         def pad(button)
           case button
-          in :lb then choose_sizing(show.cabinet.sizing.toggled) if show.sizing_offered?
+          in :lb then choose_sizing(show.game_flow.sizing.toggled) if show.sizing_offered?
           in :rb then next_display
           in :x then show.open_credits
           in :y then show.open_privacy

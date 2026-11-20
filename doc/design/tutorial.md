@@ -10,7 +10,7 @@ How Dot Popper teaches itself without a word: the tutorial that opens the first 
 
 The tutorial is a layer over the first game, played while that game is paused before its clock first runs. There is one game: its dots, score, clock, row and rules are the rules' own, and the tutorial keeps no copy of any of them. It uses the game's real drawing, the slowest real speed for its first dot (`Rules::SPEEDS.min`, 1.2 radii a second), the real HUD with its row of eight dots in a row, and the game's real pop and penalty effects. It says nothing in words: only numbers, the clock's digits, a drawn stopwatch, a small dot and drawn shapes. Nothing in it depends on sound.
 
-While it plays, `Cabinet` holds the game in its `Paused` state: the clock does not run, the dots move only as the tutorial moves them, and no press reaches the game except the ones the tutorial passes on. The `Show` draws the tutorial over it (`Show#tutorial?`). When the tutorial ends, or is skipped, it goes, and the same game plays on from the state it is in (see "Play begins").
+While it plays, `GameFlow` holds the game in its `Paused` state: the clock does not run, the dots move only as the tutorial moves them, and no press reaches the game except the ones the tutorial passes on. The `Show` draws the tutorial over it (`Show#tutorial?`). When the tutorial ends, or is skipped, it goes, and the same game plays on from the state it is in (see "Play begins").
 
 ### Why it teaches without words
 
@@ -31,13 +31,13 @@ The cost: the tutorial is the most tuned part of the presentation (its beats, ti
 | The spotlight | `Presentation::Spotlight`, `SpotlightStyle` (`spotlight.rb`) |
 | Numbers in flight | `Presentation::TravelingNumber` (`traveling_number.rb`), drawn as a `Presentation::Tally` (`tally.rb`) |
 | Whether pressing Play opens it | `Presentation::TutorialFlag` (`tutorial_flag.rb`), `tutorial.txt` |
-| The paused game | `Cabinet::Paused`, `Cabinet::Starter#paused`, `Cabinet#press_paused`, `#move_paused`, `#arrange`, `#unpause`; `Game#move_dots`, `#arrange` |
+| The paused game | `GameFlow::Paused`, `GameFlow::Starter#paused`, `GameFlow#press_paused`, `#move_paused`, `#arrange`, `#unpause`; `Game#move_dots`, `#arrange` |
 | Opening, skipping and playing on | `Show#play`, `#how_to_play`, `#skip_tutorial`, `#follow_tutorial`; `Screens::Tutorial` (its scene while it plays, `#skip`, `#follow`); `Screens::Home#open_tutorial`; `TutorialScene.opening`; `UseCases::StartGame` |
 | Drawing | `Shell::TutorialPainter`, `Shell::GuidePainter`, `Shell::HandSprites`, `Shell::TallyPainter`, and `Shell::Renderer#tutorial` |
 
 ## When it opens
 
-- **A first Play.** `Show#play` opens it, over a new game started paused (`UseCases::StartGame`, `Cabinet::Starter#paused`), when `TutorialFlag#due?(played: Show#stats_offered?)` is true. It is due once on a device, and never for a player who has played: a finished game in `stats.txt` (`StatsBook`), or Stats ever cleared (`StatsBackup#cleared?`).
+- **A first Play.** `Show#play` opens it, over a new game started paused (`UseCases::StartGame`, `GameFlow::Starter#paused`), when `TutorialFlag#due?(played: Show#stats_offered?)` is true. It is due once on a device, and never for a player who has played: a finished game in `stats.txt` (`StatsBook`), or Stats ever cleared (`StatsBackup#cleared?`).
 - **How to play.** Home's How to play button, the H key, and a gamepad's Y on Home open it at once, seen or not (`Show#how_to_play`). Home shows the button only after a game has been played (`HomeLayout#pill_names`), since before that Play opens the tutorial. H works on any Home. How to play opens over a new game exactly as a first Play's tutorial does.
 - **`tutorial.txt`** says `seen` from the moment the tutorial opens, by either road, so a skipped tutorial counts as seen (`TutorialFlag#seen!`). Anything else in the file counts as unseen. The file is kept apart from Stats, so clearing Stats leaves it: clearing starts the scores over, not the player.
 - **Development.** `DOT_POPPER_TUTORIAL=1` opens it on every Play. `DOT_POPPER_AUTOPLAY`, `DOT_POPPER_SCENARIO` (the GUI scenario runner) and `DOT_POPPER_NO_TUTORIAL` leave it out (`TutorialFlag.mode`); `DOT_POPPER_TUTORIAL=1` wins over them, which is how the GUI tutorial scenarios open it.
@@ -72,7 +72,7 @@ The first bright dot (`TutorialScene::BRIGHT`), which the game is made with (`Ga
 
 ### How the second dot parts from the first
 
-The next bright dot (`TutorialScene::NEXT`) is the one the game spawned at the first pop. As it is shown born, the tutorial places it `born`, 0.1 radii, from the popped one (`TutorialScene#parting`, `Cabinet#arrange`), while the game is paused and before anyone has seen it. Where both have room across, at least 1.15 radii ahead of and behind the popped dot, it goes back the way the popped one came, toward the middle. Where a side wall is too near, as on an upright phone, they part up and down instead: the new dot goes down, and the popped one rises. Either way they part away from where the guide waits above. Placing the dot, and turning the popped one upward, are the only changes the tutorial makes to the game that its rules do not: a paused game's dots may be arranged, a game in play's never are.
+The next bright dot (`TutorialScene::NEXT`) is the one the game spawned at the first pop. As it is shown born, the tutorial places it `born`, 0.1 radii, from the popped one (`TutorialScene#parting`, `GameFlow#arrange`), while the game is paused and before anyone has seen it. Where both have room across, at least 1.15 radii ahead of and behind the popped dot, it goes back the way the popped one came, toward the middle. Where a side wall is too near, as on an upright phone, they part up and down instead: the new dot goes down, and the popped one rises. Either way they part away from where the guide waits above. Placing the dot, and turning the popped one upward, are the only changes the tutorial makes to the game that its rules do not: a paused game's dots may be arranged, a game in play's never are.
 
 ## Stopped and flowing time
 
@@ -139,7 +139,7 @@ Only `:aim` and `:aim_next` hear the field (`TutorialScene::TURNS`, `TutorialSce
 
 On the player's turn (`TutorialScene#tap`):
 
-- a tap on the bright dot the beat waits for reaches the game (`Cabinet#press_paused`), which pops it;
+- a tap on the bright dot the beat waits for reaches the game (`GameFlow#press_paused`), which pops it;
 - a tap on empty space ripples faintly (`TOUCH_RIPPLE`), as in a game, and does not reach the game;
 - a tap on a popped dot does nothing, and does not reach the game. The lesson shows the mistake's cost and never charges it: a learner who taps the wrong dot in a lesson hasn't earned a loss (Juul, *The Art of Failure*). The game's rules are the same as in play; the tutorial simply never passes that press on.
 
@@ -153,7 +153,7 @@ A pop of the player's plays the game's burst, shockwave, pop sound and, on Andro
 
 ## Play begins
 
-When the beat is `:over`, `Show#follow_tutorial` takes the tutorial away and unpauses its game (`Screens::Tutorial#follow`, `Cabinet#unpause`). Nothing is copied: the game is the one the tutorial played over, with its three dots where they are and going as they go, the two popped ones on top and the bright one under them; its score, 1, its clock, 10 seconds, and its row, 1, which are always so, since the player's own taps on a popped dot never reach it. The `Show` keeps the tutorial's dot animations, its effects still playing and its HUD, so nothing on screen jumps (`Show#game_started`).
+When the beat is `:over`, `Show#follow_tutorial` takes the tutorial away and unpauses its game (`Screens::Tutorial#follow`, `GameFlow#unpause`). Nothing is copied: the game is the one the tutorial played over, with its three dots where they are and going as they go, the two popped ones on top and the bright one under them; its score, 1, its clock, 10 seconds, and its row, 1, which are always so, since the player's own taps on a popped dot never reach it. The `Show` keeps the tutorial's dot animations, its effects still playing and its HUD, so nothing on screen jumps (`Show#game_started`).
 
 Only the clock starts. Nothing fades, nothing resets and no dot is added. The light on the clock (`ClockHighlight`, `Style::TUTORIAL.clock_highlight`) fades out in 0.6 s, so the game's dots are never hidden for more than a moment, and a halo stays on the clock for 1.3 s, then fades in 0.4 s. While it shows, the clock's first second down ticks. A skip has no clock highlight.
 
@@ -192,6 +192,6 @@ Failure is the moment a player is ready to learn (Juul), and showing the consequ
 - `test/presentation/tutorial_beats_test.rb`: frame by frame on three screens, each beat, the HUD's numbers as they land, the sounds, the traveling numbers, the spotlight, the guide and the first two dots' places, and the game that follows.
 - `test/presentation/show_tutorial_test.rb`: opening on a first Play and by How to play, never again after Stats are cleared, never for a player who has played, play beginning on the same game, the game counting as any game, Skip by button, Escape and B at several beats, every input on the guide's demonstration, and resizing.
 - `test/presentation/games_test.rb`: the free game spent as the tutorial opens, and nothing more at its end or at Skip.
-- `test/cabinet_test.rb`: the paused game.
+- `test/game_flow_test.rb`: the paused game.
 - `test/presentation/tutorial_flag_test.rb`, `test/presentation/tutor_test.rb`, `test/presentation/pointing_hand_test.rb`.
 - GUI scenarios, which play the real game ([development.md](development.md)): `test/gui/scenarios/tutorial.rb` (with the mouse, `DOT_POPPER_GUI_INPUT=touch` or `gamepad`), `tutorial_skip.rb` and `how_to_play.rb`.

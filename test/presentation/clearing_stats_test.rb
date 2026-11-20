@@ -13,10 +13,10 @@ class ClearingStatsTest < Minitest::Test
   def setup
     @sounds = FakeSounds.new
     @folder = DotPopper::StatsBackup::Folder.new
-    @cabinet = DotPopper::Cabinet.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(@folder.call("score_record")))
+    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(@folder.call("score_record")))
     @stats_book = DotPopper::StatsBook.new(@folder.call("stats"), today: -> { Date.new(2026, 11, 5) })
-    @keeper = DotPopper::StatsBackup.new(score_record: @cabinet.score_record, stats_book: @stats_book, folder: @folder)
-    @show = new_show(cabinet: @cabinet, layout: layout, sounds: @sounds, radius: R, stats_book: @stats_book, keeper: @keeper)
+    @keeper = DotPopper::StatsBackup.new(score_record: @game_flow.score_record, stats_book: @stats_book, folder: @folder)
+    @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, stats_book: @stats_book, keeper: @keeper)
     finish_game
     @show.open_stats
   end
@@ -63,14 +63,14 @@ class ClearingStatsTest < Minitest::Test
 
   def test_undo_puts_everything_back
     before = @stats_book.stats
-    score_record = @cabinet.score_record.of(@cabinet.size_class)
+    score_record = @game_flow.score_record.of(@game_flow.size_class)
     clear_by(:mouse)
     @show.tap(*middle(@show.undo_reach), by: :mouse)
 
     assert @show.stats?, "Undo never goes back"
     refute @show.stats.empty
     assert_equal before, @stats_book.stats
-    assert_equal score_record, @cabinet.score_record.of(@cabinet.size_class)
+    assert_equal score_record, @game_flow.score_record.of(@game_flow.size_class)
     assert_equal score_record, @show.home_entrance.score_record
     assert @show.clear_offered?
   end
@@ -93,8 +93,8 @@ class ClearingStatsTest < Minitest::Test
     clear_by(:mouse)
     @show.back
     press_main
-    @cabinet.update(20)
-    @cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(20)
+    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
     press_main
     @show.open_stats
     assert @show.stats?
@@ -139,11 +139,11 @@ class ClearingStatsTest < Minitest::Test
 
   def finish_game
     press_main
-    bright = @cabinet.game.dots.find(&:bright?)
-    clear_around!(live(@cabinet), bright)
+    bright = @game_flow.game.dots.find(&:bright?)
+    clear_around!(live(@game_flow), bright)
     @show.tap(bright.x, bright.y)
-    @cabinet.update(20)
-    @cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(20)
+    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
     press_main
   end
 end

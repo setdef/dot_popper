@@ -19,7 +19,7 @@ module DotPopper
         # Home: back Home, once the game will hear a press
         # (Rules::GAME_OVER_GRACE).
         def continue_on
-          show.cabinet.press(layout.center_x, layout.center_y) if show.game_over?
+          show.game_flow.press(layout.center_x, layout.center_y) if show.game_over?
         end
 
         # Play again: Home, and at once Play, so another game is one press.
@@ -27,7 +27,7 @@ module DotPopper
         # Over, which Back closes to Game Over as it was: what StartGame
         # answers here (:offer, or :not_home while a game is left).
         def play_again
-          return unless show.cabinet.state.ready?
+          return unless show.game_flow.state.ready?
           return show.offer.open_for_play if @start_game.call == :offer
 
           continue_on
@@ -37,7 +37,7 @@ module DotPopper
         # One of its lines that opens something: a new achievement in its
         # dialog, or the friend group whose title the game took.
         def open_from(what)
-          return unless show.cabinet.state.ready?
+          return unless show.game_flow.state.ready?
 
           achievement = show.game_over.achievements.first
           group = show.group_panel.game_title_taken
@@ -67,7 +67,7 @@ module DotPopper
         def screen_layout
           over = show.game_over or return
           GameOverLayout.new(layout:, type: style::TYPE, words:, measure:, scrim: style::GAME_OVER_BACKING, game_over: over,
-                             below: layout.safe.y, radius: show.cabinet.game&.field&.radius || show.radius, chips:,
+                             below: layout.safe.y, radius: show.game_flow.game&.field&.radius || show.radius, chips:,
                              play_word: @start_game.none_left? ? words.button(:get_pro) : words.play_again, play_note: show.play_note)
         end
 

@@ -1,5 +1,5 @@
 module DotPopper
-  class Cabinet
+  class GameFlow
     LARGEST_SEED: Integer
 
     interface _Listener
@@ -32,13 +32,13 @@ module DotPopper
     def starter: () -> Starter
 
     class Starter
-      @start: ^(Stack?, Integer?) -> Cabinet
+      @start: ^(Stack?, Integer?) -> GameFlow
 
-      def initialize: (^(Stack?, Integer?) -> Cabinet start) -> void
+      def initialize: (^(Stack?, Integer?) -> GameFlow start) -> void
 
-      def game: (?Integer? seed) -> Cabinet
+      def game: (?Integer? seed) -> GameFlow
 
-      def paused: (Stack dots, ?Integer? seed) -> Cabinet
+      def paused: (Stack dots, ?Integer? seed) -> GameFlow
     end
 
     def initialize: (Field screen, ?score_record: ScoreRecord, ?random: Random, ?sizing: DotSizing) -> void

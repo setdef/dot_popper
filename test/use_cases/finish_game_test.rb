@@ -31,7 +31,7 @@ class FinishGameTest < Minitest::Test
                                                   friend_groups: @groups)
   end
 
-  # Its one way in is an event heard (#call), as the cabinet tells it the
+  # Its one way in is an event heard (#call), as the game flow tells it the
   # rules' own: nothing finishes a game with numbers of its own choosing.
   def test_a_game_is_finished_only_as_its_end_is_heard
     assert_raises(NoMethodError) { @finish.finish(ended, stats: stats) }
@@ -88,18 +88,18 @@ class FinishGameTest < Minitest::Test
   # Heard as the rules announce each event, what it finishes with is the
   # game's own: its numbers, and whether the tutorial opened it.
   def test_it_finishes_each_game_from_the_rules_events_alone
-    cabinet = DotPopper::Cabinet.new(field, random: Random.new(3), sizing: DotPopper::DotSizing::STANDARD)
-    cabinet.subscribe(@finish)
+    game_flow = DotPopper::GameFlow.new(field, random: Random.new(3), sizing: DotPopper::DotSizing::STANDARD)
+    game_flow.subscribe(@finish)
     told = []
     @finish.subscribe(told.method(:<<))
-    play = ->(start) { start.call.then { cabinet.update(30) }.then { cabinet.update(DotPopper::Rules::GAME_OVER_GRACE) } }
-    play.(-> { start!(cabinet) })
-    cabinet.press(0, 0)
-    play.(-> { start_paused!(cabinet, DotPopper::Stack.new(dots: [dot(300, 300, id: 0)])).unpause })
+    play = ->(start) { start.call.then { game_flow.update(30) }.then { game_flow.update(DotPopper::Rules::GAME_OVER_GRACE) } }
+    play.(-> { start!(game_flow) })
+    game_flow.press(0, 0)
+    play.(-> { start_paused!(game_flow, DotPopper::Stack.new(dots: [dot(300, 300, id: 0)])).unpause })
 
     assert_equal 2, @stats_book.stats.games
     assert_equal [true, false], @groups.games.map(&:last), "the tutorial's game never counts"
-    assert_equal cabinet.game.score, @finish.stats.score
+    assert_equal game_flow.game.score, @finish.stats.score
     assert_equal [[], []], told.map { it.result.achievements }
   end
 
@@ -107,17 +107,17 @@ class FinishGameTest < Minitest::Test
   # game is finished, never left to be read back: each is told once a
   # game is in Stats, with that game's own result and numbers.
   def test_it_tells_its_listeners_each_game_it_finishes_with_that_games_result
-    cabinet = DotPopper::Cabinet.new(field, random: Random.new(3))
+    game_flow = DotPopper::GameFlow.new(field, random: Random.new(3))
     told = []
     heard = []
     @finish.subscribe(->(finished) { told << [finished, @stats_book.stats.games] })
-    cabinet.subscribe(@finish)
-    cabinet.subscribe { heard << it if it.is_a?(DotPopper::Events::GameEnded) }
+    game_flow.subscribe(@finish)
+    game_flow.subscribe { heard << it if it.is_a?(DotPopper::Events::GameEnded) }
     2.times do
-      start!(cabinet)
-      cabinet.update(30)
-      cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
-      cabinet.press(0, 0)
+      start!(game_flow)
+      game_flow.update(30)
+      game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+      game_flow.press(0, 0)
     end
 
     assert_equal [1, 2], told.map(&:last), "told after the game is in Stats"

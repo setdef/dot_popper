@@ -11,20 +11,20 @@ module DotPopper
     # them by the names Presentation::Show takes. UseTheme is not among
     # them: it hears nothing, and is made before the rest, since the pen
     # and the sound player take the current theme from it before anything
-    # is drawn. +starter+ is the cabinet's one Starter, which StartGame
+    # is drawn. +starter+ is the game flow's one Starter, which StartGame
     # holds.
-    def self.use_cases(cabinet:, free_games:, entitlement:, store:, achievements:, stats_book:, friend_groups:,
-                       starter: cabinet.starter)
-      buy_pro = UseCases::BuyPro.new(store:, entitlement:, cabinet:, achievements:, friend_groups:)
+    def self.use_cases(game_flow:, free_games:, entitlement:, store:, achievements:, stats_book:, friend_groups:,
+                       starter: game_flow.starter)
+      buy_pro = UseCases::BuyPro.new(store:, entitlement:, game_flow:, achievements:, friend_groups:)
       entitlement.subscribe(buy_pro)
       finish_game = UseCases::FinishGame.new(stats_book:, achievements:, entitlement:, friend_groups:)
-      cabinet.subscribe(finish_game)
+      game_flow.subscribe(finish_game)
       {
-        start_game: UseCases::StartGame.new(cabinet:, free_games:, starter:),
+        start_game: UseCases::StartGame.new(game_flow:, free_games:, starter:),
         finish_game:,
         buy_pro:,
         join_or_create_friend_group: UseCases::JoinOrCreateFriendGroup.new(groups: friend_groups, entitlement:),
-        view_achievements: UseCases::ViewAchievements.new(achievements:, entitlement:, stats_book:, score_record: cabinet.score_record)
+        view_achievements: UseCases::ViewAchievements.new(achievements:, entitlement:, stats_book:, score_record: game_flow.score_record)
       }
     end
   end

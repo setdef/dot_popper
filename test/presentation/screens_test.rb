@@ -9,8 +9,8 @@ class ScreensTest < Minitest::Test
   include PresentationTest
 
   def setup
-    @cabinet = DotPopper::Cabinet.new(field, random: Random.new(2))
-    @show = new_show(cabinet: @cabinet, layout: layout, sounds: FakeSounds.new, radius: R, entitlement: DotPopper::Entitlement.free)
+    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2))
+    @show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, entitlement: DotPopper::Entitlement.free)
   end
 
   def test_the_screen_for_the_games_state_is_under_everything
@@ -21,7 +21,7 @@ class ScreensTest < Minitest::Test
     assert_equal Screens::Tutorial, @show.screen.class, "How to play opens the Tutorial over its game"
     @show.skip_tutorial
     assert_equal Screens::Game, @show.screen.class
-    @cabinet.update(30)
+    @game_flow.update(30)
     assert_equal Screens::GameOver, @show.screen.class
     assert_empty @show.stack
   end

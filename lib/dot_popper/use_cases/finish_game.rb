@@ -10,9 +10,9 @@ module DotPopper
     # achievement is shown at Game Over, and reported to friend groups,
     # only for a player with Pro (+entitlement+, Entitlement); a Free
     # player's is kept and shown once Pro is bought. The score record is
-    # Cabinet's own, judged as the game ends (Events::GameEnded).
+    # GameFlow's own, judged as the game ends (Events::GameEnded).
     #
-    # It hears the rules' events itself (Cabinet#subscribe, which the
+    # It hears the rules' events itself (GameFlow#subscribe, which the
     # composition root does), so what it finishes with comes from the
     # rules alone: the game's numbers (GameStats::Recorder), the
     # achievements its play earned (AchievementRecorder), and whether the

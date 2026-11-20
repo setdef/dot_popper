@@ -29,12 +29,12 @@ class GroupPanelTest < Minitest::Test
     @worker = ManualWorker.new
     @session = Groups::Session.new(store: DotPopper::ScoreRecord::Memory.new, worker: @worker)
     @pro = DotPopper::Entitlement.new(forced: true)
-    @cabinet = DotPopper::Cabinet.new(field)
+    @game_flow = DotPopper::GameFlow.new(field)
     build
   end
 
   def build(width: 800, height: 600, entitlement: @pro, group_notice: DotPopper::Presentation::GroupNotice.read, links: DotPopper::Presentation::NoLinks.new)
-    @show = new_show(cabinet: @cabinet, layout: layout(width, height), sounds: @sounds, radius: R,
+    @show = new_show(game_flow: @game_flow, layout: layout(width, height), sounds: @sounds, radius: R,
                      entitlement:, groups: @session, group_notice:, links:)
   end
 
@@ -93,11 +93,11 @@ class GroupPanelTest < Minitest::Test
   # Every game counts in a group whatever its dot size, so a group's page
   # says nothing about the size.
   def test_a_group_says_the_same_whatever_the_dot_size
-    @cabinet.sizing = DotPopper::DotSizing::DEFAULT
+    @game_flow.sizing = DotPopper::DotSizing::DEFAULT
     join!
     with_default = lines
 
-    @cabinet.sizing = DotPopper::DotSizing::DEFAULT.toggled
+    @game_flow.sizing = DotPopper::DotSizing::DEFAULT.toggled
 
     assert_equal with_default, lines
   end

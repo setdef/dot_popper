@@ -47,7 +47,7 @@ On an upright phone the floor applies: the exact fit would be about 29.6, so the
 
 **Saving.** The choice is kept in `dot_size.txt`. It is written only when the player picks a size. `DotSizing.parse` reads `fitted` (Standard) or `standard` (the bigger or smaller size), and `same`, the bigger or smaller size's name in saves from before that (`DotSizing::EARLIER_NAMES`). These are the words builds in players' hands wrote, so they never change, whatever the screens and the code call the sizes (`test/saved_dot_size_words_test.rb`); a missing, empty or unreadable file means the player never chose, and gets `DEFAULT`.
 
-**When it applies.** `Cabinet#field` gives a new game `sizing.fit(screen)`. A game keeps its radius until it ends. `Cabinet#sizing=` changes the choice only on Home, so a game in play is never resized by it. Speeds are in radii per second, so they scale with R. Buttons and their reaches do not, since they are sized for a finger, not for the field.
+**When it applies.** `GameFlow#field` gives a new game `sizing.fit(screen)`. A game keeps its radius until it ends. `GameFlow#sizing=` changes the choice only on Home, so a game in play is never resized by it. Speeds are in radii per second, so they scale with R. Buttons and their reaches do not, since they are sized for a finger, not for the field.
 
 **When the choice is offered.** Settings shows a "Dot size" row only where the two radii differ by more than a tenth (`SizingPreview#offered?`, `SizingStyle#alike` of 0.1 in `Style::SIZING`), whichever size is saved. In a 1200 × 800 window the two are alike, so the row is hidden there; resizing the window brings it back. The first segment is "Standard", the default, and the second is named for what it does on this screen next to it ("Bigger" or "Smaller", `Words#sizing`), never easy or hard (`Show::SIZINGS`). Where the row is hidden, the saved choice stands and games follow it. The screen itself is described in [screens.md](screens.md).
 
@@ -67,10 +67,10 @@ What it costs: a dot's physical size varies by screen; two sets of records exist
 
 ## Resizing during a game
 
-When the window changes size or a phone turns (`Shell::App#resize`), `Cabinet#screen=` gives a game in play the new field with the game's own radius, and `Game#field=` moves every dot in proportion (`Dot#refit`): a dot 70% of the way across the old field's room is 70% of the way across the new one's, and the same down. It is then confined to the field, which matters only on a field narrower than a dot. Velocities and the radius do not change, nor do the score and clock. The spawner is rebuilt for the new field. Turning a phone and turning it back puts each dot where it was.
+When the window changes size or a phone turns (`Shell::App#resize`), `GameFlow#screen=` gives a game in play the new field with the game's own radius, and `Game#field=` moves every dot in proportion (`Dot#refit`): a dot 70% of the way across the old field's room is 70% of the way across the new one's, and the same down. It is then confined to the field, which matters only on a field narrower than a dot. Velocities and the radius do not change, nor do the score and clock. The spawner is rebuilt for the new field. Turning a phone and turning it back puts each dot where it was.
 
 - The next game starts on the new screen, with its radius worked out again.
-- A game counts in the size class it started in, even if the window changes during it (`Cabinet::Playing#size_class`).
+- A game counts in the size class it started in, even if the window changes during it (`GameFlow::Playing#size_class`).
 - Home's drifting dots (`Attract#refit`) and the tutorial's dots move the same way. Where the new screen gives Home's dots a different radius, they are drawn afresh.
 - The Game Over pile is a Box2D pile under gravity. Its walls move to the new edges and a dot left outside is brought back in (`Shell::Pile#refit`).
 
@@ -135,7 +135,7 @@ Tests: `test/spawner_test.rb`, `test/touch_target_test.rb`.
 
 - **Pop.** The dot becomes a popped dot where it is, and a new bright dot spawns under every dot on the field.
 - **Mistake.** The penalty takes at most what the score has, so the score never falls below 0. `Events::Penalized#points` is what was really lost, and `#softened?` says the floor kept part of it from landing. The clock takes the full 2 seconds.
-- **The clock** (`Countdown`) counts down in real time and never reads less than zero. The game ends the moment it reaches zero, whether time ran out or a penalty took the last of it (`Cabinet::Playing#settle`).
+- **The clock** (`Countdown`) counts down in real time and never reads less than zero. The game ends the moment it reaches zero, whether time ran out or a penalty took the last of it (`GameFlow::Playing#settle`).
 - **`Game#elapsed`** counts only time the clock was running, and never more than was left on it, so a game plays no longer than its clock. Stats and achievements time a game by it.
 
 ## The bonus dot
@@ -146,7 +146,7 @@ Tests: `test/spawner_test.rb`, `test/touch_target_test.rb`.
 - Popping it pays 3 points and 3 seconds on top of a pop's own: "+4" and "+4s".
 - A mistake starts the count over. A bonus dot already earned stays until it is popped. Popping it starts the count over, without counting itself.
 - Nothing is random. No draw is made for it, so a seed gives the same dots with the rule on or off.
-- `Game#dots_in_a_row` is the count toward the next bonus dot. A game the tutorial played over begins play with the row its popped dots made there (`Cabinet#unpause`), so the dot lit there stays lit, whether the tutorial ended or was skipped. See [tutorial.md](tutorial.md).
+- `Game#dots_in_a_row` is the count toward the next bonus dot. A game the tutorial played over begins play with the row its popped dots made there (`GameFlow#unpause`), so the dot lit there stays lit, whether the tutorial ended or was skipped. See [tutorial.md](tutorial.md).
 - `Game.new(..., bonus: nil)` turns the rule off, as the simulator does to compare.
 - `GameStats#bonuses` counts the bonus dots popped.
 
@@ -158,7 +158,7 @@ Tests: `test/bonus_test.rb`.
 
 ## Seeds
 
-Every game has a seed of its own. A game started without one (`Cabinet::Starter#game`, `#paused`) draws one below 2³¹ (`Cabinet::LARGEST_SEED`) from the app's main generator and gives the game a `Random` of its own from it. The game draws from that `Random` only when a dot spawns, so the same seed and the same taps give the same dots, whatever else uses randomness meanwhile; a burst of droplets can't change which dots come next. `DOT_POPPER_SEED` seeds the main generator, which makes a whole session repeatable (developer settings: [doc/README.md](../README.md)). `Events::GameStarted` and `Events::GameEnded` carry the seed, and `games.csv` records it ([progress.md](progress.md#the-games-log)), so any game in a playtest can be replayed.
+Every game has a seed of its own. A game started without one (`GameFlow::Starter#game`, `#paused`) draws one below 2³¹ (`GameFlow::LARGEST_SEED`) from the app's main generator and gives the game a `Random` of its own from it. The game draws from that `Random` only when a dot spawns, so the same seed and the same taps give the same dots, whatever else uses randomness meanwhile; a burst of droplets can't change which dots come next. `DOT_POPPER_SEED` seeds the main generator, which makes a whole session repeatable (developer settings: [doc/README.md](../README.md)). `Events::GameStarted` and `Events::GameEnded` carry the seed, and `games.csv` records it ([progress.md](progress.md#the-games-log)), so any game in a playtest can be replayed.
 
 ## Time
 
@@ -176,7 +176,7 @@ The GUI suite's scenario runner steps `App#update` by its scenario's fixed step,
 
 ### Game Over's grace
 
-For `Rules::GAME_OVER_GRACE`, 0.9 s, after the clock runs out, Game Over ignores presses (`Cabinet::GameOver#ready?`). A player often taps at a dot in the game's last instant, and without the pause that tap would dismiss the final score unseen. How Play again shows the grace is in [screens.md](screens.md).
+For `Rules::GAME_OVER_GRACE`, 0.9 s, after the clock runs out, Game Over ignores presses (`GameFlow::GameOver#ready?`). A player often taps at a dot in the game's last instant, and without the pause that tap would dismiss the final score unseen. How Play again shows the grace is in [screens.md](screens.md).
 
 ## How crowded the field gets
 
@@ -237,7 +237,7 @@ On every device but one, fewer than 1 spawn in 70 is redrawn, and a new place is
 | What | Where |
 | --- | --- |
 | Every rule, over thousands of random games with random resizes | `test/rules_fuzz_test.rb` |
-| A game: popping, mistakes, the floor, the clock, resuming from the tutorial | `test/game_test.rb`, `test/cabinet_test.rb`, `test/countdown_test.rb` |
+| A game: popping, mistakes, the floor, the clock, resuming from the tutorial | `test/game_test.rb`, `test/game_flow_test.rb`, `test/countdown_test.rb` |
 | Dots, bounces, refitting | `test/dot_test.rb`, `test/field_test.rb`, `test/stack_test.rb` |
 | Dot size and the choice | `test/dot_size_test.rb`, `test/dot_sizing_test.rb`, `test/presentation/sizing_preview_test.rb` |
 | The spawn check | `test/spawner_test.rb`, `test/touch_target_test.rb` |

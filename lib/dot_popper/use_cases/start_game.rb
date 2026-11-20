@@ -10,13 +10,13 @@ module DotPopper
     # carries out. Games run out only where they are counted, which is
     # only for a Free player where Pro is offered (FreeGames.metered?), so
     # no game left means Pro is offered. A game is
-    # Gameplay's (+cabinet+, a Cabinet) and the count of free games
+    # Gameplay's (+game_flow+, a GameFlow) and the count of free games
     # Monetization's (+free_games+, FreeGames), so neither knows of the
-    # other. It holds the cabinet's +starter+ (Cabinet::Starter), which the
-    # cabinet hands out once, so it alone can start a game there.
+    # other. It holds the game flow's +starter+ (GameFlow::Starter), which the
+    # game flow hands out once, so it alone can start a game there.
     class StartGame
-      def initialize(cabinet:, free_games:, starter: cabinet.starter)
-        @cabinet = cabinet
+      def initialize(game_flow:, free_games:, starter: game_flow.starter)
+        @game_flow = game_flow
         @starter = starter
         @free_games = free_games
       end
@@ -39,7 +39,7 @@ module DotPopper
       # once Home is shown.
       def call(opening = nil)
         return :offer if none_left?
-        return :not_home unless @cabinet.state.is_a?(Cabinet::Home)
+        return :not_home unless @game_flow.state.is_a?(GameFlow::Home)
         return :offer unless @free_games.spend!
 
         opening ? @starter.paused(opening) : @starter.game

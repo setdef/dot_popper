@@ -164,12 +164,12 @@ class ControllerTest < Minitest::Test
 
   def test_nothing_but_a_and_the_right_trigger_touches_a_game
     given(at: :game)
-    score = show.cabinet.game.score
+    score = show.game_flow.game.score
     %w[b x y start back leftshoulder rightshoulder].each { tap_button(it) }
     trigger("triggerleft", 1.0)
 
     assert show.playing?
-    assert_equal score, show.cabinet.game.score
+    assert_equal score, show.game_flow.game.score
     assert_equal 0, @shell.quits
   end
 

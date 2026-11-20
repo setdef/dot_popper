@@ -8,23 +8,23 @@ require "dot_popper/use_cases"
 # (doc/design/store-and-pro.md).
 class StartGameTest < Minitest::Test
   include DotPopperTest
-  Cabinet = DotPopper::Cabinet
+  GameFlow = DotPopper::GameFlow
 
   def setup
     @day = Date.new(2026, 11, 8)
     @games = DotPopper::FreeGames.new(DotPopper::ScoreRecord::Memory.new, today: -> { @day }, entitlement: DotPopper::Entitlement.free,
                                                                          first_games: 0, daily: 2)
-    @cabinet = Cabinet.new(field, random: Random.new(3))
+    @game_flow = GameFlow.new(field, random: Random.new(3))
     @started = []
-    @cabinet.subscribe { @started << it if it.is_a?(DotPopper::Events::GameStarted) }
-    @start = DotPopper::UseCases::StartGame.new(cabinet: @cabinet, free_games: @games)
+    @game_flow.subscribe { @started << it if it.is_a?(DotPopper::Events::GameStarted) }
+    @start = DotPopper::UseCases::StartGame.new(game_flow: @game_flow, free_games: @games)
   end
 
   def test_it_starts_a_game_in_play_and_spends_one
     refute_predicate @start, :none_left?
     assert_equal :started, @start.call
 
-    assert_predicate @cabinet, :playing?
+    assert_predicate @game_flow, :playing?
     assert_equal 1, @games.left
     assert_equal 1, @started.size
   end
@@ -33,12 +33,12 @@ class StartGameTest < Minitest::Test
     opening = DotPopper::Stack.new(dots: [dot(300, 300, id: 0)])
 
     assert_equal :started, @start.call(opening)
-    assert_predicate @cabinet, :paused?
-    assert_equal [0], @cabinet.game.dots.map(&:id)
+    assert_predicate @game_flow, :paused?
+    assert_equal [0], @game_flow.game.dots.map(&:id)
     assert_equal 1, @games.left, "spent as it opens"
     assert_empty @started, "announced only as play begins"
 
-    @cabinet.unpause
+    @game_flow.unpause
     assert_equal 1, @games.left, "play beginning spends no more"
   end
 
@@ -51,7 +51,7 @@ class StartGameTest < Minitest::Test
     assert_predicate @start, :none_left?
     assert_equal :offer, @start.call
     assert_equal :offer, @start.call(DotPopper::Stack.new(dots: [dot(300, 300, id: 0)]))
-    assert_instance_of Cabinet::Home, @cabinet.state
+    assert_instance_of GameFlow::Home, @game_flow.state
     assert_equal 2, @started.size
   end
 
@@ -65,36 +65,36 @@ class StartGameTest < Minitest::Test
     assert_equal 1, @games.left
     finish_game
     @start.call
-    @cabinet.update(20)
+    @game_flow.update(20)
 
     assert_equal 0, @games.left
     assert_equal :offer, @start.call, "at Game Over, with none left"
-    assert_instance_of Cabinet::GameOver, @cabinet.state
+    assert_instance_of GameFlow::GameOver, @game_flow.state
   end
 
   def test_a_game_unmetered_costs_nothing
     games = DotPopper::FreeGames.unlimited
-    cabinet = Cabinet.new(field, random: Random.new(3)) # one StartGame for each cabinet
-    start = DotPopper::UseCases::StartGame.new(cabinet:, free_games: games)
+    game_flow = GameFlow.new(field, random: Random.new(3)) # one StartGame for each game_flow
+    start = DotPopper::UseCases::StartGame.new(game_flow:, free_games: games)
 
     assert_equal :started, start.call
-    assert_predicate cabinet, :playing?
+    assert_predicate game_flow, :playing?
   end
 
-  # A cabinet hands out its one Starter once, and the use case takes it as
-  # it is made, so nothing else can start a game on that cabinet.
-  def test_a_cabinet_hands_out_its_starter_once_and_the_use_case_holds_it
-    assert_raises(Cabinet::StarterTaken) { @cabinet.starter }
-    assert_raises(Cabinet::StarterTaken) { DotPopper::UseCases::StartGame.new(cabinet: @cabinet, free_games: @games) }
+  # A game flow hands out its one Starter once, and the use case takes it as
+  # it is made, so nothing else can start a game on that game flow.
+  def test_a_game_flow_hands_out_its_starter_once_and_the_use_case_holds_it
+    assert_raises(GameFlow::StarterTaken) { @game_flow.starter }
+    assert_raises(GameFlow::StarterTaken) { DotPopper::UseCases::StartGame.new(game_flow: @game_flow, free_games: @games) }
   end
 
-  # A Cabinet's Starter taken (".starter"), or StartGame's read by
+  # A GameFlow's Starter taken (".starter"), or StartGame's read by
   # reflection (instance_variable_get(:@starter)): the second line behind
   # the Starter handed out once.
   STARTERS = /\.starter\b|@starter\b/
 
   # Nothing but this use case, and the composition root that hands it
-  # the cabinet's Starter, takes it or reads it: no screen, no shell,
+  # the game flow's Starter, takes it or reads it: no screen, no shell,
   # no script, and no file outside lib/ that the phones load. It reads
   # the source, so it cannot see a name built at run time.
   def test_nothing_else_starts_a_game
@@ -110,8 +110,8 @@ class StartGameTest < Minitest::Test
   private
 
   def finish_game
-    @cabinet.update(20)
-    @cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
-    @cabinet.press(0, 0)
+    @game_flow.update(20)
+    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.press(0, 0)
   end
 end

@@ -34,13 +34,13 @@ module DotPopper
       end
 
       # Where to press this frame, as [x, y], or nil.
-      def update(seconds, cabinet, show)
-        notice(cabinet.state)
+      def update(seconds, game_flow, show)
+        notice(game_flow.state)
         @waited += seconds
-        case cabinet.state
-        when Cabinet::Home then home(show)
-        when Cabinet::GameOver then finish(cabinet, show)
-        when Cabinet::Playing then play(seconds, cabinet.game)
+        case game_flow.state
+        when GameFlow::Home then home(show)
+        when GameFlow::GameOver then finish(game_flow, show)
+        when GameFlow::Playing then play(seconds, game_flow.game)
         end
       end
 
@@ -49,8 +49,8 @@ module DotPopper
       def notice(state)
         return if state.class == @state
 
-        @game_overs += 1 if state.is_a?(Cabinet::GameOver)
-        @homes += 1 if state.is_a?(Cabinet::Home)
+        @game_overs += 1 if state.is_a?(GameFlow::GameOver)
+        @homes += 1 if state.is_a?(GameFlow::Home)
         @shared = false
         @state = state.class
         @waited = 0.0
@@ -108,7 +108,7 @@ module DotPopper
           return if @resized
 
           @resized = true
-          other = Show::SIZINGS.find { it != show.cabinet.sizing }
+          other = Show::SIZINGS.find { it != show.game_flow.sizing }
           return middle(show.reach_of(other) || show.back_reach)
         end
         return if @waited < @style.home_wait / 2
@@ -119,7 +119,7 @@ module DotPopper
 
       # Shares and copies every other result first, then presses Home
       # once the game will hear.
-      def finish(cabinet, show)
+      def finish(game_flow, show)
         return in_preview(show) if show.sharing?
 
         if @game_overs.even? && !@shared && @waited >= @style.game_over_wait / 2 && show.share_reach
@@ -127,7 +127,7 @@ module DotPopper
           @pressed_at = @waited
           return middle(show.share_reach)
         end
-        press_once(@style.game_over_wait) { middle(show.home_reach) } if cabinet.state.ready?
+        press_once(@style.game_over_wait) { middle(show.home_reach) } if game_flow.state.ready?
       end
 
       # In the share preview, a moment after each press: Copy, then Close.

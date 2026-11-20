@@ -56,10 +56,10 @@ if ENV["DOT_POPPER_KIT_PROBE"] == "1"
       define_singleton_method(:load) do
         load.call
         begin
-          cabinet = @app.instance_variable_get(:@cabinet)
-          cabinet.subscribe { |event| puts "kit probe: event #{event.class.name.split('::').last}" }
-          @kit_game = cabinet
-          puts "kit probe: subscribed to the cabinet's events"
+          game_flow = @app.instance_variable_get(:@game_flow)
+          game_flow.subscribe { |event| puts "kit probe: event #{event.class.name.split('::').last}" }
+          @kit_game = game_flow
+          puts "kit probe: subscribed to the game flow's events"
           @app.instance_variable_get(:@game).refresh.singleton_class.prepend(Module.new do
             def came_back
               puts "kit probe: the game heard it came back"

@@ -37,10 +37,10 @@ class BuyProTest < Minitest::Test
   def setup
     @store = Store.new
     @entitlement = DotPopper::Entitlement.test
-    @cabinet = DotPopper::Cabinet.new(field, random: Random.new(1))
+    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(1))
     @achievements = DotPopper::Achievements.new(DotPopper::ScoreRecord::Memory.new)
     @groups = Groups.new
-    @buy = DotPopper::UseCases::BuyPro.new(store: @store, entitlement: @entitlement, cabinet: @cabinet, achievements: @achievements,
+    @buy = DotPopper::UseCases::BuyPro.new(store: @store, entitlement: @entitlement, game_flow: @game_flow, achievements: @achievements,
                                            friend_groups: @groups)
     @entitlement.subscribe(@buy) # as the composition root subscribes it
   end
@@ -72,9 +72,9 @@ class BuyProTest < Minitest::Test
 
   def test_the_store_is_heard_only_while_no_game_is_in_play
     @buy.update(0.25)
-    start!(@cabinet)
+    start!(@game_flow)
     @buy.update(0.25)
-    @cabinet.update(20)
+    @game_flow.update(20)
     @buy.update(0.5)
 
     assert_equal [[:update, 0.25], [:update, 0.5]], @store.asked
@@ -90,7 +90,7 @@ class BuyProTest < Minitest::Test
   def test_a_license_key_entered_is_pro_arriving_too
     license = DotPopper::Continuity::License.new(DotPopper::ScoreRecord::Memory.new, pins: DotPopper::Continuity::TEST_PINS)
     entitlement = DotPopper::Entitlement.new(license:)
-    entitlement.subscribe(DotPopper::UseCases::BuyPro.new(store: @store, entitlement:, cabinet: @cabinet, achievements: @achievements,
+    entitlement.subscribe(DotPopper::UseCases::BuyPro.new(store: @store, entitlement:, game_flow: @game_flow, achievements: @achievements,
                                                           friend_groups: @groups))
     @achievements.award(%i[steady], day: "2026-11-01")
     entitlement.enter(DotPopper::Continuity::LicenseKey.issue(DotPopper::Continuity::TestKeys::LICENSE).text)

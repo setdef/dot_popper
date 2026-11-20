@@ -9,7 +9,7 @@ module DotPopper
   #
   # It asks again when the game comes back to the foreground (#came_back,
   # which the shell reports) and when Home is shown after a game (it
-  # hears Cabinet's HomeShown), never while a game is in play or the
+  # hears GameFlow's HomeShown), never while a game is in play or the
   # tutorial plays over one, and no sooner than FLOOR after the last ask,
   # launch included. Coming back during a game asks nothing then; Home
   # after that game does. Each of +askers+ makes the same request it makes
@@ -27,9 +27,9 @@ module DotPopper
     # it is asked at first.
     HAPPENS = "Again when the player returns to the game or to Home after a game, at most every #{Integer(FLOOR / 60)} minutes.".freeze
 
-    def initialize(askers, cabinet:, clock: -> { Time.now.to_f })
+    def initialize(askers, game_flow:, clock: -> { Time.now.to_f })
       @askers = askers
-      @cabinet = cabinet
+      @game_flow = game_flow
       @clock = clock
       @asked_at = clock.call
     end
@@ -37,7 +37,7 @@ module DotPopper
     # The game came back to the foreground.
     def came_back = ask_if_due
 
-    # Hears Cabinet's events: Home shown after a game.
+    # Hears GameFlow's events: Home shown after a game.
     def call(event)
       ask_if_due if event.is_a?(Events::HomeShown)
     end
@@ -45,7 +45,7 @@ module DotPopper
     private
 
     def ask_if_due
-      return if @cabinet.playing? || @cabinet.paused?
+      return if @game_flow.playing? || @game_flow.paused?
 
       now = @clock.call
       elapsed = now - @asked_at

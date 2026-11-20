@@ -311,12 +311,12 @@ class ScreenPlansTest < Minitest::Test
     long = ["License text with a longer word, #{"x" * 90}, and a ruled line", "-" * 70, "", "  1. an indented item"]
     notices = Notices.new(iosevka: Array.new(40) { long.join("\n") }.join("\n\n"), ofl: "Fredoka text", lota: "Lota text",
                           fledge: ["Fledge text"])
-    cabinet = DotPopper::Cabinet.new(field(screen_layout.width, screen_layout.height), random: Random.new(2))
-    show = new_show(cabinet:, layout: screen_layout, sounds: FakeSounds.new, radius: R, notices:, measure: RoughMeasure.new)
+    game_flow = DotPopper::GameFlow.new(field(screen_layout.width, screen_layout.height), random: Random.new(2))
+    show = new_show(game_flow:, layout: screen_layout, sounds: FakeSounds.new, radius: R, notices:, measure: RoughMeasure.new)
     show.primary
-    cabinet.update(30)
+    game_flow.update(30)
     show.update(1.0)
-    cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
+    game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
     show.back
     show.open_settings
     show
@@ -328,17 +328,17 @@ class ScreenPlansTest < Minitest::Test
   # cleared, Achievements and an achievement's dialog, Themes, Settings
   # at its top and scrolled to its end, Credits, and Privacy.
   def each_screen(width, height, window: NoWindowControl.new)
-    cabinet = DotPopper::Cabinet.new(field(width, height), random: Random.new(2))
-    show = new_show(cabinet:, layout: layout(width, height), sounds: FakeSounds.new, radius: R, window:)
+    game_flow = DotPopper::GameFlow.new(field(width, height), random: Random.new(2))
+    show = new_show(game_flow:, layout: layout(width, height), sounds: FakeSounds.new, radius: R, window:)
     yield "the first Home", show
     show.primary
-    cabinet.update(30)
+    game_flow.update(30)
     show.update(1.0)
     yield "Game Over", show
     show.pad(:y)
     yield "the share preview", show
     show.close_share
-    cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
+    game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
     show.back
     yield "Home after a game", show
     show.open_stats

@@ -65,7 +65,7 @@ module DotPopper
       def store_answers = StoreAnswers.in_save_folder
 
       def notices
-        NoticeFiles.new(cabinet: File.expand_path("../../..", __dir__), starts: [File.dirname(File.expand_path($PROGRAM_NAME))]).notices
+        NoticeFiles.new(game_flow: File.expand_path("../../..", __dir__), starts: [File.dirname(File.expand_path($PROGRAM_NAME))]).notices
       end
 
       def store_helper(automated:)

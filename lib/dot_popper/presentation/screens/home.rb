@@ -164,8 +164,8 @@ module DotPopper
         # start on, through the one way into a game; with no game left, the
         # offer of Pro instead, and the Tutorial stays due.
         def open_tutorial
-          cabinet = show.cabinet
-          opening = TutorialScene.opening(cabinet.field, [layout.center_x, layout.center_y], style:)
+          game_flow = show.game_flow
+          opening = TutorialScene.opening(game_flow.field, [layout.center_x, layout.center_y], style:)
           started = @start_game.call(opening)
           return offer_play if started == :offer
           return unless started == :started

@@ -17,8 +17,8 @@ class ThemesTest < Minitest::Test
     entitlement = DotPopper::Entitlement.new(forced: @pro)
     @themes = DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new)
     @themes.release(unlocked)
-    @cabinet = DotPopper::Cabinet.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new))
-    @show = new_show(cabinet: @cabinet, layout: layout, sounds: @sounds, radius: R, entitlement:, themes: @themes,
+    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new))
+    @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, entitlement:, themes: @themes,
                      stats_book: DotPopper::StatsBook.new(DotPopper::ScoreRecord::Memory.new, today: -> { @day }))
     settle
   end
@@ -78,17 +78,17 @@ class ThemesTest < Minitest::Test
     @themes.release(["ghost"])
     @themes.told(:ghost)
     @themes.use(:ghost)
-    @cabinet = DotPopper::Cabinet.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new))
-    @show = new_show(cabinet: @cabinet, layout: layout, sounds: @sounds, radius: R, entitlement:, themes: @themes,
+    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new))
+    @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, entitlement:, themes: @themes,
                      use_theme: DotPopper::UseCases::UseTheme.new(themes: @themes, entitlement:))
     settle
     press_main
     @show.back # Escape skips the Tutorial, if it opened
     pro = true
-    @cabinet.update(20)
+    @game_flow.update(20)
 
     assert_predicate @show.in_use, :ordinary?, "not in the game it arrived in, nor at its Game Over"
-    @cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
     press_main
 
     assert_predicate @show, :on_home?

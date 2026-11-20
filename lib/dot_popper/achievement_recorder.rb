@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DotPopper
-  # Listens to a Cabinet's events (Cabinet#subscribe) for the Achievements a game earns,
+  # Listens to a GameFlow's events (GameFlow#subscribe) for the Achievements a game earns,
   # and decides nothing: it only reads what the rules report. #earned
   # lists, in Achievement::IDS order, every achievement the game in play,
   # or the one just finished, has earned so far.

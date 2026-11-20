@@ -178,7 +178,7 @@ class TutorialBeatsTest < Minitest::Test
 
   def test_the_game_after_it_has_the_tutorials_dots_score_time_and_row
     TRACES.each_key do |width, height|
-      game = self.class.play(width, height).cabinet.game
+      game = self.class.play(width, height).game_flow.game
       name = "#{width}x#{height}"
 
       assert_equal [0, 1, 2], game.dots.map(&:id), name
@@ -193,9 +193,9 @@ class TutorialBeatsTest < Minitest::Test
   # frame.
   def self.play(width, height)
     radius = DotPopper::DotSize.standard(width, height).radius
-    cabinet = DotPopper::Cabinet.new(DotPopper::Field.new(width, height, radius), random: Random.new(2))
+    game_flow = DotPopper::GameFlow.new(DotPopper::Field.new(width, height, radius), random: Random.new(2))
     screen = Layout.new(width:, height:, safe: Rect.new(x: 0, y: 0, width:, height:), style: Style::LAYOUT)
-    show = PresentationTest.show(cabinet:, layout: screen, sounds: FakeSounds.new, radius:, random: Random.new(3),
+    show = PresentationTest.show(game_flow:, layout: screen, sounds: FakeSounds.new, radius:, random: Random.new(3),
                     tutorial_flag: TutorialFlag.new(DotPopper::ScoreRecord::Memory.new))
     reach = show.play_reach
     show.tap(reach.center_x, reach.center_y)
@@ -210,7 +210,7 @@ class TutorialBeatsTest < Minitest::Test
         dot = tutorial.dots.find { it.id == target }
         show.tap(dot.x, dot.y)
       end
-      cabinet.update(STEP)
+      game_flow.update(STEP)
       show.update(STEP)
       frame += 1
       raise "the tutorial never ended" if frame > 3600

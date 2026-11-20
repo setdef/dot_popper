@@ -61,10 +61,10 @@ module DotPopper
 
         private
 
-        # It goes, and its game plays on as it is (Cabinet#unpause).
+        # It goes, and its game plays on as it is (GameFlow#unpause).
         def finish
           @handed_over, @scene = @scene, nil
-          show.cabinet.unpause
+          show.game_flow.unpause
         end
       end
     end

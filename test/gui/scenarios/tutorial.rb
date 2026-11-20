@@ -49,7 +49,7 @@ module DotPopperGui
       play = show.play_reach
       how.call(play.center_x, play.center_y)
       check(show.tutorial?, "the first Play opens the tutorial")
-      check(cabinet.paused?, "over its game, paused meanwhile")
+      check(game_flow.paused?, "over its game, paused meanwhile")
     end
 
     def by_gamepad
@@ -108,7 +108,7 @@ module DotPopperGui
       wait(0.3)
       keep_screenshot(name("2-row"))
       check_equal([1, 11], shown, "the stopwatch lands in the time")
-      check(cabinet.paused? && game.score == 1 && story.none?(:Popped), "the paused game has scored the pop, and told no one")
+      check(game_flow.paused? && game.score == 1 && story.none?(:Popped), "the paused game has scored the pop, and told no one")
       wait_for("time to flow again", within: 120) { tutorial.beat == :peek }
       check(dot(T::BRIGHT).popped? && dot(T::NEXT)&.bright?, "as it does, the dot is popped, and one born under it")
       wait(0.3)

@@ -3,11 +3,11 @@ module DotPopper
     class StartGame
       type result = :started | :offer | :not_home
 
-      @cabinet: Cabinet
-      @starter: Cabinet::Starter
+      @game_flow: GameFlow
+      @starter: GameFlow::Starter
       @free_games: FreeGames
 
-      def initialize: (cabinet: Cabinet, free_games: FreeGames, ?starter: Cabinet::Starter) -> void
+      def initialize: (game_flow: GameFlow, free_games: FreeGames, ?starter: GameFlow::Starter) -> void
 
       def none_left?: () -> bool
 
@@ -75,11 +75,11 @@ module DotPopper
     class BuyPro
       @store: DotPopper::_Store
       @entitlement: Entitlement
-      @cabinet: Cabinet
+      @game_flow: GameFlow
       @achievements: Achievements
       @friend_groups: _FriendGroups
 
-      def initialize: (store: DotPopper::_Store, entitlement: Entitlement, cabinet: Cabinet, achievements: Achievements, friend_groups: _FriendGroups) -> void
+      def initialize: (store: DotPopper::_Store, entitlement: Entitlement, game_flow: GameFlow, achievements: Achievements, friend_groups: _FriendGroups) -> void
 
       def offered?: () -> bool
 

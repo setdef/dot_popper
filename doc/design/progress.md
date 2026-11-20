@@ -24,7 +24,7 @@ The composition root (`Composition::Root`) makes each store, asking the engine f
 
 ## The games log
 
-`GamesLog` (`lib/dot_popper/games_log.rb`) listens to the `Cabinet` and adds one line to `games.csv` for each finished game (`Events::GameEnded`). Its columns, `GamesLog::COLUMNS`:
+`GamesLog` (`lib/dot_popper/games_log.rb`) listens to the `GameFlow` and adds one line to `games.csv` for each finished game (`Events::GameEnded`). Its columns, `GamesLog::COLUMNS`:
 
 `time seed score duration pops mistakes softened mean_time_to_pop longest_time_to_pop goal goal_met`
 
@@ -85,7 +85,7 @@ With the bigger or smaller size an upright phone is 134 R² (small), an 11-inch 
 
 **Why.** The same model player scores about 6 on a phone, 21 to 24 on a tablet or the desktop window, and 77 on a 6K monitor with the bigger or smaller size ([rules.md](rules.md#how-crowded-the-field-gets)). Comparing those would tell a phone player they are bad at the game when the screen is the cause; Juul (*The Art of Failure*) holds that a failure should feel like the player's own, which is only fair when the comparison is. The totals, the chart and the streak stay across every class because they describe how much and how often someone plays, which isn't a contest.
 
-The Stats screen shows the records of the class a game started now would count in (`Cabinet#size_class`): the current dot size on the current screen.
+The Stats screen shows the records of the class a game started now would count in (`GameFlow#size_class`): the current dot size on the current screen.
 
 ## Game Over and records
 
@@ -166,7 +166,7 @@ Names, figures and sentences are in `Presentation::AchievementWords`. Each has a
 
 **Sharpshooter's 10%** was measured with `Visibility`, the share of a dot's disc no dot above it covers (400 sample points in a sunflower spiral, within about half a percent). With the real rules, a model player that taps the moment a fingertip-sized (44-unit) target fits pops with 31% to 50% showing, never under 10%; one that taps any sliver, which no person can aim, does so on over half the dots it pops. Under a tenth is a crescent a few units wide: a deliberate tap. The other thresholds were set against a model player of about 0.5 s a pop that never loses, and are constants in `Achievement`.
 
-**Detection** is Lota-free. `AchievementRecorder` (`lib/dot_popper/achievement_recorder.rb`), which `UseCases::FinishGame` keeps, listens to the `Cabinet`'s events and reads the dots, the clock and the time played from each event, which carries them as they stood when it was told; it keeps no game, and decides nothing. A "covered" spawn for Patience is one where `TouchTarget#clear_on?` finds no room among the dots above, and any tap, a miss included, spoils the wait.
+**Detection** is Lota-free. `AchievementRecorder` (`lib/dot_popper/achievement_recorder.rb`), which `UseCases::FinishGame` keeps, listens to the `GameFlow`'s events and reads the dots, the clock and the time played from each event, which carries them as they stood when it was told; it keeps no game, and decides nothing. A "covered" spawn for Patience is one where `TouchTarget#clear_on?` finds no room among the dots above, and any tap, a miss included, spoils the wait.
 
 **Saving.** At each Game Over, `UseCases::FinishGame` gives the recorder's finds to `Achievements#award`, which keeps the ones not earned before with today's date and writes `achievements.txt`. Achievements are earned and saved whether or not the player has Pro. An id a newer version saved and this one doesn't know is dropped on reading.
 

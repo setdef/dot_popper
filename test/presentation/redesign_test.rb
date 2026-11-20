@@ -23,11 +23,11 @@ class RedesignTest < Minitest::Test
 
   def show(pro: false, played: true)
     @sounds = FakeSounds.new
-    @cabinet = DotPopper::Cabinet.new(field(1200, 800), random: Random.new(2))
+    @game_flow = DotPopper::GameFlow.new(field(1200, 800), random: Random.new(2))
     @book = DotPopper::StatsBook.new(DotPopper::ScoreRecord::Memory.new)
     @book.record(DotPopper::GameStats.start.with(most_dots_in_a_row: 19), DotPopper::SizeClass::MEDIUM) if played
     @earned = DotPopper::Achievements.new(DotPopper::ScoreRecord::Memory.new)
-    new_show(cabinet: @cabinet, layout: layout(1200, 800), sounds: @sounds, radius: R, stats_book: @book, achievements: @earned,
+    new_show(game_flow: @game_flow, layout: layout(1200, 800), sounds: @sounds, radius: R, stats_book: @book, achievements: @earned,
              entitlement: pro ? DotPopper::Entitlement.new(forced: true) : DotPopper::Entitlement.free)
   end
 
@@ -37,10 +37,10 @@ class RedesignTest < Minitest::Test
   def game_over_with(**lines)
     s = show(pro: true)
     s.primary
-    @cabinet.update(30)
+    @game_flow.update(30)
     s.update(1.0)
     s.instance_variable_set(:@game_over, s.game_over.with(**lines))
-    @cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
     s
   end
 
@@ -136,8 +136,8 @@ class RedesignTest < Minitest::Test
   def test_a_free_tap_on_a_theme_opens_the_offer_over_themes_and_back_returns
     store = Store.new
     entitlement = DotPopper::Entitlement.test
-    cabinet = DotPopper::Cabinet.new(field(1200, 800), random: Random.new(2))
-    s = new_show(cabinet:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, entitlement:, storefront: store,
+    game_flow = DotPopper::GameFlow.new(field(1200, 800), random: Random.new(2))
+    s = new_show(game_flow:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, entitlement:, storefront: store,
                  themes: DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new))
     s.open_themes
     s.use(s.themes.last)

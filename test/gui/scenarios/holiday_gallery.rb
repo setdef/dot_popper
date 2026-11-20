@@ -50,7 +50,7 @@ module DotPopperGui
     # Four still dots, large: bright, popped, bonus, and a bright one
     # under a popped one.
     def closeup
-      r = cabinet.field.radius
+      r = game_flow.field.radius
       x = layout.center_x - (r * 5)
       y = layout.center_y
       dots = [still(5, x + (r * 7.9), y - (r * 0.7), r, popped: true), still(1, x, y, r), still(2, x + (r * 2.6), y, r, popped: true),

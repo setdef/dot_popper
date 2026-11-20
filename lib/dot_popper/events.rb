@@ -25,7 +25,7 @@ module DotPopper
 
     # Play began on a game, its dots drawn from +seed+: at once from Play,
     # or, for a game the tutorial plays over, as the tutorial ends or is
-    # skipped (Cabinet#unpause). +dots_in_a_row+ is the row it begins
+    # skipped (GameFlow#unpause). +dots_in_a_row+ is the row it begins
     # with: none from Play, and from the tutorial, the dots popped there
     # since its last mistake.
     class GameStarted < Data.define(:seed, :field, :dots, :score, :dots_in_a_row); end

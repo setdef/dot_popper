@@ -282,8 +282,8 @@ class StoreTest < Minitest::Test
   end
 
   def build_show(**options)
-    cabinet = DotPopper::Cabinet.new(field, random: Random.new(3))
-    new_show(cabinet:, layout: layout, sounds: FakeSounds.new, radius: R, measure: RoughMeasure.new, **options)
+    game_flow = DotPopper::GameFlow.new(field, random: Random.new(3))
+    new_show(game_flow:, layout: layout, sounds: FakeSounds.new, radius: R, measure: RoughMeasure.new, **options)
   end
 
   def offer_show

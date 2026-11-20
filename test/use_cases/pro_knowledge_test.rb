@@ -132,10 +132,10 @@ class ProKnowledgeTest < Minitest::Test
   # Plays a game from Home to Game Over, ready for a press.
   def play_out(game)
     press_main(game.show)
-    game.cabinet.update(30)
-    game.cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
+    game.game_flow.update(30)
+    game.game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
     game.show.update(1 / 60.0)
-    assert_instance_of DotPopper::Cabinet::GameOver, game.cabinet.state
+    assert_instance_of DotPopper::GameFlow::GameOver, game.game_flow.state
   end
 
   # What +object+ answers to +question+, or the error it raises, as some
@@ -171,7 +171,7 @@ class ProKnowledgeTest < Minitest::Test
   # instance variables, the items of arrays and hashes, the members of
   # values, and what a block or a method it keeps can reach (its receiver
   # and the variables it closes over). An object outside the presentation
-  # (the Cabinet, the friend groups' Session, a use case) is a boundary:
+  # (the GameFlow, the friend groups' Session, a use case) is a boundary:
   # what it holds is its own, and the walk notes it but goes no further.
   def holdings(from)
     held = Hash.new { |hash, key| hash[key] = [] }.compare_by_identity

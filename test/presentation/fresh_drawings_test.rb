@@ -59,7 +59,7 @@ class FreshDrawingsTest < Minitest::Test
       check = ->(what) { stale << what unless screen.drawing == fresh(screen) }
       check.call("opening")
       SIZES.each do |width, height|
-        fixture.cabinet.screen = field(width, height)
+        fixture.game_flow.screen = field(width, height)
         show.resize(layout(width, height), field(width, height))
         fixture.tick(0.05)
         check.call("a resize to #{width}x#{height}")

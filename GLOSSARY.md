@@ -40,8 +40,4 @@ Dot Popper's Ubiquitous Language. Code, screens, docs and the server use the sam
 | **Bigger / Smaller** | The other dot size, the same on every screen, named by what it does on this device next to Standard: Bigger on a phone, Smaller on a big monitor. Where the two differ by under a tenth, neither word is true, and Settings leaves the choice out, whatever size is saved. Code that doesn't know the device says `bigger_or_smaller`. | fixed size |
 | **Home** | The main screen, with Play on it, and the button that returns there. | the title screen, main menu |
 
-## Not yet decided
-
-- `Cabinet` names the app's screen flow in code. Players never see it.
-
 Don't write "bank" or "pool" for free games: say "your first 20 games" and "3 games a day". Don't call Free a trial or demo anywhere.

@@ -6,13 +6,13 @@ module DotPopper
 
     @askers: Array[^() -> void]
 
-    @cabinet: Cabinet
+    @game_flow: GameFlow
 
     @clock: ^() -> Float
 
     @asked_at: Float
 
-    def initialize: (Array[^() -> void] askers, cabinet: Cabinet, ?clock: ^() -> Float) -> void
+    def initialize: (Array[^() -> void] askers, game_flow: GameFlow, ?clock: ^() -> Float) -> void
 
     def came_back: () -> void
 

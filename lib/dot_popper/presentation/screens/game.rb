@@ -7,7 +7,7 @@ module DotPopper
       # reaches the game, so nothing scores without aiming.
       class Game < Screen
         # Every tap goes to the game at once.
-        def tap(x, y, _by) = show.cabinet.press(x, y)
+        def tap(x, y, _by) = show.game_flow.press(x, y)
       end
     end
   end

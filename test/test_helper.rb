@@ -22,21 +22,21 @@ module DotPopperTest
     DotPopper::Game.new(field, random:, dots: DotPopper::Stack.new(dots:))
   end
 
-  # Each cabinet's one Starter (Cabinet#starter), taken by the first start
+  # Each game flow's one Starter (GameFlow#starter), taken by the first start
   # a test makes on it, as UseCases::StartGame takes it in the game.
   STARTERS = ObjectSpace::WeakKeyMap.new
 
-  # Starts a game on +cabinet+, in play at once, or paused with +dots+
-  # first for the tutorial; answers the cabinet.
-  def start!(cabinet, seed = nil) = starter_of(cabinet).game(seed)
-  def start_paused!(cabinet, dots, seed = nil) = starter_of(cabinet).paused(dots, seed)
-  def starter_of(cabinet) = DotPopperTest.starter_of(cabinet)
-  def self.starter_of(cabinet) = (STARTERS[cabinet] ||= cabinet.starter)
+  # Starts a game on +game_flow+, in play at once, or paused with +dots+
+  # first for the tutorial; answers the game flow.
+  def start!(game_flow, seed = nil) = starter_of(game_flow).game(seed)
+  def start_paused!(game_flow, dots, seed = nil) = starter_of(game_flow).paused(dots, seed)
+  def starter_of(game_flow) = DotPopperTest.starter_of(game_flow)
+  def self.starter_of(game_flow) = (STARTERS[game_flow] ||= game_flow.starter)
 
-  # The game +cabinet+ holds itself, which nothing in the game can reach
-  # (Cabinet#game is its read-only Game::View): for a test that sets up a
+  # The game +game_flow+ holds itself, which nothing in the game can reach
+  # (GameFlow#game is its read-only Game::View): for a test that sets up a
   # position by hand.
-  def live(cabinet) = cabinet.instance_variable_get(:@game)
+  def live(game_flow) = game_flow.instance_variable_get(:@game)
 
   # Sets a game's score as if earlier taps had earned it.
   def score!(game, points) = game.instance_variable_set(:@score, points)

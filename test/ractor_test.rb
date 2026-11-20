@@ -23,13 +23,13 @@ class RactorTest < Minitest::Test
 
   # An event records what happened, and nothing changes it afterwards: a
   # listener that keeps one never sees the game as it is later. So every
-  # event, the ones a Cabinet tells and the ones a paused game's presses
+  # event, the ones a GameFlow tells and the ones a paused game's presses
   # return to the tutorial, is deeply frozen, with no game in it.
   def test_every_event_is_a_value_with_no_game_in_it
-    cabinet = DotPopper::Cabinet.new(field, random: Random.new(3))
+    game_flow = DotPopper::GameFlow.new(field, random: Random.new(3))
     heard = []
-    cabinet.subscribe { heard << it }
-    heard.concat(play_paused_then_on(cabinet))
+    game_flow.subscribe { heard << it }
+    heard.concat(play_paused_then_on(game_flow))
 
     assert_equal [DotPopper::Events::GameEnded, DotPopper::Events::GameStarted, DotPopper::Events::HomeShown,
                   DotPopper::Events::Missed, DotPopper::Events::Penalized, DotPopper::Events::Popped],
@@ -76,20 +76,20 @@ class RactorTest < Minitest::Test
   # A paused game the tutorial pops a dot in, then play on it to Game
   # Over and Home, with a mistake and a miss on the way. Answers the
   # events the paused game's presses returned.
-  def play_paused_then_on(cabinet)
-    start_paused!(cabinet, DotPopper::Stack.new(dots: [dot(300, 300, id: 0)]))
-    returned = [cabinet.press_paused(300, 300)]
-    cabinet.unpause
-    game = live(cabinet)
+  def play_paused_then_on(game_flow)
+    start_paused!(game_flow, DotPopper::Stack.new(dots: [dot(300, 300, id: 0)]))
+    returned = [game_flow.press_paused(300, 300)]
+    game_flow.unpause
+    game = live(game_flow)
     bright = game.dots.find(&:bright?)
     clear_around!(game, bright)
-    cabinet.press(bright.x, bright.y)
+    game_flow.press(bright.x, bright.y)
     popped = game.dots.find(&:popped?)
-    cabinet.press(popped.x, popped.y)
-    cabinet.press(-1, -1)
-    cabinet.update(20)
-    cabinet.update(1)
-    cabinet.press(0, 0)
+    game_flow.press(popped.x, popped.y)
+    game_flow.press(-1, -1)
+    game_flow.update(20)
+    game_flow.update(1)
+    game_flow.press(0, 0)
     returned
   end
 

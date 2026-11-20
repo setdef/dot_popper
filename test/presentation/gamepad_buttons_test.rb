@@ -16,8 +16,8 @@ class GamepadButtonsTest < Minitest::Test
   # options do; there the same button turns Sound on or off.
   def test_select_opens_settings_on_home_and_turns_sound_off_and_on_there
     sounds = FakeSounds.new
-    cabinet = DotPopper::Cabinet.new(field(1200, 800), random: Random.new(2))
-    show = new_show(cabinet:, layout: layout(1200, 800), sounds:, radius: R)
+    game_flow = DotPopper::GameFlow.new(field(1200, 800), random: Random.new(2))
+    show = new_show(game_flow:, layout: layout(1200, 800), sounds:, radius: R)
     show.input = InputKind::GAMEPAD
 
     show.pad(@buttons.intent(:select))
@@ -31,8 +31,8 @@ class GamepadButtonsTest < Minitest::Test
 
   # Nothing opens a screen during a game, LT included.
   def test_lt_opens_friend_groups_on_home_and_not_in_a_game
-    cabinet = DotPopper::Cabinet.new(field(1200, 800), random: Random.new(2))
-    show = new_show(cabinet:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R)
+    game_flow = DotPopper::GameFlow.new(field(1200, 800), random: Random.new(2))
+    show = new_show(game_flow:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R)
     show.input = InputKind::GAMEPAD
     show.start
     assert show.playing?
@@ -44,8 +44,8 @@ class GamepadButtonsTest < Minitest::Test
 
   # Start plays on Home as A does, and B there asks before it quits.
   def test_start_plays_and_b_twice_quits_on_home
-    cabinet = DotPopper::Cabinet.new(field(1200, 800), random: Random.new(2))
-    show = new_show(cabinet:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R)
+    game_flow = DotPopper::GameFlow.new(field(1200, 800), random: Random.new(2))
+    show = new_show(game_flow:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R)
     assert_equal :asked, show.ask_to_quit
     assert_equal :quit, show.ask_to_quit
 

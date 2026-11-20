@@ -48,9 +48,9 @@ class StackTest < Minitest::Test
      { stack: %i[share_preview offer], top: :offer, sharing?: true }],
     ["the dialog is open while a screen is over it", { pro: true, **SMALL }, [:achievements, [:achievement, DIALOG], ->(show) { show.push(:offer) }],
      { stack: %i[achievements achievement_dialog offer], top: :offer, dialog: DIALOG }],
-    ["Home shown empties the stack", {}, [:play, :play_game, :share, ->(show) { show.cabinet.press(show.layout.center_x, show.layout.center_y) }],
+    ["Home shown empties the stack", {}, [:play, :play_game, :share, ->(show) { show.game_flow.press(show.layout.center_x, show.layout.center_y) }],
      { stack: [], top: :home, on_home?: true, sharing?: false }],
-    ["a game started closes the share preview", {}, [->(show) { show.push(:share_preview) }, ->(show) { DotPopperTest.starter_of(show.cabinet).game }],
+    ["a game started closes the share preview", {}, [->(show) { show.push(:share_preview) }, ->(show) { DotPopperTest.starter_of(show.game_flow).game }],
      { stack: [], top: :game, sharing?: false }]
   ].freeze
 

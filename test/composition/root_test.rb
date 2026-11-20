@@ -43,7 +43,7 @@ class RootTest < Minitest::Test
     SYSTEMS.product(BUILDS).each do |system, channel|
       game = root(system, channel:)
 
-      assert_instance_of DotPopper::Cabinet::Home, game.cabinet.state, "#{system}, #{channel.inspect}"
+      assert_instance_of DotPopper::GameFlow::Home, game.game_flow.state, "#{system}, #{channel.inspect}"
       assert_predicate game.show, :home?, "#{system}, #{channel.inspect}"
       assert_equal DotPopperTest.platform(system), game.platform
     end
@@ -306,10 +306,10 @@ class RootTest < Minitest::Test
     assert_includes game.show.themes.map(&:key), :ghost, "opened at launch, with no check yet"
   end
 
-  # The cabinet's Starter is UseCases::StartGame's, which the root makes,
+  # The game flow's Starter is UseCases::StartGame's, which the root makes,
   # so nothing else in the game can start one.
   def test_only_the_use_case_can_start_a_game
-    SYSTEMS.each { |system| assert_raises(DotPopper::Cabinet::StarterTaken, system) { root(system).cabinet.starter } }
+    SYSTEMS.each { |system| assert_raises(DotPopper::GameFlow::StarterTaken, system) { root(system).game_flow.starter } }
   end
 
   # The root makes the use cases and subscribes them, and the offer, to
@@ -333,21 +333,21 @@ class RootTest < Minitest::Test
     game.show.play
     game.show.back # Escape skips the Tutorial, if it opened
 
-    assert_predicate game.cabinet, :playing?
-    game.cabinet.update(30)
+    assert_predicate game.game_flow, :playing?
+    game.game_flow.update(30)
 
-    assert_instance_of DotPopper::Cabinet::GameOver, game.cabinet.state
-    assert_equal game.cabinet.state.score, game.show.game_over&.score
+    assert_instance_of DotPopper::GameFlow::GameOver, game.game_flow.state
+    assert_equal game.game_flow.state.score, game.show.game_over&.score
   end
 
-  # The Show hears the rules' events from the cabinet the root builds, so
+  # The Show hears the rules' events from the game flow the root builds, so
   # a dot popped there sounds its pop: Game Over alone would not show it,
   # since the Show lays that out from what FinishGame tells it.
   def test_a_dot_popped_in_the_game_the_root_builds_sounds_its_pop
     game = root
     game.show.play
     game.show.back # Escape skips the Tutorial, if it opened
-    dot = game.cabinet.game.dots.find(&:bright?)
+    dot = game.game_flow.game.dots.find(&:bright?)
     game.sound_player.played.clear
     game.show.tap(dot.x, dot.y)
 
@@ -359,20 +359,20 @@ class RootTest < Minitest::Test
   # Making a Show subscribes nothing.
   def test_the_root_subscribes_the_rules_listeners_and_a_show_subscribes_none
     game = root
-    listeners = game.cabinet.instance_variable_get(:@listeners).map(&:class)
+    listeners = game.game_flow.instance_variable_get(:@listeners).map(&:class)
 
     assert_equal [DotPopper::UseCases::FinishGame, Show, DotPopper::Refresh, DotPopper::GamesLog], listeners
-    cabinet = DotPopper::Cabinet.new(field)
+    game_flow = DotPopper::GameFlow.new(field)
     entitlement = DotPopper::Entitlement.free
     stats_book = DotPopper::StatsBook.new(DotPopper::ScoreRecord::Memory.new)
     achievements = DotPopper::Achievements.new(DotPopper::ScoreRecord::Memory.new)
     groups = DotPopper::Groups::Session.off
     themes = DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new)
-    use_cases = DotPopper::Composition.use_cases(cabinet:, free_games: DotPopper::FreeGames.unlimited, entitlement:, store: NoStore.new,
+    use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: DotPopper::FreeGames.unlimited, entitlement:, store: NoStore.new,
                                                  achievements:, stats_book:, friend_groups: groups)
-    heard = -> { [cabinet, entitlement, use_cases[:finish_game]].map { it.instance_variable_get(:@listeners).size } }
+    heard = -> { [game_flow, entitlement, use_cases[:finish_game]].map { it.instance_variable_get(:@listeners).size } }
     before = heard.call
-    Show.new(cabinet:, layout:, sounds: FakeSounds.new, radius: R, stats_book:, achievements:, themes:, groups:,
+    Show.new(game_flow:, layout:, sounds: FakeSounds.new, radius: R, stats_book:, achievements:, themes:, groups:,
              use_theme: DotPopper::UseCases::UseTheme.new(themes:, entitlement:), **use_cases)
 
     assert_equal before, heard.call
@@ -399,7 +399,7 @@ class RootTest < Minitest::Test
       engine.file("themes.txt").write(saved)
       game = root(engine:, env: pro)
 
-      assert_instance_of DotPopper::Cabinet::Home, game.cabinet.state, saved
+      assert_instance_of DotPopper::GameFlow::Home, game.game_flow.state, saved
       assert_equal in_use, game.pen.theme.key, saved
       assert_equal in_use, game.sound_player.theme.key, saved
       assert_equal %i[classic ghost], DotPopper::Themes.new(engine.file("themes.txt")).choices, saved
@@ -471,7 +471,7 @@ class RootTest < Minitest::Test
 
     assert_equal %i[themes groups], asked
     now += DotPopper::Refresh::FLOOR
-    game.cabinet.send(:announce, DotPopper::Events::HomeShown.new(score_record: 0)) # as the cabinet does, back on Home
+    game.game_flow.send(:announce, DotPopper::Events::HomeShown.new(score_record: 0)) # as the game_flow does, back on Home
 
     assert_equal %i[themes groups themes groups], asked
   end

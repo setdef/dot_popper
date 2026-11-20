@@ -7,8 +7,8 @@ class GamesLogTest < Minitest::Test
 
   def setup
     @store = DotPopper::ScoreRecord::Memory.new
-    @cabinet = DotPopper::Cabinet.new(field, random: Random.new(9))
-    @cabinet.subscribe(DotPopper::GamesLog.new(@store, clock: -> { Time.utc(2026, 11, 5, 9, 30) },
+    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(9))
+    @game_flow.subscribe(DotPopper::GamesLog.new(@store, clock: -> { Time.utc(2026, 11, 5, 9, 30) },
                                                today: -> { Date.new(2026, 11, 5) }))
   end
 
@@ -31,10 +31,10 @@ class GamesLogTest < Minitest::Test
     old = "time,mode,seed,score\n2026-11-04T20:00:00Z,daily,7,12\n"
     store = DotPopper::ScoreRecord::Memory.new(old)
     archives = {}
-    cabinet = DotPopper::Cabinet.new(field, random: Random.new(9))
-    cabinet.subscribe(DotPopper::GamesLog.new(store, clock: -> { Time.utc(2026, 11, 5, 9, 30, 15) },
+    game_flow = DotPopper::GameFlow.new(field, random: Random.new(9))
+    game_flow.subscribe(DotPopper::GamesLog.new(store, clock: -> { Time.utc(2026, 11, 5, 9, 30, 15) },
                                               archive: ->(name) { archives[name] = DotPopper::ScoreRecord::Memory.new }))
-    @cabinet = cabinet
+    @game_flow = game_flow
     play_game(dots_popped: 1)
     play_game(dots_popped: 1)
 
@@ -54,7 +54,7 @@ class GamesLogTest < Minitest::Test
   end
 
   def test_a_game_still_in_play_is_not_logged
-    start!(@cabinet)
+    start!(@game_flow)
 
     assert_nil @store.read
   end
@@ -62,15 +62,15 @@ class GamesLogTest < Minitest::Test
   private
 
   def play_game(dots_popped:)
-    start!(@cabinet)
+    start!(@game_flow)
     dots_popped.times do |i|
-      @cabinet.update(1.0) if i.zero?
-      bright = @cabinet.game.dots.find(&:bright?)
-      clear_around!(live(@cabinet), bright)
-      @cabinet.press(bright.x, bright.y)
+      @game_flow.update(1.0) if i.zero?
+      bright = @game_flow.game.dots.find(&:bright?)
+      clear_around!(live(@game_flow), bright)
+      @game_flow.press(bright.x, bright.y)
     end
-    @cabinet.update(20)
-    @cabinet.update(1)
-    @cabinet.press(0, 0)
+    @game_flow.update(20)
+    @game_flow.update(1)
+    @game_flow.press(0, 0)
   end
 end

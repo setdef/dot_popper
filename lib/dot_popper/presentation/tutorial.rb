@@ -49,13 +49,13 @@ module DotPopper
 
     # The tutorial a player sees on their first Play: a layer over the
     # first game, which is paused before its clock first runs
-    # (Cabinet::Paused). The game is the one game: its dots, score, clock
+    # (GameFlow::Paused). The game is the one game: its dots, score, clock
     # and rules are the rules' own, and the tutorial keeps no copy of
     # them. It moves the game's dots at its own pace, passes the game
     # only the presses it chooses, and draws over it: the spotlight, the
     # guide, the numbers in flight, and the HUD's numbers as each lands.
     # When it ends, or is skipped, it goes, and the game plays on from
-    # the state it is in (Cabinet#unpause). It teaches without a word, in
+    # the state it is in (GameFlow#unpause). It teaches without a word, in
     # four beats, and each tap that moves it on is the player's:
     #
     # 1. A bright dot drifts, time eases to a stop, a spotlight finds it,
@@ -94,7 +94,7 @@ module DotPopper
     # game to surprise the player with: nothing here shows it or says so.
     #
     # It plays the sounds of its popping, cost, and chimes through the Show's +effects+,
-    # +sounds+, and +haptics+, on the +cabinet+'s game, already paused with
+    # +sounds+, and +haptics+, on the +game_flow+'s game, already paused with
     # its first dot (TutorialScene.opening, started by UseCases::StartGame),
     # as +style+ (Style) says, on the Show's clock from +now+. It is the
     # scene the Tutorial screen (Screens::Tutorial) plays.
@@ -111,7 +111,7 @@ module DotPopper
 
       # The dots the tutorial's game begins with on +field+: its first
       # bright dot, placed from +center+, the screen's middle, as +style+
-      # says. The game is started paused with them (Cabinet::Starter#paused).
+      # says. The game is started paused with them (GameFlow::Starter#paused).
       def self.opening(field, center, style: Style)
         across, down = style::TUTORIAL.start
         center_x, center_y = center
@@ -121,8 +121,8 @@ module DotPopper
                                       velocity_x: -speed, velocity_y: speed, radius: field.radius).confine(field))
       end
 
-      def initialize(cabinet:, effects:, sounds:, haptics:, style:, palette: style::PALETTE, now: 0.0, calm: false)
-        @cabinet = cabinet
+      def initialize(game_flow:, effects:, sounds:, haptics:, style:, palette: style::PALETTE, now: 0.0, calm: false)
+        @game_flow = game_flow
         @effects = effects
         @sounds = sounds
         @haptics = haptics
@@ -192,7 +192,7 @@ module DotPopper
         before = now
         @now += seconds
         flow = (@time.value(before) + rate) / 2.0
-        @cabinet.move_paused(seconds * flow) if flow.positive?
+        @game_flow.move_paused(seconds * flow) if flow.positive?
         @hud = hud.showing(hud.score, hud.seconds, now)
         @traveling_numbers = @traveling_numbers.reject { now - it.born >= it.duration }
         play_cues
@@ -221,7 +221,7 @@ module DotPopper
       private
 
       # The paused game it plays over.
-      def game = @cabinet.game
+      def game = @game_flow.game
 
       def dot(id) = game.dots.find { it.id == id }
 
@@ -287,7 +287,7 @@ module DotPopper
       # which pops it and spawns the next under it; the tutorial draws it
       # bright, and the new dot unborn, until it shows them so.
       def pop_turn(dot, x, y)
-        popped = @cabinet.press_paused(x, y)
+        popped = @game_flow.press_paused(x, y)
         return unless popped.is_a?(Events::Popped)
 
         @bright << dot.id
@@ -358,7 +358,7 @@ module DotPopper
       # is born where it parts from it, and slides out.
       def resume
         popped, following = parting(settle(BRIGHT))
-        @cabinet.arrange(popped, following)
+        @game_flow.arrange(popped, following)
         spawned(dot(NEXT))
         enter(:peek)
         @time = @time.toward(1.0, now, @script.resume)
@@ -430,7 +430,7 @@ module DotPopper
         dot = dot(BRIGHT)
         x = dot.x
         y = dot.y
-        penalty = @cabinet.press_paused(x, y)
+        penalty = @game_flow.press_paused(x, y)
         animations.wobble(dot.id, now)
         @effects.ring(x, y, @style::ALARM_RING, follow: dot.id)
         hidden = game.dots.bright_beneath(dot, x, y)

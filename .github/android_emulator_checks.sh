@@ -49,7 +49,7 @@ fi
 if wanted back-on-title; then
   ruby "$here/android_emulator.rb" "$apk" "$package" "$out/back-on-title" \
   --env ALSOFT_DRIVERS=null --env DOT_POPPER_SAVE_AS=ci_back --env DOT_POPPER_KIT_PROBE=1 --env DOT_POPPER_AUTOMATED=1 \
-  --ready "kit probe: subscribed to the cabinet" --shot 2 --timeout 90 \
+  --ready "kit probe: subscribed to the game flow" --shot 2 --timeout 90 \
   --key-after "1:KEYCODE_BACK:kit probe: splash over" \
   --expect "Dot Popper: a dot's radius is 50 dp, about 8 mm" \
   --expect-order "kit probe: splash over" \

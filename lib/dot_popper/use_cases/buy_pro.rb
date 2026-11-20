@@ -7,7 +7,7 @@ module DotPopper
     # Purchases, and a license key pasted or typed on a copy that takes
     # one; once the player has Pro (+entitlement+, Entitlement), Buy and a
     # typed key do nothing. The store is heard only while no game
-    # is in play (+cabinet+, Cabinet), so a purchase never lands mid-game.
+    # is in play (+game_flow+, GameFlow), so a purchase never lands mid-game.
     # When Pro arrives (Entitlement::ProGranted, which the composition
     # root subscribes it to), the player's friend groups (+friend_groups+)
     # hear of every achievement already earned (+achievements+,
@@ -15,10 +15,10 @@ module DotPopper
     # It is the offer's one way to the store and to whether the player
     # has Pro, so no screen holds either.
     class BuyPro
-      def initialize(store:, entitlement:, cabinet:, achievements:, friend_groups:)
+      def initialize(store:, entitlement:, game_flow:, achievements:, friend_groups:)
         @store = store
         @entitlement = entitlement
-        @cabinet = cabinet
+        @game_flow = game_flow
         @achievements = achievements
         @friend_groups = friend_groups
       end
@@ -67,7 +67,7 @@ module DotPopper
 
       # Hears the store, +seconds+ on, unless a game is in play.
       def update(seconds)
-        @store.update(seconds) unless @cabinet.playing?
+        @store.update(seconds) unless @game_flow.playing?
       end
 
       # Pro arrived: what was earned while Free counts now.

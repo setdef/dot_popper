@@ -176,7 +176,7 @@ module DotPopper
         hud = hud_drawing(@show.hud, layout) if highlight || shown
         if highlight
           pill = @hud.bounds(hud)
-          @tutorial.clock_highlight_under(highlight, @show.now, pill, @hud.spots(hud), @show.cabinet.game.field.radius)
+          @tutorial.clock_highlight_under(highlight, @show.now, pill, @hud.spots(hud), @show.game_flow.game.field.radius)
         end
         hud(hud) if shown
         @tutorial.clock_highlight_over(highlight, @show.now, pill) if highlight
@@ -185,7 +185,7 @@ module DotPopper
       # A title change's announcement, for the few seconds it shows.
       def banner(layout) = @group.banner(@show.group_panel.banner, @show.now, layout, @show.banner_y)
 
-      def radius = @show.cabinet.field.radius
+      def radius = @show.game_flow.field.radius
 
       # The Tutorial, drawn as the game it opens is: its dots over their
       # glow and the effects of its taps, its HUD, never shaken, and its
@@ -220,7 +220,7 @@ module DotPopper
       end
 
       def field
-        game = @show.cabinet.game or return
+        game = @show.game_flow.game or return
         @dots.draw(dots, @show.animations, @show.now, game.field.radius)
       end
 
@@ -228,7 +228,7 @@ module DotPopper
       # so it never washes out a dot or hints at a bright dot that is
       # covered.
       def glow
-        game = @show.cabinet.game or return
+        game = @show.game_flow.game or return
         @bloom.glow do
           @dots.glow(dots, @show.animations, @show.now, game.field.radius)
           @effects.droplets
@@ -237,7 +237,7 @@ module DotPopper
 
       # The game's dots where they are drawn: where the rules put them, or
       # after time's up, wherever they have tumbled to in the Pile.
-      def dots = @pile.stack || @show.cabinet.game&.dots
+      def dots = @pile.stack || @show.game_flow.game&.dots
 
       # The score and clock, on top of everything, until Game Over has
       # arrived, so a game ended by a penalty is seen to reach 0; Game

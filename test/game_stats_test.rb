@@ -4,20 +4,20 @@ require "test_helper"
 
 class GameStatsTest < Minitest::Test
   include DotPopperTest
-  Cabinet = DotPopper::Cabinet
+  GameFlow = DotPopper::GameFlow
   GameStats = DotPopper::GameStats
 
   def setup
-    @cabinet = Cabinet.new(field, random: Random.new(9))
+    @game_flow = GameFlow.new(field, random: Random.new(9))
     @recorder = GameStats::Recorder.new
-    @cabinet.subscribe(@recorder)
-    start!(@cabinet)
+    @game_flow.subscribe(@recorder)
+    start!(@game_flow)
   end
 
   def test_it_counts_dots_popped_and_times_each_wait_from_the_dot_appearing
-    @cabinet.update(1.5)
+    @game_flow.update(1.5)
     pop!
-    @cabinet.update(0.5)
+    @game_flow.update(0.5)
     pop!
 
     stats = @recorder.stats
@@ -29,29 +29,29 @@ class GameStatsTest < Minitest::Test
 
   def test_it_counts_mistakes_and_those_the_floor_softened
     pop!
-    popped = @cabinet.game.dots.first
-    clear_around!(live(@cabinet), popped)
-    @cabinet.press(popped.x, popped.y) # 1 point to lose: softened
-    @cabinet.press(popped.x, popped.y) # 0 points to lose: softened
+    popped = @game_flow.game.dots.first
+    clear_around!(live(@game_flow), popped)
+    @game_flow.press(popped.x, popped.y) # 1 point to lose: softened
+    @game_flow.press(popped.x, popped.y) # 0 points to lose: softened
 
     assert_equal 2, @recorder.stats.mistakes
     assert_equal 2, @recorder.stats.softened
   end
 
   def test_the_game_ending_stats_how_long_it_ran
-    @cabinet.update(4)
+    @game_flow.update(4)
     pop!
-    @cabinet.update(20)
+    @game_flow.update(20)
 
     assert_in_delta 11.0, @recorder.stats.duration
   end
 
   def test_a_new_game_starts_from_nothing
     pop!
-    @cabinet.update(20)
-    @cabinet.update(1)
-    @cabinet.press(0, 0)
-    start!(@cabinet)
+    @game_flow.update(20)
+    @game_flow.update(1)
+    @game_flow.press(0, 0)
+    start!(@game_flow)
 
     assert_equal GameStats.start, @recorder.stats
   end
@@ -73,11 +73,11 @@ class GameStatsTest < Minitest::Test
   end
 
   def test_it_knows_the_shortest_time_to_pop_and_the_dots_popped_in_the_first_seconds
-    @cabinet.update(2.0)
+    @game_flow.update(2.0)
     pop!
-    @cabinet.update(0.5)
+    @game_flow.update(0.5)
     pop!
-    @cabinet.update(8.0)
+    @game_flow.update(8.0)
     pop!
 
     stats = @recorder.stats
@@ -90,39 +90,39 @@ class GameStatsTest < Minitest::Test
   private
 
   def mistake!
-    popped = @cabinet.game.dots.find(&:popped?)
-    clear_around!(live(@cabinet), popped)
-    @cabinet.press(popped.x, popped.y)
+    popped = @game_flow.game.dots.find(&:popped?)
+    clear_around!(live(@game_flow), popped)
+    @game_flow.press(popped.x, popped.y)
   end
 
   def pop!
-    bright = @cabinet.game.dots.find(&:bright?)
-    clear_around!(live(@cabinet), bright)
-    @cabinet.press(bright.x, bright.y)
+    bright = @game_flow.game.dots.find(&:bright?)
+    clear_around!(live(@game_flow), bright)
+    @game_flow.press(bright.x, bright.y)
   end
   # The tutorial's game: two dots popped and the guide's mistake while it is
   # paused, heard by the rules but announced to no one, then play.
   def test_a_game_the_tutorial_played_over_counts_its_dots_popped_without_a_wait_and_no_mistake
-    cabinet = Cabinet.new(field, random: Random.new(9))
+    game_flow = GameFlow.new(field, random: Random.new(9))
     recorder = GameStats::Recorder.new
-    cabinet.subscribe(recorder)
-    start_paused!(cabinet, DotPopper::Stack.new(dots: [dot(300, 300, id: 0)]))
-    cabinet.press_paused(300, 300)
-    cabinet.press_paused(300, 300)
-    spawned = cabinet.game.dots.to_a.last
-    clear_around!(live(cabinet), spawned)
-    cabinet.press_paused(spawned.x, spawned.y)
-    cabinet.unpause
+    game_flow.subscribe(recorder)
+    start_paused!(game_flow, DotPopper::Stack.new(dots: [dot(300, 300, id: 0)]))
+    game_flow.press_paused(300, 300)
+    game_flow.press_paused(300, 300)
+    spawned = game_flow.game.dots.to_a.last
+    clear_around!(live(game_flow), spawned)
+    game_flow.press_paused(spawned.x, spawned.y)
+    game_flow.unpause
 
     stats = recorder.stats
     assert_equal [2, 0, 1, 1, 1], [stats.dots_popped, stats.mistakes, stats.score, stats.dots_in_a_row, stats.most_dots_in_a_row]
     assert_empty stats.times_to_pop
     assert_nil stats.shortest_time_to_pop
 
-    cabinet.update(1.5)
-    bright = cabinet.game.dots.to_a.last
-    clear_around!(live(cabinet), bright)
-    cabinet.press(bright.x, bright.y)
+    game_flow.update(1.5)
+    bright = game_flow.game.dots.to_a.last
+    clear_around!(live(game_flow), bright)
+    game_flow.press(bright.x, bright.y)
     assert_equal [3, 2, 2], [recorder.stats.dots_popped, recorder.stats.score, recorder.stats.most_dots_in_a_row], "the row is the game's own"
     assert_equal [1.5], recorder.stats.times_to_pop.map { it.round(6) }, "the first wait runs from the clock starting"
   end

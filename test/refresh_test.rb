@@ -6,14 +6,14 @@ require "dot_popper/presentation"
 class RefreshTest < Minitest::Test
   include DotPopperTest
   Refresh = DotPopper::Refresh
-  Cabinet = DotPopper::Cabinet
+  GameFlow = DotPopper::GameFlow
 
   def setup
     @now = 1_000.0
     @asked = []
-    @cabinet = Cabinet.new(field, random: Random.new(3))
-    @refresh = Refresh.new([-> { @asked << :themes }, -> { @asked << :groups }], cabinet: @cabinet, clock: -> { @now })
-    @cabinet.subscribe(@refresh)
+    @game_flow = GameFlow.new(field, random: Random.new(3))
+    @refresh = Refresh.new([-> { @asked << :themes }, -> { @asked << :groups }], game_flow: @game_flow, clock: -> { @now })
+    @game_flow.subscribe(@refresh)
   end
 
   def later(seconds = Refresh::FLOOR) = @now += seconds
@@ -60,7 +60,7 @@ class RefreshTest < Minitest::Test
   end
 
   def test_nothing_is_asked_during_a_game
-    start!(@cabinet)
+    start!(@game_flow)
     later
     @refresh.came_back
 
@@ -68,7 +68,7 @@ class RefreshTest < Minitest::Test
   end
 
   def test_nothing_is_asked_while_the_tutorial_plays_over_a_game
-    start_paused!(@cabinet, DotPopper::Stack.new)
+    start_paused!(@game_flow, DotPopper::Stack.new)
     later
     @refresh.came_back
 
@@ -76,7 +76,7 @@ class RefreshTest < Minitest::Test
   end
 
   def test_coming_back_during_a_game_waits_for_home
-    start!(@cabinet)
+    start!(@game_flow)
     later
     @refresh.came_back
     finish_and_go_home
@@ -103,13 +103,13 @@ class RefreshTest < Minitest::Test
   private
 
   def play_a_game
-    start!(@cabinet)
+    start!(@game_flow)
     finish_and_go_home
   end
 
   def finish_and_go_home
-    @cabinet.update(DotPopper::Rules::STARTING_SECONDS + 1) until @cabinet.state.is_a?(Cabinet::GameOver)
-    @cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
-    @cabinet.press(0, 0)
+    @game_flow.update(DotPopper::Rules::STARTING_SECONDS + 1) until @game_flow.state.is_a?(GameFlow::GameOver)
+    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.press(0, 0)
   end
 end

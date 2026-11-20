@@ -16,7 +16,7 @@ class DevelopmentHooksTest < Minitest::Test
   def hooks(env, channel: nil)
     settings = DotPopper::Composition::DeveloperSettings.new(env, channel:)
     game = DotPopper::Composition::Root.new(engine: FakeEngine.new("Linux"), settings:)
-    DotPopper::Shell::DevelopmentHooks.for(settings, cabinet: game.cabinet, show: game.show, pile: nil, dragging: nil,
+    DotPopper::Shell::DevelopmentHooks.for(settings, game_flow: game.game_flow, show: game.show, pile: nil, dragging: nil,
                                                      pad: ->(*) {})
   end
 

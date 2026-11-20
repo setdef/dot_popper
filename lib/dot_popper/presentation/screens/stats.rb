@@ -129,9 +129,9 @@ module DotPopper
         end
 
         def build_sheet
-          cabinet = show.cabinet
-          size_class = cabinet.size_class
-          StatsSheet.build(@stats_book.stats, score_record: cabinet.score_record.of(size_class), words:, streak: @stats_book.streak,
+          game_flow = show.game_flow
+          size_class = game_flow.size_class
+          StatsSheet.build(@stats_book.stats, score_record: game_flow.score_record.of(size_class), words:, streak: @stats_book.streak,
                                               size_class:, achievements: @achievements)
         end
       end

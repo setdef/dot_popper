@@ -9,29 +9,29 @@ class SettingsTest < Minitest::Test
 
   def setup
     @sizing_store = DotPopper::ScoreRecord::Memory.new
-    @cabinet = DotPopper::Cabinet.new(field, random: Random.new(2))
-    @show = new_show(cabinet: @cabinet, layout: layout, sounds: FakeSounds.new, radius: R, sizing_store: @sizing_store)
+    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2))
+    @show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, sizing_store: @sizing_store)
     @show.open_settings
   end
 
   # 800 by 600 fits a radius of about 35 with standard dots.
   def test_a_tap_on_a_dot_size_chooses_it_and_it_is_remembered
-    refute @cabinet.sizing.standard?
+    refute @game_flow.sizing.standard?
     @show.tap(*middle(@show.reach_of(DotPopper::DotSizing::BIGGER_OR_SMALLER)))
     assert_nil @sizing_store.read, "the chosen one again changes nothing, so nothing is saved"
 
     @show.tap(*middle(@show.reach_of(DotPopper::DotSizing::STANDARD)))
-    assert @cabinet.sizing.standard?
+    assert @game_flow.sizing.standard?
     assert_equal "fitted", @sizing_store.read, "dot_size.txt's word for the default, as every build wrote it"
     assert @show.settings?, "the tap never leaves Settings"
     assert_in_delta 35.4, @show.attract.dots.first.radius, 0.1, "Home's dots follow the choice"
     @show.back
     press_main
-    assert_in_delta 35.4, @cabinet.game.field.radius, 0.1
+    assert_in_delta 35.4, @game_flow.game.field.radius, 0.1
   end
 
   def test_the_size_that_is_the_same_everywhere_saves_as_standard
-    @cabinet.sizing = DotPopper::DotSizing::DEFAULT
+    @game_flow.sizing = DotPopper::DotSizing::DEFAULT
     @show.tap(*middle(@show.reach_of(DotPopper::DotSizing::DEFAULT.toggled)))
 
     assert_equal "standard", @sizing_store.read, "dot_size.txt's word for it, as every build wrote it"
@@ -40,29 +40,29 @@ class SettingsTest < Minitest::Test
   # On the 24 × 16 R window, the two sizes are the same, so
   # Settings leaves the choice out, and a shoulder button changes nothing.
   def test_where_the_sizes_look_alike_the_choice_is_not_offered
-    cabinet = DotPopper::Cabinet.new(field(1200, 800), random: Random.new(2), sizing: DotPopper::DotSizing::STANDARD)
-    show = new_show(cabinet:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, sizing_store: @sizing_store)
+    game_flow = DotPopper::GameFlow.new(field(1200, 800), random: Random.new(2), sizing: DotPopper::DotSizing::STANDARD)
+    show = new_show(game_flow:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, sizing_store: @sizing_store)
     show.open_settings
 
     refute show.sizing_offered?
     assert_nil show.reach_of(DotPopper::DotSizing::BIGGER_OR_SMALLER)
     show.pad(:lb)
-    assert cabinet.sizing.standard?, "the saved choice stays"
+    assert game_flow.sizing.standard?, "the saved choice stays"
     assert_nil @sizing_store.read
   end
 
   # Whatever size is saved: with the bigger or smaller size saved there,
   # the choice is left out too, and the saved size stands.
   def test_where_the_sizes_look_alike_the_choice_is_left_out_whatever_size_is_saved
-    cabinet = DotPopper::Cabinet.new(field(1200, 800), random: Random.new(2), sizing: DotPopper::DotSizing::BIGGER_OR_SMALLER)
-    show = new_show(cabinet:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, sizing_store: @sizing_store)
+    game_flow = DotPopper::GameFlow.new(field(1200, 800), random: Random.new(2), sizing: DotPopper::DotSizing::BIGGER_OR_SMALLER)
+    show = new_show(game_flow:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, sizing_store: @sizing_store)
     show.open_settings
 
     refute show.sizing_offered?
     assert_nil show.reach_of(DotPopper::DotSizing::STANDARD)
     assert_nil show.reach_of(DotPopper::DotSizing::BIGGER_OR_SMALLER)
     show.pad(:lb)
-    refute cabinet.sizing.standard?, "the saved choice stays"
+    refute game_flow.sizing.standard?, "the saved choice stays"
     assert_nil @sizing_store.read
   end
 
@@ -76,7 +76,7 @@ class SettingsTest < Minitest::Test
   end
 
   def test_a_short_window_scrolls_to_what_does_not_fit
-    show = new_show(cabinet: @cabinet, layout: layout(400, 320), sounds: FakeSounds.new, radius: R, window: FakeWindow.new)
+    show = new_show(game_flow: @game_flow, layout: layout(400, 320), sounds: FakeSounds.new, radius: R, window: FakeWindow.new)
     show.open_settings
     assert_nil show.reach_of(:privacy), "Privacy is below the window"
 

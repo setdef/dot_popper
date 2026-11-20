@@ -15,7 +15,7 @@ module DotPopper
 
     # The stats of a game as play begins on it (Events::GameStarted):
     # none for a game begun afresh; for one the tutorial played over while
-    # it was paused (Cabinet::Paused), each of its popped dots, its score,
+    # it was paused (GameFlow::Paused), each of its popped dots, its score,
     # and its row. Those dots were popped before the clock ran, so none
     # has a wait; and the guide's mistake, which the player did not make,
     # is not one of theirs.
@@ -56,7 +56,7 @@ module DotPopper
       times_to_pop.count { (at += it) <= seconds }
     end
 
-    # Listens to a Cabinet (Cabinet#subscribe) and keeps the stats of the game
+    # Listens to a GameFlow (GameFlow#subscribe) and keeps the stats of the game
     # in play, or of the one just finished, timing each event by the
     # time played it carries.
     class Recorder

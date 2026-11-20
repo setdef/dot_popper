@@ -12,8 +12,8 @@ class WindowButtonsTest < Minitest::Test
 
   def setup
     @window = FakeWindow.new
-    @cabinet = DotPopper::Cabinet.new(field(1200, 800), random: Random.new(2))
-    @show = new_show(cabinet: @cabinet, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, window: @window)
+    @game_flow = DotPopper::GameFlow.new(field(1200, 800), random: Random.new(2))
+    @show = new_show(game_flow: @game_flow, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, window: @window)
   end
 
   def test_each_display_choice_in_settings_moves_the_window_and_shows_as_chosen
@@ -63,11 +63,11 @@ class WindowButtonsTest < Minitest::Test
   def test_only_home_offers_quit
     @show.primary
     refute_includes names, :quit, "a game"
-    @cabinet.update(30)
+    @game_flow.update(30)
     @show.update(1.0)
     refute_includes names, :quit, "Game Over"
     assert @show.home_reach, "Game Over goes back Home"
-    @cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
     @show.back
     @show.open_stats
     refute_includes names, :quit, "the Stats screen"
@@ -75,7 +75,7 @@ class WindowButtonsTest < Minitest::Test
   end
 
   def test_a_phone_or_tablet_offers_neither
-    show = new_show(cabinet: @cabinet, layout: layout(400, 850), sounds: FakeSounds.new, radius: R)
+    show = new_show(game_flow: @game_flow, layout: layout(400, 850), sounds: FakeSounds.new, radius: R)
     refute_includes show.controls.map(&:name), :quit
     show.open_settings
 

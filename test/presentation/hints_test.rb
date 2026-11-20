@@ -54,7 +54,7 @@ class HintsTest < Minitest::Test
     %i[buttons sound] => [:settings, :select, ->(t) { t.show.sounds.muted? }],
     # Dot size is offered only where the two sizes look different, as on
     # an upright phone.
-    %i[buttons dot_size] => [:phone_settings, :lb, ->(t) { t.show.cabinet.sizing != t.sizing }],
+    %i[buttons dot_size] => [:phone_settings, :lb, ->(t) { t.show.game_flow.sizing != t.sizing }],
     %i[buttons display] => [:settings, :rb, ->(t) { t.fixture.window.display != :window }],
     %i[buttons credits_licenses] => [:settings, :x, ->(t) { t.show.credits? }],
     %i[buttons privacy] => [:settings, :y, ->(t) { t.show.privacy? }],
@@ -135,7 +135,7 @@ class HintsTest < Minitest::Test
     @fixture = Fixture.new(os: phone ? "iOS" : os, width: phone ? 400 : 1200, height: phone ? 850 : 800, pro: at == :notice)
     start = P::GamepadCursor.centered(show.layout.whole, style: P::Style::GAMEPAD, radius: DotPopperTest::R)
     @handler = P::InputHandler.new(show:, platform: fixture.platform, shell: FakeShell.new, pile: FakeShell.new, cursor: start)
-    @sizing = show.cabinet.sizing
+    @sizing = show.game_flow.sizing
     reach(at)
     fixture.tick(0.1)
   end

@@ -6,40 +6,40 @@ class BotTest < Minitest::Test
   include PresentationTest
 
   def test_it_plays_a_game_and_comes_back_home
-    cabinet = DotPopper::Cabinet.new(field, random: Random.new(4))
-    show = new_show(cabinet:, layout: layout, sounds: FakeSounds.new, radius: R)
+    game_flow = DotPopper::GameFlow.new(field, random: Random.new(4))
+    show = new_show(game_flow:, layout: layout, sounds: FakeSounds.new, radius: R)
     bot = Bot.new(Style::BOT, random: Random.new(5))
     seen = []
     events = []
-    cabinet.subscribe { events << it.class }
+    game_flow.subscribe { events << it.class }
     3000.times do
-      x, y = bot.update(1 / 60.0, cabinet, show)
+      x, y = bot.update(1 / 60.0, game_flow, show)
       show.tap(x, y) if x
-      cabinet.update(1 / 60.0)
+      game_flow.update(1 / 60.0)
       show.update(1 / 60.0)
-      seen << cabinet.state.class
-      break if seen.include?(DotPopper::Cabinet::GameOver) && cabinet.state.is_a?(DotPopper::Cabinet::Home)
+      seen << game_flow.state.class
+      break if seen.include?(DotPopper::GameFlow::GameOver) && game_flow.state.is_a?(DotPopper::GameFlow::Home)
     end
 
-    assert_includes seen, DotPopper::Cabinet::GameOver
-    assert_instance_of DotPopper::Cabinet::Home, cabinet.state
+    assert_includes seen, DotPopper::GameFlow::GameOver
+    assert_instance_of DotPopper::GameFlow::Home, game_flow.state
     assert_includes events, DotPopper::Events::Popped
   end
 
   def test_with_the_show_it_copies_every_other_result
-    cabinet = DotPopper::Cabinet.new(field, random: Random.new(4))
+    game_flow = DotPopper::GameFlow.new(field, random: Random.new(4))
     clipboard = MemoryClipboard.new
-    show = new_show(cabinet:, layout: layout, sounds: FakeSounds.new, radius: R, clipboard:)
+    show = new_show(game_flow:, layout: layout, sounds: FakeSounds.new, radius: R, clipboard:)
     bot = Bot.new(Style::BOT, random: Random.new(5))
     copies = []
     games = 0
-    cabinet.subscribe { games += 1 if it.is_a?(DotPopper::Events::GameStarted) }
+    game_flow.subscribe { games += 1 if it.is_a?(DotPopper::Events::GameStarted) }
     12_000.times do
-      x, y = bot.update(1 / 60.0, cabinet, show)
+      x, y = bot.update(1 / 60.0, game_flow, show)
       show.tap(x, y) if x
-      cabinet.update(1 / 60.0)
+      game_flow.update(1 / 60.0)
       show.update(1 / 60.0)
-      copies << clipboard.text if cabinet.state.is_a?(DotPopper::Cabinet::Home) && copies.size < games
+      copies << clipboard.text if game_flow.state.is_a?(DotPopper::GameFlow::Home) && copies.size < games
       break if games >= 3
     end
 
@@ -49,17 +49,17 @@ class BotTest < Minitest::Test
   end
 
   def test_on_its_second_visit_home_it_opens_the_stats_and_goes_back
-    cabinet = DotPopper::Cabinet.new(field, random: Random.new(4))
-    show = new_show(cabinet:, layout: layout, sounds: FakeSounds.new, radius: R)
+    game_flow = DotPopper::GameFlow.new(field, random: Random.new(4))
+    show = new_show(game_flow:, layout: layout, sounds: FakeSounds.new, radius: R)
     bot = Bot.new(Style::BOT, random: Random.new(5))
     opened = false
     games = 0
-    cabinet.subscribe { games += 1 if it.is_a?(DotPopper::Events::GameStarted) }
+    game_flow.subscribe { games += 1 if it.is_a?(DotPopper::Events::GameStarted) }
     12_000.times do
-      x, y = bot.update(1 / 60.0, cabinet, show)
+      x, y = bot.update(1 / 60.0, game_flow, show)
       show.tap(x, y) if x
       opened ||= show.stats?
-      cabinet.update(1 / 60.0)
+      game_flow.update(1 / 60.0)
       show.update(1 / 60.0)
       break if games >= 2
     end
@@ -72,20 +72,20 @@ class BotTest < Minitest::Test
   # 800 by 600 fits smaller dots, so once a game has finished Settings
   # offers the choice, and the bot switches it once there.
   def test_it_switches_the_dot_size_once_home_offers_it
-    cabinet = DotPopper::Cabinet.new(field, random: Random.new(4))
-    show = new_show(cabinet:, layout: layout, sounds: FakeSounds.new, radius: R)
+    game_flow = DotPopper::GameFlow.new(field, random: Random.new(4))
+    show = new_show(game_flow:, layout: layout, sounds: FakeSounds.new, radius: R)
     bot = Bot.new(Style::BOT, random: Random.new(5))
     games = 0
-    cabinet.subscribe { games += 1 if it.is_a?(DotPopper::Events::GameStarted) }
+    game_flow.subscribe { games += 1 if it.is_a?(DotPopper::Events::GameStarted) }
     12_000.times do
-      x, y = bot.update(1 / 60.0, cabinet, show)
+      x, y = bot.update(1 / 60.0, game_flow, show)
       show.tap(x, y) if x
-      cabinet.update(1 / 60.0)
+      game_flow.update(1 / 60.0)
       show.update(1 / 60.0)
       break if games >= 3
     end
 
-    assert cabinet.sizing.standard?
+    assert game_flow.sizing.standard?
     assert_equal 3, games
   end
 
@@ -93,16 +93,16 @@ class BotTest < Minitest::Test
   # behind it: the bot answers it instead of pressing a button that isn't
   # there.
   def test_it_answers_a_new_themes_card_before_playing
-    cabinet = DotPopper::Cabinet.new(field, random: Random.new(4))
+    game_flow = DotPopper::GameFlow.new(field, random: Random.new(4))
     themes = DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new)
     themes.release(%w[ghost])
-    show = new_show(cabinet:, layout: layout, sounds: FakeSounds.new, radius: R, themes:)
+    show = new_show(game_flow:, layout: layout, sounds: FakeSounds.new, radius: R, themes:)
     bot = Bot.new(Style::BOT, random: Random.new(5))
     assert show.new_theme?
     600.times do
-      x, y = bot.update(1 / 60.0, cabinet, show)
+      x, y = bot.update(1 / 60.0, game_flow, show)
       show.tap(x, y) if x
-      cabinet.update(1 / 60.0)
+      game_flow.update(1 / 60.0)
       show.update(1 / 60.0)
       break if show.playing?
     end

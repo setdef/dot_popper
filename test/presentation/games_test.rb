@@ -26,8 +26,8 @@ class GamesTest < Minitest::Test
     @day = Date.new(2026, 11, 8)
     @entitlement = DotPopper::Entitlement.test
     @games = DotPopper::FreeGames.new(Memory.new, today: -> { @day }, entitlement: @entitlement, first_games: 0)
-    @cabinet = DotPopper::Cabinet.new(field, random: Random.new(3))
-    @show = new_show(cabinet: @cabinet, layout: layout, sounds: FakeSounds.new, radius: R, games: @games, entitlement: @entitlement,
+    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(3))
+    @show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, games: @games, entitlement: @entitlement,
                      storefront: Store.new)
   end
 
@@ -68,9 +68,9 @@ class GamesTest < Minitest::Test
   def test_get_pro_at_game_over_opens_the_offer_over_it_and_back_returns_there
     2.times { @games.spend! }
     press_main
-    @cabinet.update(20)
+    @game_flow.update(20)
     @show.update(0.016)
-    @cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
     @show.update(0.016)
 
     assert_predicate @show, :game_over?
@@ -94,7 +94,7 @@ class GamesTest < Minitest::Test
   def test_get_pro_at_game_over_does_nothing_before_game_over_takes_a_press
     2.times { @games.spend! }
     press_main
-    @cabinet.update(20)
+    @game_flow.update(20)
     @show.update(0.016)
     reach = @show.play_again_reach
     @show.tap(reach.center_x, reach.center_y)
@@ -106,7 +106,7 @@ class GamesTest < Minitest::Test
   # Nor does a line that opens something (Screens::GameOver#open_from).
   def test_game_overs_lines_open_nothing_before_game_over_takes_a_press
     press_main
-    @cabinet.update(20)
+    @game_flow.update(20)
     @show.update(0.016)
     @show.screens.fetch(:game_over).open_from(:group)
 
@@ -119,12 +119,12 @@ class GamesTest < Minitest::Test
   # which does nothing under the offer, before asking the screen on top.
   def test_over_game_over_a_controllers_y_buys_as_its_words_say
     store = Buying.new
-    @show = new_show(cabinet: @cabinet, layout: layout, sounds: FakeSounds.new, radius: R, games: @games, entitlement: @entitlement,
+    @show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, games: @games, entitlement: @entitlement,
                      storefront: store, input: InputKind::GAMEPAD)
     2.times { @games.spend! }
     press_main
-    @cabinet.update(20)
-    @cabinet.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(20)
+    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
     @show.update(0.016)
     @show.primary
 
@@ -252,7 +252,7 @@ class GamesTest < Minitest::Test
       assert_equal 1, start_game.asked, name
       assert_empty started, name
       refute_predicate show, :tutorial?, name
-      assert_instance_of DotPopper::Cabinet::Home, @cabinet.state, name
+      assert_instance_of DotPopper::GameFlow::Home, @game_flow.state, name
     end
   end
 
@@ -268,7 +268,7 @@ class GamesTest < Minitest::Test
   def test_with_none_left_a_first_play_leaves_the_tutorial_due
     3.times { @games.spend! }
     flag = TutorialFlag.new(Memory.new)
-    show = new_show(cabinet: @cabinet, layout: layout, sounds: FakeSounds.new, radius: R, games: @games,
+    show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, games: @games,
                     entitlement: @entitlement, storefront: Store.new, tutorial_flag: flag)
     press_main(show)
 
@@ -287,11 +287,11 @@ class GamesTest < Minitest::Test
   end
 
   # A Show with its Tutorial still due, or, +seen+, only How to Play's.
-  def tutorial_show(seen: false, **) = new_show(cabinet: @cabinet, layout: layout, sounds: FakeSounds.new, radius: R, games: @games,
+  def tutorial_show(seen: false, **) = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, games: @games,
                                                     entitlement: @entitlement, storefront: Store.new,
                                                     tutorial_flag: TutorialFlag.new(Memory.new).tap { it.seen! if seen }, **)
 
-  def started_games = [].tap { |seen| @cabinet.subscribe { |event| seen << event if event.is_a?(DotPopper::Events::GameStarted) } }
+  def started_games = [].tap { |seen| @game_flow.subscribe { |event| seen << event if event.is_a?(DotPopper::Events::GameStarted) } }
 
   # The Tutorial played out as a player would, tapping each dot on its turn.
   def play_out(show)
@@ -300,7 +300,7 @@ class GamesTest < Minitest::Test
       id = TutorialScene::TURNS[scene.beat]
       dot = id && scene.dots.find { it.id == id && !it.popped? }
       show.tap(dot.x, dot.y) if dot
-      @cabinet.update(1 / 60.0)
+      @game_flow.update(1 / 60.0)
       show.update(1 / 60.0)
     end
   end

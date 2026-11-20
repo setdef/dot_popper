@@ -25,17 +25,17 @@ class RulesFuzzTest < Minitest::Test
   def test_random_presses_change_a_game_only_while_it_is_played
     seed = Integer(ENV.fetch("RULES_FUZZ_SEED", 20_261_105))
     random = Random.new(seed)
-    cabinet = DotPopper::Cabinet.new(random_field(random), random:)
+    game_flow = DotPopper::GameFlow.new(random_field(random), random:)
     seen = Set.new
     3_000.times do |step|
-      before = cabinet.state
+      before = game_flow.state
       seen << before.class
-      kept = [cabinet.game&.score, cabinet.game&.countdown]
-      if before.is_a?(DotPopper::Cabinet::Home) && random.rand < 0.1 then start!(cabinet)
-      elsif random.rand < 0.5 then cabinet.press(*aim_anywhere(cabinet, random))
-      else cabinet.update(random.rand(1.5))
+      kept = [game_flow.game&.score, game_flow.game&.countdown]
+      if before.is_a?(DotPopper::GameFlow::Home) && random.rand < 0.1 then start!(game_flow)
+      elsif random.rand < 0.5 then game_flow.press(*aim_anywhere(game_flow, random))
+      else game_flow.update(random.rand(1.5))
       end
-      next if before.is_a?(DotPopper::Cabinet::Playing)
+      next if before.is_a?(DotPopper::GameFlow::Playing)
 
       assert_equal kept, [before.game&.score, before.game&.countdown], "seed #{seed}, step #{step}"
     end
@@ -44,7 +44,7 @@ class RulesFuzzTest < Minitest::Test
 
   private
 
-  def aim_anywhere(cabinet, random) = [random.rand(cabinet.field.width), random.rand(cabinet.field.height)]
+  def aim_anywhere(game_flow, random) = [random.rand(game_flow.field.width), random.rand(game_flow.field.height)]
 
   def play(random, where)
     game = DotPopper::Game.new(random_field(random), random:)

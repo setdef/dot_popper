@@ -247,11 +247,11 @@ class KeyboardTest < Minitest::Test
 
   def test_the_main_button_is_not_pressed_during_a_game
     given(at: :game)
-    score = show.cabinet.game.score
+    score = show.game_flow.game.score
     %i[enter space].each { press(it) }
 
     assert show.playing?
-    assert_equal score, show.cabinet.game.score
+    assert_equal score, show.game_flow.game.score
   end
 
   def test_alt_or_cmd_enter_switches_fullscreen_and_ctrl_enter_does_not

@@ -42,7 +42,7 @@ class GroupStub
     when "GET /groups" then Reply.new(200, @groups.values.select { it[:joined] }.map { group_json(it) })
     when "POST /groups" then Reply.new(201, group_json(new_group(you: 1, joined: true)))
     when "POST /memberships" then join(body["join_code"])
-    when "POST /games" then cabinet(body["score"].to_i)
+    when "POST /games" then game(body["score"].to_i)
     when "POST /achievements" then achievement(body["key"].to_s)
     when %r{\AGET /groups/(\d+)\z} then one($1.to_i)
     when %r{\AGET /groups/(\d+)/history\z} then Reply.new(200, @changes.fetch($1.to_i, []).first(20))
@@ -67,7 +67,7 @@ class GroupStub
     Reply.new(204, nil)
   end
 
-  def cabinet(score)
+  def game(score)
     Reply.new(200, { groups: @groups.values.select { it[:joined] }.map { { group: group_json(play(it, score)), won_title: it[:won] } } })
   end
 

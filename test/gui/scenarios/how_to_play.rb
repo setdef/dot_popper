@@ -28,7 +28,7 @@ module DotPopperGui
       keep_screenshot(name("home"))
       press_it(reach)
       check(show.tutorial?, "How to play opens the tutorial at once")
-      check(cabinet.paused?, "over its game, paused meanwhile")
+      check(game_flow.paused?, "over its game, paused meanwhile")
       wait_for("the tutorial's first beat", within: 900) { show.tutorial&.beat == :aim }
       wait(0.6)
       keep_screenshot(name("tutorial"))

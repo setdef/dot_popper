@@ -173,7 +173,7 @@ module DotPopper
         def button(name, frame) = Control.new(name:, frame:, reach: within_safe(frame.reach(2 * show.radius)))
 
         # A screen's main button, which a press reaches more generously.
-        def primary_button(name, frame) = Control.new(name:, frame:, reach: layout.primary_reach(frame, show.cabinet.field.radius))
+        def primary_button(name, frame) = Control.new(name:, frame:, reach: layout.primary_reach(frame, show.game_flow.field.radius))
 
         def back_button = button(:back, layout.back_button)
 

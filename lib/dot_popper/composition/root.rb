@@ -40,7 +40,7 @@ module DotPopper
       GAMES_LOG = "games.csv"
       SMALLEST_WINDOW = [400, 320].freeze
 
-      attr_reader :settings, :platform, :dot_size, :window, :cabinet, :show, :pen, :sound_player, :splash, :storefront,
+      attr_reader :settings, :platform, :dot_size, :window, :game_flow, :show, :pen, :sound_player, :splash, :storefront,
                   :entitlement, :theme_releases, :watch, :cursor, :bot, :haptics, :sharing, :refresh
 
       def initialize(engine:, settings: DeveloperSettings.new, clock: -> { Time.now.to_f })
@@ -135,12 +135,12 @@ module DotPopper
         # this screen's class.
         legacy = SizeClass.of(screen)
         sizing_store = file("dot_size.txt")
-        @cabinet = Cabinet.new(screen, score_record: ScoreRecord.new(file("score_record.txt"), legacy:), random:,
+        @game_flow = GameFlow.new(screen, score_record: ScoreRecord.new(file("score_record.txt"), legacy:), random:,
                                        sizing: DotSizing.parse(sizing_store.read))
-        @engine.say("dots are standard, worked out from the screen as each game starts") if @cabinet.sizing.standard?
+        @engine.say("dots are standard, worked out from the screen as each game starts") if @game_flow.sizing.standard?
         stats_book = StatsBook.new(file("stats.txt"), today:, legacy:)
         achievements = Achievements.new(file("achievements.txt"))
-        keeper = StatsBackup.new(score_record: @cabinet.score_record, stats_book:, achievements:, folder: ->(name) { file(name) })
+        keeper = StatsBackup.new(score_record: @game_flow.score_record, stats_book:, achievements:, folder: ->(name) { file(name) })
         @gone = Continuity::Gone.new(file("setdef.txt"))
         # What this build trusts, and where it keeps a license key, as
         # Monetization decides by the channel alone (ADR-0010).
@@ -170,10 +170,10 @@ module DotPopper
         @haptics = platform.buzzes? ? @engine.buzzer : Presentation::NoHaptics.new
         @sharing = Presentation::SheetSharing.for(platform, opener: @engine.opener)
         groups = groups_session
-        use_cases = Composition.use_cases(cabinet: @cabinet, free_games: games, entitlement:, store: storefront, achievements:,
+        use_cases = Composition.use_cases(game_flow: @game_flow, free_games: games, entitlement:, store: storefront, achievements:,
                                           stats_book:, friend_groups: groups)
         @show = Presentation::Show.new(
-          groups:, cabinet: @cabinet, layout: @engine.layout, sounds: @sound_player, radius: dot_size.radius,
+          groups:, game_flow: @game_flow, layout: @engine.layout, sounds: @sound_player, radius: dot_size.radius,
           random:, calm: settings.calm?, tutor: Presentation::Tutor.new(file("taught.txt"), times: Style::LESSON.times),
           haptics:, clipboard:, notices: @engine.notices, sharing:,
           stats_book:, achievements:, keeper:, sizing_store:, input: starting_input, measure: @engine.measure(@pen),
@@ -186,12 +186,12 @@ module DotPopper
         # finishes it, for Game Over; a store's purchase landing ticks on
         # the offer, after BuyPro has told friend groups of what was earned
         # while Free.
-        @cabinet.subscribe(@show)
+        @game_flow.subscribe(@show)
         use_cases[:finish_game].subscribe(@show)
         entitlement.subscribe(@show.offer)
-        @refresh = Refresh.new([-> { @theme_releases&.ask }, -> { groups.refresh }], cabinet: @cabinet, clock: @clock)
-        @cabinet.subscribe(@refresh)
-        @cabinet.subscribe(GamesLog.new(file(GAMES_LOG), today:, archive: ->(name) { file(name) }))
+        @refresh = Refresh.new([-> { @theme_releases&.ask }, -> { groups.refresh }], game_flow: @game_flow, clock: @clock)
+        @game_flow.subscribe(@refresh)
+        @game_flow.subscribe(GamesLog.new(file(GAMES_LOG), today:, archive: ->(name) { file(name) }))
         @engine.say("each game is logged in #{@engine.path(GAMES_LOG)}")
         @show.group_panel.open if flag?("DOT_POPPER_GROUP_SCREEN")
         @cursor = Presentation::GamepadCursor.centered(@show.layout.whole, style: Style::GAMEPAD, radius: dot_size.radius)

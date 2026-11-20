@@ -13,18 +13,18 @@ module DotPopper
       # The hooks +settings+ ask for, or nil for none. +show+, +pile+ and
       # +dragging+ are the game's; +pad+ is called with (action, x, y) for
       # the fake drag made with a gamepad (DOT_POPPER_FAKE_GAMEPAD).
-      def self.for(settings, cabinet:, show:, pile:, dragging:, pad:)
+      def self.for(settings, game_flow:, show:, pile:, dragging:, pad:)
         shots = Presentation::ShotSchedule.parse(settings["DOT_POPPER_SHOTS"]).then { it unless it.empty? }
         quit_after = Float(settings.fetch("DOT_POPPER_QUIT_AFTER"), exception: false)
         frames = Presentation::FrameMeter.start(5) if settings.flag?("DOT_POPPER_PERF")
         fake_drag = Presentation::FakeDrag.parse(settings["DOT_POPPER_FAKE_DRAG"])
         return unless shots || quit_after || frames || fake_drag
 
-        new(shots:, quit_after:, frames:, fake_drag:, cabinet:, show:, pile:, dragging:,
+        new(shots:, quit_after:, frames:, fake_drag:, game_flow:, show:, pile:, dragging:,
             pad: (pad if settings.fake_gamepad?))
       end
 
-      def initialize(shots:, quit_after:, frames:, fake_drag:, cabinet:, show:, pile:, dragging:, pad:)
+      def initialize(shots:, quit_after:, frames:, fake_drag:, game_flow:, show:, pile:, dragging:, pad:)
         @shots = shots
         @quit_after = quit_after
         @frames = frames
@@ -34,7 +34,7 @@ module DotPopper
         @dragging = dragging
         @pad = pad
         @elapsed = 0.0
-        cabinet.subscribe { happened(it.class.name.split("::").last) } if @frames
+        game_flow.subscribe { happened(it.class.name.split("::").last) } if @frames
       end
 
       # As a frame starts, with the +seconds+ it measured: with
