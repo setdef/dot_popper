@@ -23,7 +23,10 @@
 # Popped", at most five times. --pull copies, with run-as, every file the
 # app names in a line the REGEX's first group captures. It exits 1 unless
 # every --expect matches a line of the app's, and the --expect-order
-# patterns match lines in the order given. --key-after sends the key
+# patterns match lines in the order given; and, whatever was met, if the
+# game raised (Lota's "Error: " line, which it stops at), the app exited
+# with a status other than 0, its process went away without a word, or
+# Android logged a crash of it. --key-after sends the key
 # event KEYCODE once, SECONDS after the first line that matches REGEX;
 # each waits for the one before it to be sent, and for the probe to say
 # the game's window has the focus, and looks only at the lines that came
@@ -153,6 +156,7 @@ seen = 0
 origin = nil
 pop_taps = 0
 probe_failed = false
+failed = false
 last_tap = nil
 pending_shots = shots.sort
 pending_taps = taps.sort_by(&:first)
@@ -217,7 +221,20 @@ loop do
     probe_failed = true
     break
   end
-  break if lines.any? { it.include?("exited with status") }
+  # Lota prints "Error: " and the backtrace of what the game raised, then
+  # shows its error screen until someone leaves it, which no check does.
+  raised = lines.index { it.start_with?("Error: ") }
+  if raised
+    sleep 1 # the rest of the backtrace
+    say "the game raised:\n#{streamed.drop(raised).first(20).join("\n")}"
+    failed = true
+    break
+  end
+  exited = lines.find { it.include?("exited with status") }
+  if exited
+    failed = !exited.end_with?("exited with status 0")
+    break
+  end
   if until_met && keys.all? { it[:sent] } && expects.all? { |pattern| lines.any? { pattern.match?(it) } } && in_order?(lines, ordered)
     say "every expectation met"
     break
@@ -225,6 +242,7 @@ loop do
 
   if Time.now - started > 20 && adb("shell", "pidof", package, allow_failure: true).strip.empty?
     say "the app's process is gone"
+    failed = true
     break
   end
   if Time.now - started > timeout
@@ -254,6 +272,10 @@ if pull
 end
 crashes = text(File.binread(File.join(out, "logcat.txt"))).lines.grep(/FATAL|Fatal signal|AndroidRuntime|DEBUG\s*:|libc\s*:|SDL\s*: activity finished|wm_relaunch\w*: .*#{Regexp.escape(package)}/)
 say "crash lines:\n#{crashes.first(80).join}" unless crashes.empty?
+# Android's own word that the app crashed, in Java or in native code,
+# fails the run even where every expectation was met before it.
+crashed = text(File.binread(File.join(out, "logcat.txt"))).lines.grep(/am_crash: .*\b#{Regexp.escape(package)}\b|Process: #{Regexp.escape(package)}\b/)
+say "the app crashed:\n#{crashed.first(10).join}" unless crashed.empty?
 missing = expects.reject { |pattern| lines.any? { pattern.match?(it) } }
 missing.each { say "missing: #{it.source}" }
 rest_of_lines = lines
@@ -264,7 +286,7 @@ end
 say "missing, in order: #{out_of_order.source}" if out_of_order
 unsent = keys.reject { it[:sent] }
 unsent.each { say "never sent #{it[:code]}: no line matched #{it[:pattern].source}" }
-passed = !probe_failed && missing.empty? && out_of_order.nil? && unsent.empty?
+passed = !probe_failed && !failed && crashed.empty? && missing.empty? && out_of_order.nil? && unsent.empty?
 unless passed
   say "the focused window: #{focused_window}"
   life = text(File.binread(File.join(out, "logcat.txt"))).lines.grep(/#{Regexp.escape(package)}/)

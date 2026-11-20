@@ -16,9 +16,12 @@ status=0
 wanted() { [ -z "${ANDROID_CHECKS:-}" ] || [[ " $ANDROID_CHECKS " == *" $1 "* ]]; }
 
 # The bot plays its first game. Back during it and at its Game Over must
-# do nothing but go on: the game carries on to Home. The run ends there
-# (--until-met); DOT_POPPER_QUIT_AFTER only makes sure the game ends if
-# it never gets there, since a bonus dot can stretch a game.
+# do nothing but go on: the game carries on to Home, where the bot opens
+# Stats and Settings, and into its second game. The run ends once that
+# game has started and a dot is popped (--until-met), long before its
+# Game Over, whose "Share my score" would open Android's share sheet
+# over the next run. DOT_POPPER_QUIT_AFTER only makes sure the game
+# ends if it never gets there, since a bonus dot can stretch a game.
 if wanted autoplay; then
   ruby "$here/android_emulator.rb" "$apk" "$package" "$out/autoplay" \
   --env DOT_POPPER_AUTOPLAY=1 --env DOT_POPPER_SEED=7 --env DOT_POPPER_QUIT_AFTER=120 --env ALSOFT_DRIVERS=null \
@@ -30,7 +33,9 @@ if wanted autoplay; then
   --expect-order "kit probe: keypressed :escape, :acback, false in Playing" \
   --expect-order "kit probe: event GameEnded" \
   --expect-order "kit probe: keypressed :escape, :acback, false in GameOver" \
-  --expect-order "kit probe: event HomeShown" || status=1
+  --expect-order "kit probe: event HomeShown" \
+  --expect-order "kit probe: event GameStarted" \
+  --expect-order "kit probe: event Popped" || status=1
 fi
 
 # Back on Home leaves the app: Dot Popper quits itself

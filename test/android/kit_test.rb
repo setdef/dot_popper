@@ -15,9 +15,11 @@ require "tmpdir"
 # no longer prints would otherwise show only there. So each run of
 # .github/android_emulator_checks.sh is played here, with the same
 # settings, keys and expectations, on a stand-in for Lota on Android
-# (test/android/fake_android/lota.rb), and must pass as it must there.
+# (test/android/fake_android/lota.rb), and must pass as it must there,
+# and exit with status 0, since the fake plays on until the game quits.
 # What only Android does (the host starting Ruby, drawing, the activity's
-# life, Back trapped as Escape) is the emulator's to check.
+# life) is the emulator's to check; that Back is trapped as Escape is
+# test/android_manifest_test.rb's.
 class KitTest < Minitest::Test
   ROOT = File.expand_path("../..", __dir__)
   CHECKS = File.join(ROOT, ".github/android_emulator_checks.sh")
@@ -62,6 +64,9 @@ class KitTest < Minitest::Test
     define_method(:"test_the_#{run.name.tr('-', '_')}_check_passes_on_the_game_the_app_carries") do
       lines, status = play(run)
       failures = Expectations.new(run.options).failures(lines)
+      # The fake plays on until the game quits, past where an emulator
+      # run stops: a game that raised meanwhile fails the check too.
+      failures << "the game exited with status #{status}" unless status.zero?
       assert_empty failures, "#{run.name}, exit #{status}:\n#{lines.last(40).join("\n")}"
     end
   end
