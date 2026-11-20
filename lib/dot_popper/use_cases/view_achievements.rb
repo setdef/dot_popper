@@ -42,10 +42,10 @@ module DotPopper
 
         records = @saved_stats.stats.records.values
         case id
-        when :steady then [most_dots_in_a_row(records), Achievement::STEADY]
-        when :unshaken then [most_dots_in_a_row(records), Achievement::UNSHAKEN]
-        when :big_score then [Gameplay::SizeClass::ALL.map { @score_record.of(it) }.max || 0, Achievement::BIG_SCORE]
-        when :long_haul then [records.map(&:longest_game).max.to_f.round, Achievement::LONG_HAUL.to_i]
+        when :steady then [most_dots_in_a_row(records), Gameplay::Achievement::STEADY]
+        when :unshaken then [most_dots_in_a_row(records), Gameplay::Achievement::UNSHAKEN]
+        when :big_score then [Gameplay::SizeClass::ALL.map { @score_record.of(it) }.max || 0, Gameplay::Achievement::BIG_SCORE]
+        when :long_haul then [records.map(&:longest_game).max.to_f.round, Gameplay::Achievement::LONG_HAUL.to_i]
         end
       end
 

@@ -120,13 +120,13 @@ class WordsTest < Minitest::Test
   end
 
   def test_every_goal_reads_as_a_whole_sentence
-    DotPopper::DailyGoal::LIST.each do |goal|
+    DotPopper::Gameplay::DailyGoal::LIST.each do |goal|
       line = Style::WORDS.goal(goal)
       assert_match(/\AToday's goal: [a-z].*[a-z]\.\z/, line)
       assert_includes line, goal.target.to_s
     end
     assert_equal "Today's goal: pop 15 bright dots in a row without a mistake.",
-                 Style::WORDS.goal(DotPopper::DailyGoal.new(kind: :clean_run, target: 15))
+                 Style::WORDS.goal(DotPopper::Gameplay::DailyGoal.new(kind: :clean_run, target: 15))
     assert_equal "Met 3 days in a row.", Style::WORDS.streak(3)
   end
 
@@ -158,7 +158,7 @@ class WordsTest < Minitest::Test
   end
 
   def test_a_met_goal_still_says_what_it_was
-    goal = DotPopper::DailyGoal.for(Date.new(2026, 11, 1))
+    goal = DotPopper::Gameplay::DailyGoal.for(Date.new(2026, 11, 1))
     line = Style::WORDS.goal_done_line(goal)
 
     assert line.start_with?("Done today: ")

@@ -365,7 +365,7 @@ class RootTest < Minitest::Test
     game_flow = DotPopper::Gameplay::GameFlow.new(field)
     entitlement = DotPopper::Entitlement.free
     saved_stats = DotPopper::Gameplay::SavedStats.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
-    achievements = DotPopper::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
+    achievements = DotPopper::Gameplay::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     groups = DotPopper::Groups::Session.off
     saved_themes = DotPopper::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: DotPopper::FreeGames.unlimited, entitlement:, store: NoStore.new,

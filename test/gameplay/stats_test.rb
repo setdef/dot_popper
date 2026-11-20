@@ -123,7 +123,7 @@ class StatsTest < Minitest::Test
   def test_it_saves_and_reads_back
     stats = add(add(Stats.new, game, day: "2026-11-05"), game(score: 3, times_to_pop: []), day: "2026-11-05",
                 size_class: SMALL)
-    stats = stats.with(streak: DotPopper::GoalStreak.new(current: 2, longest: 4, last_met: "2026-11-05"))
+    stats = stats.with(streak: DotPopper::Gameplay::GoalStreak.new(current: 2, longest: 4, last_met: "2026-11-05"))
 
     assert_equal stats, Stats.parse(stats.to_text)
     assert_includes stats.to_text, "small.most_dots_in_a_row=8\n"

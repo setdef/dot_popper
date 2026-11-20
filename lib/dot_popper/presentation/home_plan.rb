@@ -34,7 +34,7 @@ module DotPopper
       end
 
       # Whether every daily goal, in +words+, fits whole on a card in +rect+.
-      def self.room?(rect, words, measure) = DailyGoal::LIST.all? { fit(rect, words.goal_sentence(it), measure).whole? }
+      def self.room?(rect, words, measure) = Gameplay::DailyGoal::LIST.all? { fit(rect, words.goal_sentence(it), measure).whole? }
 
       def at(sentence, size) = with(text_size: size, lines: Words.wrap(sentence, room) { measure.width(:bold, size, it) })
 

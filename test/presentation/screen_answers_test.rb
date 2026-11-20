@@ -224,7 +224,7 @@ class ScreenAnswersTest < Minitest::Test
     stats: at(path: [:stats]),
     stats_with_undo: at(path: %i[stats clear]),
     achievements: at(fixture: SMALL, path: [:achievements]),
-    achievement_dialog: at(fixture: SMALL.merge(pro: true), path: [:achievements, [:achievement, DotPopper::Achievement::IDS.first]]),
+    achievement_dialog: at(fixture: SMALL.merge(pro: true), path: [:achievements, [:achievement, DotPopper::Gameplay::Achievement::IDS.first]]),
     themes: at(fixture: { pro: true }, path: [:themes]),
     themes_for_a_free_player: at(path: [:themes]),
     settings: at(fixture: SMALL, path: [:settings]),

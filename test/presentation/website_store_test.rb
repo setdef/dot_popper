@@ -151,7 +151,7 @@ class WebsiteStoreTest < Minitest::Test
     reported = []
     groups = DotPopper::Groups::Session.off
     groups.define_singleton_method(:report_achievements) { |keys| reported << keys }
-    achievements = DotPopper::Achievements.new(Memory.new)
+    achievements = DotPopper::Gameplay::Achievements.new(Memory.new)
     achievements.award(%i[blink], day: "2026-11-01")
     game_flow = DotPopper::Gameplay::GameFlow.new(field(1200, 800), random: Random.new(2))
     s = new_show(game_flow:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, clipboard: @clipboard, entitlement: @entitlement,

@@ -3,7 +3,7 @@
 require "test_helper"
 
 class GoalStreakTest < Minitest::Test
-  GoalStreak = DotPopper::GoalStreak
+  GoalStreak = DotPopper::Gameplay::GoalStreak
 
   def day(number) = Date.new(2026, 11, number)
 

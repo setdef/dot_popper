@@ -153,7 +153,7 @@ class HintsTest < Minitest::Test
     when :stats then show.open_stats
     when :cleared then show.open_stats.then { hold_clear }
     when :achievements then show.open_achievements
-    when :dialog then show.open_achievements.then { show.open_achievement(DotPopper::Achievement::IDS.first) }
+    when :dialog then show.open_achievements.then { show.open_achievement(DotPopper::Gameplay::Achievement::IDS.first) }
     when :settings, :phone_settings then show.open_settings
     when :privacy then show.open_settings.then { show.open_privacy }
     when :offer then open_offer(show)

@@ -1,0 +1,61 @@
+module DotPopper
+  module Gameplay
+    class AchievementRecorder
+      @watching: bool
+
+      @targets: Hash[Float, TouchTarget]
+
+      @found: Array[Achievement::id]
+
+      @sharp: Integer
+
+      @dots_in_a_row: Integer
+
+      @mistaken: bool
+
+      @low: bool
+
+      @early: Integer
+
+      @last_pop: Float?
+
+      @covered: bool
+
+      @tapped: bool
+
+      def initialize: () -> void
+
+      def earned: () -> Array[Achievement::id]
+
+      def call: (event event) -> void
+
+      private
+
+      def reset: () -> void
+
+      def begin_game: (Events::GameStarted started) -> void
+
+      def popped: (Events::Popped event) -> void
+
+      def mistake_made: (Events::MistakeMade event) -> void
+
+      def ended: (Events::GameEnded event) -> void
+
+      def sharp: (Dot dot, Array[Dot] above) -> void
+
+      def time_to_pop: (Float seconds) -> void
+
+      def dots_in_a_row: () -> void
+
+      def early: (Events::Popped popped) -> void
+
+      def note_low_clock: (Events::Popped | Events::MistakeMade tapped) -> void
+
+      def appeared: (Dot dot, Array[Dot] above, Events::Popped popped) -> void
+
+      def target: (Float radius) -> TouchTarget
+
+      def find: (Achievement::id id) -> void
+    end
+  end
+end

@@ -368,7 +368,7 @@ module DotPopper
       # does not know.
       def history_entries
         list = groups.history(@group_id) || groups.title_changes(@group_id) || []
-        list.reject { it.is_a?(Groups::MemberAchievement) && !Achievement::IDS.include?(it.key) }
+        list.reject { it.is_a?(Groups::MemberAchievement) && !Gameplay::Achievement::IDS.include?(it.key) }
       end
 
       # Show, then Copy: the code shows, then goes to the clipboard.

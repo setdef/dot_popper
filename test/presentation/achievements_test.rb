@@ -12,7 +12,7 @@ class AchievementsOnStatsTest < Minitest::Test
 
   def setup
     @folder = DotPopper::Gameplay::StatsBackup::Folder.new
-    @achievements = DotPopper::Achievements.new(@folder.call("achievements"))
+    @achievements = DotPopper::Gameplay::Achievements.new(@folder.call("achievements"))
   end
 
   def show(pro:)
@@ -67,7 +67,7 @@ class AchievementsOnStatsTest < Minitest::Test
     sheet = build_sheet
     marks = sheet.achievements.rows.map(&:mark)
 
-    assert_equal DotPopper::Achievement::IDS.size, marks.size
+    assert_equal DotPopper::Gameplay::Achievement::IDS.size, marks.size
     assert_equal [:open], marks.uniq
     assert_equal "Achievements: 0 of 11", sheet.achievements.heading
   end
@@ -113,7 +113,7 @@ class AchievementsOnStatsTest < Minitest::Test
     @show.open_achievements
     @show.achievement_cells
     assert_operator @show.scroll.farthest, :>, 0.0, "the grid scrolls here"
-    @show.open_achievement(DotPopper::Achievement::IDS.first)
+    @show.open_achievement(DotPopper::Gameplay::Achievement::IDS.first)
     @show.achievement_pro
     assert_predicate @show, :offer?
 
@@ -140,7 +140,7 @@ class AchievementsOnStatsTest < Minitest::Test
     @show.open_achievements
     @show.achievement_cells
     assert_operator @show.scroll.farthest, :>, 0.0, "the grid scrolls here"
-    @show.open_achievement(DotPopper::Achievement::IDS.first)
+    @show.open_achievement(DotPopper::Gameplay::Achievement::IDS.first)
 
     before = grid_offset
     @show.wheel_scroll(-3)

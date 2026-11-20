@@ -238,7 +238,7 @@ module Simulation
     jobs.zip(results).group_by { |job, _| job.device }.each do |device, rows|
       puts "\n#{device.name}"
       puts format("%-18s %6s %5s %6s %6s %7s %8s %6s  %s", "bonus (n/pts/s)", "score", "p90", "secs", "p90s", "endless",
-                  "mistakes", "bonus", DotPopper::DailyGoal::LIST.map { "#{it.kind}".ljust(12) }.join)
+                  "mistakes", "bonus", DotPopper::Gameplay::DailyGoal::LIST.map { "#{it.kind}".ljust(12) }.join)
       rows.each { |job, each| compare_row(job.bonus, each, games) }
     end
   end
@@ -246,7 +246,7 @@ module Simulation
   def self.compare_row(bonus, results, games)
     scores = results.map(&:score).sort
     times = results.map(&:seconds).sort
-    goals = DotPopper::DailyGoal::LIST.map { |goal| format("%-12s", format("%.0f%%", 100.0 * results.count { goal.met?(it.stats) } / games)) }
+    goals = DotPopper::Gameplay::DailyGoal::LIST.map { |goal| format("%-12s", format("%.0f%%", 100.0 * results.count { goal.met?(it.stats) } / games)) }
     name = bonus ? "#{bonus.dots_in_a_row}/#{bonus.points}/#{bonus.seconds.to_i}" : "none"
     puts format("%-18s %6.1f %5d %6.1f %6.1f %6.0f%% %8.1f %6.2f  %s", name, scores.sum.fdiv(games), scores[(games * 0.9).floor],
                 times.sum / games, times[(games * 0.9).floor], 100.0 * results.count(&:endless?) / games,

@@ -1,0 +1,33 @@
+module DotPopper
+  module Gameplay
+    class Achievements
+      @file: ScoreRecord::_SaveFile
+
+      @days: Hash[Achievement::id, String]
+
+      def initialize: (ScoreRecord::_SaveFile file) -> void
+
+      def earned?: (Achievement::id id) -> bool
+
+      def earned: () -> Array[Achievement::id]
+
+      def count: () -> Integer
+
+      def day: (Achievement::id id) -> String?
+
+      def award: (Array[Achievement::id] ids, day: String) -> Array[Achievement::id]
+
+      def saved: () -> String?
+
+      def clear: () -> void
+
+      def restore: (String? text) -> void
+
+      private
+
+      def text: () -> String
+
+      def parse: (String? text) -> Hash[Achievement::id, String]
+    end
+  end
+end

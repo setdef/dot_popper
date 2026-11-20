@@ -77,7 +77,7 @@ class ServerExchangesTest < Minitest::Test
   def test_every_achievement_and_theme_key_is_one_the_server_takes
     values = RECORD.fetch("values")
 
-    assert_empty DotPopper::Achievement::IDS.map(&:to_s).grep_v(Regexp.new(values.fetch("achievement_key_format")))
+    assert_empty DotPopper::Gameplay::Achievement::IDS.map(&:to_s).grep_v(Regexp.new(values.fetch("achievement_key_format")))
     assert_empty DotPopper::Theme::ALL.map { it.key.to_s }.grep_v(Regexp.new(values.fetch("theme_key_format")))
   end
 

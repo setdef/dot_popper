@@ -24,7 +24,7 @@ class FinishGameTest < Minitest::Test
 
   def setup
     @saved_stats = DotPopper::Gameplay::SavedStats.new(Memory.new, today: -> { Date.new(2026, 11, 13) })
-    @achievements = DotPopper::Achievements.new(Memory.new)
+    @achievements = DotPopper::Gameplay::Achievements.new(Memory.new)
     @entitlement = DotPopper::Entitlement.new
     @groups = Groups.new
     @finish = DotPopper::UseCases::FinishGame.new(saved_stats: @saved_stats, achievements: @achievements, entitlement: @entitlement,

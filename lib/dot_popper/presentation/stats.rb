@@ -32,7 +32,7 @@ module DotPopper
       def self.achievements_section(achievements)
         return unless achievements
 
-        rows = Achievement::IDS.map do |id|
+        rows = Gameplay::Achievement::IDS.map do |id|
           StatsRow.new(label: AchievementWords.name(id), value: AchievementWords.mark(id),
                        mark: achievements.earned?(id) ? :earned : :open)
         end

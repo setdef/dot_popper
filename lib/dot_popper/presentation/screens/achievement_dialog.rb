@@ -31,7 +31,7 @@ module DotPopper
 
         # The previous (+by+ -1) or next (1) achievement, round the ends.
         def step(by)
-          ids = DotPopper::Achievement::IDS
+          ids = DotPopper::Gameplay::Achievement::IDS
           @achievement = ids[((ids.index(achievement) || 0) + by) % ids.size]
           sounds.play(:tick)
         end

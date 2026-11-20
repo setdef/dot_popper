@@ -135,7 +135,7 @@ module DotPopper
           skip: ByInput.new(touch: "Skip", mouse: "Skip", gamepad: "Skip (B)"),
           get_pro: "Get Pro", home: ByInput.new(touch: "Home", mouse: "Home", gamepad: "Home (B)"),
           tile_stats: "Stats", tile_achievements: "Achievements", tile_themes: "Themes", tile_groups: "Friend groups",
-          tile_note_to_earn: "#{Achievement::IDS.size} to earn", tile_note_take_title: "Join or create",
+          tile_note_to_earn: "#{Gameplay::Achievement::IDS.size} to earn", tile_note_take_title: "Join or create",
           badge_stats: "X", badge_achievements: "LB", badge_themes: "RB", badge_groups: "LT",
           goal_label: "Today's goal", in_a_row: "in a row",
           sound: ByInput.new(touch: "Sound", mouse: "Sound", gamepad: "Sound (Select)"),

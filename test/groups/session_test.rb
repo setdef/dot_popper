@@ -889,6 +889,6 @@ end
 
 class SessionHistoryTest < Minitest::Test
   def test_achievement_keys_fit_what_the_server_accepts
-    DotPopper::Achievement::IDS.each { assert_match(/\A[a-z0-9][a-z0-9_.-]{0,63}\z/, it.to_s) }
+    DotPopper::Gameplay::Achievement::IDS.each { assert_match(/\A[a-z0-9][a-z0-9_.-]{0,63}\z/, it.to_s) }
   end
 end

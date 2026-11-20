@@ -26,7 +26,7 @@ class RedesignTest < Minitest::Test
     @game_flow = DotPopper::Gameplay::GameFlow.new(field(1200, 800), random: Random.new(2))
     @book = DotPopper::Gameplay::SavedStats.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     @book.record(DotPopper::Gameplay::GameStats.start.with(most_dots_in_a_row: 19), DotPopper::Gameplay::SizeClass::MEDIUM) if played
-    @earned = DotPopper::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
+    @earned = DotPopper::Gameplay::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     new_show(game_flow: @game_flow, layout: layout(1200, 800), sounds: @sounds, radius: R, saved_stats: @book, achievements: @earned,
              entitlement: pro ? DotPopper::Entitlement.new(forced: true) : DotPopper::Entitlement.free)
   end

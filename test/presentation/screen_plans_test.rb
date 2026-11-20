@@ -13,7 +13,7 @@ class ScreenPlansTest < Minitest::Test
   SIZES = [[400, 850], [1200, 800], [800, 500], [640, 400], [400, 320], [844, 390], [1024, 768], [1920, 1080],
            [2560, 1440], [3840, 2160], [412, 832], [832, 412], [375, 812], [812, 375], [850, 400]].freeze
   WORDS = Style::WORDS
-  GOAL = WORDS.goal(DotPopper::DailyGoal.for(Date.new(2026, 11, 1)))
+  GOAL = WORDS.goal(DotPopper::Gameplay::DailyGoal.for(Date.new(2026, 11, 1)))
 
   # A desktop's window may be any size from SMALLEST_WINDOW up, so these
   # step across the whole range, and past it to big screens.
@@ -258,7 +258,7 @@ class ScreenPlansTest < Minitest::Test
         assert rect, "#{width}x#{height}, #{tiles} tiles, window #{window}: the card is shown" if kept.include?([width, height])
         next unless rect
 
-        DotPopper::DailyGoal::LIST.each do |goal|
+        DotPopper::Gameplay::DailyGoal::LIST.each do |goal|
           sentence = WORDS.goal_sentence(goal)
           card = GoalCard.fit(rect, sentence, measure)
           name = "#{width}x#{height}, #{tiles} tiles, window #{window}, #{goal}"
@@ -349,7 +349,7 @@ class ScreenPlansTest < Minitest::Test
     show.back
     show.open_achievements
     yield "Achievements", show
-    show.open_achievement(DotPopper::Achievement::IDS.first)
+    show.open_achievement(DotPopper::Gameplay::Achievement::IDS.first)
     yield "an achievement's dialog", show
     show.back
     show.back

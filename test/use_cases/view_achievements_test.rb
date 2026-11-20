@@ -10,7 +10,7 @@ class ViewAchievementsTest < Minitest::Test
   Memory = DotPopper::Gameplay::ScoreRecord::Memory
 
   def setup
-    @achievements = DotPopper::Achievements.new(Memory.new)
+    @achievements = DotPopper::Gameplay::Achievements.new(Memory.new)
     @achievements.award(%i[blink], day: "2026-11-01")
     @saved_stats = DotPopper::Gameplay::SavedStats.new(Memory.new, today: -> { Date.new(2026, 11, 13) })
     @saved_stats.record(DotPopper::Gameplay::GameStats.start.with(duration: 31.6, most_dots_in_a_row: 12), DotPopper::Gameplay::SizeClass::SMALL)
@@ -35,9 +35,9 @@ class ViewAchievementsTest < Minitest::Test
   def test_pro_sees_how_far_along_the_measured_ones_are_until_earned
     pro = view(pro: true)
 
-    assert_equal [12, DotPopper::Achievement::STEADY], pro.progress(:steady)
-    assert_equal [40, DotPopper::Achievement::BIG_SCORE], pro.progress(:big_score)
-    assert_equal [32, DotPopper::Achievement::LONG_HAUL.to_i], pro.progress(:long_haul)
+    assert_equal [12, DotPopper::Gameplay::Achievement::STEADY], pro.progress(:steady)
+    assert_equal [40, DotPopper::Gameplay::Achievement::BIG_SCORE], pro.progress(:big_score)
+    assert_equal [32, DotPopper::Gameplay::Achievement::LONG_HAUL.to_i], pro.progress(:long_haul)
     assert_nil pro.progress(:blink), "earned, and not measured"
   end
 

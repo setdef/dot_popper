@@ -9,7 +9,7 @@ module DotPopper
         include Scrolling
 
         # Where the grid goes (AchievementsLayout).
-        def grid = AchievementsLayout.new(layout:, ids: DotPopper::Achievement::IDS)
+        def grid = AchievementsLayout.new(layout:, ids: DotPopper::Gameplay::Achievement::IDS)
 
         # Each cell where it is on screen, with the list scrolled to fit its
         # window.
@@ -29,7 +29,7 @@ module DotPopper
         end
 
         # X: the first achievement's dialog.
-        def pad(button) = (show.screens.fetch(:achievement_dialog).open_at(DotPopper::Achievement::IDS.first) if button == :x)
+        def pad(button) = (show.screens.fetch(:achievement_dialog).open_at(DotPopper::Gameplay::Achievement::IDS.first) if button == :x)
 
         def answers = [*super, :achievement]
 

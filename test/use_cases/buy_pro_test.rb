@@ -38,7 +38,7 @@ class BuyProTest < Minitest::Test
     @store = Store.new
     @entitlement = DotPopper::Entitlement.test
     @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(1))
-    @achievements = DotPopper::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
+    @achievements = DotPopper::Gameplay::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     @groups = Groups.new
     @buy = DotPopper::UseCases::BuyPro.new(store: @store, entitlement: @entitlement, game_flow: @game_flow, achievements: @achievements,
                                            friend_groups: @groups)

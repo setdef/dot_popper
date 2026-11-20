@@ -25,7 +25,7 @@ module DotPopperGui
       resize(width, height)
       name = "#{gone ? "gone-" : ""}#{width}x#{height}"
       show.open_achievements
-      show.open_achievement(DotPopper::Achievement::IDS.first)
+      show.open_achievement(DotPopper::Gameplay::Achievement::IDS.first)
       show.achievement_pro
       wait(0.5)
       keep_screenshot("website-offer-#{name}")

@@ -114,7 +114,7 @@ The rest of the Stats screen's layout (`StatsSheet`, `StatsLayout`) is in [scree
 
 ## The daily goal and its streak
 
-**The goal.** Each local date picks one goal from `DailyGoal::LIST` (`lib/dot_popper/daily_goal.rb`), by a 32-bit FNV-1a hash of the ISO date (`DailyGoal.fnv("2026-11-05")`) modulo the list's length, so the goal is the same all day, on every device and in every run. (Ruby's `String#hash` changes from run to run.) Changing the hash, or the list's order or length, changes which goal every date gets. `DOT_POPPER_TODAY` pretends a date, for testing.
+**The goal.** Each local date picks one goal from `DailyGoal::LIST` (`lib/dot_popper/gameplay/daily_goal.rb`), by a 32-bit FNV-1a hash of the ISO date (`DailyGoal.fnv("2026-11-05")`) modulo the list's length, so the goal is the same all day, on every device and in every run. (Ruby's `String#hash` changes from run to run.) Changing the hash, or the list's order or length, changes which goal every date gets. `DOT_POPPER_TODAY` pretends a date, for testing.
 
 A goal is met within one game, judged from that game's `GameStats` when it ends (`DailyGoal#met?`):
 
@@ -136,17 +136,17 @@ The words are `goals:` in `Style::WORDS`. A bonus pop is a pop.
 
 **When the goal is met.** `SavedStats#record` says `goal_met` for the first game of the day to meet it; Game Over shows "You met today's goal!" with a check, once. Home's goal card shows "Today's goal", the sentence, and a check once it is met (`SavedStats#goal_done?`).
 
-**The streak** (`GoalStreak`, `lib/dot_popper/goal_streak.rb`) is the days in a row the goal was met: `current`, `longest`, and `last_met`, saved in `stats.txt` as `goal_streak`, `longest_goal_streak` and `goal_met_on`. Meeting the goal again the same day changes nothing. Meeting it the day after `last_met` adds one; any later day starts again at 1. `GoalStreak#current_on(today)` is the streak as it stands: still whole through the day after it was last met, and 0 once a day has gone by without it. `longest` keeps.
+**The streak** (`GoalStreak`, `lib/dot_popper/gameplay/goal_streak.rb`) is the days in a row the goal was met: `current`, `longest`, and `last_met`, saved in `stats.txt` as `goal_streak`, `longest_goal_streak` and `goal_met_on`. Meeting the goal again the same day changes nothing. Meeting it the day after `last_met` adds one; any later day starts again at 1. `GoalStreak#current_on(today)` is the streak as it stands: still whole through the day after it was last met, and 0 once a day has gone by without it. `longest` keeps.
 
 Home's goal card shows the current streak beside the goal, as a number over "days in a row"; the Stats screen shows "Days in a row" and "Most days in a row". A missed day costs nothing and is never mentioned, because a reward for coming back can crowd out the reason to play (Nguyen, *Games: Agency as Art*), and a failure should feel fair (Juul).
 
 Home shows the goal card only once a game has finished, or Stats have been cleared (below), so a first-time player's Home says only how to play. On the smallest windows the card is left out; Stats shows the streak too.
 
-Tests: `test/daily_goal_test.rb`, `test/goal_streak_test.rb`, `test/gameplay/saved_stats_test.rb`.
+Tests: `test/gameplay/daily_goal_test.rb`, `test/gameplay/goal_streak_test.rb`, `test/gameplay/saved_stats_test.rb`.
 
 ## Achievements
 
-Eleven goals, each earned once, each for skill and none for time spent (Ferrara, *Playful Design*; Nguyen, *Games: Agency as Art*). Their numbers are in `Achievement` (`lib/dot_popper/achievement.rb`), apart from the rules, which they never touch. `Achievement::IDS` is the order they are listed in.
+Eleven goals, each earned once, each for skill and none for time spent (Ferrara, *Playful Design*; Nguyen, *Games: Agency as Art*). Their numbers are in `Achievement` (`lib/dot_popper/gameplay/achievement.rb`), apart from the rules, which they never touch. `Achievement::IDS` is the order they are listed in.
 
 | Id | Name | Earned by | Constants |
 | --- | --- | --- | --- |
@@ -166,13 +166,13 @@ Names, figures and sentences are in `Presentation::AchievementWords`. Each has a
 
 **Sharpshooter's 10%** was measured with `Visibility`, the share of a dot's disc no dot above it covers (400 sample points in a sunflower spiral, within about half a percent). With the real rules, a model player that taps the moment a fingertip-sized (44-unit) target fits pops with 31% to 50% showing, never under 10%; one that taps any sliver, which no person can aim, does so on over half the dots it pops. Under a tenth is a crescent a few units wide: a deliberate tap. The other thresholds were set against a model player of about 0.5 s a pop that never loses, and are constants in `Achievement`.
 
-**Detection** is Lota-free. `AchievementRecorder` (`lib/dot_popper/achievement_recorder.rb`), which `UseCases::FinishGame` keeps, listens to the `GameFlow`'s events and reads the dots, the clock and the time played from each event, which carries them as they stood when it was told; it keeps no game, and decides nothing. A "covered" spawn for Patience is one where `TouchTarget#clear_on?` finds no room among the dots above, and any tap, a miss included, spoils the wait.
+**Detection** is Lota-free. `AchievementRecorder` (`lib/dot_popper/gameplay/achievement_recorder.rb`), which `UseCases::FinishGame` keeps, listens to the `GameFlow`'s events and reads the dots, the clock and the time played from each event, which carries them as they stood when it was told; it keeps no game, and decides nothing. A "covered" spawn for Patience is one where `TouchTarget#clear_on?` finds no room among the dots above, and any tap, a miss included, spoils the wait.
 
 **Saving.** At each Game Over, `UseCases::FinishGame` gives the recorder's finds to `Achievements#award`, which keeps the ones not earned before with today's date and writes `achievements.txt`. Achievements are earned and saved whether or not the player has Pro. An id a newer version saved and this one doesn't know is dropped on reading.
 
 **Showing.** Nothing shows during a game. For a Pro player, Game Over adds "New achievement: Sharpshooter" (or "New achievements: …") for the ones first earned that game, and friend groups hear of them. A Free player sees how each is earned on the Achievements screen but no earned marks, dates, count or progress; what they earned is kept, shown once Pro is bought, and then reported to their friend groups. What the screen may show is `UseCases::ViewAchievements`'s to say (`#earned?`, `#day`, `#count`, `#progress`, all held back while `#locked?`), so the `Show` and the painters only draw it. See [store-and-pro.md](store-and-pro.md) and [screens.md](screens.md).
 
-Tests: `test/achievement_recorder_test.rb`, `test/achievements_test.rb`, `test/gameplay/visibility_test.rb`, `test/presentation/achievements_test.rb`.
+Tests: `test/gameplay/achievement_recorder_test.rb`, `test/gameplay/achievements_test.rb`, `test/gameplay/visibility_test.rb`, `test/presentation/achievements_test.rb`.
 
 ## Clearing Stats
 

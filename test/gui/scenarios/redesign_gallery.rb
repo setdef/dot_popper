@@ -101,7 +101,7 @@ module DotPopperGui
       show.input = phone ? P::InputKind::TOUCH : P::InputKind::MOUSE
       show.back
       page(:open_achievements, "achievements")
-      show.open_achievement(DotPopper::Achievement::IDS.first)
+      show.open_achievement(DotPopper::Gameplay::Achievement::IDS.first)
       shoot("ach-open")
       show.back
       show.back

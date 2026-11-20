@@ -8,7 +8,7 @@ class AchievementRecorderTest < Minitest::Test
   Events = DotPopper::Gameplay::Events
 
   def setup
-    @recorder = DotPopper::AchievementRecorder.new
+    @recorder = DotPopper::Gameplay::AchievementRecorder.new
   end
 
   # Starts recording +game+, as the game announces it.
@@ -73,7 +73,7 @@ class AchievementRecorderTest < Minitest::Test
     covered = dot(400, 300, popped: true)
     record(game_with(covered, dot(395, 300, id: 7)))
 
-    assert_operator DotPopper::Gameplay::Visibility.of(@game.dots.find(&:bright?), [covered]), :<, DotPopper::Achievement::SHARP
+    assert_operator DotPopper::Gameplay::Visibility.of(@game.dots.find(&:bright?), [covered]), :<, DotPopper::Gameplay::Achievement::SHARP
     assert_instance_of Events::Popped, tap_at(346, 300)
     assert_equal %i[sharpshooter], @recorder.earned
   end
@@ -90,7 +90,7 @@ class AchievementRecorderTest < Minitest::Test
     bright = dot(400 - 9, 300, id: 7)
     record(game_with(covered, bright))
 
-    assert_operator DotPopper::Gameplay::Visibility.of(bright, [covered]), :>=, DotPopper::Achievement::SHARP
+    assert_operator DotPopper::Gameplay::Visibility.of(bright, [covered]), :>=, DotPopper::Gameplay::Achievement::SHARP
     tap_at(bright.x - 45, 300)
     refute_includes @recorder.earned, :sharpshooter
   end

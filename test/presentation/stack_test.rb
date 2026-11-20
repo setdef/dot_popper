@@ -14,7 +14,7 @@ class StackTest < Minitest::Test
   include Inputs
 
   SMALL = { width: 400, height: 320 }.freeze
-  DIALOG = DotPopper::Achievement::IDS.first
+  DIALOG = DotPopper::Gameplay::Achievement::IDS.first
 
   # name, the Fixture's options, the steps there, and what is then so.
   # A step is a control a finger presses (Input#press), :play_game

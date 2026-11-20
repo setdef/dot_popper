@@ -139,7 +139,7 @@ module DotPopper
                                        sizing: Gameplay::DotSizing.parse(sizing_file.read))
         @engine.say("dots are standard, worked out from the screen as each game starts") if @game_flow.sizing.standard?
         saved_stats = Gameplay::SavedStats.new(file("stats.txt"), today:, legacy:)
-        achievements = Achievements.new(file("achievements.txt"))
+        achievements = Gameplay::Achievements.new(file("achievements.txt"))
         stats_backup = Gameplay::StatsBackup.new(score_record: @game_flow.score_record, saved_stats:, achievements:, folder: ->(name) { file(name) })
         @gone = Continuity::Gone.new(file("setdef.txt"))
         # What this build trusts, and where it keeps a license key, as

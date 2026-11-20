@@ -24,7 +24,7 @@ class GamesLogTest < Minitest::Test
     assert_match(/\A\d+\z/, seed)
     assert_equal %w[2 12.00 2 0 0], [score, duration, dots_popped, mistakes, softened]
     assert_equal %w[0.50 1.00], [mean_time_to_pop, longest_time_to_pop]
-    assert_equal [DotPopper::DailyGoal.for(Date.new(2026, 11, 5)).to_s, "false"], [goal, met]
+    assert_equal [DotPopper::Gameplay::DailyGoal.for(Date.new(2026, 11, 5)).to_s, "false"], [goal, met]
   end
 
   def test_a_log_with_other_columns_is_set_aside_and_a_new_one_begins
