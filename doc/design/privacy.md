@@ -16,7 +16,7 @@ The declarations live in `lib/dot_popper/privacy/`, and each request's with the 
 bundle exec rake privacy
 ```
 
-`test_the_document_is_current` (`test/privacy/declared_test.rb`) fails while the committed file differs from what the code generates, so its words are never older than the code. The public privacy policy and the store forms are written from it. On every `v*` tag, the Package workflow's `privacy-document` job runs `script/publish_privacy_document.sh`, which regenerates the file, fails if that changed it or if its `game_version` is not the tag's, and sends it to the server.
+`test_the_document_is_current` (`test/privacy/declared_test.rb`) fails while the committed file differs from what the code generates, so its words are never older than the code. The public privacy policy and the store forms are written from it. On every `v*` tag, the Package workflow's `privacy-document` job runs `script/publish_privacy_document.sh`, which first stamps a playtest tag's version into `fledge.yml` and the file, as every build of the tag does (`script/release_version.rb`; from 1.0.0 on the tagged commit carries it), regenerates the file, fails if that changed it or if its `game_version` is not the tag's, and sends it to the server.
 
 The document has: what stays on the device (`on_device`), every request (`network`), purchases, the libraries shipped (`sdks`), permissions and the privacy manifest's settings, the sensor, sharing, deletion, the answers for Apple's and Google's forms (`store_labels`), and `declared_but_not_enforced`.
 

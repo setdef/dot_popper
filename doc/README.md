@@ -149,7 +149,7 @@ The iPhone, iPad, and Android builds are experimental, and are not released to p
 
 ### Releases
 
-`version` in `fledge.yml` sets the app's version. A `v*` tag makes CI build every app and playtest kit and attach them to the tag's [GitHub release](https://github.com/setdef/dot_popper/releases).
+A `v*` tag makes CI build every app and playtest kit and attach them to the tag's [GitHub release](https://github.com/setdef/dot_popper/releases). Before 1.0.0, a playtest tag (`v0.X.Y`) names the version of everything CI builds from it, stamped as it builds; `version` in `fledge.yml` is what any other build carries. From 1.0.0 on, the version is committed in `fledge.yml` in the tagged commit ([PACKAGING.md](../PACKAGING.md#cutting-a-release)).
 
 ## Documentation
 

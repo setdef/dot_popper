@@ -52,13 +52,18 @@ A packaged build saves the score record, the sound setting, and the games log in
 
 ## Cutting a release
 
-1. Set `version:` in `fledge.yml` to the new version.
-2. Commit, and push the commit to `trunk`.
-3. Tag the commit and push the tag. For example, for version 0.9.0:
+Before 1.0.0, the tag names the version, and nothing is committed to make a release:
+
+1. Choose a commit on `trunk` whose Package run passed. Any recent one will do; it need not be the newest.
+2. Tag that commit with the new version and push the tag. For example, for version 0.9.22:
 
    ```console
-   $ git tag v0.9.0 && git push origin v0.9.0
+   $ git tag v0.9.22 COMMIT && git push origin v0.9.22
    ```
+
+Every job the tag starts that builds an app or reads the version first runs `ruby script/release_version.rb stamp "$GITHUB_REF_NAME"` (the fuse action does, for every desktop app), which writes the tag's version into that job's own copy of `fledge.yml` and `doc/privacy.json`, and nothing commits it. A release candidate builds its base version (`v0.9.22-rc.1` builds 0.9.22). So before 1.0.0, `version:` in `fledge.yml` on `trunk` does not name the newest release: it is only the version a build that is not a release carries, such as a push to `trunk`, a build by hand, or the phone scripts' builds.
+
+From 1.0.0 on, the version is committed. Set `version:` in `fledge.yml` to the new version (without the `v` or a suffix), run `bundle exec rake privacy` so `doc/privacy.json` carries it too, push that commit to `trunk`, and tag it once its Package run has passed. The script then stamps nothing, and every job the tag starts fails at its first step if the tag and `fledge.yml` disagree.
 
 Pushing a playtest tag, which today is any tag that starts with `v0.`, makes the Package workflow attach the apps, and the Kits workflow the playtest kits, to a new prerelease for that tag. A tag with a suffix, such as `v0.8.2-rc.1`, works the same way, which is how to try a release's kits before the release itself. `ruby script/release_kind.rb TAG` says what a tag releases: `playtest`, `website` (the builds for sale alone, from `v1.0.0` on; see [doc/publishing.md](doc/publishing.md)), or `none`.
 
@@ -75,7 +80,7 @@ $ gem install --local vendor/cache/lota-0.5.2-PLATFORM.gem
 $ lota fuse . --identifier com.setdef.DotPopper --app-version VERSION --icon icons/icon --out DIR
 ```
 
-The first line installs Lota's release gem for the platform from `vendor/cache`, after checking its SHA-256 against the `SHA256SUMS` of [Lota's v0.5.2 release](https://github.com/setdef/Lota/releases/tag/v0.5.2). `lota fuse` ships that very gem file in the app. `VERSION` is the tag's version without its `v` when CI builds a tag, and `fledge.yml`'s `version:` otherwise, as for a build by hand. A release candidate builds its base version (`v0.8.2-rc.1` builds 0.8.2), since macOS, iOS, and Windows take only numbers there; the kit's header names the tag beside it, and the Kits workflow checks that it does (`script/playtest_kit.rb check-build`).
+The first line installs Lota's release gem for the platform from `vendor/cache`, after checking its SHA-256 against the `SHA256SUMS` of [Lota's v0.5.2 release](https://github.com/setdef/Lota/releases/tag/v0.5.2). `lota fuse` ships that very gem file in the app. `VERSION` is the tag's version without its `v` when CI builds a tag ([Cutting a release](#cutting-a-release)), and `fledge.yml`'s `version:` otherwise, as for a build by hand. A release candidate builds its base version (`v0.8.2-rc.1` builds 0.8.2), since macOS, iOS, and Windows take only numbers there; the kit's header names the tag beside it, and the Kits workflow checks that it does (`script/playtest_kit.rb check-build`).
 
 `lota fuse` reads the game's name ("Dot Popper", from `conf.rb`'s `t.window.title`) and its save folder's name (`t.identity`, `dot_popper`) without opening a window. It copies the game into `DIR/fuse-project/game/dot_popper`, leaving out `.git`, `.bundle`, and `vendor/cache`, and writes a Gemfile from the game's own, with Fledge v0.12.0, a `fledge.yml`, and an entry script that starts the game fused. It then runs `fledge build` in that project. Since Lota 0.2.2, `lota fuse` honors the game's `Gemfile` and `Gemfile.lock`: it ships the gems the lockfile locks, at those versions, and refuses a game whose lockfile is missing, doesn't lock the platform it builds for, or locks another version of Lota. Dot Popper's Gemfile asks only for Lota outside its development and test groups, so Lota's gem is all that ships. `lota fuse` also writes Lota's notices, `NOTICES.txt`, into the app's `app` folder, two folders above the game's (`Contents/Resources/app` on macOS), where the Credits screen finds them.
 
@@ -85,7 +90,7 @@ The first line installs Lota's release gem for the platform from `vendor/cache`,
 
 ### The launcher, `bin/dot_popper`, and `fledge.yml`
 
-`bin/dot_popper` and the `programs:` entry in `fledge.yml` are what Fledge built from directly before `lota fuse` was released. The desktop builds no longer use them. The iOS build still does (see [The iPad and iPhone kit](#the-ipad-and-iphone-kit)), because `lota fuse` doesn't build for phones: Fledge's `fledge build ios` packages `bin/dot_popper`, which starts the game folder fused with `Lota::Boot.new(folder, ARGV, fused: true).call`. Its `DOT_POPPER_SMOKE` check mode, and `script/smoke-windows.ps1`, which ran it on a Windows build, belong to that older path. `fledge.yml` also holds the version every build takes.
+`bin/dot_popper` and the `programs:` entry in `fledge.yml` are what Fledge built from directly before `lota fuse` was released. The desktop builds no longer use them. The iOS build still does (see [The iPad and iPhone kit](#the-ipad-and-iphone-kit)), because `lota fuse` doesn't build for phones: Fledge's `fledge build ios` packages `bin/dot_popper`, which starts the game folder fused with `Lota::Boot.new(folder, ARGV, fused: true).call`. Its `DOT_POPPER_SMOKE` check mode, and `script/smoke-windows.ps1`, which ran it on a Windows build, belong to that older path. `fledge.yml` also holds the version a build takes when no playtest tag names one ([Cutting a release](#cutting-a-release)).
 
 ### Lota's gems
 
@@ -143,7 +148,7 @@ The [Package workflow](.github/workflows/package.yml) runs on every push to `tru
 
 - **Test**, on Ubuntu, runs `bundle exec rake`: the tests, then Steep.
 - **Windows x64**, on `windows-latest`; **macOS arm64**, on `macos-15`; and **Linux x86_64**, on `ubuntu-24.04` (its glibc is 2.39, Fledge's Linux floor), each run `lota fuse`, unpack the app under a folder with a space in its name, play it with the autoplay bot for 20 seconds with no Ruby on its `PATH` and an all but empty environment, and upload the `dot-popper-windows-x64`, `dot-popper-macos-arm64`, or `dot-popper-linux-x86_64` artifact. GitHub's Windows and Linux runners have no graphics card, so the game draws there with Mesa's software OpenGL (llvmpipe): on Windows, Mesa's `opengl32.dll` from the runner's MSYS2 goes beside the program, and on Linux it draws on Xvfb. The run must exit with status 0 and print its frame rate. The Windows job then plays the app again allowed only Vulkan (`DOT_POPPER_RENDERERS=vulkan`), which the runner can't start, and checks that the game ran its own `Dot Popper.exe` again without Vulkan, drew with OpenGL, and exited with status 0 ([platforms](doc/design/platforms.md#the-vulkan-rescue)).
-- **What this run releases** asks `script/release_kind.rb` about the tag, if any, and gives the other jobs the version the apps must have.
+- **What this run releases** asks `script/release_kind.rb` about the tag, if any, and gives the other jobs the version the apps must have, from `script/release_version.rb` (a website tag whose version `fledge.yml` does not carry fails here).
 - **Website build**, on each of the same three runners, sets the `website` channel, fuses, checks the app in every file it made with `script/check_build.rb`, plays it with the bot as above, and uploads `website-windows-x64`, `website-macos-arm64` or `website-linux-x86_64`. The **Windows MSIX** and **Mac App Store** jobs, the stores' own builds, run the same check on their apps ([doc/publishing.md](doc/publishing.md)).
 - **Release** runs only for a playtest tag. It attaches the test builds and the MSIX to a GitHub prerelease for the tag. It requires the Windows job to have passed. Nothing is published to RubyGems.
 - **Release the website builds** runs only for a website tag, once the tests and every website build have passed. It makes the tag's release with the website builds alone.
