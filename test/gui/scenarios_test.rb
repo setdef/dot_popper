@@ -84,7 +84,8 @@ class GuiScenariosTest < Minitest::Test
   end
 
   def test_clearing_the_stats_and_undoing_it
-    play("clearing", "letting go too soon clears nothing", "Undo restores every file exactly",
+    play("clearing", "letting go too soon clears nothing", "a finger let go too soon clears nothing",
+         "Undo restores every file exactly",
          "the games log is untouched", "a press of Y undoes")
   end
 

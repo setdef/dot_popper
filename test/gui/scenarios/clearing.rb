@@ -2,9 +2,9 @@
 
 module DotPopperGui
   # Clearing the records from the Stats screen: a press of "Clear my
-  # records…" let go too soon changes nothing; held two seconds, by a
-  # finger or a gamepad's Y, it clears them, and Undo puts them back. The
-  # games log stays as it was throughout.
+  # records…" let go too soon, by the mouse or a finger, changes nothing;
+  # held two seconds, by a finger or a gamepad's Y, it clears them, and
+  # Undo puts them back. The games log stays as it was throughout.
   class ClearingScenario < Scenario
     scenario :clearing
 
@@ -18,6 +18,7 @@ module DotPopperGui
       check(!show.stats.empty, "the Stats screen lists the game")
 
       let_go_too_soon(before)
+      let_go_too_soon_by_touch(before)
       hold_by_touch
       check_cleared(before)
       undo = show.undo_reach
@@ -56,6 +57,19 @@ module DotPopperGui
       wait(HOLD)
       check(!show.stats.empty && !show.undo_offer, "letting go too soon clears nothing")
       check(before == files, "letting go too soon leaves every file as it was")
+    end
+
+    # The finger is let go as the mouse was: Lota's touchreleased must
+    # reach the game, or the hold would go on to clear.
+    def let_go_too_soon_by_touch(before)
+      reach = show.clear_reach
+      touch_down(reach.center_x, reach.center_y)
+      wait(HOLD / 2)
+      check(show.clearing.held?, "a finger on Clear my stats starts a hold")
+      touch_up(reach.center_x, reach.center_y)
+      wait(HOLD)
+      check(!show.stats.empty && !show.undo_offer, "a finger let go too soon clears nothing")
+      check(before == files, "a finger let go too soon leaves every file as it was")
     end
 
     def hold_by_touch
