@@ -214,10 +214,10 @@ class RootTest < Minitest::Test
   end
 
   def test_a_store_build_starts_with_the_usual_free_games
-    games = root(channel: B::WEBSITE, env: SETTINGS).free_games(DotPopper::Entitlement.free, metered: true, file: DotPopper::ScoreRecord::Memory.new)
+    games = root(channel: B::WEBSITE, env: SETTINGS).free_games(DotPopper::Entitlement.free, metered: true, file: DotPopper::Gameplay::ScoreRecord::Memory.new)
 
     assert_equal DotPopper::FreeGames::FIRST_GAMES + DotPopper::FreeGames::DAILY, games.left
-    test_build = root(env: SETTINGS).free_games(DotPopper::Entitlement.free, metered: true, file: DotPopper::ScoreRecord::Memory.new)
+    test_build = root(env: SETTINGS).free_games(DotPopper::Entitlement.free, metered: true, file: DotPopper::Gameplay::ScoreRecord::Memory.new)
 
     assert_equal 999 * 2, test_build.left
   end
@@ -361,13 +361,13 @@ class RootTest < Minitest::Test
     game = root
     listeners = game.game_flow.instance_variable_get(:@listeners).map(&:class)
 
-    assert_equal [DotPopper::UseCases::FinishGame, Show, DotPopper::Refresh, DotPopper::GamesLog], listeners
+    assert_equal [DotPopper::UseCases::FinishGame, Show, DotPopper::Refresh, DotPopper::Gameplay::GamesLog], listeners
     game_flow = DotPopper::Gameplay::GameFlow.new(field)
     entitlement = DotPopper::Entitlement.free
-    saved_stats = DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new)
-    achievements = DotPopper::Achievements.new(DotPopper::ScoreRecord::Memory.new)
+    saved_stats = DotPopper::Gameplay::SavedStats.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
+    achievements = DotPopper::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     groups = DotPopper::Groups::Session.off
-    saved_themes = DotPopper::SavedThemes.new(DotPopper::ScoreRecord::Memory.new)
+    saved_themes = DotPopper::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: DotPopper::FreeGames.unlimited, entitlement:, store: NoStore.new,
                                                  achievements:, saved_stats:, friend_groups: groups)
     heard = -> { [game_flow, entitlement, use_cases[:finish_game]].map { it.instance_variable_get(:@listeners).size } }

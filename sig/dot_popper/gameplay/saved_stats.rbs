@@ -1,0 +1,39 @@
+module DotPopper
+  module Gameplay
+    class SavedStats
+      attr_reader stats: Stats
+
+      @file: ScoreRecord::_SaveFile
+
+      @today: ^() -> Date
+
+      @legacy: SizeClass
+
+      def initialize: (ScoreRecord::_SaveFile file, ?today: ^() -> Date, ?legacy: SizeClass) -> void
+
+      def record: (GameStats game, SizeClass size_class) -> Result
+
+      def today: () -> Date
+
+      def saved: () -> String?
+
+      def clear: () -> void
+
+      def restore: (String? text) -> void
+
+      def goal: () -> DailyGoal
+
+      def goal_done?: () -> bool
+
+      def streak: () -> Integer
+
+      class Result < ::Data
+        attr_reader records: Array[Stats::Record]
+
+        attr_reader goal_met: bool
+
+        def self.new: (records: Array[Stats::Record], goal_met: bool) -> instance
+      end
+    end
+  end
+end

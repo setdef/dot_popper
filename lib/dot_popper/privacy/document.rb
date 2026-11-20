@@ -78,7 +78,7 @@ module DotPopper
       end
 
       def sharing
-        stats = GameStats.start.with(dots_popped: 27, mistakes: 1, duration: 38.2)
+        stats = Gameplay::GameStats.start.with(dots_popped: 27, mistakes: 1, duration: 38.2)
         { how: sharing_how, example: Presentation::Style::WORDS.share_text(25, stats, score_record: 25, new_score_record: true) }
       end
 

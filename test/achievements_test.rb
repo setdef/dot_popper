@@ -3,7 +3,7 @@
 require "test_helper"
 
 class AchievementsTest < Minitest::Test
-  Memory = DotPopper::ScoreRecord::Memory
+  Memory = DotPopper::Gameplay::ScoreRecord::Memory
 
   def test_a_new_device_has_earned_nothing
     achievements = DotPopper::Achievements.new(Memory.new)

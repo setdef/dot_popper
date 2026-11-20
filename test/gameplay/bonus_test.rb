@@ -113,7 +113,7 @@ class BonusTest < Minitest::Test
   end
 
   def test_stats_count_the_bonus_dots_popped
-    stats = DotPopper::GameStats.start
+    stats = DotPopper::Gameplay::GameStats.start
     game = calm_game
     (Rules::BONUS.dots_in_a_row + 1).times do
       event = pop_next(game)

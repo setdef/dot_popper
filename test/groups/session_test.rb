@@ -17,7 +17,7 @@ class SessionTest < Minitest::Test
   end
 
   def setup
-    @file = DotPopper::ScoreRecord::Memory.new
+    @file = DotPopper::Gameplay::ScoreRecord::Memory.new
     @worker = ManualWorker.new
     @time = Time.at(1_000_000)
     @session = new_session
@@ -635,7 +635,7 @@ class SessionTest < Minitest::Test
 
   def test_an_empty_or_missing_group_txt_is_a_new_player
     [nil, "", "\n\n\n\n"].each do |text|
-      @session = Groups::Session.new(file: DotPopper::ScoreRecord::Memory.new(text), worker: @worker)
+      @session = Groups::Session.new(file: DotPopper::Gameplay::ScoreRecord::Memory.new(text), worker: @worker)
 
       refute_predicate @session, :known?
       refute_predicate @session, :member?

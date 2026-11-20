@@ -11,7 +11,7 @@ require "platforms_helper"
 module Inputs
   include PresentationTest
 
-  Memory = DotPopper::ScoreRecord::Memory
+  Memory = DotPopper::Gameplay::ScoreRecord::Memory
   P = DotPopper::Presentation
 
   # Opens nothing, and remembers what it was asked to open: the share
@@ -119,8 +119,8 @@ module Inputs
       saved_themes = DotPopper::SavedThemes.new(Memory.new)
       saved_themes.release(THEMES.map(&:to_s))
       (new_theme ? saved_themes.choices[0...-1] : saved_themes.choices).each { saved_themes.told(it) }
-      book = DotPopper::SavedStats.new(Memory.new, today: -> { @day })
-      book.record(DotPopper::GameStats.start, @game_flow.size_class) if played
+      book = DotPopper::Gameplay::SavedStats.new(Memory.new, today: -> { @day })
+      book.record(DotPopper::Gameplay::GameStats.start, @game_flow.size_class) if played
       session = DotPopper::Groups::Session.new(file: Memory.new, worker: Server.new(groups:))
       @server_choice = DotPopper::ServerChoice.new(Memory.new, gone: @gone, clipboard:)
       @show = new_show(game_flow:, layout: layout(width, height), sounds:, radius: R, random: Random.new(5), clipboard:, window:, saved_stats: book,

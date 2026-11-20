@@ -7,7 +7,7 @@ require "dot_popper/use_cases"
 # Game Over shows and friend groups hear of an achievement is Pro's.
 class FinishGameTest < Minitest::Test
   include DotPopperTest
-  Memory = DotPopper::ScoreRecord::Memory
+  Memory = DotPopper::Gameplay::ScoreRecord::Memory
 
   # Friend groups as a local fake: what they were told.
   class Groups
@@ -23,7 +23,7 @@ class FinishGameTest < Minitest::Test
   end
 
   def setup
-    @saved_stats = DotPopper::SavedStats.new(Memory.new, today: -> { Date.new(2026, 11, 13) })
+    @saved_stats = DotPopper::Gameplay::SavedStats.new(Memory.new, today: -> { Date.new(2026, 11, 13) })
     @achievements = DotPopper::Achievements.new(Memory.new)
     @entitlement = DotPopper::Entitlement.new
     @groups = Groups.new
@@ -140,5 +140,5 @@ class FinishGameTest < Minitest::Test
                                      score:, elapsed: 10.0, tutorial:)
   end
 
-  def stats(**) = DotPopper::GameStats.start.with(duration: 10.0, **)
+  def stats(**) = DotPopper::Gameplay::GameStats.start.with(duration: 10.0, **)
 end

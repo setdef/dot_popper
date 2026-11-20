@@ -45,7 +45,7 @@ The default size, Standard, is worked out from the screen, so every screen is ab
 
 On an upright phone the floor applies: the exact fit would be about 29.6, so the field is 373 R² rather than 384.
 
-**Saving.** The choice is kept in `dot_size.txt`. It is written only when the player picks a size. `DotSizing.parse` reads `fitted` (Standard) or `standard` (the bigger or smaller size), and `same`, the bigger or smaller size's name in saves from before that (`DotSizing::EARLIER_NAMES`). These are the words builds in players' hands wrote, so they never change, whatever the screens and the code call the sizes (`test/saved_dot_size_words_test.rb`); a missing, empty or unreadable file means the player never chose, and gets `DEFAULT`.
+**Saving.** The choice is kept in `dot_size.txt`. It is written only when the player picks a size. `DotSizing.parse` reads `fitted` (Standard) or `standard` (the bigger or smaller size), and `same`, the bigger or smaller size's name in saves from before that (`DotSizing::EARLIER_NAMES`). These are the words builds in players' hands wrote, so they never change, whatever the screens and the code call the sizes (`test/gameplay/saved_dot_size_words_test.rb`); a missing, empty or unreadable file means the player never chose, and gets `DEFAULT`.
 
 **When it applies.** `GameFlow#field` gives a new game `sizing.fit(screen)`. A game keeps its radius until it ends. `GameFlow#sizing=` changes the choice only on Home, so a game in play is never resized by it. Speeds are in radii per second, so they scale with R. Buttons and their reaches do not, since they are sized for a finger, not for the field.
 

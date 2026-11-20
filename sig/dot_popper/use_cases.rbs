@@ -27,11 +27,11 @@ module DotPopper
     end
 
     class FinishGame
-      @saved_stats: SavedStats
+      @saved_stats: Gameplay::SavedStats
       @achievements: Achievements
       @entitlement: Entitlement
       @friend_groups: _FriendGroups
-      @recorder: GameStats::Recorder
+      @recorder: Gameplay::GameStats::Recorder
       @achievement_recorder: AchievementRecorder
       @listeners: Array[_FinishedListener]
 
@@ -39,37 +39,37 @@ module DotPopper
         def call: (Finished finished) -> void
       end
 
-      def initialize: (saved_stats: SavedStats, achievements: Achievements, entitlement: Entitlement, friend_groups: _FriendGroups) -> void
+      def initialize: (saved_stats: Gameplay::SavedStats, achievements: Achievements, entitlement: Entitlement, friend_groups: _FriendGroups) -> void
 
       def subscribe: (_FinishedListener listener) -> self
 
-      def stats: () -> GameStats
+      def stats: () -> Gameplay::GameStats
 
       def call: (Gameplay::event event) -> void
 
       class Result < ::Data
-        attr_reader record: Stats::Record?
+        attr_reader record: Gameplay::Stats::Record?
 
         attr_reader goal_met: bool
 
         attr_reader achievements: Array[Achievement::id]
 
-        def self.new: (record: Stats::Record?, goal_met: bool, achievements: Array[Achievement::id]) -> instance
+        def self.new: (record: Gameplay::Stats::Record?, goal_met: bool, achievements: Array[Achievement::id]) -> instance
       end
 
       class Finished < ::Data
         attr_reader ended: Gameplay::Events::GameEnded
 
-        attr_reader stats: GameStats
+        attr_reader stats: Gameplay::GameStats
 
         attr_reader result: Result
 
-        def self.new: (ended: Gameplay::Events::GameEnded, stats: GameStats, result: Result) -> instance
+        def self.new: (ended: Gameplay::Events::GameEnded, stats: Gameplay::GameStats, result: Result) -> instance
       end
 
       private
 
-      def finish: (Gameplay::Events::GameEnded ended, stats: GameStats, ?earned: Array[Achievement::id]) -> Result
+      def finish: (Gameplay::Events::GameEnded ended, stats: Gameplay::GameStats, ?earned: Array[Achievement::id]) -> Result
     end
 
     class BuyPro
@@ -160,10 +160,10 @@ module DotPopper
     class ViewAchievements
       @achievements: Achievements
       @entitlement: Entitlement
-      @saved_stats: SavedStats
-      @score_record: ScoreRecord
+      @saved_stats: Gameplay::SavedStats
+      @score_record: Gameplay::ScoreRecord
 
-      def initialize: (achievements: Achievements, entitlement: Entitlement, saved_stats: SavedStats, score_record: ScoreRecord) -> void
+      def initialize: (achievements: Achievements, entitlement: Entitlement, saved_stats: Gameplay::SavedStats, score_record: Gameplay::ScoreRecord) -> void
 
       def status: (Achievement::id id) -> (:earned | :not_earned | :offer)
 
@@ -179,7 +179,7 @@ module DotPopper
 
       def locked?: () -> bool
 
-      def most_dots_in_a_row: (Array[Stats::RecordSet] records) -> Integer
+      def most_dots_in_a_row: (Array[Gameplay::Stats::RecordSet] records) -> Integer
     end
   end
 end

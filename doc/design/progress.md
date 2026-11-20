@@ -4,7 +4,7 @@
 -->
 # Progress: Stats, records, the daily goal and achievements
 
-What Dot Popper keeps about a player's games, and how: the games log, Stats, records and size classes, the daily goal and its streak, achievements, and clearing Stats. It is for anyone changing what is counted, saved or shown about past games. The keeping is Lota-free, in `lib/dot_popper/*.rb`; what the screens say is in `lib/dot_popper/presentation/`, and how the screens look is in [screens.md](screens.md).
+What Dot Popper keeps about a player's games, and how: the games log, Stats, records and size classes, the daily goal and its streak, achievements, and clearing Stats. It is for anyone changing what is counted, saved or shown about past games. The keeping is Lota-free, in `lib/dot_popper/gameplay/`; what the screens say is in `lib/dot_popper/presentation/`, and how the screens look is in [screens.md](screens.md).
 
 ## Saved files
 
@@ -24,7 +24,7 @@ The composition root (`Composition::Root`) makes each store, asking the engine f
 
 ## The games log
 
-`GamesLog` (`lib/dot_popper/games_log.rb`) listens to the `GameFlow` and adds one line to `games.csv` for each finished game (`Events::GameEnded`). Its columns, `GamesLog::COLUMNS`:
+`GamesLog` (`lib/dot_popper/gameplay/games_log.rb`) listens to the `GameFlow` and adds one line to `games.csv` for each finished game (`Events::GameEnded`). Its columns, `GamesLog::COLUMNS`:
 
 `time seed score duration pops mistakes softened mean_time_to_pop longest_time_to_pop goal goal_met`
 
@@ -32,17 +32,17 @@ The composition root (`Composition::Root`) makes each store, asking the engine f
 
 **A header change.** When the log's first line is not the current header, because an older version wrote it, the old log is copied whole to `games-YYYYMMDD-HHMMSS.csv` and a new `games.csv` starts under the current header. A CSV whose rows disagree with its header would mislead anyone comparing playtests, and keeping the old file loses nothing.
 
-The log is rewritten whole each time, which is fine for the few hundred lines a playtest makes. The game prints the log's path at launch. Clearing Stats never touches it. Tests: `test/games_log_test.rb`.
+The log is rewritten whole each time, which is fine for the few hundred lines a playtest makes. The game prints the log's path at launch. Clearing Stats never touches it. Tests: `test/gameplay/games_log_test.rb`.
 
 ## One game's numbers: `GameStats`
 
-`GameStats` (`lib/dot_popper/game_stats.rb`) is built from the rules' events by `GameStats::Recorder`, and decides nothing. It counts dots popped, mistakes, softened mistakes, each pop's time to pop (from the bright dot appearing to its pop), the game's duration (`Game#elapsed`, clock time only, as `Events::GameEnded#elapsed` carries it), the score, `dots_in_a_row` and `most_dots_in_a_row`, and `bonuses`. From these it gives `longest_time_to_pop`, `shortest_time_to_pop`, `mean_time_to_pop` and `dots_popped_within(seconds)`.
+`GameStats` (`lib/dot_popper/gameplay/game_stats.rb`) is built from the rules' events by `GameStats::Recorder`, and decides nothing. It counts dots popped, mistakes, softened mistakes, each pop's time to pop (from the bright dot appearing to its pop), the game's duration (`Game#elapsed`, clock time only, as `Events::GameEnded#elapsed` carries it), the score, `dots_in_a_row` and `most_dots_in_a_row`, and `bonuses`. From these it gives `longest_time_to_pop`, `shortest_time_to_pop`, `mean_time_to_pop` and `dots_popped_within(seconds)`.
 
 A game the tutorial played over (`GameStats.opening`) begins play with a pop for each of its popped dots, its score, and its dots in a row (1 at the tutorial's end); those dots have no time to pop, and the guide's mistake is not counted. `AchievementRecorder` starts the game's row at the same count. It is the same whether the tutorial ended or was skipped.
 
 ## Stats
 
-`Stats` (`lib/dot_popper/stats.rb`) is every game this device has played, added up. `SavedStats` (`lib/dot_popper/saved_stats.rb`) keeps it in `stats.txt` and adds each finished game (`SavedStats#record`, called as the game is finished, `UseCases::FinishGame`).
+`Stats` (`lib/dot_popper/gameplay/stats.rb`) is every game this device has played, added up. `SavedStats` (`lib/dot_popper/gameplay/saved_stats.rb`) keeps it in `stats.txt` and adds each finished game (`SavedStats#record`, called as the game is finished, `UseCases::FinishGame`).
 
 Across every screen:
 
@@ -68,7 +68,7 @@ Why keep all this: a player who comes back wants to see that they are improving,
 
 **Older files.** A `score_record.txt` holding one bare number, or a `stats.txt` whose records have no class name, gives those records to the class of the screen the game opens on (`legacy:`, `SizeClass.of(screen)` in `Composition::Root`), and is saved again in the new form at once, so they stay in that class whichever screen the game opens on next.
 
-Tests: `test/stats_test.rb`, `test/saved_stats_test.rb`, `test/score_record_test.rb`, `test/game_stats_test.rb`.
+Tests: `test/gameplay/stats_test.rb`, `test/gameplay/saved_stats_test.rb`, `test/gameplay/score_record_test.rb`, `test/gameplay/game_stats_test.rb`.
 
 ## Size classes
 
@@ -142,7 +142,7 @@ Home's goal card shows the current streak beside the goal, as a number over "day
 
 Home shows the goal card only once a game has finished, or Stats have been cleared (below), so a first-time player's Home says only how to play. On the smallest windows the card is left out; Stats shows the streak too.
 
-Tests: `test/daily_goal_test.rb`, `test/goal_streak_test.rb`, `test/saved_stats_test.rb`.
+Tests: `test/daily_goal_test.rb`, `test/goal_streak_test.rb`, `test/gameplay/saved_stats_test.rb`.
 
 ## Achievements
 
@@ -186,13 +186,13 @@ The Stats screen has **Clear my stats…**, offered while there is something to 
 
 Forgiveness, from Lidwell's *Universal Principles of Design*: an Undo serves the player better than a confirmation they learn to dismiss, and a held press is hard to make by accident yet the same with a finger, a mouse or a gamepad. The control is quiet because records aren't the point of the game (Ferrara).
 
-**What clears.** `StatsBackup` (`lib/dot_popper/stats_backup.rb`) clears the three stores that are records: `ScoreRecord`, `SavedStats` and `Achievements`. That is every class's highest score and records, the totals, the chart, the goal streaks and today's goal met, and every achievement earned. Achievements are records of what the player did, as a highest score is. Nothing else is touched: the games log, the settings (`dot_size.txt`, `sound.txt`), what the game has taught, themes, friend groups, free games and Pro stay as they are.
+**What clears.** `StatsBackup` (`lib/dot_popper/gameplay/stats_backup.rb`) clears the three stores that are records: `ScoreRecord`, `SavedStats` and `Achievements`. That is every class's highest score and records, the totals, the chart, the goal streaks and today's goal met, and every achievement earned. Achievements are records of what the player did, as a highest score is. Nothing else is touched: the games log, the settings (`dot_size.txt`, `sound.txt`), what the game has taught, themes, friend groups, free games and Pro stay as they are.
 
 **Backup.** Before emptying anything, `StatsBackup#clear` copies each store's text exactly to `<name>-YYYYMMDD-HHMMSS.txt` (`score_record-…`, `stats-…`, `achievements-…`) and notes them in `cleared.txt` (`cleared=<time>`, then `score_record.txt=score_record-….txt` and so on). The next clearing first removes the backups the note names, and only names shaped like backups (`StatsBackup::BACKUP`), so the folder keeps one backup. A store never written gets no backup. Since the save folder can't rename, the copy is written before anything is lost.
 
 **Undo** restores each store's exact text, kept in memory (`StatsBackup#restore` with the `Cleared` value). The backup stays on disk for support.
 
-Tests: `test/stats_backup_test.rb`, `test/presentation/clearing_stats_test.rb`, `test/presentation/hold_to_confirm_test.rb`.
+Tests: `test/gameplay/stats_backup_test.rb`, `test/presentation/clearing_stats_test.rb`, `test/presentation/hold_to_confirm_test.rb`.
 
 ## Home after clearing
 

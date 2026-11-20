@@ -11,7 +11,7 @@ class FakeStoreContractTest < Minitest::Test
 
   FakeStore = DotPopper::FakeStore
 
-  def new_store(fails: nil, ledger: DotPopper::ScoreRecord::Memory.new)
+  def new_store(fails: nil, ledger: DotPopper::Gameplay::ScoreRecord::Memory.new)
     FakeStore.new(ledger, fails:).tap { (@ledgers ||= {})[it] = ledger }
   end
 
@@ -19,7 +19,7 @@ class FakeStoreContractTest < Minitest::Test
 
   # The maintainer's rule: editing a text file must never grant Pro.
   def test_a_ledger_edited_to_say_owned_proves_nothing
-    ledger = DotPopper::ScoreRecord::Memory.new
+    ledger = DotPopper::Gameplay::ScoreRecord::Memory.new
     ledger.write("owned")
     entitlement = DotPopper::Entitlement.test
     front = Store.new(port: new_store(ledger:), entitlement:)
@@ -33,7 +33,7 @@ class FakeStoreContractTest < Minitest::Test
   # A playtester's pretend Pro was bought before Pro's product id was
   # lowercased; it still owns Pro, under today's id.
   def test_a_pretend_purchase_under_the_earlier_product_id_carries_over
-    ledger = DotPopper::ScoreRecord::Memory.new
+    ledger = DotPopper::Gameplay::ScoreRecord::Memory.new
     ledger.write(DotPopper::Receipt.issue(product_id: "com.setdef.DotPopper.pro"))
     entitlement = DotPopper::Entitlement.test
     front = Store.new(port: new_store(ledger:), entitlement:)

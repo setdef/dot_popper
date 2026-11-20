@@ -30,7 +30,7 @@ class WordsTest < Minitest::Test
   # The result to share names a new record or a tie, and otherwise only
   # the score.
   def test_the_shared_result_says_the_score_and_what_the_game_was
-    stats = DotPopper::GameStats.start.with(dots_popped: 27, mistakes: 1, duration: 38.2)
+    stats = DotPopper::Gameplay::GameStats.start.with(dots_popped: 27, mistakes: 1, duration: 38.2)
 
     assert_equal "Dot Popper: 25 points, a new record!\n🟡 27 dots · ⚫ 1 mistake · ⏱ 38 seconds",
                  Style::WORDS.share_text(25, stats, score_record: 25, new_score_record: true)
@@ -42,8 +42,8 @@ class WordsTest < Minitest::Test
   end
 
   def test_the_shared_result_names_a_record_on_its_own_line
-    stats = DotPopper::GameStats.start.with(dots_popped: 27, mistakes: 1, duration: 38.2)
-    record = DotPopper::Stats::Record.new(kind: :most_dots_in_a_row, value: 18)
+    stats = DotPopper::Gameplay::GameStats.start.with(dots_popped: 27, mistakes: 1, duration: 38.2)
+    record = DotPopper::Gameplay::Stats::Record.new(kind: :most_dots_in_a_row, value: 18)
 
     assert_equal "Dot Popper: 25 points, a new record!\nNew record: 18 dots in a row without a mistake\n" \
                  "🟡 27 dots · ⚫ 1 mistake · ⏱ 38 seconds",
@@ -54,14 +54,14 @@ class WordsTest < Minitest::Test
   # nothing of the dot size or the screen: whoever reads it did not play
   # on them.
   def test_the_shared_result_says_nothing_of_the_dot_size
-    stats = DotPopper::GameStats.start.with(dots_popped: 27, mistakes: 1, duration: 38.2)
+    stats = DotPopper::Gameplay::GameStats.start.with(dots_popped: 27, mistakes: 1, duration: 38.2)
 
     assert_equal "Dot Popper: 25 points\n🟡 27 dots · ⚫ 1 mistake · ⏱ 38 seconds",
                  Style::WORDS.share_text(25, stats, score_record: 30, new_score_record: false)
   end
 
   def test_each_record_reads_as_a_sentence
-    record = ->(kind, value) { Style::WORDS.record(DotPopper::Stats::Record.new(kind:, value:)) }
+    record = ->(kind, value) { Style::WORDS.record(DotPopper::Gameplay::Stats::Record.new(kind:, value:)) }
 
     assert_equal "New record: 18 dots in a row without a mistake", record[:most_dots_in_a_row, 18]
     assert_equal "New record: your longest game, 48 seconds", record[:longest_game, 47.6]
@@ -100,10 +100,10 @@ class WordsTest < Minitest::Test
 
   # Game Over's facts are signs and numbers, with no word to translate.
   def test_the_game_in_signs_and_numbers
-    stats = DotPopper::GameStats.start.with(dots_popped: 14, mistakes: 2, times_to_pop: [1.0, 3.14], duration: 33.6)
+    stats = DotPopper::Gameplay::GameStats.start.with(dots_popped: 14, mistakes: 2, times_to_pop: [1.0, 3.14], duration: 33.6)
 
     assert_equal [[:bright, "14"], [:popped, "2"], [:stopwatch, "34s"]], Words.facts(stats)
-    assert_equal [[:bright, "0"], [:popped, "0"], [:stopwatch, "0s"]], Words.facts(DotPopper::GameStats.start)
+    assert_equal [[:bright, "0"], [:popped, "0"], [:stopwatch, "0s"]], Words.facts(DotPopper::Gameplay::GameStats.start)
   end
 
   def test_a_long_time_reads_in_the_units_that_suit_it

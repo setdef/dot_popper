@@ -4,7 +4,7 @@ require "test_helper"
 
 class DailyGoalTest < Minitest::Test
   DailyGoal = DotPopper::DailyGoal
-  GameStats = DotPopper::GameStats
+  GameStats = DotPopper::Gameplay::GameStats
 
   def goal(kind) = DailyGoal::LIST.find { it.kind == kind }
 

@@ -39,7 +39,7 @@ module DotPopper
     def self.starting(_env, channel:) = nil
 
     # Games that never count and never show: for a Show made without any.
-    def self.unlimited = new(ScoreRecord::Memory.new, today: -> { Date.today }, entitlement: Entitlement.free, metered: false)
+    def self.unlimited = new(Gameplay::ScoreRecord::Memory.new, today: -> { Date.today }, entitlement: Entitlement.free, metered: false)
 
     # +today+ answers the player's local Date; +first_games+ and +daily+ are
     # what a new save starts with and each day gives.

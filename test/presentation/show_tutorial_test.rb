@@ -12,9 +12,9 @@ class ShowTutorialTest < Minitest::Test
 
   def setup
     @sounds = FakeSounds.new
-    @file = DotPopper::ScoreRecord::Memory.new
-    @score_record = DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new)
-    @saved_stats = DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new)
+    @file = DotPopper::Gameplay::ScoreRecord::Memory.new
+    @score_record = DotPopper::Gameplay::ScoreRecord.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
+    @saved_stats = DotPopper::Gameplay::SavedStats.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     @game_flow = DotPopper::Gameplay::GameFlow.new(field, score_record: @score_record, random: Random.new(2))
     @events = []
     @game_flow.subscribe { @events << it.class }
@@ -217,7 +217,7 @@ class ShowTutorialTest < Minitest::Test
   def test_it_never_opens_again_not_even_after_the_stats_are_cleared
     play_through
     finish_game
-    stats_backup = DotPopper::StatsBackup.new(score_record: @score_record, saved_stats: @saved_stats)
+    stats_backup = DotPopper::Gameplay::StatsBackup.new(score_record: @score_record, saved_stats: @saved_stats)
     stats_backup.clear
     @show = show(stats_backup:)
     press_main
@@ -227,7 +227,7 @@ class ShowTutorialTest < Minitest::Test
   end
 
   def test_a_player_who_has_played_before_goes_straight_to_the_game
-    @saved_stats.record(DotPopper::GameStats.start.with(dots_popped: 3, duration: 13.0, score: 3), DotPopper::Gameplay::SizeClass::MEDIUM)
+    @saved_stats.record(DotPopper::Gameplay::GameStats.start.with(dots_popped: 3, duration: 13.0, score: 3), DotPopper::Gameplay::SizeClass::MEDIUM)
     press_main
 
     refute @show.tutorial?
@@ -289,7 +289,7 @@ class ShowTutorialTest < Minitest::Test
 
   private
 
-  def show(stats_backup: DotPopper::StatsBackup.new(score_record: @score_record, saved_stats: @saved_stats))
+  def show(stats_backup: DotPopper::Gameplay::StatsBackup.new(score_record: @score_record, saved_stats: @saved_stats))
     new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, random: Random.new(3), saved_stats: @saved_stats,
              stats_backup:, tutorial_flag: TutorialFlag.new(@file))
   end

@@ -3,12 +3,12 @@
 require "test_helper"
 
 class SavedStatsTest < Minitest::Test
-  SavedStats = DotPopper::SavedStats
-  GameStats = DotPopper::GameStats
+  SavedStats = DotPopper::Gameplay::SavedStats
+  GameStats = DotPopper::Gameplay::GameStats
   MEDIUM = DotPopper::Gameplay::SizeClass::MEDIUM
 
   def setup
-    @file = DotPopper::ScoreRecord::Memory.new
+    @file = DotPopper::Gameplay::ScoreRecord::Memory.new
     @saved_stats = SavedStats.new(@file, today: -> { Date.new(2026, 11, 5) })
   end
 
@@ -55,7 +55,7 @@ class SavedStatsTest < Minitest::Test
   end
 
   def test_an_older_file_is_given_to_this_screens_class_and_saved_again_at_once
-    file = DotPopper::ScoreRecord::Memory.new("games=3\nlongest_game=20.0\nmost_dots_in_a_row=5\n")
+    file = DotPopper::Gameplay::ScoreRecord::Memory.new("games=3\nlongest_game=20.0\nmost_dots_in_a_row=5\n")
     small = DotPopper::Gameplay::SizeClass::SMALL
     saved_stats = SavedStats.new(file, legacy: small)
 
@@ -65,6 +65,6 @@ class SavedStatsTest < Minitest::Test
   end
 
   def test_a_store_holding_nonsense_starts_from_nothing
-    assert_equal DotPopper::Stats.new, SavedStats.new(DotPopper::ScoreRecord::Memory.new("\xFF\xFE".b)).stats
+    assert_equal DotPopper::Gameplay::Stats.new, SavedStats.new(DotPopper::Gameplay::ScoreRecord::Memory.new("\xFF\xFE".b)).stats
   end
 end

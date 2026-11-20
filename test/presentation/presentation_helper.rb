@@ -57,9 +57,9 @@ module PresentationTest
   # game flow starts its games through the game flow's one Starter. The rest
   # of +options+ go to the Show as they are.
   def self.show(game_flow:, entitlement: DotPopper::Entitlement.free, store: DotPopper::NoStore.new, games: DotPopper::FreeGames.unlimited,
-                saved_stats: DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new),
-                achievements: DotPopper::Achievements.new(DotPopper::ScoreRecord::Memory.new), groups: DotPopper::Groups::Session.off,
-                saved_themes: DotPopper::SavedThemes.new(DotPopper::ScoreRecord::Memory.new), use_theme: DotPopper::UseCases::UseTheme.new(saved_themes:, entitlement:),
+                saved_stats: DotPopper::Gameplay::SavedStats.new(DotPopper::Gameplay::ScoreRecord::Memory.new),
+                achievements: DotPopper::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new), groups: DotPopper::Groups::Session.off,
+                saved_themes: DotPopper::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new), use_theme: DotPopper::UseCases::UseTheme.new(saved_themes:, entitlement:),
                 **options)
     use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: games, entitlement:, store:, achievements:, saved_stats:,
                                                  friend_groups: groups, starter: DotPopperTest.starter_of(game_flow))

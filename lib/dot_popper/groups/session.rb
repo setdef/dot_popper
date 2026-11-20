@@ -37,7 +37,7 @@ module DotPopper
       NO_WORKER = NoWorker.new
 
       # A Session with no server, for a game that offers no groups.
-      def self.off = new(file: ScoreRecord::Memory.new, worker: NO_WORKER, available: false)
+      def self.off = new(file: Gameplay::ScoreRecord::Memory.new, worker: NO_WORKER, available: false)
 
       # The Session for a game whose server is at +url+, or Session.off.
       def self.at(url, file:) = url ? new(file:, worker: Network::Worker.new(Network::Link.new(url))) : off

@@ -119,8 +119,8 @@ class ServerExchangesTest < Minitest::Test
       exchange("the device asks again after losing the answer"), exchange("another device enters the same key"), exchange("the first device learns the key has moved")
     text = entering.dig("request", "body", "key")
     secrets = [entering, checking, moving].map { H[body(it).fetch(it.equal?(entering) ? "secret" : "next")] }
-    first = C::License.new(DotPopper::ScoreRecord::Memory.new, pins:, fresh: -> { secrets.shift })
-    second = C::License.new(DotPopper::ScoreRecord::Memory.new, pins:, fresh: -> { H[body(elsewhere).fetch("secret")] })
+    first = C::License.new(DotPopper::Gameplay::ScoreRecord::Memory.new, pins:, fresh: -> { secrets.shift })
+    second = C::License.new(DotPopper::Gameplay::ScoreRecord::Memory.new, pins:, fresh: -> { H[body(elsewhere).fetch("secret")] })
 
     assert_equal :entered, first.enter(text)
     assert_equal :current, ask(server, first, entering)
@@ -208,7 +208,7 @@ class ServerExchangesTest < Minitest::Test
     started_on = asking.dig("request", "path")[/started_on=([\d-]+)/, 1]
     saved_themes = SavedThemes.new
     theme_releases = DotPopper::ThemeReleases.new(worker: InlineWorker.new(Network::Link.new(@url)), saved_themes:,
-                                        file: DotPopper::ScoreRecord::Memory.new, now: -> { Time.utc(*started_on.split("-").map(&:to_i), 12) })
+                                        file: DotPopper::Gameplay::ScoreRecord::Memory.new, now: -> { Time.utc(*started_on.split("-").map(&:to_i), 12) })
     theme_releases.ask
     theme_releases.update
 
@@ -216,7 +216,7 @@ class ServerExchangesTest < Minitest::Test
     refute_empty saved_themes.keys
   end
 
-  def session = Groups::Session.new(file: DotPopper::ScoreRecord::Memory.new, worker: InlineWorker.new(Network::Link.new(@url)))
+  def session = Groups::Session.new(file: DotPopper::Gameplay::ScoreRecord::Memory.new, worker: InlineWorker.new(Network::Link.new(@url)))
 
   # Lets the whole conversation finish.
   def pump(session) = 6.times { session.update(quiet: true) }

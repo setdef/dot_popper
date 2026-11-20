@@ -6,10 +6,10 @@ class StatsSheetTest < Minitest::Test
   include PresentationTest
 
   def stats
-    records = DotPopper::Stats::RecordSet.new(games: 40, longest_game: 47.6, most_dots_in_a_row: 18, shortest_time_to_pop: 0.34,
+    records = DotPopper::Gameplay::Stats::RecordSet.new(games: 40, longest_game: 47.6, most_dots_in_a_row: 18, shortest_time_to_pop: 0.34,
                                                 longest_time_to_pop: 6.2)
-    phone = DotPopper::Stats::RecordSet.new(games: 2, longest_game: 12.0, most_dots_in_a_row: 3)
-    DotPopper::Stats.new(games: 42, dots_popped: 812, mistakes: 61, seconds: 1890.0, days: 5, recent: [3, 9, 27, 12],
+    phone = DotPopper::Gameplay::Stats::RecordSet.new(games: 2, longest_game: 12.0, most_dots_in_a_row: 3)
+    DotPopper::Gameplay::Stats.new(games: 42, dots_popped: 812, mistakes: 61, seconds: 1890.0, days: 5, recent: [3, 9, 27, 12],
                                  recent_classes: [MEDIUM] * 4,
                                  streak: DotPopper::GoalStreak.new(current: 3, longest: 7, last_met: "2026-11-04"),
                                  records: { MEDIUM => records, DotPopper::Gameplay::SizeClass::SMALL => phone })
@@ -61,7 +61,7 @@ class StatsSheetTest < Minitest::Test
   end
 
   def test_with_no_games_the_sheet_is_empty_and_says_none_yet
-    empty = StatsSheet.build(DotPopper::Stats.new, score_record: 0, words: Style::WORDS)
+    empty = StatsSheet.build(DotPopper::Gameplay::Stats.new, score_record: 0, words: Style::WORDS)
 
     assert empty.empty
     assert_equal "None yet", empty.records.rows[3].value

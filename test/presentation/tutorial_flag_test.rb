@@ -6,7 +6,7 @@ class TutorialFlagTest < Minitest::Test
   include PresentationTest
 
   def setup
-    @file = DotPopper::ScoreRecord::Memory.new
+    @file = DotPopper::Gameplay::ScoreRecord::Memory.new
   end
 
   def test_it_is_due_once_on_a_bright_install_and_remembered_across_sessions
@@ -33,7 +33,7 @@ class TutorialFlagTest < Minitest::Test
     @file.write("seen")
 
     assert TutorialFlag.new(@file, mode: :forced).due?(played: true)
-    refute TutorialFlag.new(DotPopper::ScoreRecord::Memory.new, mode: :skipped).due?(played: false)
+    refute TutorialFlag.new(DotPopper::Gameplay::ScoreRecord::Memory.new, mode: :skipped).due?(played: false)
   end
 
   def test_the_environment_chooses_the_mode

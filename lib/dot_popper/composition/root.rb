@@ -135,12 +135,12 @@ module DotPopper
         # this screen's class.
         legacy = Gameplay::SizeClass.of(screen)
         sizing_file = file("dot_size.txt")
-        @game_flow = Gameplay::GameFlow.new(screen, score_record: ScoreRecord.new(file("score_record.txt"), legacy:), random:,
+        @game_flow = Gameplay::GameFlow.new(screen, score_record: Gameplay::ScoreRecord.new(file("score_record.txt"), legacy:), random:,
                                        sizing: Gameplay::DotSizing.parse(sizing_file.read))
         @engine.say("dots are standard, worked out from the screen as each game starts") if @game_flow.sizing.standard?
-        saved_stats = SavedStats.new(file("stats.txt"), today:, legacy:)
+        saved_stats = Gameplay::SavedStats.new(file("stats.txt"), today:, legacy:)
         achievements = Achievements.new(file("achievements.txt"))
-        stats_backup = StatsBackup.new(score_record: @game_flow.score_record, saved_stats:, achievements:, folder: ->(name) { file(name) })
+        stats_backup = Gameplay::StatsBackup.new(score_record: @game_flow.score_record, saved_stats:, achievements:, folder: ->(name) { file(name) })
         @gone = Continuity::Gone.new(file("setdef.txt"))
         # What this build trusts, and where it keeps a license key, as
         # Monetization decides by the channel alone (ADR-0010).
@@ -191,7 +191,7 @@ module DotPopper
         entitlement.subscribe(@show.offer)
         @refresh = Refresh.new([-> { @theme_releases&.ask }, -> { groups.refresh }], game_flow: @game_flow, now: @now)
         @game_flow.subscribe(@refresh)
-        @game_flow.subscribe(GamesLog.new(file(GAMES_LOG), today:, archive: ->(name) { file(name) }))
+        @game_flow.subscribe(Gameplay::GamesLog.new(file(GAMES_LOG), today:, archive: ->(name) { file(name) }))
         @engine.say("each game is logged in #{@engine.path(GAMES_LOG)}")
         @show.group_panel.open if flag?("DOT_POPPER_GROUP_SCREEN")
         @cursor = Presentation::GamepadCursor.centered(@show.layout.whole, style: Style::GAMEPAD, radius: dot_size.radius)

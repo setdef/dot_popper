@@ -5,7 +5,7 @@ require "test_helper"
 class GameStatsTest < Minitest::Test
   include DotPopperTest
   GameFlow = DotPopper::Gameplay::GameFlow
-  GameStats = DotPopper::GameStats
+  GameStats = DotPopper::Gameplay::GameStats
 
   def setup
     @game_flow = GameFlow.new(field, random: Random.new(9))

@@ -3,7 +3,7 @@
 require "test_helper"
 
 class StatsBackupTest < Minitest::Test
-  Memory = DotPopper::ScoreRecord::Memory
+  Memory = DotPopper::Gameplay::ScoreRecord::Memory
   MEDIUM = DotPopper::Gameplay::SizeClass::MEDIUM
   SCORE_RECORD = "medium=24\nsmall=6\n"
   STATS = "games=3\npops=40\nrecent=12,24,4\ngoal_streak=2\nlongest_goal_streak=5\ngoal_met_on=2026-11-05\n" \
@@ -72,7 +72,7 @@ class StatsBackupTest < Minitest::Test
 
   def test_only_the_latest_backup_is_kept
     @stats_backup.clear
-    @saved_stats.record(DotPopper::GameStats.start.with(score: 2, duration: 11.0), MEDIUM)
+    @saved_stats.record(DotPopper::Gameplay::GameStats.start.with(score: 2, duration: 11.0), MEDIUM)
     @time += 60
     @stats_backup.clear
 
@@ -110,8 +110,8 @@ class StatsBackupTest < Minitest::Test
   private
 
   def keep
-    @score_record = DotPopper::ScoreRecord.new(@folder.call("score_record.txt"))
-    @saved_stats = DotPopper::SavedStats.new(@folder.call("stats.txt"), today: -> { @today })
-    @stats_backup = DotPopper::StatsBackup.new(score_record: @score_record, saved_stats: @saved_stats, folder: @folder, now: -> { @time })
+    @score_record = DotPopper::Gameplay::ScoreRecord.new(@folder.call("score_record.txt"))
+    @saved_stats = DotPopper::Gameplay::SavedStats.new(@folder.call("stats.txt"), today: -> { @today })
+    @stats_backup = DotPopper::Gameplay::StatsBackup.new(score_record: @score_record, saved_stats: @saved_stats, folder: @folder, now: -> { @time })
   end
 end

@@ -18,7 +18,7 @@ class WebsiteStoreTest < Minitest::Test
   FakeCheckout = DotPopper::FakeCheckout
 
   C = DotPopper::Continuity
-  Memory = DotPopper::ScoreRecord::Memory
+  Memory = DotPopper::Gameplay::ScoreRecord::Memory
 
   def setup
     @clipboard = MemoryClipboard.new
@@ -34,8 +34,8 @@ class WebsiteStoreTest < Minitest::Test
 
   def show
     game_flow = DotPopper::Gameplay::GameFlow.new(field(1200, 800), random: Random.new(2))
-    book = DotPopper::SavedStats.new(Memory.new)
-    book.record(DotPopper::GameStats.start, DotPopper::Gameplay::SizeClass::MEDIUM)
+    book = DotPopper::Gameplay::SavedStats.new(Memory.new)
+    book.record(DotPopper::Gameplay::GameStats.start, DotPopper::Gameplay::SizeClass::MEDIUM)
     new_show(game_flow:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, saved_stats: book, clipboard: @clipboard,
              entitlement: @entitlement, store: @store, server_choice: @choice)
   end

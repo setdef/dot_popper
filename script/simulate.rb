@@ -102,7 +102,7 @@ module Simulation
       field = @field
       @hand = [field.width / 2, field.height / 2]
       game = DotPopper::Gameplay::Game.new(field, random: @random, spawn_tries: @spawn_tries, bonus: @bonus)
-      stats = DotPopper::GameStats.start
+      stats = DotPopper::Gameplay::GameStats.start
       t = 0.0
       mistakes = 0
       covered_spawns = 0

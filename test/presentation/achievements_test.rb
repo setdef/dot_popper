@@ -7,18 +7,18 @@ require_relative "presentation_helper"
 class AchievementsOnStatsTest < Minitest::Test
   include PresentationTest
 
-  Memory = DotPopper::ScoreRecord::Memory
+  Memory = DotPopper::Gameplay::ScoreRecord::Memory
   MEDIUM = DotPopper::Gameplay::SizeClass::MEDIUM
 
   def setup
-    @folder = DotPopper::StatsBackup::Folder.new
+    @folder = DotPopper::Gameplay::StatsBackup::Folder.new
     @achievements = DotPopper::Achievements.new(@folder.call("achievements"))
   end
 
   def show(pro:)
-    @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(@folder.call("score_record")))
-    saved_stats = DotPopper::SavedStats.new(@folder.call("stats"), today: -> { Date.new(2026, 11, 8) })
-    stats_backup = DotPopper::StatsBackup.new(score_record: @game_flow.score_record, saved_stats:, achievements: @achievements, folder: @folder)
+    @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::Gameplay::ScoreRecord.new(@folder.call("score_record")))
+    saved_stats = DotPopper::Gameplay::SavedStats.new(@folder.call("stats"), today: -> { Date.new(2026, 11, 8) })
+    stats_backup = DotPopper::Gameplay::StatsBackup.new(score_record: @game_flow.score_record, saved_stats:, achievements: @achievements, folder: @folder)
     entitlement = DotPopper::Entitlement.new(forced: pro)
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, saved_stats:, stats_backup:,
                      achievements: @achievements, entitlement:)
@@ -180,7 +180,7 @@ class AchievementsOnStatsTest < Minitest::Test
   def grid_offset = @show.screens.fetch(:achievements).scroll.offset
 
   def stats
-    DotPopper::Stats.new(games: 4, dots_popped: 40, mistakes: 2, seconds: 100.0, days: 2, recent: [3, 9],
+    DotPopper::Gameplay::Stats.new(games: 4, dots_popped: 40, mistakes: 2, seconds: 100.0, days: 2, recent: [3, 9],
                                  recent_classes: [MEDIUM] * 2)
   end
 

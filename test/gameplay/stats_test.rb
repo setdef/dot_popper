@@ -3,8 +3,8 @@
 require "test_helper"
 
 class StatsTest < Minitest::Test
-  Stats = DotPopper::Stats
-  GameStats = DotPopper::GameStats
+  Stats = DotPopper::Gameplay::Stats
+  GameStats = DotPopper::Gameplay::GameStats
   SMALL = DotPopper::Gameplay::SizeClass::SMALL
   MEDIUM = DotPopper::Gameplay::SizeClass::MEDIUM
 

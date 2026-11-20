@@ -5,7 +5,7 @@ require "test_helper"
 # Asking the server which themes are released: the date sent, kept for
 # good, and what its answer opens.
 class ThemeReleasesTest < Minitest::Test
-  Memory = DotPopper::ScoreRecord::Memory
+  Memory = DotPopper::Gameplay::ScoreRecord::Memory
   Reply = DotPopper::Network::Reply
 
   class FakeWorker

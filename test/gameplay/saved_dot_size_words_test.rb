@@ -14,8 +14,8 @@ require "test_helper"
 # before and after a rename.
 class SavedDotSizeWordsTest < Minitest::Test
   DotSizing = DotPopper::Gameplay::DotSizing
-  ScoreRecord = DotPopper::ScoreRecord
-  Stats = DotPopper::Stats
+  ScoreRecord = DotPopper::Gameplay::ScoreRecord
+  Stats = DotPopper::Gameplay::Stats
   SizeClass = DotPopper::Gameplay::SizeClass
 
   PHONE = DotPopper::Gameplay::Field.new(390, 844, 50)

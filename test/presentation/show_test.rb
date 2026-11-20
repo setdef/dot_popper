@@ -9,7 +9,7 @@ class ShowTest < Minitest::Test
     @sounds = FakeSounds.new
     @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2))
     @clipboard = MemoryClipboard.new
-    @sizing_file = DotPopper::ScoreRecord::Memory.new
+    @sizing_file = DotPopper::Gameplay::ScoreRecord::Memory.new
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, random: Random.new(3),
                      clipboard: @clipboard, sizing_file: @sizing_file)
   end
@@ -269,7 +269,7 @@ class ShowTest < Minitest::Test
 
   # 2026-11-01's goal is to pop 10 bright dots in the first 10 seconds.
   def test_the_game_that_meets_todays_goal_celebrates_it_once_the_score_has_counted
-    saved_stats = DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new, today: -> { Date.new(2026, 11, 1) })
+    saved_stats = DotPopper::Gameplay::SavedStats.new(DotPopper::Gameplay::ScoreRecord::Memory.new, today: -> { Date.new(2026, 11, 1) })
     show = new_show(game_flow: @game_flow, layout:, sounds: @sounds, radius: R, random: Random.new(3), saved_stats:)
     press_main(show)
     10.times do
@@ -622,7 +622,7 @@ class ShowTest < Minitest::Test
   # The stacking rule is taught on Game Over, never in play, and only
   # after a game whose mistake had the bright dot hidden beneath.
   def test_game_over_teaches_the_stack_after_a_mistake_over_the_bright_dot
-    file = DotPopper::ScoreRecord::Memory.new
+    file = DotPopper::Gameplay::ScoreRecord::Memory.new
     @show = new_show(game_flow: @game_flow, layout:, sounds: @sounds, radius: R, random: Random.new(3),
                      tutor: Tutor.new(file, times: 1))
     start_and_pop
@@ -681,7 +681,7 @@ class ShowTest < Minitest::Test
   # Once the bright dot it hid has been popped, the pile can't show which
   # it was, so Game Over shows nothing, and that Game Over doesn't count.
   def test_a_mistake_whose_bright_dot_was_popped_later_teaches_nothing
-    file = DotPopper::ScoreRecord::Memory.new
+    file = DotPopper::Gameplay::ScoreRecord::Memory.new
     @show = new_show(game_flow: @game_flow, layout:, sounds: @sounds, radius: R, random: Random.new(3),
                      tutor: Tutor.new(file, times: 2))
     hide_bright_under_a_popped_dot_and_tap_it
@@ -750,9 +750,9 @@ class ShowTest < Minitest::Test
     show = nil
     game_flow.subscribe { show&.call(it) }
     entitlement = DotPopper::Entitlement.free
-    saved_stats = DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new)
-    achievements = DotPopper::Achievements.new(DotPopper::ScoreRecord::Memory.new)
-    saved_themes = DotPopper::SavedThemes.new(DotPopper::ScoreRecord::Memory.new)
+    saved_stats = DotPopper::Gameplay::SavedStats.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
+    achievements = DotPopper::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
+    saved_themes = DotPopper::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     groups = DotPopper::Groups::Session.off
     use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: DotPopper::FreeGames.unlimited, entitlement:, store: DotPopper::NoStore.new,
                                                  achievements:, saved_stats:, friend_groups: groups, starter: DotPopperTest.starter_of(game_flow))

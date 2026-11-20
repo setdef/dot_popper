@@ -83,7 +83,7 @@ class UseThemeTest < Minitest::Test
   # after a restart, and a saved choice of a theme since removed gives way
   # to the ordinary one.
   def test_with_the_games_themes_a_choice_lasts_and_a_removed_one_gives_way
-    file = DotPopper::ScoreRecord::Memory.new("unlocked: ghost jingle_bell\ntold: ghost\nchosen: jingle_bell\n")
+    file = DotPopper::Gameplay::ScoreRecord::Memory.new("unlocked: ghost jingle_bell\ntold: ghost\nchosen: jingle_bell\n")
     pro = DotPopper::Entitlement.new(forced: true)
     theme = DotPopper::UseCases::UseTheme.new(saved_themes: DotPopper::SavedThemes.new(file), entitlement: pro)
 

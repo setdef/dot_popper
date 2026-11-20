@@ -69,8 +69,8 @@ class ScreenPlansTest < Minitest::Test
   # fits across its bubble, and Close and Copy are side by side, a
   # fingertip tall at least.
   def test_the_share_preview_never_overlaps_or_runs_off_screen
-    stats = DotPopper::GameStats.start.with(dots_popped: 128, mistakes: 11, duration: 141.0)
-    record = DotPopper::Stats::Record.new(kind: :longest_time_to_pop, value: 12.3)
+    stats = DotPopper::Gameplay::GameStats.start.with(dots_popped: 128, mistakes: 11, duration: 141.0)
+    record = DotPopper::Gameplay::Stats::Record.new(kind: :longest_time_to_pop, value: 12.3)
     SIZES.each do |width, height|
       screen_layout = layout(width, height)
       [InputKind::MOUSE, InputKind::GAMEPAD].product([nil, record]) do |input, held|
@@ -138,7 +138,7 @@ class ScreenPlansTest < Minitest::Test
   # The facts stand in one row where it fits, and one under another
   # where it does not, every one inside the room.
   def test_game_overs_facts_stack_where_a_row_does_not_fit
-    huge = game_over.with(stats: DotPopper::GameStats.start.with(dots_popped: 123_456_789, mistakes: 123_456_789, duration: 123_456_789.0))
+    huge = game_over.with(stats: DotPopper::Gameplay::GameStats.start.with(dots_popped: 123_456_789, mistakes: 123_456_789, duration: 123_456_789.0))
     wide = GameOverLayout.new(layout: layout(1200, 800), type: Style::TYPE, words: WORDS, measure: RoughMeasure.new,
                               scrim: Style::GAME_OVER_BACKING, game_over:, below: 0).plan
     narrow = GameOverLayout.new(layout: layout(320, 800), type: Style::TYPE, words: WORDS, measure: RoughMeasure.new,
@@ -374,7 +374,7 @@ class ScreenPlansTest < Minitest::Test
 
   def game_over(goal_met: false, new_score_record: false, record: false)
     GameOverResult.new(style: Style::GAME_OVER, score: 128, score_record: new_score_record ? 128 : 140, new_score_record:, at: 0.0, goal_met:,
-               record: (DotPopper::Stats::Record.new(kind: :most_dots_in_a_row, value: 31) if record))
+               record: (DotPopper::Gameplay::Stats::Record.new(kind: :most_dots_in_a_row, value: 31) if record))
   end
 
   def assert_apart(rects, name)

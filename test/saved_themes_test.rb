@@ -6,7 +6,7 @@ require "test_helper"
 # exists for them only once the server has released it, or, once setdef
 # has been gone long enough, once its date has passed.
 class SavedThemesTest < Minitest::Test
-  Memory = DotPopper::ScoreRecord::Memory
+  Memory = DotPopper::Gameplay::ScoreRecord::Memory
   Theme = DotPopper::Theme
   Continuity = DotPopper::Continuity
 

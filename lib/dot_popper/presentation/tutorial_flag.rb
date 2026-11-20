@@ -18,7 +18,7 @@ module DotPopper
       FORCED_BY = "DOT_POPPER_TUTORIAL"
 
       # A flag that is never due, for a Show that teaches nothing.
-      def self.never = new(ScoreRecord::Memory.new, mode: :skipped)
+      def self.never = new(Gameplay::ScoreRecord::Memory.new, mode: :skipped)
 
       # The mode +env+ asks for: DOT_POPPER_TUTORIAL=1 forces it, and the
       # bot, the GUI scenario runner and DOT_POPPER_NO_TUTORIAL leave it out.

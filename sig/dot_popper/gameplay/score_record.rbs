@@ -1,0 +1,63 @@
+module DotPopper
+  module Gameplay
+    class ScoreRecord
+      interface _SaveFile
+        def read: () -> String?
+
+        def write: (String text) -> void
+      end
+
+      interface _Removable
+        include _SaveFile
+
+        def remove: () -> void
+      end
+
+      @file: _SaveFile
+
+      @legacy: SizeClass
+
+      @values: Hash[SizeClass, Integer]
+
+      def initialize: (_SaveFile file, ?legacy: SizeClass) -> void
+
+      def of: (SizeClass size_class) -> Integer
+
+      def first?: (SizeClass size_class) -> bool
+
+      def record: (Integer score, SizeClass size_class) -> bool
+
+      def saved: () -> String?
+
+      def clear: () -> void
+
+      def restore: (String? text) -> void
+
+      private
+
+      def save: () -> void
+
+      module Table
+        OLD: Regexp
+
+        def self.parse: (String text, legacy: SizeClass) -> Hash[SizeClass, Integer]
+
+        def self.old?: (String text) -> bool
+
+        def self.to_text: (Hash[SizeClass, Integer] values) -> String
+      end
+
+      class Memory
+        @text: String?
+
+        def initialize: (?String? text) -> void
+
+        def read: () -> String?
+
+        def write: (String text) -> String
+
+        def remove: () -> nil
+      end
+    end
+  end
+end

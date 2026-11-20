@@ -24,9 +24,9 @@ class RedesignTest < Minitest::Test
   def show(pro: false, played: true)
     @sounds = FakeSounds.new
     @game_flow = DotPopper::Gameplay::GameFlow.new(field(1200, 800), random: Random.new(2))
-    @book = DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new)
-    @book.record(DotPopper::GameStats.start.with(most_dots_in_a_row: 19), DotPopper::Gameplay::SizeClass::MEDIUM) if played
-    @earned = DotPopper::Achievements.new(DotPopper::ScoreRecord::Memory.new)
+    @book = DotPopper::Gameplay::SavedStats.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
+    @book.record(DotPopper::Gameplay::GameStats.start.with(most_dots_in_a_row: 19), DotPopper::Gameplay::SizeClass::MEDIUM) if played
+    @earned = DotPopper::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     new_show(game_flow: @game_flow, layout: layout(1200, 800), sounds: @sounds, radius: R, saved_stats: @book, achievements: @earned,
              entitlement: pro ? DotPopper::Entitlement.new(forced: true) : DotPopper::Entitlement.free)
   end
@@ -138,7 +138,7 @@ class RedesignTest < Minitest::Test
     entitlement = DotPopper::Entitlement.test
     game_flow = DotPopper::Gameplay::GameFlow.new(field(1200, 800), random: Random.new(2))
     s = new_show(game_flow:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, entitlement:, store:,
-                 saved_themes: DotPopper::SavedThemes.new(DotPopper::ScoreRecord::Memory.new))
+                 saved_themes: DotPopper::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new))
     s.open_themes
     s.use(s.themes.last)
     assert s.offer?

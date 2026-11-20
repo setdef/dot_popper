@@ -34,7 +34,7 @@ module DotPopper
         @achievements = achievements
         @entitlement = entitlement
         @friend_groups = friend_groups
-        @recorder = GameStats::Recorder.new
+        @recorder = Gameplay::GameStats::Recorder.new
         @achievement_recorder = AchievementRecorder.new
         @listeners = []
       end

@@ -82,7 +82,7 @@ module DotPopper
     # all); the others are dim, and never marked as the record, though they keep
     # their true height, so every bar is drawn to one scale.
     class ScoreBars < Data.define(:scores, :slots, :mine)
-      def initialize(scores:, slots: Stats::RECENT, mine: [true] * scores.size) = super
+      def initialize(scores:, slots: Gameplay::Stats::RECENT, mine: [true] * scores.size) = super
 
       def bars(rect, pixels)
         highest = scores.max || 0

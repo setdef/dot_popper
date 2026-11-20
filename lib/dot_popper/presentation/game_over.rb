@@ -22,7 +22,7 @@ module DotPopper
     # game.
     class GameOverResult < Data.define(:style, :score, :score_record, :new_score_record, :at, :stats, :record, :goal_met, :ready_at,
                                :celebrated, :goal_celebrated, :lesson, :replayed, :first, :achievements)
-      def initialize(style:, score:, score_record:, new_score_record:, at:, stats: GameStats.start, record: nil, goal_met: false,
+      def initialize(style:, score:, score_record:, new_score_record:, at:, stats: Gameplay::GameStats.start, record: nil, goal_met: false,
                      ready_at: nil, celebrated: false, goal_celebrated: false, lesson: nil, replayed: 0, first: false,
                      achievements: [])
         super

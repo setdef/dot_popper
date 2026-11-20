@@ -3,7 +3,7 @@
 require "test_helper"
 
 class ScoreRecordTest < Minitest::Test
-  ScoreRecord = DotPopper::ScoreRecord
+  ScoreRecord = DotPopper::Gameplay::ScoreRecord
   SMALL = DotPopper::Gameplay::SizeClass::SMALL
   MEDIUM = DotPopper::Gameplay::SizeClass::MEDIUM
   LARGE = DotPopper::Gameplay::SizeClass::LARGE

@@ -8,7 +8,7 @@ class SettingsTest < Minitest::Test
   include PresentationTest
 
   def setup
-    @sizing_file = DotPopper::ScoreRecord::Memory.new
+    @sizing_file = DotPopper::Gameplay::ScoreRecord::Memory.new
     @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2))
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, sizing_file: @sizing_file)
     @show.open_settings

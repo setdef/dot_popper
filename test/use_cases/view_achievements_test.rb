@@ -7,14 +7,14 @@ require "dot_popper/use_cases"
 # was earned, when, how many and how far along is Pro's.
 class ViewAchievementsTest < Minitest::Test
   include DotPopperTest
-  Memory = DotPopper::ScoreRecord::Memory
+  Memory = DotPopper::Gameplay::ScoreRecord::Memory
 
   def setup
     @achievements = DotPopper::Achievements.new(Memory.new)
     @achievements.award(%i[blink], day: "2026-11-01")
-    @saved_stats = DotPopper::SavedStats.new(Memory.new, today: -> { Date.new(2026, 11, 13) })
-    @saved_stats.record(DotPopper::GameStats.start.with(duration: 31.6, most_dots_in_a_row: 12), DotPopper::Gameplay::SizeClass::SMALL)
-    @score_record = DotPopper::ScoreRecord.new(Memory.new)
+    @saved_stats = DotPopper::Gameplay::SavedStats.new(Memory.new, today: -> { Date.new(2026, 11, 13) })
+    @saved_stats.record(DotPopper::Gameplay::GameStats.start.with(duration: 31.6, most_dots_in_a_row: 12), DotPopper::Gameplay::SizeClass::SMALL)
+    @score_record = DotPopper::Gameplay::ScoreRecord.new(Memory.new)
     @score_record.record(40, DotPopper::Gameplay::SizeClass::SMALL)
   end
 
