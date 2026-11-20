@@ -15,7 +15,7 @@ class AchievementsFileTest < Minitest::Test
   end
 
   def test_what_it_cannot_read_or_does_not_know_is_left_out
-    saved = AchievementsFile.parse("feat_of_the_future=2030-01-01\n\nnonsense\nblink=2026-11-03\n")
+    saved = AchievementsFile.parse("from_a_newer_version=2030-01-01\n\nnonsense\nblink=2026-11-03\n")
     assert_equal "blink=2026-11-03\n", saved.to_s
     assert_equal "", AchievementsFile.parse(nil).to_s
   end
