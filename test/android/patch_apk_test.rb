@@ -60,6 +60,18 @@ class PatchApkTest < Minitest::Test
     assert_equal ["assets/fledge.zip!app/game/dot_popper/lib/rules.rb"], P.differences(patched, P.patch(base, @project))
   end
 
+  def test_an_entry_whose_attributes_differ_is_named
+    patched = P.patch(base, @project)
+    outer = P.entries(patched)
+    asset = outer.find { it.name == P::ASSET }
+    inner = P.entries(P.data(asset)).each do |entry|
+      entry.central = entry.central.b.tap { it[38, 4] = [0o100755 << 16].pack("V") } if entry.name == "app/main.rb"
+    end
+    other = P.write(outer.reject { it == asset } + [P.stored(P::ASSET, P.write(inner))])
+
+    assert_equal ["assets/fledge.zip!app/main.rb"], P.differences(patched, other)
+  end
+
   # Gradle's Ant writes every file as 0100644, whatever its mode on disk,
   # and every folder as 040755 with DOS's folder bit, so a full build's
   # entries carry those, and the patched app's must too.

@@ -130,13 +130,14 @@ end
 module AndroidPatch
   module_function
 
-  # What the app +apk+ (bytes) holds, by name: each entry's CRC-32 and
-  # size, and those of every entry of its fledge.zip, named under it;
-  # its signature left out.
+  # What the app +apk+ (bytes) holds, by name: each entry's CRC-32, sizes
+  # and external attributes (a Unix mode, where the archiver wrote one),
+  # and those of every entry of its fledge.zip, named under it; its
+  # signature left out.
   def contents(apk)
     outer = entries(apk).reject { it.name.match?(SIGNATURE) }
     asset = outer.find { it.name == ASSET }
-    listed = ->(list, under) { list.to_h { ["#{under}#{it.name}", it.central.unpack("@16VV@24V")] } }
+    listed = ->(list, under) { list.to_h { ["#{under}#{it.name}", it.central.unpack("@16VV@24V@38V")] } }
     listed.(outer.reject { it == asset }, "").merge(listed.(entries(data(asset)), "#{ASSET}!"))
   end
 
