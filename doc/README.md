@@ -87,7 +87,7 @@ The game reads these from its environment. `main.rb` lists them all.
 
 | Setting | What it does |
 | --- | --- |
-| `DOT_POPPER_AUTOPLAY=1` | A bot plays: the title, a game, Game Over, and again. It sometimes taps a popped dot, so penalties show |
+| `DOT_POPPER_AUTOPLAY=1` | A bot plays: the title, a game, Game Over, and again. It sometimes taps a popped dot, so mistakes show |
 | `DOT_POPPER_NO_SPLASH=1` | Skips setdef's splash screen |
 | `DOT_POPPER_SAVE_AS=test` | Saves in a folder of this name, so a run starts with no records |
 | `DOT_POPPER_SEED=42` | Makes the dots' randomness repeatable |
@@ -125,7 +125,7 @@ No type error detected. 🫖
 
 - `bundle exec rake test` runs the unit tests alone, and `bundle exec rake steep` runs Steep alone.
 - `bundle exec rake test:gui` plays the scenarios in `test/gui/scenarios`, except the galleries, which render screens to compare by eye, in real windows. It needs a display, so `rake` leaves it out. CI runs it on every push and pull request, on Linux, under a virtual display with software OpenGL.
-- `bundle exec ruby script/simulate.rb 20` plays 20 games on each of six screens with a model player, with each dot size, and prints a table of scores, game lengths, and penalties. A run of 20 games finished in 36 seconds on an M1 Max. [The rules](design/rules.md) has what its numbers set, and [Development](design/development.md) how it runs.
+- `bundle exec ruby script/simulate.rb 20` plays 20 games on each of six screens with a model player, with each dot size, and prints a table of scores, game lengths, and mistakes. A run of 20 games finished in 36 seconds on an M1 Max. [The rules](design/rules.md) has what its numbers set, and [Development](design/development.md) how it runs.
 
 ## Building the app
 

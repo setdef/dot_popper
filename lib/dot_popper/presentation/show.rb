@@ -82,7 +82,7 @@ module DotPopper
         @tutor = tutor
         @clipboard = clipboard
         @mistake = nil
-        @penalized_at = -Float::INFINITY
+        @mistake_at = -Float::INFINITY
         @beckoned_at = nil
         @stats_backup = stats_backup
         @pointer = nil
@@ -667,7 +667,7 @@ module DotPopper
         case event
         when Events::GameStarted then game_started(event)
         when Events::Popped then popped(event)
-        when Events::Penalized then penalized(event)
+        when Events::MistakeMade then mistake_made(event)
         when Events::Missed then effects.ring(event.x, event.y, style::TOUCH_RIPPLE)
         when UseCases::FinishGame::Finished then game_ended(event.ended, event.stats, event.result)
         when Events::HomeShown then home_shown(event)
@@ -739,7 +739,7 @@ module DotPopper
         @hud = hud.read(game_flow.game, now) { tick(it) if playing? }
         beckon
         @clock_highlight = nil if @clock_highlight&.over?(now)
-        return unless @clock_highlight && playing? && before && hud.seconds < before && now - @penalized_at >= 0.1
+        return unless @clock_highlight && playing? && before && hud.seconds < before && now - @mistake_at >= 0.1
 
         sounds.play(:tick)
       end
@@ -790,7 +790,7 @@ module DotPopper
         effects.burst(event.x, event.y, style::BONUS_BURST, style::BONUS_CONFETTI)
         effects.ring(event.dot.x, event.dot.y, style::BONUS_SHOCKWAVE, follow: event.dot.id)
         sounds.play(:bonus_pop, pan: pan(event.x))
-        @haptics.buzz(style::HAPTICS.penalty)
+        @haptics.buzz(style::HAPTICS.mistake)
       end
 
       # The row's result: the bonus dot arrives in place of the ordinary
@@ -811,21 +811,21 @@ module DotPopper
         effects.ring(dot.x, dot.y, style::BONUS_BEACON, follow: dot.id)
       end
 
-      def penalized(event)
-        @penalized_at = now
+      def mistake_made(event)
+        @mistake_at = now
         animations.wobble(event.dot.id, now)
         effects.ring(event.dot.x, event.dot.y, style::ALARM_RING, follow: event.dot.id)
         hidden = event.dots.bright_beneath(event.dot, event.x, event.y)
         effects.outline(hidden, style::MISTAKE_OUTLINE) if hidden
         @mistake = Mistake.new(popped: event.dot.id, bright: hidden.id) if hidden
-        effects.kick(style::PENALTY_SHAKE)
-        effects.light(style::PENALTY_FLASH)
+        effects.kick(style::MISTAKE_SHAKE)
+        effects.light(style::MISTAKE_FLASH)
         # The floor can keep the score from falling; say only what was lost.
         points = event.points.zero? ? nil : Words.points(event.points)
         float_pair(event.x, event.y, points, Words.seconds(event.seconds), palette.alarm, palette.alarm,
                    style::LOSS_FLOAT)
         sounds.play(:bonk, pan: pan(event.x))
-        @haptics.buzz(style::HAPTICS.penalty)
+        @haptics.buzz(style::HAPTICS.mistake)
       end
 
 
@@ -868,7 +868,7 @@ module DotPopper
       end
 
       def tick(seconds)
-        return if now - @penalized_at < 0.1
+        return if now - @mistake_at < 0.1
 
         sounds.play(:tick, pitch: 1.0 + ((style::HUD.urgent_below - seconds) * style::SOUND.tick_climb))
         effects.light(style::TICK_FLASH)

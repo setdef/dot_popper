@@ -63,7 +63,7 @@ module Simulation
 
   # How one game went. +covered+ counts the bright dots that spawned
   # under a popped one; +spawns+, how each was drawn (DotPopper::Spawn).
-  Result = Data.define(:score, :seconds, :penalties, :dots, :covered, :spawns, :stats) do
+  Result = Data.define(:score, :seconds, :mistakes, :dots, :covered, :spawns, :stats) do
     def endless? = seconds > GIVE_UP
     def count(&) = spawns.count(&)
   end
@@ -104,7 +104,7 @@ module Simulation
       game = DotPopper::Game.new(field, random: @random, spawn_tries: @spawn_tries, bonus: @bonus)
       stats = DotPopper::GameStats.start
       t = 0.0
-      penalties = 0
+      mistakes = 0
       covered_spawns = 0
       until game.over? || t > GIVE_UP
         bright = game.dots.find(&:bright?)
@@ -130,12 +130,12 @@ module Simulation
           @hand = aim
           case event
           in DotPopper::Events::Popped then break
-          in DotPopper::Events::Penalized then penalties += 1
+          in DotPopper::Events::MistakeMade then mistakes += 1
           in DotPopper::Events::Missed | nil then next
           end
         end
       end
-      Result.new(score: game.score, seconds: t, penalties:, dots: game.dots.size, covered: covered_spawns,
+      Result.new(score: game.score, seconds: t, mistakes:, dots: game.dots.size, covered: covered_spawns,
                  spawns: game.spawns, stats: stats.with(duration: game.elapsed))
     end
 
@@ -196,8 +196,8 @@ module Simulation
   def self.report(games, all_results)
     JOBS.zip(all_results).group_by { |job, _| job.sizing }.each do |sizing, rows|
       puts sizing.standard? ? "\nStandard dots, worked out from the screen" : "\nThe bigger or smaller dot size"
-      puts format("%-26s %6s %6s %6s %6s %6s %7s %6s %8s %7s %9s %9s", "device", "R", "area", "score", "p90", "secs",
-                  "endless", "pen", "redrawn", "moved", "no target", "old score")
+      puts format("%-26s %6s %6s %6s %6s %6s %7s %8s %8s %7s %9s %9s", "device", "R", "area", "score", "p90", "secs",
+                  "endless", "mistakes", "redrawn", "moved", "no target", "old score")
       rows.each_slice(TRIES.size) { |(job, results), (_, unruled)| report_row(job, results, unruled, games) }
     end
   end
@@ -205,10 +205,10 @@ module Simulation
   def self.report_row(job, results, unruled, games)
     field = job.field
     scores = results.map(&:score).sort
-    puts format("%-26s %6.1f %6.0f %6.1f %6d %6.1f %6.0f%% %6.1f %7.2f%% %6.2f%% %8.2f%% %9.1f",
+    puts format("%-26s %6.1f %6.0f %6.1f %6d %6.1f %6.0f%% %8.1f %7.2f%% %6.2f%% %8.2f%% %9.1f",
                 job.device.name, field.radius, field.width * field.height / (field.radius**2),
                 scores.sum.fdiv(games), scores[(games * 0.9).floor], results.sum(&:seconds) / games,
-                100.0 * results.count(&:endless?) / games, results.sum(&:penalties).fdiv(games),
+                100.0 * results.count(&:endless?) / games, results.sum(&:mistakes).fdiv(games),
                 share(results, &:redrawn?), share(results, &:moved?), share(unruled, &:exhausted?),
                 unruled.sum(&:score).fdiv(games))
   end
@@ -237,8 +237,8 @@ module Simulation
     results = jobs.map { |job| Ractor.new(job, games) { |each, count| Simulation.play(each, count) } }.map(&:value)
     jobs.zip(results).group_by { |job, _| job.device }.each do |device, rows|
       puts "\n#{device.name}"
-      puts format("%-18s %6s %5s %6s %6s %7s %6s %6s  %s", "bonus (n/pts/s)", "score", "p90", "secs", "p90s", "endless",
-                  "pen", "bonus", DotPopper::DailyGoal::LIST.map { "#{it.kind}".ljust(12) }.join)
+      puts format("%-18s %6s %5s %6s %6s %7s %8s %6s  %s", "bonus (n/pts/s)", "score", "p90", "secs", "p90s", "endless",
+                  "mistakes", "bonus", DotPopper::DailyGoal::LIST.map { "#{it.kind}".ljust(12) }.join)
       rows.each { |job, each| compare_row(job.bonus, each, games) }
     end
   end
@@ -248,9 +248,9 @@ module Simulation
     times = results.map(&:seconds).sort
     goals = DotPopper::DailyGoal::LIST.map { |goal| format("%-12s", format("%.0f%%", 100.0 * results.count { goal.met?(it.stats) } / games)) }
     name = bonus ? "#{bonus.dots_in_a_row}/#{bonus.points}/#{bonus.seconds.to_i}" : "none"
-    puts format("%-18s %6.1f %5d %6.1f %6.1f %6.0f%% %6.1f %6.2f  %s", name, scores.sum.fdiv(games), scores[(games * 0.9).floor],
+    puts format("%-18s %6.1f %5d %6.1f %6.1f %6.0f%% %8.1f %6.2f  %s", name, scores.sum.fdiv(games), scores[(games * 0.9).floor],
                 times.sum / games, times[(games * 0.9).floor], 100.0 * results.count(&:endless?) / games,
-                results.sum(&:penalties).fdiv(games), results.sum { it.stats.bonuses }.fdiv(games), goals.join)
+                results.sum(&:mistakes).fdiv(games), results.sum { it.stats.bonuses }.fdiv(games), goals.join)
   end
 end
 

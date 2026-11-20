@@ -16,7 +16,7 @@ class RactorTest < Minitest::Test
               DotPopper::SizeClass::STANDARD, DotPopper::Events::Missed.new(x: 1, y: 2),
               DotPopper::Events::Popped.new(dot: stack.dots.first.pop, x: 1, y: 2, points: 1, seconds: 1.0,
                                             spawned: stack.dots.last, **stands),
-              DotPopper::Events::Penalized.new(dot: stack.dots.last, x: 1, y: 2, points: -2, seconds: -2.0, **stands)]
+              DotPopper::Events::MistakeMade.new(dot: stack.dots.last, x: 1, y: 2, points: -2, seconds: -2.0, **stands)]
 
     values.each { assert Ractor.shareable?(it), "#{it.class} is not shareable" }
   end
@@ -32,7 +32,7 @@ class RactorTest < Minitest::Test
     heard.concat(play_paused_then_on(game_flow))
 
     assert_equal [DotPopper::Events::GameEnded, DotPopper::Events::GameStarted, DotPopper::Events::HomeShown,
-                  DotPopper::Events::Missed, DotPopper::Events::Penalized, DotPopper::Events::Popped],
+                  DotPopper::Events::Missed, DotPopper::Events::MistakeMade, DotPopper::Events::Popped],
                  heard.map(&:class).uniq.sort_by(&:name)
     heard.each { assert Ractor.shareable?(it), "#{it.class} is not a value" }
   end

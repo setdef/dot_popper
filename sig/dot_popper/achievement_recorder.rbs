@@ -36,7 +36,7 @@ module DotPopper
 
     def popped: (Events::Popped event) -> void
 
-    def penalized: (Events::Penalized event) -> void
+    def mistake_made: (Events::MistakeMade event) -> void
 
     def ended: (Events::GameEnded event) -> void
 
@@ -48,7 +48,7 @@ module DotPopper
 
     def early: (Events::Popped popped) -> void
 
-    def note_low_clock: (Events::Popped | Events::Penalized tapped) -> void
+    def note_low_clock: (Events::Popped | Events::MistakeMade tapped) -> void
 
     def appeared: (Dot dot, Array[Dot] above, Events::Popped popped) -> void
 

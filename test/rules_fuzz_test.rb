@@ -151,10 +151,10 @@ class RulesFuzzTest < Minitest::Test
       assert top.bright?, "#{where}: a popped dot was popped again"
       assert_equal before.map { it.id == dot.id ? it.pop : it } + [spawned], after, "#{where}: a pop changed more"
       check_spawn(game, after[0...-1], where)
-    in DotPopper::Events::Penalized(dot:)
-      assert_equal top&.id, dot.id, "#{where}: a penalty reached past the top dot"
-      assert top.popped?, "#{where}: a bright dot cost a penalty"
-      assert_equal before, after, "#{where}: a penalty changed the dots"
+    in DotPopper::Events::MistakeMade(dot:)
+      assert_equal top&.id, dot.id, "#{where}: a mistake reached past the top dot"
+      assert top.popped?, "#{where}: a tap on a bright dot was a mistake"
+      assert_equal before, after, "#{where}: a mistake changed the dots"
     end
   end
 
@@ -175,7 +175,7 @@ class RulesFuzzTest < Minitest::Test
   def check_score_change(event, change, score, where)
     expected = case event
                in DotPopper::Events::Popped then DotPopper::Rules::POP_POINTS
-               in DotPopper::Events::Penalized then -[DotPopper::Rules::PENALTY_POINTS, score].min
+               in DotPopper::Events::MistakeMade then -[DotPopper::Rules::MISTAKE_POINTS, score].min
                in DotPopper::Events::Missed then 0
                end
     assert_equal expected, change, "#{where}: the score changed by #{change}"
@@ -185,7 +185,7 @@ class RulesFuzzTest < Minitest::Test
   def check_clock_change(event, change, remaining, where)
     expected = case event
                in DotPopper::Events::Popped then DotPopper::Rules::POP_SECONDS
-               in DotPopper::Events::Penalized then -[DotPopper::Rules::PENALTY_SECONDS, remaining].min
+               in DotPopper::Events::MistakeMade then -[DotPopper::Rules::MISTAKE_SECONDS, remaining].min
                in DotPopper::Events::Missed then 0
                end
     assert_in_delta expected, change, EPSILON, "#{where}: the clock changed by #{change}"

@@ -43,12 +43,12 @@ module DotPopperGui
     # game time that has passed.
     def expect(dots_popped:, mistakes:)
       check_equal(expected_score(dots_popped, mistakes), game.score, "the score after #{dots_popped} dots popped and #{mistakes} mistakes")
-      granted = R::STARTING_SECONDS + (dots_popped * R::POP_SECONDS) - (mistakes * R::PENALTY_SECONDS)
+      granted = R::STARTING_SECONDS + (dots_popped * R::POP_SECONDS) - (mistakes * R::MISTAKE_SECONDS)
       check_close(granted, game.clock.remaining + game.elapsed, "the clock's time left and time played add up")
     end
 
     def expected_score(dots_popped, mistakes)
-      [(dots_popped * R::POP_POINTS) - (mistakes * R::PENALTY_POINTS), R::LOWEST_SCORE].max
+      [(dots_popped * R::POP_POINTS) - (mistakes * R::MISTAKE_POINTS), R::LOWEST_SCORE].max
     end
 
     # Waits for a popped dot to lie over the bright one, and taps between
@@ -58,8 +58,8 @@ module DotPopperGui
       x, y = wait_for("a popped dot over the bright one", within: 1200) { covering_point }
       before = events.size
       click(x, y)
-      penalty = events.drop(before).grep(DotPopper::Events::Penalized).first
-      check(penalty, "a click on a popped dot over the bright one is a mistake")
+      mistake = events.drop(before).grep(DotPopper::Events::MistakeMade).first
+      check(mistake, "a click on a popped dot over the bright one is a mistake")
       check(!show.effects.mistake_outlines.empty?, "the bright dot hidden under it is outlined")
     end
 
@@ -82,7 +82,7 @@ module DotPopperGui
       ended = events.grep(DotPopper::Events::GameEnded).last
       score = expected_score(DOTS_POPPED, 1)
       check_equal(score, ended.score, "Game Over's score")
-      check_close(R::STARTING_SECONDS + DOTS_POPPED - (R::PENALTY_SECONDS * 1), ended.elapsed,
+      check_close(R::STARTING_SECONDS + DOTS_POPPED - (R::MISTAKE_SECONDS * 1), ended.elapsed,
                   "the game lasted the time it was given")
       lesson = show.game_over.lesson
       bright = ended.dots.find(&:bright?)

@@ -10,9 +10,9 @@ module DotPopper
 
     POP_SECONDS: Float
 
-    PENALTY_POINTS: Integer
+    MISTAKE_POINTS: Integer
 
-    PENALTY_SECONDS: Float
+    MISTAKE_SECONDS: Float
 
     LOWEST_SCORE: Integer
 

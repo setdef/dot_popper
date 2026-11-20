@@ -63,7 +63,7 @@ class GameFlowTest < Minitest::Test
     @game_flow.update(20)
     assert_stood game, @heard.last, :field, :dots, :score, :elapsed
 
-    assert_equal [Events::GameStarted, Events::Popped, Events::Penalized, Events::GameEnded], @heard.map(&:class)
+    assert_equal [Events::GameStarted, Events::Popped, Events::MistakeMade, Events::GameEnded], @heard.map(&:class)
     # 10 seconds, +1 for the pop and -2 for the mistake, all played
     assert_equal [1.25, 1.25, 9.0], @heard.drop(1).map(&:elapsed)
   end
@@ -77,7 +77,7 @@ class GameFlowTest < Minitest::Test
     assert_instance_of Events::GameEnded, @heard.last
   end
 
-  def test_a_penalty_that_empties_the_clock_ends_the_game_at_once
+  def test_a_mistake_that_empties_the_clock_ends_the_game_at_once
     start!(@game_flow)
     target = @game_flow.game.dots.first
     @game_flow.press(target.x, target.y)
@@ -233,15 +233,15 @@ class GameFlowTest < Minitest::Test
     popped = @game_flow.press_paused(300, 300)
     bright = @game_flow.game.dots.find(&:bright?)
     clear_around!(live(@game_flow), @game_flow.game.dots.first)
-    penalized = @game_flow.press_paused(300, 300)
+    mistake = @game_flow.press_paused(300, 300)
 
     assert_instance_of Events::Popped, popped
     assert_equal 1, popped.spawned.id
     assert_equal bright.id, popped.spawned.id
-    assert_instance_of Events::Penalized, penalized
+    assert_instance_of Events::MistakeMade, mistake
     assert_equal [0, 9.0, 0], [@game_flow.game.score, @game_flow.game.clock.remaining, @game_flow.game.dots_in_a_row]
     assert_empty @heard.grep(Events::Popped)
-    assert_empty @heard.grep(Events::Penalized)
+    assert_empty @heard.grep(Events::MistakeMade)
   end
 
   def test_the_tutorial_arranges_a_paused_games_dots

@@ -24,7 +24,7 @@
 #
 #   DOT_POPPER_AUTOPLAY=1       a bot plays: Home, a game, Game Over, and
 #                               game again. It mostly taps bright dots and
-#                               sometimes a popped one, so penalties show.
+#                               sometimes a popped one, so mistakes show.
 #   DOT_POPPER_NO_SPLASH=1      leaves out setdef's splash before Home
 #   DOT_POPPER_SERVER=http://localhost:9292
 #                               asks this server for friend groups and themes

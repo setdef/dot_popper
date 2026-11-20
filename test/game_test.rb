@@ -41,7 +41,7 @@ class GameTest < Minitest::Test
 
     event = game.tap_at(400, 300)
 
-    assert_instance_of Events::Penalized, event
+    assert_instance_of Events::MistakeMade, event
     assert_equal 3, game.score
     assert_in_delta 8.0, game.clock.remaining
     assert_equal [-2, -2.0], [event.points, event.seconds]
@@ -78,7 +78,7 @@ class GameTest < Minitest::Test
 
     event = game.tap_at(405, 300)
 
-    assert_instance_of Events::Penalized, event
+    assert_instance_of Events::MistakeMade, event
     assert game.dots.to_a.last.bright?, "the tap does not pass through"
   end
 
@@ -123,7 +123,7 @@ class GameTest < Minitest::Test
     assert_equal 0, game.clock.whole_seconds
   end
 
-  def test_a_penalty_can_end_the_game
+  def test_a_mistake_can_end_the_game
     game = game_with(dot(400, 300, popped: true))
     game.update(8.5)
 

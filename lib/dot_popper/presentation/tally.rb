@@ -19,7 +19,7 @@ module DotPopper
       # What a pop does, and what a tap on a popped dot does, as the
       # rules say, each as its points and its seconds.
       def self.pop = [points(Rules::POP_POINTS), seconds(Rules::POP_SECONDS)]
-      def self.penalty = [points(-Rules::PENALTY_POINTS), seconds(-Rules::PENALTY_SECONDS)]
+      def self.mistake = [points(-Rules::MISTAKE_POINTS), seconds(-Rules::MISTAKE_SECONDS)]
 
       # The stopwatch's size on a line +height+ tall.
       def self.icon(height) = height * ICON

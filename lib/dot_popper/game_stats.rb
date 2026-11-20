@@ -33,7 +33,7 @@ module DotPopper
     def record(event, at:)
       case event
       when Events::Popped then popped(event, at)
-      when Events::Penalized
+      when Events::MistakeMade
         with(mistakes: mistakes + 1, softened: softened + (event.softened? ? 1 : 0), score: score + event.points, dots_in_a_row: 0)
       when Events::GameEnded then with(duration: at)
       else self
@@ -69,7 +69,7 @@ module DotPopper
       def call(event)
         case event
         when Events::GameStarted then @stats = GameStats.opening(event)
-        when Events::Popped, Events::Penalized, Events::GameEnded then @stats = stats.record(event, at: event.elapsed)
+        when Events::Popped, Events::MistakeMade, Events::GameEnded then @stats = stats.record(event, at: event.elapsed)
         end
       end
     end

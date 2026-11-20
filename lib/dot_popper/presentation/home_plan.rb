@@ -60,7 +60,7 @@ module DotPopper
       ROW = 2.8
       HEIGHT = 2.4
 
-      def self.rows = [[true, *Tally.pop], [false, *Tally.penalty]]
+      def self.rows = [[true, *Tally.pop], [false, *Tally.mistake]]
 
       def self.measure(height, &measure)
         first = height * DOT * (2 + AFTER_DOT)

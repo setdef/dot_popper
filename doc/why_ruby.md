@@ -54,8 +54,8 @@ in DotPopper::Events::Missed
 in DotPopper::Events::Popped(dot:, spawned:)
   assert_equal top&.id, dot.id, "#{where}: a pop reached past the top dot"
   # ...and that the stack gained exactly +spawned+, at the bottom
-in DotPopper::Events::Penalized(dot:)
-  assert top.popped?, "#{where}: a bright dot cost a penalty"
+in DotPopper::Events::MistakeMade(dot:)
+  assert top.popped?, "#{where}: a tap on a bright dot was a mistake"
 end
 ```
 

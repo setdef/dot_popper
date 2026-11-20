@@ -63,7 +63,7 @@ class BonusTest < Minitest::Test
     (Rules::BONUS.dots_in_a_row - 1).times { pop_next(game) }
     popped = game.dots.find(&:popped?)
 
-    assert_instance_of Events::Penalized, game.tap_at(popped.x, popped.y)
+    assert_instance_of Events::MistakeMade, game.tap_at(popped.x, popped.y)
 
     assert_equal 0, game.dots_in_a_row
     refute pop_next(game).spawned.bonus?, "one more pop would have earned it, had the streak held"
@@ -75,7 +75,7 @@ class BonusTest < Minitest::Test
     bonus = game.dots.find(&:bonus?)
     popped = game.dots.find(&:popped?)
 
-    assert_instance_of Events::Penalized, game.tap_at(popped.x, popped.y)
+    assert_instance_of Events::MistakeMade, game.tap_at(popped.x, popped.y)
 
     assert_equal 0, game.dots_in_a_row
     assert game.dots.find { it.id == bonus.id }.bonus?

@@ -13,13 +13,13 @@ class StyleTest < Minitest::Test
   end
 
   def test_the_shake_is_within_its_limit
-    assert_operator Style::PENALTY_SHAKE.amplitude, :<=, ShakeStyle::LIMIT
-    assert_operator Style::PENALTY_SHAKE.duration, :<=, 0.25
+    assert_operator Style::MISTAKE_SHAKE.amplitude, :<=, ShakeStyle::LIMIT
+    assert_operator Style::MISTAKE_SHAKE.duration, :<=, 0.25
   end
 
   # A mistake's edge glow tints a dot near an edge only for a moment.
-  def test_the_penalty_glow_is_soft_narrow_and_quick
-    flash = Style::PENALTY_FLASH
+  def test_the_mistake_glow_is_soft_narrow_and_quick
+    flash = Style::MISTAKE_FLASH
 
     assert_operator flash.alpha, :<=, 0.45
     assert_operator flash.band, :<=, 0.12

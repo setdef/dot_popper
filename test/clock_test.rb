@@ -18,7 +18,7 @@ class ClockTest < Minitest::Test
     assert clock.expired?
   end
 
-  def test_a_penalty_can_empty_it
+  def test_a_mistake_can_empty_it
     clock = DotPopper::Clock.new(1.5).adjust(-2)
 
     assert clock.expired?

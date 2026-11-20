@@ -22,7 +22,7 @@ module DotPopper
       case event
       when Events::GameStarted then begin_game(event)
       when Events::Popped then popped(event) if @watching
-      when Events::Penalized then penalized(event) if @watching
+      when Events::MistakeMade then mistake_made(event) if @watching
       when Events::Missed then @tapped = true
       when Events::GameEnded then ended(event)
       end
@@ -62,7 +62,7 @@ module DotPopper
       appeared(event.spawned, dots.take_while { it.id != event.spawned.id }, event)
     end
 
-    def penalized(event)
+    def mistake_made(event)
       @dots_in_a_row = 0
       @mistaken = true
       @tapped = true

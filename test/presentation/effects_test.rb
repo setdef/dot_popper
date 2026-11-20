@@ -45,7 +45,7 @@ class EffectsTest < Minitest::Test
   end
 
   def test_the_shake_is_small_and_short
-    @effects.kick(Style::PENALTY_SHAKE)
+    @effects.kick(Style::MISTAKE_SHAKE)
     offsets = (0..30).map do
       @effects.update(0.01)
       Math.hypot(@effects.shake_x, @effects.shake_y)
@@ -58,18 +58,18 @@ class EffectsTest < Minitest::Test
 
   def test_a_calm_shake_never_moves
     calm = Effects.new(radius: R, calm: true)
-    calm.kick(Style::PENALTY_SHAKE)
+    calm.kick(Style::MISTAKE_SHAKE)
     calm.update(0.03)
 
     assert_in_delta 0.0, calm.shake_x
   end
 
   def test_the_edge_flash_fades_out
-    @effects.light(Style::PENALTY_FLASH)
+    @effects.light(Style::MISTAKE_FLASH)
     bright = @effects.flash_alpha
-    @effects.update(Style::PENALTY_FLASH.duration)
+    @effects.update(Style::MISTAKE_FLASH.duration)
 
-    assert_in_delta Style::PENALTY_FLASH.alpha, bright
+    assert_in_delta Style::MISTAKE_FLASH.alpha, bright
     assert_in_delta 0.0, @effects.flash_alpha
   end
 

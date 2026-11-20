@@ -566,8 +566,8 @@ class ShowTest < Minitest::Test
     clear_around!(live(@game_flow), popped)
     @show.tap(popped.x, popped.y)
 
-    assert_equal [Style::HAPTICS.pop, Style::HAPTICS.penalty], haptics.buzzes
-    assert_operator Style::HAPTICS.penalty, :>, Style::HAPTICS.pop
+    assert_equal [Style::HAPTICS.pop, Style::HAPTICS.mistake], haptics.buzzes
+    assert_operator Style::HAPTICS.mistake, :>, Style::HAPTICS.pop
   end
 
   def test_a_pop_is_heard_where_it_is
@@ -650,7 +650,7 @@ class ShowTest < Minitest::Test
     assert_nil @show.game_over.lesson, "it has been taught as often as it is"
   end
 
-  # On the pile, the mistake's penalty replays as it played, after the
+  # On the pile, the mistake replays as it played, after the
   # score has counted, a few times: the popped dot's shudder and alarm
   # ring, and the dashed outline of the bright dot under it, which
   # pulses. The screen never shakes, and Continue works as ever.

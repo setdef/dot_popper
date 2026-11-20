@@ -74,6 +74,6 @@ module DotPopper
 
     def pop: (Dot dot, number x, number y) -> Events::Popped
 
-    def penalize: (Dot dot, number x, number y) -> Events::Penalized
+    def mistake: (Dot dot, number x, number y) -> Events::MistakeMade
   end
 end

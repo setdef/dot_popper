@@ -1,8 +1,8 @@
 module DotPopper
-  type event = Events::Popped | Events::Penalized | Events::Missed
+  type event = Events::Popped | Events::MistakeMade | Events::Missed
              | Events::GameStarted | Events::GameEnded | Events::HomeShown
 
-  type tap_event = Events::Popped | Events::Penalized | Events::Missed
+  type tap_event = Events::Popped | Events::MistakeMade | Events::Missed
 
   module Events
     class Popped < ::Data
@@ -29,7 +29,7 @@ module DotPopper
       def self.new: (dot: Dot, x: number, y: number, points: Integer, seconds: Float, spawned: Dot, dots: Stack, score: Integer, clock: Clock, elapsed: Float) -> instance
     end
 
-    class Penalized < ::Data
+    class MistakeMade < ::Data
       attr_reader dot: Dot
 
       attr_reader x: number

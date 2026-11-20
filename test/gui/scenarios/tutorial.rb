@@ -162,7 +162,7 @@ module DotPopperGui
       x = popped.x + ((popped.x - peeking.x).positive? ? 0.5 : -0.5) * popped.radius
       how.call(x, popped.y)
       check_equal([0, 9], shown, "a tap on the popped dot does nothing")
-      check(game.score.zero? && game.clock.remaining == 9.0 && story.none?(:Penalized),
+      check(game.score.zero? && game.clock.remaining == 9.0 && story.none?(:MistakeMade),
             "the game hears nothing of it, and its clock stands still")
       check_equal(:aim_next, tutorial.beat, "the turn goes on")
     end

@@ -220,7 +220,7 @@ module DotPopper
     end
 
     # A game in progress. It ends the moment the clock reaches zero,
-    # whether time ran out or a penalty took the last of it. +tutorial+
+    # whether time ran out or a mistake took the last of it. +tutorial+
     # says the tutorial played over its opening, while it was Paused.
     class Playing < Data.define(:game, :seed, :size_class, :tutorial)
       def press(transitions, live, x, y)

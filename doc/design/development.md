@@ -72,8 +72,8 @@ Pattern matching is fine wherever Steep does not look: the tests (the fuzz test 
 After each step it checks that:
 
 - every dot is inside the field;
-- the score never goes below `Rules::LOWEST_SCORE`, and changes only by `POP_POINTS` for a pop, by `PENALTY_POINTS` or as many as are left for a mistake, and not at all for a miss, and each event reports those points;
-- the clock never goes negative; a tick takes off exactly its seconds, down to zero; a pop adds `POP_SECONDS`, and a mistake takes off `PENALTY_SECONDS` or what is left;
+- the score never goes below `Rules::LOWEST_SCORE`, and changes only by `POP_POINTS` for a pop, by `MISTAKE_POINTS` or as many as are left for a mistake, and not at all for a miss, and each event reports those points;
+- the clock never goes negative; a tick takes off exactly its seconds, down to zero; a pop adds `POP_SECONDS`, and a mistake takes off `MISTAKE_SECONDS` or what is left;
 - exactly one dot is bright while the game runs;
 - a tap reaches the topmost dot under it and changes no other dot; a miss and a mistake change no dot at all;
 - older dots stay above newer ones;

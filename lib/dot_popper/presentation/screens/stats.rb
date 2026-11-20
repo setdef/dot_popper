@@ -97,7 +97,7 @@ module DotPopper
           @undo = UndoableClear.new(cleared: @stats_backup.clear, at: show.now, seconds: style::STATS_CLEAR.undo)
           changed
           sounds.play(:bonk, pitch: 0.7)
-          @haptics.buzz(style::HAPTICS.penalty)
+          @haptics.buzz(style::HAPTICS.mistake)
         end
 
         def controls

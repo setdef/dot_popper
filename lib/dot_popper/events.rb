@@ -14,10 +14,10 @@ module DotPopper
     class Popped < Data.define(:dot, :x, :y, :points, :seconds, :spawned, :dots, :score, :clock, :elapsed); end
 
     # A popped dot was tapped. +points+ is what the score actually lost,
-    # which is less than the penalty when the score was near zero.
-    class Penalized < Data.define(:dot, :x, :y, :points, :seconds, :dots, :score, :clock, :elapsed)
-      # Whether the score floor kept part of the penalty from landing.
-      def softened? = points > -Rules::PENALTY_POINTS
+    # which is less than a mistake costs when the score was near zero.
+    class MistakeMade < Data.define(:dot, :x, :y, :points, :seconds, :dots, :score, :clock, :elapsed)
+      # Whether the score floor kept part of the mistake's cost from landing.
+      def softened? = points > -Rules::MISTAKE_POINTS
     end
 
     # A tap hit no dot.

@@ -72,7 +72,7 @@ module DotPopper
       dot = dots.top_at(x, y)
       if dot.nil? then Events::Missed.new(x:, y:)
       elsif dot.bright? then pop(dot, x, y)
-      else penalize(dot, x, y)
+      else mistake(dot, x, y)
       end
     end
 
@@ -145,12 +145,12 @@ module DotPopper
       earned
     end
 
-    def penalize(dot, x, y)
+    def mistake(dot, x, y)
       @dots_in_a_row = 0
-      lost = [Rules::PENALTY_POINTS, score - Rules::LOWEST_SCORE].min
+      lost = [Rules::MISTAKE_POINTS, score - Rules::LOWEST_SCORE].min
       @score -= lost
-      @clock = clock.adjust(-Rules::PENALTY_SECONDS)
-      Events::Penalized.new(dot:, x:, y:, points: -lost, seconds: -Rules::PENALTY_SECONDS, dots:, score:, clock:, elapsed:)
+      @clock = clock.adjust(-Rules::MISTAKE_SECONDS)
+      Events::MistakeMade.new(dot:, x:, y:, points: -lost, seconds: -Rules::MISTAKE_SECONDS, dots:, score:, clock:, elapsed:)
     end
   end
 end

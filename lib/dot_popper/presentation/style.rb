@@ -204,7 +204,7 @@ module DotPopper
 
       # The stacking rule, taught on the first two Game Overs after a wrong
       # tap that had the bright dot hidden under the popped one: the tap's
-      # penalty replays on the pile three times, 2.4 s apart, slowly
+      # mistake replays on the pile three times, 2.4 s apart, slowly
       # enough to watch, and then the pile is left in peace.
       LESSON = LessonStyle.new(times: 2, every: 2.4, replays: 3)
 
@@ -338,10 +338,10 @@ module DotPopper
         alpha: Tween.new(from: 1.0, to: 0.0, duration: 0.6, ease: :in_quad),
         width: 0.075, dashes: 12, color: PALETTE.bright_light
       )
-      PENALTY_SHAKE = ShakeStyle.new(amplitude: 0.12, duration: 0.22, frequency: 24.0)
+      MISTAKE_SHAKE = ShakeStyle.new(amplitude: 0.12, duration: 0.22, frequency: 24.0)
       # The glow is narrow and quick, so a dot near an edge is tinted only
       # for a moment.
-      PENALTY_FLASH = FlashStyle.new(color: PALETTE.alarm, alpha: 0.42, duration: 0.32, band: 0.1)
+      MISTAKE_FLASH = FlashStyle.new(color: PALETTE.alarm, alpha: 0.42, duration: 0.32, band: 0.1)
       # The clock's last seconds give each tick a faint glow too.
       TICK_FLASH = FlashStyle.new(color: PALETTE.urgent, alpha: 0.16, duration: 0.3, band: 0.12)
 
@@ -473,7 +473,7 @@ module DotPopper
 
       # A short buzz under the finger for a pop, a longer one for a wrong
       # tap, on phones and tablets that can (Shell::Haptics).
-      HAPTICS = HapticsStyle.new(pop: 0.015, penalty: 0.04)
+      HAPTICS = HapticsStyle.new(pop: 0.015, mistake: 0.04)
 
       # The gamepad cursor (Lota 0.1.3 and newer). At full tilt it crosses
       # the window corner to corner in a second, whatever the window's

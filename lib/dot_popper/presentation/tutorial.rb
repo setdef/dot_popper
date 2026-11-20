@@ -74,7 +74,7 @@ module DotPopper
     #    has held at that instant until now, and it is shown born, where
     #    it parts from the popped one (#parting), only now. As it peeks out,
     #    time stops again, and the guide taps the popped dot, once: the
-    #    game's own penalty plays, its shudder, the dashed outline of the
+    #    game's own mistake plays, its shudder, the dashed outline of the
     #    bright dot under it, and its cost out of the score and the time,
     #    which drop as it does; the row goes dark and rings red. The guide then waits to one side while time
     #    flows slowly until the bright dot is clear, and moves to it and
@@ -316,15 +316,15 @@ module DotPopper
          [:dots_in_a_row, 1, @palette.gain, -> { count_the_pop }]]
       end
 
-      # What the guide's mistake cost (Events::Penalized), in the same
+      # What the guide's mistake cost (Events::MistakeMade), in the same
       # turn, leaving out what was already at nothing: the score and the
       # seconds the rules took, and the row shown.
-      def losses(penalty)
-        return [] unless penalty.is_a?(Events::Penalized)
+      def losses(mistake)
+        return [] unless mistake.is_a?(Events::MistakeMade)
 
         alarm = @palette.alarm
-        points = penalty.points
-        seconds = penalty.seconds.to_i
+        points = mistake.points
+        seconds = mistake.seconds.to_i
         [[:score, points, alarm, -> { land(points:) }],
          [:time, seconds, alarm, -> { land(seconds:) }],
          [:dots_in_a_row, -hud.dots_in_a_row, alarm, -> { empty_the_row }]].reject { |_, amount, *| amount.zero? }
@@ -419,7 +419,7 @@ module DotPopper
       end
 
       # The guide's press reaches the game, which charges it as in play,
-      # and the game's own penalty plays: its shudder and ring, the bright
+      # and the game's own mistake plays: its shudder and ring, the bright
       # dot under it outlined, the edge's glow and the bonk. Then what it
       # cost flies out of the dot, to the score, the time and the row, in
       # turn, as a pop's reward does. The light stays on the dot and the
@@ -430,14 +430,14 @@ module DotPopper
         dot = dot(BRIGHT)
         x = dot.x
         y = dot.y
-        penalty = @game_flow.press_paused(x, y)
+        mistake = @game_flow.press_paused(x, y)
         animations.wobble(dot.id, now)
         @effects.ring(x, y, @style::ALARM_RING, follow: dot.id)
         hidden = game.dots.bright_beneath(dot, x, y)
         @effects.outline(hidden, @style::MISTAKE_OUTLINE) if hidden
-        @effects.light(@style::PENALTY_FLASH)
+        @effects.light(@style::MISTAKE_FLASH)
         @sounds.play(:bonk, pan: pan(x))
-        ends = one_by_one(x, y, losses(penalty))
+        ends = one_by_one(x, y, losses(mistake))
         goes = ends - @script.flight
         cue(goes) { @guide = guide.hovering(waiting_place, now) }
         @waited_out = goes + @guide_style.glide + @guide_style.waiting

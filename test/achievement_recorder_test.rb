@@ -282,7 +282,7 @@ class AchievementRecorderTest < Minitest::Test
     gone = dot(100, 100, popped: true)
     stands = as_it_stands(game_with(gone, dot(5, 5)))
     @recorder.call(Events::Popped.new(dot: gone, x: 1, y: 1, points: 1, seconds: 1.0, spawned: dot(5, 5), **stands))
-    @recorder.call(Events::Penalized.new(dot: gone, x: 1, y: 1, points: -2, seconds: -2.0, **stands))
+    @recorder.call(Events::MistakeMade.new(dot: gone, x: 1, y: 1, points: -2, seconds: -2.0, **stands))
 
     assert_empty @recorder.earned
   end

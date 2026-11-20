@@ -19,8 +19,8 @@ module DotPopper
     POP_POINTS = 1
     POP_SECONDS = 1.0
 
-    PENALTY_POINTS = 2
-    PENALTY_SECONDS = 2.0
+    MISTAKE_POINTS = 2
+    MISTAKE_SECONDS = 2.0
 
     LOWEST_SCORE = 0
 
