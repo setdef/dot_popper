@@ -16,8 +16,8 @@ module DotPopper
         def store_for(clipboard)
           return super if settings.store_build?
 
-          fake = FakeStore.new(file("fake_store.txt"), fails: FakeStore.failure(settings.env))
-          Store.of_test_build(platform, entitlement:, fake:, website: -> { website_store(clipboard, FakeCheckout.new(clipboard:)) })
+          fake = Monetization::FakeStore.new(file("fake_store.txt"), fails: Monetization::FakeStore.failure(settings.env))
+          Monetization::Store.of_test_build(platform, entitlement:, fake:, website: -> { website_store(clipboard, Monetization::FakeCheckout.new(clipboard:)) })
         end
 
         # A scenario's released themes and theme, in place of the server's.

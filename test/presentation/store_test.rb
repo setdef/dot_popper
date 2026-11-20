@@ -8,12 +8,12 @@ require "platforms_helper"
 class StoreTest < Minitest::Test
   include PresentationTest
 
-  Store = DotPopper::Store
-  NoStore = DotPopper::NoStore
-  NativeStore = DotPopper::NativeStore
-  FakeStore = DotPopper::FakeStore
-  WebsiteStore = DotPopper::WebsiteStore
-  FakeCheckout = DotPopper::FakeCheckout
+  Store = DotPopper::Monetization::Store
+  NoStore = DotPopper::Monetization::NoStore
+  NativeStore = DotPopper::Monetization::NativeStore
+  FakeStore = DotPopper::Monetization::FakeStore
+  WebsiteStore = DotPopper::Monetization::WebsiteStore
+  FakeCheckout = DotPopper::Monetization::FakeCheckout
 
   class FakeOpener
     attr_reader :urls
@@ -45,7 +45,7 @@ class StoreTest < Minitest::Test
     @store = Store.new(port: port, entitlement: @entitlement)
   end
 
-  def port = DotPopper::NativeStore.new(opener: @opener, answers: @answers)
+  def port = DotPopper::Monetization::NativeStore.new(opener: @opener, answers: @answers)
 
   # The native adapter a build for sale chooses, at the composition root.
   def stores
@@ -54,7 +54,7 @@ class StoreTest < Minitest::Test
   end
 
   # The fake store's adapter, which only a test build chooses.
-  def fake = @fake ||= DotPopper::FakeStore.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
+  def fake = @fake ||= DotPopper::Monetization::FakeStore.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
 
   def hear(text)
     @answers.text = text
@@ -288,7 +288,7 @@ class StoreTest < Minitest::Test
 
   def offer_show
     opener = FakeOpener.new
-    store = Store.new(port: DotPopper::NativeStore.new(opener:, answers: @answers), entitlement: @entitlement)
+    store = Store.new(port: DotPopper::Monetization::NativeStore.new(opener:, answers: @answers), entitlement: @entitlement)
     show = build_show(store:, entitlement: @entitlement)
     [show, opener]
   end

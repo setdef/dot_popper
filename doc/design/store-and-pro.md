@@ -59,7 +59,7 @@ Tests: `test/build_test.rb`, `test/composition/root_test.rb`, `test/set_build_ch
 
 ### Which store each build gets
 
-`Store.for(platform, native:, entitlement:, website:, channel:)` (`lib/dot_popper/store.rb`) chooses once for a channel, called only from the composition root (`Composition::Root#store_for`). A test build (no channel) never asks it: the test build's part puts its own choice in its place, `Store.of_test_build(platform, fake:, entitlement:, website:)` (`lib/dot_popper/test_build/store.rb`), so a build for sale holds no branch for a build with no channel. `platform` is the game's `Platform`, which the shell makes from `Lota::System.os` (`Shell::Platforms`); the table names each system as Lota does.
+`Store.for(platform, native:, entitlement:, website:, channel:)` (`lib/dot_popper/monetization/store.rb`) chooses once for a channel, called only from the composition root (`Composition::Root#store_for`). A test build (no channel) never asks it: the test build's part puts its own choice in its place, `Store.of_test_build(platform, fake:, entitlement:, website:)` (`lib/dot_popper/test_build/store.rb`), so a build for sale holds no branch for a build with no channel. `platform` is the game's `Platform`, which the shell makes from `Lota::System.os` (`Shell::Platforms`); the table names each system as Lota does.
 
 | Channel | iOS | Android | macOS (`OS X`) | Windows | Linux |
 | --- | --- | --- | --- | --- | --- |
@@ -69,7 +69,7 @@ Tests: `test/build_test.rb`, `test/composition/root_test.rb`, `test/set_build_ch
 | `microsoft-store` (`MICROSOFT_STORE`) | `NativeStore` | `NativeStore` | `NoStore` | `Shell::StoreHelper` | `NoStore` |
 | any other | `NativeStore` | `NativeStore` | `Store::CHANNELS[name]`, or `NoStore` | same | same |
 
-`FakeStore`, `NativeStore` and `StoreHelper` sit behind a `Store`; `WebsiteStore` and `NoStore` answer the Store's methods themselves (`DotPopper::_Store` in `sig/dot_popper/store.rbs`). A platform in the phone host (`Platform#phone_host?`: iOS, Android) catches the store URL; `HELPER_CHANNELS` are the computer stores' channels, each sold through the native port only on the platform whose own store it is (`Platform#own_store`). An iOS build never takes the website store (`Platform#website_sales?`; Apple 3.1.1). `Store::CHANNELS` is the registry for other computer channels (such as Steam), each a callable taking `entitlement:`; it is empty. `NoStore` offers nothing, so no one is offered a purchase that cannot complete. No environment variable selects any of this.
+`FakeStore`, `NativeStore` and `StoreHelper` sit behind a `Store`; `WebsiteStore` and `NoStore` answer the Store's methods themselves (`DotPopper::Monetization::_Store` in `sig/dot_popper/monetization/store.rbs`). A platform in the phone host (`Platform#phone_host?`: iOS, Android) catches the store URL; `HELPER_CHANNELS` are the computer stores' channels, each sold through the native port only on the platform whose own store it is (`Platform#own_store`). An iOS build never takes the website store (`Platform#website_sales?`; Apple 3.1.1). `Store::CHANNELS` is the registry for other computer channels (such as Steam), each a callable taking `entitlement:`; it is empty. `NoStore` offers nothing, so no one is offered a purchase that cannot complete. No environment variable selects any of this.
 
 `script/check_build.rb` and the release checks are in [Release checks](#release-checks).
 
@@ -79,7 +79,7 @@ Pro is sold through five channels, and none can be reached from a test: no autom
 
 What it costs: a build for sale must be stamped with its channel, or it is a test build with the fakes; and playtests never touch a real store, so a sandbox purchase on a real phone has to be tried by hand before a store release.
 
-`Store` (`lib/dot_popper/store.rb`, Monetization's, in the core, which Steep checks strictly) is the game's half of every store purchase: the offer, Buy, Restore, the thanks, and proving Pro. Its only way to a store is a port: `open(url)`, answering whether the request was taken, and `read`, `remove` and `path` for the answer.
+`Store` (`lib/dot_popper/monetization/store.rb`, Monetization's, in the core, which Steep checks strictly) is the game's half of every store purchase: the offer, Buy, Restore, the thanks, and proving Pro. Its only way to a store is a port: `open(url)`, answering whether the request was taken, and `read`, `remove` and `path` for the answer.
 
 **The request.** A URL in the scheme `dotpopper-store` (`Store::SCHEME`): `dotpopper-store://ACTION?n=NUMBER&product=com.setdef.dotpopper.pro&file=PATH`, where ACTION is `open`, `buy` or `restore`, NUMBER counts up with each request, and PATH is where to answer (`-` for a store helper's standard output). The scheme is registered with no system, so no other app can send one.
 
@@ -124,7 +124,7 @@ Both ask for owned purchases first (StoreKit's `Transaction.currentEntitlements`
 
 `DOT_POPPER_FAKE_STORE_FAILS` (`FakeStore::FAILS_BY`) makes the fake go wrong, for a developer only and in a test build only: `refused` (the system will not take the request), `unavailable` (no store answers), and `failed`, `canceled` or `pending` (how a Buy can end; a Restore takes `failed` and `canceled`, and `pending` is a Buy's alone).
 
-**`WebsiteStore`** (`lib/dot_popper/website_store.rb`, with its checkouts) is the store for copies no store controls: setdef's website, itch.io, Homebrew, winget, a Linux package or an APK. It answers the Store's methods, plus `#keys?` (true: a license key is how Pro arrives) and `#paste`. Its price is `WebsiteStore::PRICE` (`$1.99`), which must match the checkout page. It has no Restore: the key is the purchase, on any device. Its checkout is a port, `#buy` answering the state to show:
+**`WebsiteStore`** (`lib/dot_popper/monetization/website_store.rb`, with its checkouts) is the store for copies no store controls: setdef's website, itch.io, Homebrew, winget, a Linux package or an APK. It answers the Store's methods, plus `#keys?` (true: a license key is how Pro arrives) and `#paste`. Its price is `WebsiteStore::PRICE` (`$1.99`), which must match the checkout page. It has no Restore: the key is the purchase, on any device. Its checkout is a port, `#buy` answering the state to show:
 
 - `BrowserCheckout` opens `BrowserCheckout::URL` (`https://dot-popper.setdef.com/buy`) in the player's browser and answers `:browser` ("Finish in your browser. Your key comes by email."), or `:unavailable`. The URL is the one constant to set once a payment company is chosen.
 - `FakeCheckout`, a test build's on a computer, puts a real license key signed by the test key on the clipboard and answers `:copied` ("Your license key is copied. Paste it here."). Paste license key then takes the road a bought key takes.
@@ -133,9 +133,9 @@ Both ask for owned purchases first (StoreKit's `Transaction.currentEntitlements`
 
 ### The store contract
 
-`test/store_contract.rb` is one suite of what any adapter must do, included by each adapter's test, which writes `new_store(fails:)` and `relaunched(store)`. It reads answers only through `read`, as `Store` does. It checks that a request is taken and names where its answer goes; that an answer comes later than the question; that every answer is the whole state and names its request; the price on opening; buying after the price, and failing without it; that owning hands over a receipt the test build trusts; restoring nothing and restoring a purchase; a purchase known after a relaunch; removing the answer; each failure; and buying, restoring and failing again through `Store`.
+`test/monetization/store_contract.rb` is one suite of what any adapter must do, included by each adapter's test, which writes `new_store(fails:)` and `relaunched(store)`. It reads answers only through `read`, as `Store` does. It checks that a request is taken and names where its answer goes; that an answer comes later than the question; that every answer is the whole state and names its request; the price on opening; buying after the price, and failing without it; that owning hands over a receipt the test build trusts; restoring nothing and restoring a purchase; a purchase known after a relaunch; removing the answer; each failure; and buying, restoring and failing again through `Store`.
 
-- `FakeStoreContractTest` (`test/store_contract_test.rb`) runs it on `FakeStore`.
+- `FakeStoreContractTest` (`test/monetization/store_contract_test.rb`) runs it on `FakeStore`.
 - `NativeStoreContractTest` runs it on `NativeStore` over a real answer file and a Ruby stand-in for the host, transcribed from `Store.swift` and `ProStore.java`. It shows `NativeStore`'s Ruby half and the suite's fairness, not the hosts.
 - `StoreHelperContractTest` (`test/shell/store_helper_test.rb`) runs it on `StoreHelper` with real processes against a Ruby stand-in for the helper.
 

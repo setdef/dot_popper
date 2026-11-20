@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "test_helper"
+require_relative "../test_helper"
 require_relative "store_contract"
 require "dot_popper/shell/store_answers"
 require "tmpdir"
@@ -9,7 +9,7 @@ require "tmpdir"
 class FakeStoreContractTest < Minitest::Test
   include StoreContract
 
-  FakeStore = DotPopper::FakeStore
+  FakeStore = DotPopper::Monetization::FakeStore
 
   def new_store(fails: nil, ledger: DotPopper::Gameplay::ScoreRecord::Memory.new)
     FakeStore.new(ledger, fails:).tap { (@ledgers ||= {})[it] = ledger }
@@ -142,7 +142,7 @@ class NativeStoreContractTest < Minitest::Test
     path = File.join(@folder, "#{@count}.txt")
     host = FakeHost.new(fails, path)
     (@hosts ||= {})[path] = host
-    DotPopper::NativeStore.new(opener: host, answers: Polled.new(file: DotPopper::Shell::StoreAnswers.new(path:), host:))
+    DotPopper::Monetization::NativeStore.new(opener: host, answers: Polled.new(file: DotPopper::Shell::StoreAnswers.new(path:), host:))
   end
 
   def relaunched(store)

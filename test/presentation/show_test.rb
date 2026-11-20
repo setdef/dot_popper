@@ -754,7 +754,7 @@ class ShowTest < Minitest::Test
     achievements = DotPopper::Gameplay::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     saved_themes = DotPopper::Gameplay::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     groups = DotPopper::Gameplay::Groups::Session.off
-    use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: DotPopper::Monetization::FreeGames.unlimited, entitlement:, store: DotPopper::NoStore.new,
+    use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: DotPopper::Monetization::FreeGames.unlimited, entitlement:, store: DotPopper::Monetization::NoStore.new,
                                                  achievements:, saved_stats:, friend_groups: groups, starter: DotPopperTest.starter_of(game_flow))
     told = []
     use_cases[:finish_game].subscribe(told.method(:<<))

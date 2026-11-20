@@ -97,7 +97,7 @@ check.call("it holds nothing a #{channel} build leaves out, and is stamped for i
 end
 check.call("it loads none of the test build's part") do
   $LOADED_FEATURES.none? { it.include?("/dot_popper/test_build/") } && !defined?(c::TestKeys) && !defined?(c::TEST_PINS) &&
-    !defined?(DotPopper::FakeStore) && !DotPopper::Receipt.const_defined?(:TEST, false)
+    !defined?(DotPopper::Monetization::FakeStore) && !DotPopper::Receipt.const_defined?(:TEST, false)
 end
 check.call("#{channel.inspect} is a channel the game names (#{build::CHANNEL_NAMES.join(", ")})") { build::CHANNEL_NAMES.include?(channel) }
 check.call("the app was built for #{channel.inspect} (Build::CHANNEL is #{build::CHANNEL.inspect})") { build::CHANNEL == channel }

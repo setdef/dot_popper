@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# What any adapter behind the store's port (DotPopper::Store) must do. Include it in a test
+# What any adapter behind the store's port (DotPopper::Monetization::Store) must do. Include it in a test
 # class and write two methods:
 #
 #   new_store(fails: nil)  an adapter on a fresh install; +fails+ is one of
@@ -13,7 +13,7 @@
 # adapter speaks the port; it says nothing of Apple's or Google's real
 # stores (doc/design/store-and-pro.md).
 module StoreContract
-  Store = DotPopper::Store
+  Store = DotPopper::Monetization::Store
   STATES = %w[loading working ready pending canceled restored none failed unavailable].freeze
   UNDER_WAY = %w[loading working].freeze
 

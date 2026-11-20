@@ -70,7 +70,7 @@ module ChannelContents
     Piece.new(name: "the test build's settings that grant Pro or skip the free-game limit", needed_by: [TEST], apart: :all,
               marks: [/DOT_POPPER_PRO\b/, /DOT_POPPER_FREE_GAMES/, /DOT_POPPER_TODAY/, /DOT_POPPER_THEME_UNLOCKS/]),
     Piece.new(name: "the website checkout", needed_by: [TEST, Build::WEBSITE],
-              files: %w[lib/dot_popper/website_store.rb],
+              files: %w[lib/dot_popper/monetization/website_store.rb],
               marks: [/WebsiteStore/, /BrowserCheckout/, %r{dot-popper\.setdef\.com/buy}]),
     Piece.new(name: "license keys", needed_by: [TEST, Build::WEBSITE],
               files: %w[lib/dot_popper/continuity/license_key.rb lib/dot_popper/continuity/license.rb],

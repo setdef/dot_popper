@@ -55,7 +55,7 @@ class ChannelContentsTest < Minitest::Test
     assert ok, out
     assert_match %r{^the test build's part .*\n  file lib/dot_popper/test_build$}, out
     assert_match %r{  text lib/dot_popper/test_build/receipt_test_key\.rb: BEGIN PRIVATE KEY x1}, out
-    assert_match %r{^the website checkout .*\n  file lib/dot_popper/website_store\.rb$}, out
+    assert_match %r{^the website checkout .*\n  file lib/dot_popper/monetization/website_store\.rb$}, out
     assert_match(/^the Microsoft Store's license /, out)
     refute_match(/^Apple's receipts/, out)
     refute_match(/openssl_doc/, out)

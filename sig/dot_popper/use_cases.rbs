@@ -73,13 +73,13 @@ module DotPopper
     end
 
     class BuyPro
-      @store: DotPopper::_Store
+      @store: DotPopper::Monetization::_Store
       @entitlement: Monetization::Entitlement
       @game_flow: Gameplay::GameFlow
       @achievements: Gameplay::Achievements
       @friend_groups: _FriendGroups
 
-      def initialize: (store: DotPopper::_Store, entitlement: Monetization::Entitlement, game_flow: Gameplay::GameFlow, achievements: Gameplay::Achievements, friend_groups: _FriendGroups) -> void
+      def initialize: (store: DotPopper::Monetization::_Store, entitlement: Monetization::Entitlement, game_flow: Gameplay::GameFlow, achievements: Gameplay::Achievements, friend_groups: _FriendGroups) -> void
 
       def offered?: () -> bool
 

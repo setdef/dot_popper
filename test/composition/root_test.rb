@@ -10,12 +10,12 @@ require_relative "fake_engine"
 class RootTest < Minitest::Test
   include PresentationTest
 
-  Store = DotPopper::Store
-  NoStore = DotPopper::NoStore
-  NativeStore = DotPopper::NativeStore
-  FakeStore = DotPopper::FakeStore
-  WebsiteStore = DotPopper::WebsiteStore
-  FakeCheckout = DotPopper::FakeCheckout
+  Store = DotPopper::Monetization::Store
+  NoStore = DotPopper::Monetization::NoStore
+  NativeStore = DotPopper::Monetization::NativeStore
+  FakeStore = DotPopper::Monetization::FakeStore
+  WebsiteStore = DotPopper::Monetization::WebsiteStore
+  FakeCheckout = DotPopper::Monetization::FakeCheckout
 
   C = DotPopper::Continuity
   B = DotPopper::Build

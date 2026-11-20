@@ -110,9 +110,9 @@ module Inputs
       license = DotPopper::Continuity::License.new(Memory.new, pins: DotPopper::Continuity::TEST_PINS)
       @entitlement = DotPopper::Monetization::Entitlement.new(forced: pro, license:, trust: DotPopper::Receipt::TEST)
       @store = if channel
-                      DotPopper::Store.for(platform, entitlement:, native: DotPopper::FakeStore.new(Memory.new), website: -> { website(fake: false) }, channel:)
+                      DotPopper::Monetization::Store.for(platform, entitlement:, native: DotPopper::Monetization::FakeStore.new(Memory.new), website: -> { website(fake: false) }, channel:)
                     else
-                      DotPopper::Store.of_test_build(platform, entitlement:, fake: DotPopper::FakeStore.new(Memory.new), website: -> { website(fake: true) })
+                      DotPopper::Monetization::Store.of_test_build(platform, entitlement:, fake: DotPopper::Monetization::FakeStore.new(Memory.new), website: -> { website(fake: true) })
                     end
       @games = DotPopper::Monetization::FreeGames.new(Memory.new, today: -> { @day }, entitlement:, metered: store.offered?, first_games: [games_left - 3, 0].max)
       (3 - games_left.clamp(0, 3)).times { games.spend! }
@@ -167,8 +167,8 @@ module Inputs
     private
 
     def website(fake:)
-      checkout = fake ? DotPopper::FakeCheckout.new(clipboard:) : DotPopper::BrowserCheckout.new(opener:)
-      DotPopper::WebsiteStore.new(checkout:, entitlement:, gone: @gone, clipboard:)
+      checkout = fake ? DotPopper::Monetization::FakeCheckout.new(clipboard:) : DotPopper::Monetization::BrowserCheckout.new(opener:)
+      DotPopper::Monetization::WebsiteStore.new(checkout:, entitlement:, gone: @gone, clipboard:)
     end
 
     def join(session)

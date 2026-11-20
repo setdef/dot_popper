@@ -98,7 +98,7 @@ module DotPopper
       def native_store
         return @engine.store_helper(automated: settings.automated?) if platform.own_store
 
-        NativeStore.new(opener: @engine.opener, answers: @engine.store_answers)
+        Monetization::NativeStore.new(opener: @engine.opener, answers: @engine.store_answers)
       end
 
       # The server friend groups and themes use: setdef's, or while setdef
@@ -201,8 +201,8 @@ module DotPopper
 
       # The store for this build, as Store.for chooses it by the channel.
       def store_for(clipboard)
-        Store.for(platform, entitlement:, channel: settings.channel, native: native_store,
-                            website: -> { website_store(clipboard, BrowserCheckout.new(opener: @engine.opener)) })
+        Monetization::Store.for(platform, entitlement:, channel: settings.channel, native: native_store,
+                            website: -> { website_store(clipboard, Monetization::BrowserCheckout.new(opener: @engine.opener)) })
       end
 
       # A build for sale releases no theme here and has no stand-in for
@@ -244,7 +244,7 @@ module DotPopper
       # The website's store, with +checkout+: in the browser, in a build
       # for sale.
       def website_store(clipboard, checkout)
-        WebsiteStore.new(checkout:, entitlement:, gone: @gone, clipboard:, entered: -> { @watch.start })
+        Monetization::WebsiteStore.new(checkout:, entitlement:, gone: @gone, clipboard:, entered: -> { @watch.start })
       end
 
       # What asks the server which themes are released, if the game has a

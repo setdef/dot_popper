@@ -26,8 +26,8 @@ class ProKnowledgeTest < Minitest::Test
 
   # What decides Pro, which only the use cases may hold, and the
   # composition root, which holds all of it.
-  DECIDING = [DotPopper::Monetization::Entitlement, DotPopper::Monetization::FreeGames, DotPopper::Continuity::License, DotPopper::Store, DotPopper::NoStore,
-              DotPopper::WebsiteStore, DotPopper::FakeStore, DotPopper::NativeStore, DotPopper::Composition::Root].freeze
+  DECIDING = [DotPopper::Monetization::Entitlement, DotPopper::Monetization::FreeGames, DotPopper::Continuity::License, DotPopper::Monetization::Store, DotPopper::Monetization::NoStore,
+              DotPopper::Monetization::WebsiteStore, DotPopper::Monetization::FakeStore, DotPopper::Monetization::NativeStore, DotPopper::Composition::Root].freeze
 
   def test_the_presentation_holds_nothing_that_decides_pro_but_through_a_use_case
     show = game.show
@@ -59,7 +59,7 @@ class ProKnowledgeTest < Minitest::Test
     lib/dot_popper/continuity/license.rb
     lib/dot_popper/monetization/entitlement.rb
     lib/dot_popper/monetization/free_games.rb
-    lib/dot_popper/store.rb
+    lib/dot_popper/monetization/store.rb
     lib/dot_popper/test_build/fake_store.rb
     lib/dot_popper/test_build/root.rb
     lib/dot_popper/test_build/store.rb
@@ -70,7 +70,7 @@ class ProKnowledgeTest < Minitest::Test
     lib/dot_popper/use_cases/start_game.rb
     lib/dot_popper/use_cases/use_theme.rb
     lib/dot_popper/use_cases/view_achievements.rb
-    lib/dot_popper/website_store.rb
+    lib/dot_popper/monetization/website_store.rb
   ].freeze
 
   # "pro?" with anything before it (has_pro?), or the Entitlement or the

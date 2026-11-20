@@ -2,7 +2,7 @@
 
 require_relative "../presentation/presentation_helper"
 require "platforms_helper"
-require_relative "../store_contract"
+require_relative "../monetization/store_contract"
 require "dot_popper/shell/store_helper"
 require "rbconfig"
 require "tmpdir"

@@ -138,11 +138,11 @@ class CheckBuildTest < Minitest::Test
 
   def test_a_build_naming_a_test_key_fails
     stamp("mac-app-store")
-    File.write(File.join(@game, "lib/dot_popper/store.rb"), "# Continuity::TestKeys\n", mode: "a")
+    File.write(File.join(@game, "lib/dot_popper/monetization/store.rb"), "# Continuity::TestKeys\n", mode: "a")
     ok, out = check("mac-app-store")
 
     refute ok, out
-    assert_match(%r{FAIL .* holds lib/dot_popper/store\.rb, which names the test keys}, out)
+    assert_match(%r{FAIL .* holds lib/dot_popper/monetization/store\.rb, which names the test keys}, out)
   end
 
   def test_a_google_play_build_needs_the_play_key
