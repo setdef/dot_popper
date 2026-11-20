@@ -49,7 +49,7 @@ module DotPopper
     # that is pro for needs to change, since features ask only
     # Entitlement#pro?.
     CHANNELS = (
-      {} #: Hash[String, ^(entitlement: Entitlement) -> _Store]
+      {} #: Hash[String, ^(entitlement: Monetization::Entitlement) -> _Store]
     ).freeze
     # The channel this build is sold through (Build::CHANNEL).
     BUILD_CHANNEL = Build::CHANNEL

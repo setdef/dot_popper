@@ -749,12 +749,12 @@ class ShowTest < Minitest::Test
     game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2))
     show = nil
     game_flow.subscribe { show&.call(it) }
-    entitlement = DotPopper::Entitlement.free
+    entitlement = DotPopper::Monetization::Entitlement.free
     saved_stats = DotPopper::Gameplay::SavedStats.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     achievements = DotPopper::Gameplay::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     saved_themes = DotPopper::Gameplay::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     groups = DotPopper::Gameplay::Groups::Session.off
-    use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: DotPopper::FreeGames.unlimited, entitlement:, store: DotPopper::NoStore.new,
+    use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: DotPopper::Monetization::FreeGames.unlimited, entitlement:, store: DotPopper::NoStore.new,
                                                  achievements:, saved_stats:, friend_groups: groups, starter: DotPopperTest.starter_of(game_flow))
     told = []
     use_cases[:finish_game].subscribe(told.method(:<<))

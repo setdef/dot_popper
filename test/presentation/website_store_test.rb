@@ -25,7 +25,7 @@ class WebsiteStoreTest < Minitest::Test
     @gone_store = Memory.new
     @gone = C::Gone.new(@gone_store)
     @license = C::License.new(Memory.new, pins: C::TEST_PINS)
-    @entitlement = DotPopper::Entitlement.new(license: @license)
+    @entitlement = DotPopper::Monetization::Entitlement.new(license: @license)
     @entered = 0
     @store = WebsiteStore.new(checkout: FakeCheckout.new(clipboard: @clipboard), entitlement: @entitlement, gone: @gone, clipboard: @clipboard,
                               entered: -> { @entered += 1 })
@@ -240,7 +240,7 @@ class WebsiteStoreTest < Minitest::Test
 
   def test_a_stores_copy_never_shows_paste_license_key
     s = new_show(game_flow: DotPopper::Gameplay::GameFlow.new(field(1200, 800)), layout: layout(1200, 800), sounds: FakeSounds.new, radius: R,
-                 store: Store.new(port: FakeStore.new(Memory.new), entitlement: DotPopper::Entitlement.free))
+                 store: Store.new(port: FakeStore.new(Memory.new), entitlement: DotPopper::Monetization::Entitlement.free))
     open_offer(s)
 
     refute_includes names(s), :paste
@@ -250,8 +250,8 @@ class WebsiteStoreTest < Minitest::Test
 
   def test_store_for_gives_computers_the_website_and_never_ios
     website = -> { :website }
-    args = { native: :native_port, entitlement: DotPopper::Entitlement.free, website: }
-    test_build = { fake: FakeStore.new(Memory.new), entitlement: DotPopper::Entitlement.free, website: }
+    args = { native: :native_port, entitlement: DotPopper::Monetization::Entitlement.free, website: }
+    test_build = { fake: FakeStore.new(Memory.new), entitlement: DotPopper::Monetization::Entitlement.free, website: }
 
     assert_equal :website, Store.of_test_build(DotPopperTest.platform("Linux"), **test_build)
     assert_kind_of Store, Store.of_test_build(DotPopperTest.platform("Android"), **test_build)

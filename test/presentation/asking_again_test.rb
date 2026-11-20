@@ -36,7 +36,7 @@ class AskingAgainTest < Minitest::Test
     @saved_themes = DotPopper::Gameplay::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     @theme_releases = DotPopper::Gameplay::ThemeReleases.new(worker: @themes_worker, saved_themes: @saved_themes, file: DotPopper::Gameplay::ScoreRecord::Memory.new)
     @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2))
-    @show = new_show(game_flow: @game_flow, layout:, sounds: FakeSounds.new, radius: R, entitlement: DotPopper::Entitlement.new(forced: true),
+    @show = new_show(game_flow: @game_flow, layout:, sounds: FakeSounds.new, radius: R, entitlement: DotPopper::Monetization::Entitlement.new(forced: true),
                      saved_themes: @saved_themes, groups: @session)
     @theme_releases.ask
     @refresh = Refresh.new([-> { @theme_releases.ask }, -> { @session.refresh }], game_flow: @game_flow, now: -> { @now })

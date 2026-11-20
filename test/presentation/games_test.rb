@@ -24,8 +24,8 @@ class GamesTest < Minitest::Test
 
   def setup
     @day = Date.new(2026, 11, 8)
-    @entitlement = DotPopper::Entitlement.test
-    @games = DotPopper::FreeGames.new(Memory.new, today: -> { @day }, entitlement: @entitlement, first_games: 0)
+    @entitlement = DotPopper::Monetization::Entitlement.test
+    @games = DotPopper::Monetization::FreeGames.new(Memory.new, today: -> { @day }, entitlement: @entitlement, first_games: 0)
     @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(3))
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, games: @games, entitlement: @entitlement,
                      store: Store.new)
@@ -235,7 +235,7 @@ class GamesTest < Minitest::Test
     def call(_opening = nil) = (@asked += 1) && :offer
     def none_left? = true
     def left = 0
-    def daily = DotPopper::FreeGames::DAILY
+    def daily = DotPopper::Monetization::FreeGames::DAILY
   end
 
   # Every way into a game goes through the StartGame the Show is given

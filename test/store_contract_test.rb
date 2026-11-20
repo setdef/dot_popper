@@ -21,7 +21,7 @@ class FakeStoreContractTest < Minitest::Test
   def test_a_ledger_edited_to_say_owned_proves_nothing
     ledger = DotPopper::Gameplay::ScoreRecord::Memory.new
     ledger.write("owned")
-    entitlement = DotPopper::Entitlement.test
+    entitlement = DotPopper::Monetization::Entitlement.test
     front = Store.new(port: new_store(ledger:), entitlement:)
     front.connect
     settle(front) { front.price }
@@ -35,7 +35,7 @@ class FakeStoreContractTest < Minitest::Test
   def test_a_pretend_purchase_under_the_earlier_product_id_carries_over
     ledger = DotPopper::Gameplay::ScoreRecord::Memory.new
     ledger.write(DotPopper::Receipt.issue(product_id: "com.setdef.DotPopper.pro"))
-    entitlement = DotPopper::Entitlement.test
+    entitlement = DotPopper::Monetization::Entitlement.test
     front = Store.new(port: new_store(ledger:), entitlement:)
     front.connect
     settle(front) { front.price }

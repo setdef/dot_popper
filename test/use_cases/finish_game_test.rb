@@ -25,7 +25,7 @@ class FinishGameTest < Minitest::Test
   def setup
     @saved_stats = DotPopper::Gameplay::SavedStats.new(Memory.new, today: -> { Date.new(2026, 11, 13) })
     @achievements = DotPopper::Gameplay::Achievements.new(Memory.new)
-    @entitlement = DotPopper::Entitlement.new
+    @entitlement = DotPopper::Monetization::Entitlement.new
     @groups = Groups.new
     @finish = DotPopper::UseCases::FinishGame.new(saved_stats: @saved_stats, achievements: @achievements, entitlement: @entitlement,
                                                   friend_groups: @groups)
@@ -65,7 +65,7 @@ class FinishGameTest < Minitest::Test
 
   def test_a_pro_player_sees_and_reports_only_those_first_earned_in_this_game
     finish(ended, stats: stats, earned: %i[big_score])
-    pro = DotPopper::UseCases::FinishGame.new(saved_stats: @saved_stats, achievements: @achievements, entitlement: DotPopper::Entitlement.new(forced: true),
+    pro = DotPopper::UseCases::FinishGame.new(saved_stats: @saved_stats, achievements: @achievements, entitlement: DotPopper::Monetization::Entitlement.new(forced: true),
                                               friend_groups: @groups)
     result = finish(ended, by: pro, stats: stats, earned: %i[big_score blink])
 

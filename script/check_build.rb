@@ -53,7 +53,7 @@ MAKE_PROOFS = <<~RUBY
     "a key signed by the test key unlocks a test build" => c::LicenseKey.parse(keys[1])&.valid?(c::TEST_PINS) == true,
     "a test build takes a proof certified by the test root" =>
       !c::Certificate.verified(certificate, roots: c::TEST_PINS.roots, purpose: c::Certificate::PROOF).nil?,
-    "the fake store's receipt proves Pro in a test build" => DotPopper::Entitlement.new(trust: DotPopper::Receipt::TEST).verify_receipt(receipt) == true
+    "the fake store's receipt proves Pro in a test build" => DotPopper::Monetization::Entitlement.new(trust: DotPopper::Receipt::TEST).verify_receipt(receipt) == true
   }
   puts JSON.generate("roots" => c::TEST_PINS.roots.map(&hex), "license_keys" => c::TEST_PINS.license_keys.map(&hex),
                      "keys" => keys, "certificate" => hex.(certificate), "receipt" => receipt, "controls" => controls)
@@ -119,11 +119,11 @@ check.call("it takes no proof certified by the test root") do
   c::Certificate.verified([proofs.fetch("certificate")].pack("H*"), roots: pins.roots, purpose: c::Certificate::PROOF).nil?
 end
 check.call("the fake store's receipt proves nothing in it") do
-  !DotPopper::Entitlement.new(trust: DotPopper::Receipt.trusted(build::CHANNEL)).verify_receipt(proofs.fetch("receipt"))
+  !DotPopper::Monetization::Entitlement.new(trust: DotPopper::Receipt.trusted(build::CHANNEL)).verify_receipt(proofs.fetch("receipt"))
 end
 check.call("no setting grants Pro or changes the server in it") do
   env = build.settings({ "DOT_POPPER_PRO" => "1", "DOT_POPPER_SERVER" => "http://localhost:1" })
-  !DotPopper::Entitlement.forced?(env) && DotPopper::Network::Server.url(env) == DotPopper::Network::Server::SERVER_URL
+  !DotPopper::Monetization::Entitlement.forced?(env) && DotPopper::Network::Server.url(env) == DotPopper::Network::Server::SERVER_URL
 end
 
 shipped = YAML.load_file(File.join(game, "fledge.yml")).fetch("version").to_s

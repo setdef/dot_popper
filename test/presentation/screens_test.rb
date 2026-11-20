@@ -10,7 +10,7 @@ class ScreensTest < Minitest::Test
 
   def setup
     @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2))
-    @show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, entitlement: DotPopper::Entitlement.free)
+    @show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, entitlement: DotPopper::Monetization::Entitlement.free)
   end
 
   def test_the_screen_for_the_games_state_is_under_everything

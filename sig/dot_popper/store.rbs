@@ -44,7 +44,7 @@ module DotPopper
     EVERY: Float
     UNRESERVED: Regexp
     STATES: Hash[String, Symbol]
-    CHANNELS: Hash[String, ^(entitlement: Entitlement) -> _Store]
+    CHANNELS: Hash[String, ^(entitlement: Monetization::Entitlement) -> _Store]
     BUILD_CHANNEL: String?
     MAC_APP_STORE: String
     MICROSOFT_STORE: String
@@ -52,7 +52,7 @@ module DotPopper
     WEBSITE: String
 
     @port: _Port
-    @entitlement: Entitlement
+    @entitlement: Monetization::Entitlement
     @status: Symbol
     @price: String?
     @number: Integer
@@ -62,15 +62,15 @@ module DotPopper
 
     attr_reader price: String?
 
-    def self.for: (Platform platform, native: _Port, entitlement: Entitlement,
+    def self.for: (Platform platform, native: _Port, entitlement: Monetization::Entitlement,
                    ?website: (^() -> _Store)?, ?channel: String?,
-                   ?channels: Hash[String, ^(entitlement: Entitlement) -> _Store]) -> _Store
+                   ?channels: Hash[String, ^(entitlement: Monetization::Entitlement) -> _Store]) -> _Store
 
     def self.url: (Symbol | String action, Integer number, String path) -> String
 
     def self.encode: (Object value) -> String
 
-    def initialize: (port: _Port, entitlement: Entitlement) -> void
+    def initialize: (port: _Port, entitlement: Monetization::Entitlement) -> void
 
     def offered?: () -> bool
 
@@ -222,7 +222,7 @@ module DotPopper
     PRICE: String
 
     @checkout: _Checkout
-    @entitlement: Entitlement
+    @entitlement: Monetization::Entitlement
     @gone: _Gone
     @clipboard: _Clipboard
     @entered: ^() -> void
@@ -233,7 +233,7 @@ module DotPopper
 
     attr_reader typed: String
 
-    def initialize: (checkout: _Checkout, entitlement: Entitlement, gone: _Gone, clipboard: _Clipboard, ?entered: ^() -> void) -> void
+    def initialize: (checkout: _Checkout, entitlement: Monetization::Entitlement, gone: _Gone, clipboard: _Clipboard, ?entered: ^() -> void) -> void
 
     def offered?: () -> bool
 

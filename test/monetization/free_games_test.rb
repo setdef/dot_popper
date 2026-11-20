@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require_relative "test_helper"
+require_relative "../test_helper"
 
 class FreeGamesTest < Minitest::Test
-  FreeGames = DotPopper::FreeGames
+  FreeGames = DotPopper::Monetization::FreeGames
   Memory = DotPopper::Gameplay::ScoreRecord::Memory
 
   def setup
     @file = Memory.new
     @day = Date.new(2026, 11, 8)
-    @entitlement = DotPopper::Entitlement.test
+    @entitlement = DotPopper::Monetization::Entitlement.test
   end
 
   def games(metered: true, **) = FreeGames.new(@file, today: -> { @day }, entitlement: @entitlement, metered:, **)
@@ -154,7 +154,7 @@ class FreeGamesTest < Minitest::Test
   end
 
   def test_forcing_the_pro_version_counts_nothing
-    forced = DotPopper::Entitlement.new(forced: true)
+    forced = DotPopper::Monetization::Entitlement.new(forced: true)
     games = FreeGames.new(@file, today: -> { @day }, entitlement: forced)
 
     5.times { assert games.spend! }

@@ -26,7 +26,7 @@ class ProKnowledgeTest < Minitest::Test
 
   # What decides Pro, which only the use cases may hold, and the
   # composition root, which holds all of it.
-  DECIDING = [DotPopper::Entitlement, DotPopper::FreeGames, DotPopper::Continuity::License, DotPopper::Store, DotPopper::NoStore,
+  DECIDING = [DotPopper::Monetization::Entitlement, DotPopper::Monetization::FreeGames, DotPopper::Continuity::License, DotPopper::Store, DotPopper::NoStore,
               DotPopper::WebsiteStore, DotPopper::FakeStore, DotPopper::NativeStore, DotPopper::Composition::Root].freeze
 
   def test_the_presentation_holds_nothing_that_decides_pro_but_through_a_use_case
@@ -45,7 +45,7 @@ class ProKnowledgeTest < Minitest::Test
   # Entitlement outright, or in a block it keeps.
   def test_the_walk_finds_an_entitlement_held_outright_or_in_a_block
     show = game.show
-    entitlement = DotPopper::Entitlement.free
+    entitlement = DotPopper::Monetization::Entitlement.free
     show.screens[:home].instance_variable_set(:@entitlement, entitlement)
     show.screens[:stats].instance_variable_set(:@ask, -> { entitlement.pro? })
 
@@ -57,8 +57,8 @@ class ProKnowledgeTest < Minitest::Test
     lib/dot_popper/composition/root.rb
     lib/dot_popper/composition/use_cases.rb
     lib/dot_popper/continuity/license.rb
-    lib/dot_popper/entitlement.rb
-    lib/dot_popper/free_games.rb
+    lib/dot_popper/monetization/entitlement.rb
+    lib/dot_popper/monetization/free_games.rb
     lib/dot_popper/store.rb
     lib/dot_popper/test_build/fake_store.rb
     lib/dot_popper/test_build/root.rb
@@ -83,7 +83,7 @@ class ProKnowledgeTest < Minitest::Test
     knowing = Dir["#{root}/lib/**/*.rb"].select { |path| File.foreach(path).any? { it.match?(NAMES) && !it.start_with?("require") } }
     knowing = knowing.map { it.delete_prefix("#{root}/") }
 
-    assert_equal KNOWS, knowing.sort
+    assert_equal KNOWS.sort, knowing.sort
   end
 
   # Whether the player has Pro, under a use case's other names for it

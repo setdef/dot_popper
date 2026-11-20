@@ -163,7 +163,7 @@ module StoreContract
 
   def test_through_the_store_buying_unlocks_and_restoring_finds_it
     store = new_store
-    entitlement = DotPopper::Entitlement.test
+    entitlement = DotPopper::Monetization::Entitlement.test
     front = Store.new(port: store, entitlement:)
     front.connect
     settle(front) { front.price }
@@ -178,7 +178,7 @@ module StoreContract
 
     assert_equal :ready, front.status
 
-    again = DotPopper::Entitlement.test
+    again = DotPopper::Monetization::Entitlement.test
     other = Store.new(port: relaunched(store), entitlement: again)
     refute_predicate again, :pro?, "nothing is kept: a relaunch asks the store"
     other.connect
@@ -189,7 +189,7 @@ module StoreContract
 
   def test_through_the_store_a_failure_is_said_and_unlocks_nothing
     store = new_store(fails: "failed")
-    entitlement = DotPopper::Entitlement.test
+    entitlement = DotPopper::Monetization::Entitlement.test
     front = Store.new(port: store, entitlement:)
     front.connect
     settle(front) { front.price }

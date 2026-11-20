@@ -12,7 +12,7 @@ class StartGameTest < Minitest::Test
 
   def setup
     @day = Date.new(2026, 11, 8)
-    @games = DotPopper::FreeGames.new(DotPopper::Gameplay::ScoreRecord::Memory.new, today: -> { @day }, entitlement: DotPopper::Entitlement.free,
+    @games = DotPopper::Monetization::FreeGames.new(DotPopper::Gameplay::ScoreRecord::Memory.new, today: -> { @day }, entitlement: DotPopper::Monetization::Entitlement.free,
                                                                          first_games: 0, daily: 2)
     @game_flow = GameFlow.new(field, random: Random.new(3))
     @started = []
@@ -73,7 +73,7 @@ class StartGameTest < Minitest::Test
   end
 
   def test_a_game_unmetered_costs_nothing
-    games = DotPopper::FreeGames.unlimited
+    games = DotPopper::Monetization::FreeGames.unlimited
     game_flow = GameFlow.new(field, random: Random.new(3)) # one StartGame for each game_flow
     start = DotPopper::UseCases::StartGame.new(game_flow:, free_games: games)
 

@@ -17,7 +17,7 @@ class JoinOrCreateFriendGroupTest < Minitest::Test
 
   def setup = @groups = Groups.new
 
-  def joining(pro:) = DotPopper::UseCases::JoinOrCreateFriendGroup.new(groups: @groups, entitlement: DotPopper::Entitlement.new(forced: pro))
+  def joining(pro:) = DotPopper::UseCases::JoinOrCreateFriendGroup.new(groups: @groups, entitlement: DotPopper::Monetization::Entitlement.new(forced: pro))
 
   def test_pro_creates_and_joins
     pro = joining(pro: true)

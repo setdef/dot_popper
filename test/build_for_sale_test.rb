@@ -129,7 +129,7 @@ class BuildForSaleTest < Minitest::Test
   end
 
   def test_a_new_player_of_a_build_for_sale_has_the_first_free_games_and_no_more
-    first = DotPopper::FreeGames::FIRST_GAMES + DotPopper::FreeGames::DAILY
+    first = DotPopper::Monetization::FreeGames::FIRST_GAMES + DotPopper::Monetization::FreeGames::DAILY
     each_build do |_, built, where|
       next assert_nil built["games"], where unless built["offered"]
 

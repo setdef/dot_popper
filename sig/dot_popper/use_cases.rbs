@@ -5,9 +5,9 @@ module DotPopper
 
       @game_flow: Gameplay::GameFlow
       @starter: Gameplay::GameFlow::Starter
-      @free_games: FreeGames
+      @free_games: Monetization::FreeGames
 
-      def initialize: (game_flow: Gameplay::GameFlow, free_games: FreeGames, ?starter: Gameplay::GameFlow::Starter) -> void
+      def initialize: (game_flow: Gameplay::GameFlow, free_games: Monetization::FreeGames, ?starter: Gameplay::GameFlow::Starter) -> void
 
       def none_left?: () -> bool
 
@@ -29,7 +29,7 @@ module DotPopper
     class FinishGame
       @saved_stats: Gameplay::SavedStats
       @achievements: Gameplay::Achievements
-      @entitlement: Entitlement
+      @entitlement: Monetization::Entitlement
       @friend_groups: _FriendGroups
       @recorder: Gameplay::GameStats::Recorder
       @achievement_recorder: Gameplay::AchievementRecorder
@@ -39,7 +39,7 @@ module DotPopper
         def call: (Finished finished) -> void
       end
 
-      def initialize: (saved_stats: Gameplay::SavedStats, achievements: Gameplay::Achievements, entitlement: Entitlement, friend_groups: _FriendGroups) -> void
+      def initialize: (saved_stats: Gameplay::SavedStats, achievements: Gameplay::Achievements, entitlement: Monetization::Entitlement, friend_groups: _FriendGroups) -> void
 
       def subscribe: (_FinishedListener listener) -> self
 
@@ -74,12 +74,12 @@ module DotPopper
 
     class BuyPro
       @store: DotPopper::_Store
-      @entitlement: Entitlement
+      @entitlement: Monetization::Entitlement
       @game_flow: Gameplay::GameFlow
       @achievements: Gameplay::Achievements
       @friend_groups: _FriendGroups
 
-      def initialize: (store: DotPopper::_Store, entitlement: Entitlement, game_flow: Gameplay::GameFlow, achievements: Gameplay::Achievements, friend_groups: _FriendGroups) -> void
+      def initialize: (store: DotPopper::_Store, entitlement: Monetization::Entitlement, game_flow: Gameplay::GameFlow, achievements: Gameplay::Achievements, friend_groups: _FriendGroups) -> void
 
       def offered?: () -> bool
 
@@ -105,7 +105,7 @@ module DotPopper
 
       def update: (Float seconds) -> void
 
-      def call: (Entitlement::ProGranted granted) -> void
+      def call: (Monetization::Entitlement::ProGranted granted) -> void
 
       private
 
@@ -114,11 +114,11 @@ module DotPopper
 
     class UseTheme
       @saved_themes: Gameplay::SavedThemes
-      @entitlement: Entitlement
+      @entitlement: Monetization::Entitlement
 
       attr_reader current: Gameplay::theme_key
 
-      def initialize: (saved_themes: Gameplay::SavedThemes, entitlement: Entitlement) -> void
+      def initialize: (saved_themes: Gameplay::SavedThemes, entitlement: Monetization::Entitlement) -> void
 
       def choice: (Gameplay::theme_key? key) -> (:use | :same | :offer)
 
@@ -142,9 +142,9 @@ module DotPopper
 
     class JoinOrCreateFriendGroup
       @groups: _Groups
-      @entitlement: Entitlement
+      @entitlement: Monetization::Entitlement
 
-      def initialize: (groups: _Groups, entitlement: Entitlement) -> void
+      def initialize: (groups: _Groups, entitlement: Monetization::Entitlement) -> void
 
       def start: () -> (:offer | :go)
 
@@ -159,11 +159,11 @@ module DotPopper
 
     class ViewAchievements
       @achievements: Gameplay::Achievements
-      @entitlement: Entitlement
+      @entitlement: Monetization::Entitlement
       @saved_stats: Gameplay::SavedStats
       @score_record: Gameplay::ScoreRecord
 
-      def initialize: (achievements: Gameplay::Achievements, entitlement: Entitlement, saved_stats: Gameplay::SavedStats, score_record: Gameplay::ScoreRecord) -> void
+      def initialize: (achievements: Gameplay::Achievements, entitlement: Monetization::Entitlement, saved_stats: Gameplay::SavedStats, score_record: Gameplay::ScoreRecord) -> void
 
       def status: (Gameplay::Achievement::id id) -> (:earned | :not_earned | :offer)
 

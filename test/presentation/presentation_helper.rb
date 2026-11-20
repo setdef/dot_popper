@@ -56,7 +56,7 @@ module PresentationTest
   # and the offer to Pro arriving, each after them. Every Show a test makes on one
   # game flow starts its games through the game flow's one Starter. The rest
   # of +options+ go to the Show as they are.
-  def self.show(game_flow:, entitlement: DotPopper::Entitlement.free, store: DotPopper::NoStore.new, games: DotPopper::FreeGames.unlimited,
+  def self.show(game_flow:, entitlement: DotPopper::Monetization::Entitlement.free, store: DotPopper::NoStore.new, games: DotPopper::Monetization::FreeGames.unlimited,
                 saved_stats: DotPopper::Gameplay::SavedStats.new(DotPopper::Gameplay::ScoreRecord::Memory.new),
                 achievements: DotPopper::Gameplay::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new), groups: DotPopper::Gameplay::Groups::Session.off,
                 saved_themes: DotPopper::Gameplay::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new), use_theme: DotPopper::UseCases::UseTheme.new(saved_themes:, entitlement:),

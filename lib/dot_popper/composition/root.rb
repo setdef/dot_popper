@@ -86,8 +86,8 @@ module DotPopper
       # (FreeGames.metered?), starting as a developer may ask
       # (FreeGames.starting).
       def free_games(entitlement, metered:, file: file("games.txt"))
-        start = FreeGames.starting(settings.env, channel: settings.channel)
-        FreeGames.new(file, today: settings.today, entitlement:, metered:,
+        start = Monetization::FreeGames.starting(settings.env, channel: settings.channel)
+        Monetization::FreeGames.new(file, today: settings.today, entitlement:, metered:,
                              **(start ? { first_games: start, daily: start } : {}))
       end
 
@@ -148,7 +148,7 @@ module DotPopper
         pins = Continuity.pins_for(channel)
         license = Continuity::License.new(Continuity::License.kept_in(channel) { file("license.txt") }, pins:)
         @watch = watch_for(license, pins)
-        @entitlement = Entitlement.new(forced: Entitlement.forced?(settings.env, platform:), license:, trust: Receipt.trusted(channel))
+        @entitlement = Monetization::Entitlement.new(forced: Monetization::Entitlement.forced?(settings.env, platform:), license:, trust: Receipt.trusted(channel))
         clipboard = @engine.clipboard
         @server_choice = Gameplay::ServerChoice.new(file("server.txt"), gone: @gone, clipboard:)
         saved_themes = Gameplay::SavedThemes.new(file("themes.txt"))
@@ -166,7 +166,7 @@ module DotPopper
           @splash = Presentation::Splash.start(calm: settings.calm?, sounding: !@sound_player.muted?)
         end
         @store = store_for(clipboard)
-        games = free_games(entitlement, metered: FreeGames.metered?(settings.env, channel:, offered: store.offered?))
+        games = free_games(entitlement, metered: Monetization::FreeGames.metered?(settings.env, channel:, offered: store.offered?))
         @haptics = platform.buzzes? ? @engine.buzzer : Presentation::NoHaptics.new
         @sharing = Presentation::SheetSharing.for(platform, opener: @engine.opener)
         groups = groups_session

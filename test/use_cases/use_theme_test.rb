@@ -21,7 +21,7 @@ class UseThemeTest < Minitest::Test
     @saved_themes = SavedThemes.new(open: %i[plain ghost])
   end
 
-  def use_theme(pro:) = DotPopper::UseCases::UseTheme.new(saved_themes: @saved_themes, entitlement: DotPopper::Entitlement.new(forced: pro))
+  def use_theme(pro:) = DotPopper::UseCases::UseTheme.new(saved_themes: @saved_themes, entitlement: DotPopper::Monetization::Entitlement.new(forced: pro))
 
   def test_pro_uses_an_open_theme_at_once
     pro = use_theme(pro: true)
@@ -69,7 +69,7 @@ class UseThemeTest < Minitest::Test
   end
 
   def test_pro_arriving_changes_the_current_theme_only_once_it_is_taken_up
-    entitlement = DotPopper::Entitlement.test
+    entitlement = DotPopper::Monetization::Entitlement.test
     @saved_themes.use(:ghost)
     theme = DotPopper::UseCases::UseTheme.new(saved_themes: @saved_themes, entitlement:)
     entitlement.verify_receipt(DotPopper::Receipt.issue)
@@ -84,7 +84,7 @@ class UseThemeTest < Minitest::Test
   # to the ordinary one.
   def test_with_the_games_themes_a_choice_lasts_and_a_removed_one_gives_way
     file = DotPopper::Gameplay::ScoreRecord::Memory.new("unlocked: ghost jingle_bell\ntold: ghost\nchosen: jingle_bell\n")
-    pro = DotPopper::Entitlement.new(forced: true)
+    pro = DotPopper::Monetization::Entitlement.new(forced: true)
     theme = DotPopper::UseCases::UseTheme.new(saved_themes: DotPopper::Gameplay::SavedThemes.new(file), entitlement: pro)
 
     assert_equal :classic, theme.current

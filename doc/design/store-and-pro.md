@@ -21,7 +21,7 @@ Pro never changes how the game plays or scores. Join, Create, Achievements and T
 
 ### `Entitlement#pro?`
 
-Every Pro feature asks `Entitlement#pro?` (`lib/dot_popper/entitlement.rb`) and nothing else. It is true from exactly three sources:
+Every Pro feature asks `Entitlement#pro?` (`lib/dot_popper/monetization/entitlement.rb`) and nothing else. It is true from exactly three sources:
 
 1. **A receipt that verified during this run** (`Entitlement#verify_receipt`), handed over by the store. Nothing is saved: the next launch asks the store again. A receipt already refused is not checked again, since the store's answer is read four times a second.
 2. **A license key that verifies** against the pinned keys (`Continuity::License#pro?`), on a website copy.
@@ -55,7 +55,7 @@ In a store build, also:
 - free games are always metered (`FreeGames.player?` is true, so the bot and scenarios do not skip the limit);
 - an automated run still sells through the build's channel and uses the real pins, so a pipeline that wants fakes runs the test build.
 
-Tests: `test/build_test.rb`, `test/composition/root_test.rb`, `test/set_build_channel_test.rb`, `test/check_build_test.rb`, `test/build_for_sale_test.rb` (each channel's build put together in a Ruby of its own from a copy stamped for it, without what it leaves out, so the shared code's own answers are the ones tested: every other test loads the test build's part), and for the rules' own homes `test/receipt_test.rb` (`Receipt.trusted`), `test/continuity/license_test.rb` (`Continuity.pins_for`, `Continuity::License.kept_in`) and `test/free_games_test.rb` (`FreeGames.metered?`, `.player?`).
+Tests: `test/build_test.rb`, `test/composition/root_test.rb`, `test/set_build_channel_test.rb`, `test/check_build_test.rb`, `test/build_for_sale_test.rb` (each channel's build put together in a Ruby of its own from a copy stamped for it, without what it leaves out, so the shared code's own answers are the ones tested: every other test loads the test build's part), and for the rules' own homes `test/receipt_test.rb` (`Receipt.trusted`), `test/continuity/license_test.rb` (`Continuity.pins_for`, `Continuity::License.kept_in`) and `test/monetization/free_games_test.rb` (`FreeGames.metered?`, `.player?`).
 
 ### Which store each build gets
 
@@ -165,7 +165,7 @@ A `Receipt::Trust` holds the Apple roots, the Play keys, the app's ID, the produ
 
 `Receipt::PLAY_KEYS` is empty until the maintainer copies the app's licensing key from the Play Console (Monetize, Monetization setup). Until then no Google Play purchase proves Pro, and `script/check_build.rb` fails a `google-play` build.
 
-Tests: `test/receipt_test.rb` (including chains made in the test for `Receipt::Apple`), `test/entitlement_test.rb`.
+Tests: `test/receipt_test.rb` (including chains made in the test for `Receipt::Apple`), `test/monetization/entitlement_test.rb`.
 
 ## The offer
 
@@ -191,7 +191,7 @@ GUI galleries: `test/gui/scenarios/offer_gallery.rb`, `website_gallery.rb`.
 
 ## Free games
 
-`FreeGames` (`lib/dot_popper/free_games.rb`, Lota-free) counts the games a Free player may still start.
+`FreeGames` (`lib/dot_popper/monetization/free_games.rb`, Lota-free) counts the games a Free player may still start.
 
 Free play was unlimited in the brief, with Pro adding achievements, themes and friend groups, which gave a player who enjoys the game no reason tied to playing it to buy. The maintainer decided instead on your first 20 games, then 3 a day; he calls both numbers provisional, and no playtest has tested them. The limit is meant to be visible and fair: nothing hides it, nags, expires bought play, or sells a way around it (no dark patterns, `INSIPIRATION.md`), and it applies only where Pro can be bought, since a limit with no way past it is a dead end. It trusts the player's clock and files, as the other saves do, so a changed date or a deleted `games.txt` gives more games; and every way into a game must spend one in one place, since a gap there gives unlimited games.
 
@@ -206,7 +206,7 @@ Free play was unlimited in the brief, with Pro adding achievements, themes and f
 
 **What the player sees.** Home's Play has the count in its own label ("23 games left", `Words#games_left`), and with none left says Get Pro over "No games left today. 3 more tomorrow." (`Words#no_games_left`). Game Over's Play again does the same. The books: Schell (the player should always know what they have and what comes), Norman (visible state), Johnson (plain words, one name for one thing).
 
-Tests: `test/free_games_test.rb`, `test/presentation/games_test.rb`; gallery `test/gui/scenarios/games_gallery.rb`.
+Tests: `test/monetization/free_games_test.rb`, `test/presentation/games_test.rb`; gallery `test/gui/scenarios/games_gallery.rb`.
 
 ## License keys
 

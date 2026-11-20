@@ -14,7 +14,7 @@ class ThemesTest < Minitest::Test
 
   def show(pro:, released: [])
     @pro = true if pro
-    entitlement = DotPopper::Entitlement.new(forced: @pro)
+    entitlement = DotPopper::Monetization::Entitlement.new(forced: @pro)
     @saved_themes = DotPopper::Gameplay::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     @saved_themes.release(released)
     @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::Gameplay::ScoreRecord.new(DotPopper::Gameplay::ScoreRecord::Memory.new))
@@ -72,7 +72,7 @@ class ThemesTest < Minitest::Test
   # theme the player chose is put on at Home.
   def test_pro_that_arrives_in_a_game_puts_on_the_chosen_theme_only_at_home
     pro = false
-    entitlement = DotPopper::Entitlement.free
+    entitlement = DotPopper::Monetization::Entitlement.free
     entitlement.define_singleton_method(:pro?) { pro }
     @saved_themes = DotPopper::Gameplay::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     @saved_themes.release(["ghost"])

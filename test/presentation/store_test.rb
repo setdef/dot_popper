@@ -41,7 +41,7 @@ class StoreTest < Minitest::Test
   def setup
     @opener = FakeOpener.new
     @answers = FakeAnswers.new
-    @entitlement = DotPopper::Entitlement.test
+    @entitlement = DotPopper::Monetization::Entitlement.test
     @store = Store.new(port: port, entitlement: @entitlement)
   end
 
@@ -77,7 +77,7 @@ class StoreTest < Minitest::Test
     assert_nil Store::BUILD_CHANNEL
     %w[iOS Android].each do |os|
       store = Store.of_test_build(DotPopperTest.platform(os), fake:, entitlement: @entitlement)
-      games = DotPopper::FreeGames.new(DotPopper::Gameplay::ScoreRecord::Memory.new, today: -> { Date.today }, entitlement: @entitlement,
+      games = DotPopper::Monetization::FreeGames.new(DotPopper::Gameplay::ScoreRecord::Memory.new, today: -> { Date.today }, entitlement: @entitlement,
                                                                          metered: store.offered?)
 
       assert_predicate games, :metered?, os
@@ -153,7 +153,7 @@ class StoreTest < Minitest::Test
   end
   
   def test_a_receipt_the_test_key_signed_proves_nothing_in_a_store_build
-    store = Store.new(port:, entitlement: entitlement = DotPopper::Entitlement.free)
+    store = Store.new(port:, entitlement: entitlement = DotPopper::Monetization::Entitlement.free)
     store.connect
     @answers.text = "answer=1\nowned=1\nstate=ready\nprice=$1.99\nreceipt=#{RECEIPT}\n"
     store.update(Store::EVERY)
@@ -223,15 +223,15 @@ class StoreTest < Minitest::Test
   end
 
   def test_a_computer_is_free_by_default_and_the_setting_still_stands_in
-    refute DotPopper::Entitlement.forced?({}, platform: DotPopperTest.platform("Linux"))
-    refute DotPopper::Entitlement.forced?({}, platform: DotPopperTest.platform("Windows"))
-    refute DotPopper::Entitlement.forced?({}, platform: DotPopperTest.platform("OS X"))
-    assert DotPopper::Entitlement.forced?({ "DOT_POPPER_PRO" => "1" }, platform: DotPopperTest.platform("Linux"))
-    refute DotPopper::Entitlement.forced?({}, platform: DotPopperTest.platform("iOS"))
-    refute DotPopper::Entitlement.forced?({}, platform: DotPopperTest.platform("Android"))
-    refute DotPopper::Entitlement.forced?({ "DOT_POPPER_PRO" => "0" }, platform: DotPopperTest.platform("Windows"))
-    assert DotPopper::Entitlement.forced?({ "DOT_POPPER_PRO" => "1" }, platform: DotPopperTest.platform("iOS"))
-    assert DotPopper::Entitlement.forced?({ "DOT_POPPER_PRO" => "1" })
+    refute DotPopper::Monetization::Entitlement.forced?({}, platform: DotPopperTest.platform("Linux"))
+    refute DotPopper::Monetization::Entitlement.forced?({}, platform: DotPopperTest.platform("Windows"))
+    refute DotPopper::Monetization::Entitlement.forced?({}, platform: DotPopperTest.platform("OS X"))
+    assert DotPopper::Monetization::Entitlement.forced?({ "DOT_POPPER_PRO" => "1" }, platform: DotPopperTest.platform("Linux"))
+    refute DotPopper::Monetization::Entitlement.forced?({}, platform: DotPopperTest.platform("iOS"))
+    refute DotPopper::Monetization::Entitlement.forced?({}, platform: DotPopperTest.platform("Android"))
+    refute DotPopper::Monetization::Entitlement.forced?({ "DOT_POPPER_PRO" => "0" }, platform: DotPopperTest.platform("Windows"))
+    assert DotPopper::Monetization::Entitlement.forced?({ "DOT_POPPER_PRO" => "1" }, platform: DotPopperTest.platform("iOS"))
+    assert DotPopper::Monetization::Entitlement.forced?({ "DOT_POPPER_PRO" => "1" })
   end
 
   def test_a_computer_store_build_uses_its_channel_or_offers_nothing

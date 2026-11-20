@@ -28,7 +28,7 @@ class RedesignTest < Minitest::Test
     @book.record(DotPopper::Gameplay::GameStats.start.with(most_dots_in_a_row: 19), DotPopper::Gameplay::SizeClass::MEDIUM) if played
     @earned = DotPopper::Gameplay::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     new_show(game_flow: @game_flow, layout: layout(1200, 800), sounds: @sounds, radius: R, saved_stats: @book, achievements: @earned,
-             entitlement: pro ? DotPopper::Entitlement.new(forced: true) : DotPopper::Entitlement.free)
+             entitlement: pro ? DotPopper::Monetization::Entitlement.new(forced: true) : DotPopper::Monetization::Entitlement.free)
   end
 
   def middle(rect) = [rect.center_x, rect.center_y]
@@ -135,7 +135,7 @@ class RedesignTest < Minitest::Test
   # Buy goes.
   def test_a_free_tap_on_a_theme_opens_the_offer_over_themes_and_back_returns
     store = Store.new
-    entitlement = DotPopper::Entitlement.test
+    entitlement = DotPopper::Monetization::Entitlement.test
     game_flow = DotPopper::Gameplay::GameFlow.new(field(1200, 800), random: Random.new(2))
     s = new_show(game_flow:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, entitlement:, store:,
                  saved_themes: DotPopper::Gameplay::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new))

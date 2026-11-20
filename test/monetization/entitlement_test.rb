@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require_relative "test_helper"
+require_relative "../test_helper"
 
 # Pro comes only from proof checked offline, never from a stored flag
 # (ADR-0010).
 class EntitlementTest < Minitest::Test
-  Entitlement = DotPopper::Entitlement
+  Entitlement = DotPopper::Monetization::Entitlement
   Receipt = DotPopper::Receipt
 
   def test_a_new_player_is_free_until_a_receipt_verifies

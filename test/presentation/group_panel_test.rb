@@ -28,7 +28,7 @@ class GroupPanelTest < Minitest::Test
     @sounds = FakeSounds.new
     @worker = ManualWorker.new
     @session = Groups::Session.new(file: DotPopper::Gameplay::ScoreRecord::Memory.new, worker: @worker)
-    @pro = DotPopper::Entitlement.new(forced: true)
+    @pro = DotPopper::Monetization::Entitlement.new(forced: true)
     @game_flow = DotPopper::Gameplay::GameFlow.new(field)
     build
   end
@@ -110,7 +110,7 @@ class GroupPanelTest < Minitest::Test
   end
 
   def test_join_and_create_look_the_same_to_a_free_player_and_a_pro_one
-    build(entitlement: DotPopper::Entitlement.free)
+    build(entitlement: DotPopper::Monetization::Entitlement.free)
     panel.open
     free = @show.group_plan.actions.map { [it.name, it.text] }
     build(entitlement: @pro)
@@ -121,7 +121,7 @@ class GroupPanelTest < Minitest::Test
   end
 
   def test_joining_leads_a_free_player_to_the_offer_and_back_to_where_they_were
-    build(entitlement: DotPopper::Entitlement.free)
+    build(entitlement: DotPopper::Monetization::Entitlement.free)
     panel.open
     tap_control(:group_join_open)
 
@@ -138,7 +138,7 @@ class GroupPanelTest < Minitest::Test
   end
 
   def test_creating_leads_a_free_player_to_the_offer_and_starts_nothing
-    build(entitlement: DotPopper::Entitlement.free)
+    build(entitlement: DotPopper::Monetization::Entitlement.free)
     panel.open
     tap_control(:group_create)
 
@@ -155,7 +155,7 @@ class GroupPanelTest < Minitest::Test
   # offer of Pro opens instead.
   def test_joining_after_pro_is_gone_leads_to_the_offer_and_sends_nothing
     license = License.new(true)
-    build(entitlement: DotPopper::Entitlement.new(license:))
+    build(entitlement: DotPopper::Monetization::Entitlement.new(license:))
     open_join
     tap_code("2345678")
     license[:pro?] = false
@@ -171,7 +171,7 @@ class GroupPanelTest < Minitest::Test
   # comes once the code is whole (the test above).
   def test_joining_with_a_partial_code_after_pro_is_gone_ticks_low_and_opens_nothing
     license = License.new(true)
-    build(entitlement: DotPopper::Entitlement.new(license:))
+    build(entitlement: DotPopper::Monetization::Entitlement.new(license:))
     open_join
     tap_code("123")
     license[:pro?] = false
@@ -188,7 +188,7 @@ class GroupPanelTest < Minitest::Test
   def test_creating_after_pro_is_gone_leads_to_the_offer_and_sends_nothing
     license = License.new(true)
     with_notice
-    build(entitlement: DotPopper::Entitlement.new(license:), group_notice: DotPopper::Presentation::GroupNotice.new(@notice_file))
+    build(entitlement: DotPopper::Monetization::Entitlement.new(license:), group_notice: DotPopper::Presentation::GroupNotice.new(@notice_file))
     panel.open
     tap_control(:group_create)
     assert_equal :create, panel.asking
@@ -270,7 +270,7 @@ class GroupPanelTest < Minitest::Test
   def test_a_free_player_sees_the_offer_not_the_notice
     %i[group_join_open group_create].each do |pressed|
       with_notice
-      build(entitlement: DotPopper::Entitlement.free, group_notice: DotPopper::Presentation::GroupNotice.new(@notice_file))
+      build(entitlement: DotPopper::Monetization::Entitlement.free, group_notice: DotPopper::Presentation::GroupNotice.new(@notice_file))
       panel.open
       tap_control(pressed)
 
@@ -302,7 +302,7 @@ class GroupPanelTest < Minitest::Test
     tap_control(:group_leave)
 
     assert_predicate panel.hold, :held?
-    @pro = DotPopper::Entitlement.free
+    @pro = DotPopper::Monetization::Entitlement.free
     build(entitlement: @pro)
     tick
     open_privacy

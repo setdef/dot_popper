@@ -188,10 +188,10 @@ class ChannelContentsTest < Minitest::Test
     _, out = run_script("list", "app-store", @app)
 
     refute_match(/^words about the test build/, out)
-    File.write(File.join(@game, "lib/dot_popper/entitlement.rb"), "# A test build has a setting of its own.\n", mode: "a")
+    File.write(File.join(@game, "lib/dot_popper/monetization/entitlement.rb"), "# A test build has a setting of its own.\n", mode: "a")
     _, out = run_script("check", "app-store", @app)
 
-    assert_match(%r{FAIL .* holds lib/dot_popper/entitlement\.rb, which names words about the test build}, out)
+    assert_match(%r{FAIL .* holds lib/dot_popper/monetization/entitlement\.rb, which names words about the test build}, out)
   end
 
   def test_an_unknown_channel_or_a_missing_folder_is_refused

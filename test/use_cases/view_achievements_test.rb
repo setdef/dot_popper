@@ -18,7 +18,7 @@ class ViewAchievementsTest < Minitest::Test
     @score_record.record(40, DotPopper::Gameplay::SizeClass::SMALL)
   end
 
-  def view(pro:) = DotPopper::UseCases::ViewAchievements.new(achievements: @achievements, entitlement: DotPopper::Entitlement.new(forced: pro),
+  def view(pro:) = DotPopper::UseCases::ViewAchievements.new(achievements: @achievements, entitlement: DotPopper::Monetization::Entitlement.new(forced: pro),
                                                              saved_stats: @saved_stats, score_record: @score_record)
 
   def test_pro_sees_what_was_earned_when_and_how_many
