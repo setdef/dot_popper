@@ -83,7 +83,7 @@ module DotPopper
           current = key or return nil
           return nil unless reply.ok? && due.body[:secret] == @lines["secret"]
 
-          verdict = Continuity::SignedAnswers.verdict(reply.body, current.id, nonce, @pins)
+          verdict = Verdict.of(reply.body, current.id, nonce, @pins)
           case verdict
           when :current then accepted(due)
           when :moved then moved

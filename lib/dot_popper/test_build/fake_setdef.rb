@@ -15,7 +15,7 @@ module DotPopper
 
         def signed_verdict(verdict, id, nonce)
           { "key_id" => Continuity.hex(id), "verdict" => verdict, "nonce" => Continuity.hex(nonce),
-            "signature" => Continuity.hex(Ed25519.sign(TestKeys::ONLINE, verdict_message(verdict, id, nonce))),
+            "signature" => Continuity.hex(Ed25519.sign(TestKeys::ONLINE, LicenseKeys::Verdict.message(verdict, id, nonce))),
             "certificate" => Continuity.hex(TestKeys.online_certificate) }
         end
       end

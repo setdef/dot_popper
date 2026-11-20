@@ -11,4 +11,4 @@ module DotPopper
   end
 end
 
-%w[license_key license].each { require_relative "license_keys/#{it}" }
+%w[license_key verdict license].each { require_relative "license_keys/#{it}" }

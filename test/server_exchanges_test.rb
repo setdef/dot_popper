@@ -62,12 +62,12 @@ class ServerExchangesTest < Minitest::Test
   def test_the_values_both_sides_hold_are_the_servers
     values = RECORD.fetch("values")
 
-    assert_equal [C::Certificate::PROOF, C::Certificate::SIGNING_LABEL, L::LicenseKey::LABEL, C::SignedAnswers::LICENSE],
+    assert_equal [C::Certificate::PROOF, C::Certificate::SIGNING_LABEL, L::LicenseKey::LABEL, L::Verdict::LABEL],
                  values.fetch("labels").values_at("proof", "certificate", "license_key", "license_check").map { C.label(it) }
     assert_equal [C::Certificate::SIZE, C::Certificate::MAGIC, C::Certificate::VERSION], values.fetch("certificate").values_at("size", "magic", "version")
     assert_equal [L::LicenseKey::SIZE, L::LicenseKey::VERSION, L::LicenseKey::PREFIX, L::LicenseKey::ALPHABET, L::LicenseKey::LETTERS],
                  values.fetch("license_key").values_at("size", "version", "prefix", "alphabet", "letters")
-    assert_equal C::SignedAnswers::VERDICTS, values.fetch("verdicts")
+    assert_equal L::Verdict::VERDICTS, values.fetch("verdicts")
     assert_equal Groups::Unsent::HIGHEST_SCORE, values.fetch("highest_score")
     assert_equal DotPopper::Gameplay::Groups::JoinCode::LENGTH, values.fetch("join_code_digits")
     assert_equal Groups::Session::LONGEST_RETRY_WAIT, values.fetch("retry_after")
@@ -136,7 +136,7 @@ class ServerExchangesTest < Minitest::Test
     assert_predicate second, :pro?
     [entering, checking, again, elsewhere, moving].each do |answered|
       verdict = answered.dig("reply", "body", "verdict")
-      assert_equal answered["signed"], C.hex(C::SignedAnswers.verdict_message(verdict, L::LicenseKey.parse(text).id, nonce_of(answered)))
+      assert_equal answered["signed"], C.hex(L::Verdict.message(verdict, L::LicenseKey.parse(text).id, nonce_of(answered)))
     end
   end
 

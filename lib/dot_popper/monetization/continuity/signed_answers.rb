@@ -3,13 +3,12 @@
 module DotPopper
   module Monetization
     module Continuity
-      # The answers setdef's server signs with its online key, which a pinned
-      # root certifies (Certificate::PROOF). An answer that fails any check
-      # is no answer at all.
+      # The proof setdef's server signs with its online key, which a pinned
+      # root certifies (Certificate::PROOF), and that key itself, which
+      # LicenseKeys::Verdict also checks. An answer that fails any check is
+      # no answer at all.
       module SignedAnswers
         PROOF = Certificate::PROOF
-        LICENSE = Continuity.label("dot-popper/license-check/v1")
-        VERDICTS = { "current" => 1, "moved" => 0 }.freeze
 
         module_function
 
@@ -30,20 +29,8 @@ module DotPopper
           Ed25519.verify(key, signature, PROOF + nonce)
         end
 
-        # The verdict, :current or :moved, that +body+ (the parsed JSON of a
-        # 200 from POST /licenses or /license_checks) signs for the license
-        # key +id+ in answer to +nonce+, or nil.
-        def verdict(body, id, nonce, pins = PINNED)
-          return nil unless body.is_a?(Hash) && VERDICTS.key?(body["verdict"]) && body["nonce"] == Continuity.hex(nonce)
-          return nil unless body["key_id"] == Continuity.hex(id)
-
-          online = online_key(body, pins) or return nil
-          signature = Continuity.unhex(body["signature"], 64) or return nil
-          Ed25519.verify(online, signature, verdict_message(body["verdict"], id, nonce)) ? body["verdict"].to_sym : nil
-        end
-
-        def verdict_message(verdict, id, nonce) = LICENSE + nonce + id + [VERDICTS.fetch(verdict)].pack("C")
-
+        # The online key that +body+'s certificate carries, if a root of
+        # +pins+ certified it for proof.
         def online_key(body, pins)
           bytes = Continuity.unhex(body["certificate"], Certificate::SIZE) or return nil
           Certificate.verified(bytes, roots: pins.roots, purpose: PROOF)&.public_key

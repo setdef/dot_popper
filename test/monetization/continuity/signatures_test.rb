@@ -93,12 +93,12 @@ class SignaturesTest < Minitest::Test
     nonce = C::SignedAnswers.fresh
     body = C::SignedAnswers.signed_verdict("moved", id, nonce)
 
-    assert_equal :moved, C::SignedAnswers.verdict(body, id, nonce, C::TEST_PINS)
-    assert_equal :current, C::SignedAnswers.verdict(C::SignedAnswers.signed_verdict("current", id, nonce), id, nonce, C::TEST_PINS)
-    assert_nil C::SignedAnswers.verdict(body, id, C::SignedAnswers.fresh, C::TEST_PINS)
-    assert_nil C::SignedAnswers.verdict(body, Random.bytes(16), nonce, C::TEST_PINS)
-    assert_nil C::SignedAnswers.verdict(body.merge("verdict" => "current"), id, nonce, C::TEST_PINS)
-    assert_nil C::SignedAnswers.verdict(body, id, nonce, VECTOR_PINS)
+    assert_equal :moved, L::Verdict.of(body, id, nonce, C::TEST_PINS)
+    assert_equal :current, L::Verdict.of(C::SignedAnswers.signed_verdict("current", id, nonce), id, nonce, C::TEST_PINS)
+    assert_nil L::Verdict.of(body, id, C::SignedAnswers.fresh, C::TEST_PINS)
+    assert_nil L::Verdict.of(body, Random.bytes(16), nonce, C::TEST_PINS)
+    assert_nil L::Verdict.of(body.merge("verdict" => "current"), id, nonce, C::TEST_PINS)
+    assert_nil L::Verdict.of(body, id, nonce, VECTOR_PINS)
   end
 
   def test_a_store_build_pins_setdefs_real_keys_and_so_asks_the_real_server
