@@ -3,12 +3,6 @@ module DotPopper
     class SavedThemes
       GONE_DAYS: Integer
 
-      RELEASED: String
-
-      TOLD: String
-
-      CHOSEN: String
-
       @file: ::DotPopper::_SaveFile
 
       @themes: Array[Theme]
@@ -49,9 +43,30 @@ module DotPopper
 
       def read: () -> [Array[theme_key], Array[theme_key], theme_key?]
 
-      def keys: (String line) -> Array[theme_key]
-
       def save: () -> void
+    end
+
+    # What themes.txt holds (themes_file.rb).
+    class ThemesFile < ::Data
+      RELEASED: String
+
+      TOLD: String
+
+      CHOSEN: String
+
+      attr_reader released: Array[theme_key]
+
+      attr_reader told: Array[theme_key]
+
+      attr_reader chosen: theme_key?
+
+      def self.new: (released: Array[theme_key], told: Array[theme_key], chosen: theme_key?) -> instance
+
+      def self.parse: (String? text) -> ThemesFile
+
+      def self.keys: (String line) -> Array[theme_key]
+
+      def to_s: () -> String
     end
   end
 end

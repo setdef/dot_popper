@@ -14,17 +14,12 @@ module DotPopper
     # and that only Pro uses one other than the ordinary, is
     # UseCases::UseTheme's to say.
     #
-    # The save file (themes.txt) keeps three lines: "unlocked: ghost eclipse",
-    # "told: ghost", and "chosen: ghost".
+    # It reads and writes its save file, themes.txt, as a ThemesFile, and
+    # keeps of it only the themes this game knows.
     class SavedThemes
       # How long setdef must have been gone before a theme opens by its
       # date alone.
       GONE_DAYS = 180
-      # The saved word for the themes released to this device, from before
-      # themes were said to be released; kept so every saved file reads.
-      RELEASED = "unlocked"
-      TOLD = "told"
-      CHOSEN = "chosen"
 
       def initialize(file, themes: Theme::ALL)
         @file = file
@@ -105,16 +100,12 @@ module DotPopper
       def known?(key) = @themes.any? { it.key == key && !it.ordinary? }
 
       def read
-        lines = @file.read.to_s.lines.filter_map { it.split(":", 2).map(&:strip) if it.include?(":") }.to_h
+        saved = ThemesFile.parse(@file.read)
         known = @themes.map(&:key)
-        [keys(lines.fetch(RELEASED, "")) & known, keys(lines.fetch(TOLD, "")) & known, lines[CHOSEN]&.to_sym]
+        [saved.released & known, saved.told & known, saved.chosen]
       end
 
-      def keys(line) = line.split.map(&:to_sym)
-
-      def save
-        @file.write("#{RELEASED}: #{@released.join(" ")}\n#{TOLD}: #{@told.join(" ")}\n#{CHOSEN}: #{@chosen}\n")
-      end
+      def save = @file.write(ThemesFile.new(released: @released, told: @told, chosen: @chosen).to_s)
     end
   end
 end
