@@ -8,11 +8,19 @@ url="${PRIVACY_DOCUMENT_URL:-https://server.dot-popper.setdef.com/privacy_docume
 : "${PRIVACY_DOCUMENT_TOKEN:?PRIVACY_DOCUMENT_TOKEN is not set}"
 doc=doc/privacy.json
 
+# Before 1.0.0 the tag names the version, which this stamps into
+# fledge.yml and the document, here only, as every build of the tag does
+# (script/release_version.rb); from 1.0.0 on it fails unless the tagged
+# commit carries the tag's version.
+ruby script/release_version.rb stamp "$tag" > /dev/null
+
 # Regenerate, so a stale document cannot be published.
+before="$(mktemp)"
+cp "$doc" "$before"
 bundle exec rake privacy
-if ! git diff --quiet -- "$doc"; then
-  echo "::error::$doc is stale: regenerating it changed it. Commit it and re-tag."
-  git diff -- "$doc"
+if ! cmp -s "$before" "$doc"; then
+  echo "::error::$doc is stale: regenerating it changed it. Run bundle exec rake privacy, commit it, and tag again."
+  diff -u "$before" "$doc" || true
   exit 1
 fi
 
