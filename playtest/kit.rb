@@ -159,13 +159,6 @@ module Playtest
 
     def tag? = TAG.match?(ref)
 
-    # +text+, a fledge.yml, with its version: line set to this version.
-    def pin(text)
-      raise ArgumentError, "no version: line in fledge.yml" unless text.match?(/^version: /)
-
-      text.sub(/^version: .*$/, "version: #{app.inspect}")
-    end
-
     # Whether +line+, the first of a kit's build lines, names this build:
     # its ref, and the version its app was given.
     def names?(line) = line.start_with?("Dot Popper #{ref},") && line.end_with?(", version #{app}")

@@ -148,13 +148,6 @@ class PlaytestKitTest < Minitest::Test
     refute other.tag?
   end
 
-  def test_the_tags_version_replaces_fledge_ymls_and_nothing_else
-    yml = "name: Dot Popper\nversion: \"0.8.1\"\nkind: windowed\n"
-    assert_equal "name: Dot Popper\nversion: \"0.8.2\"\nkind: windowed\n",
-                 Playtest::BuildVersion.of("v0.8.2-rc.1", fallback: "0.8.1").pin(yml)
-    assert_raises(ArgumentError) { Playtest::BuildVersion.of("v1.0.0", fallback: "").pin("name: x\n") }
-  end
-
   def test_a_kits_header_must_name_the_tag_and_its_version
     version = Playtest::BuildVersion.of("v0.8.2-rc.1", fallback: "0.8.1")
     assert version.names?("Dot Popper v0.8.2-rc.1, commit 4246fd6, version 0.8.2")
@@ -162,14 +155,9 @@ class PlaytestKitTest < Minitest::Test
     refute version.names?("Dot Popper trunk, commit 4246fd6, version 0.8.2")
   end
 
-  def test_the_kit_script_pins_the_version_and_checks_the_header
+  def test_the_kit_script_checks_the_header
     Dir.mktmpdir do |dir|
-      fledge = File.join(dir, "fledge.yml")
-      File.write(fledge, "name: Dot Popper\nversion: \"0.8.1\"\n")
       script = File.expand_path("../script/playtest_kit.rb", __dir__)
-      assert_equal "0.8.2\n", IO.popen(["ruby", script, "tag-version", "v0.8.2-rc.1", fledge], &:read)
-      assert_includes File.read(fledge), "version: \"0.8.2\""
-
       build = File.join(dir, "build.txt")
       File.write(build, "Dot Popper v0.8.2-rc.1, commit abc, version 0.8.1\nFused by lota fuse\n")
       refute system("ruby", script, "check-build", "v0.8.2-rc.1", build, err: File::NULL, out: File::NULL)
