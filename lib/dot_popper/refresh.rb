@@ -15,9 +15,9 @@ module DotPopper
   # after that game does. Each of +askers+ makes the same request it makes
   # at launch, so nothing new is sent, only more often.
   #
-  # +clock+ answers the time in seconds. It is the wall clock, since the
+  # +now+ answers the time in seconds. It is the time on the wall, since the
   # frames' time stands still while the game is away, which is when the
-  # most time passes; a clock set back asks at once rather than wait.
+  # most time passes; a device whose time is set back asks at once rather than wait.
   class Refresh
     # The least time between asks, in seconds. The server limits neither
     # request; five minutes keeps a player who switches apps often to a
@@ -27,11 +27,11 @@ module DotPopper
     # it is asked at first.
     HAPPENS = "Again when the player returns to the game or to Home after a game, at most every #{Integer(FLOOR / 60)} minutes.".freeze
 
-    def initialize(askers, game_flow:, clock: -> { Time.now.to_f })
+    def initialize(askers, game_flow:, now: -> { Time.now.to_f })
       @askers = askers
       @game_flow = game_flow
-      @clock = clock
-      @asked_at = clock.call
+      @now = now
+      @asked_at = now.call
     end
 
     # The game came back to the foreground.
@@ -47,7 +47,7 @@ module DotPopper
     def ask_if_due
       return if @game_flow.playing? || @game_flow.paused?
 
-      now = @clock.call
+      now = @now.call
       elapsed = now - @asked_at
       return if elapsed >= 0 && elapsed < FLOOR
 

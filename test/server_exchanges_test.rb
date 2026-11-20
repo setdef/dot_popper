@@ -208,7 +208,7 @@ class ServerExchangesTest < Minitest::Test
     started_on = asking.dig("request", "path")[/started_on=([\d-]+)/, 1]
     themes = Themes.new
     feed = DotPopper::ThemeReleases.new(worker: InlineWorker.new(Network::Link.new(@url)), themes:,
-                                        store: DotPopper::ScoreRecord::Memory.new, clock: -> { Time.utc(*started_on.split("-").map(&:to_i), 12) })
+                                        store: DotPopper::ScoreRecord::Memory.new, now: -> { Time.utc(*started_on.split("-").map(&:to_i), 12) })
     feed.ask
     feed.update
 

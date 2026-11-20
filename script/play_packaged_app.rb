@@ -71,23 +71,23 @@ module PlayPackagedApp
     end.parse!(argv)
     abort "#{$PROGRAM_NAME} plays the Linux x86_64 app only; CI plays the others" unless RUBY_PLATFORM.match?(/x86_64-linux/)
 
-    started = clock
+    started = now
     Dir.mktmpdir("dot_popper-play") do |work|
       app = options[:archive] ? unpack(options[:archive], work) : assemble(work, options[:channel])
       play(app, work, options[:seconds])
     end
-    puts "Played the packaged app in #{(clock - started).round(1)} s."
+    puts "Played the packaged app in #{(now - started).round(1)} s."
   rescue Failure => e
     warn "play_packaged_app: #{e.message}"
     exit 1
   end
 
-  def clock = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  def now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
   def step(what)
-    started = clock
+    started = now
     result = yield
-    puts format("%-48s %6.1f s", what, clock - started)
+    puts format("%-48s %6.1f s", what, now - started)
     result
   end
 

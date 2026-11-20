@@ -8,11 +8,11 @@ module DotPopper
 
     @game_flow: GameFlow
 
-    @clock: ^() -> Float
+    @now: ^() -> Float
 
     @asked_at: Float
 
-    def initialize: (Array[^() -> void] askers, game_flow: GameFlow, ?clock: ^() -> Float) -> void
+    def initialize: (Array[^() -> void] askers, game_flow: GameFlow, ?now: ^() -> Float) -> void
 
     def came_back: () -> void
 

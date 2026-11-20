@@ -456,7 +456,7 @@ class RootTest < Minitest::Test
   def test_coming_back_asks_again_for_themes_and_groups_and_nothing_asked_once_a_start
     now = 0.0
     engine = FakeEngine.new("iOS")
-    game = Root.new(engine:, settings: DotPopper::Composition::DeveloperSettings.new(SETTINGS, channel: nil), clock: -> { now })
+    game = Root.new(engine:, settings: DotPopper::Composition::DeveloperSettings.new(SETTINGS, channel: nil), now: -> { now })
     asked = []
     game.theme_releases.define_singleton_method(:ask) { asked << :themes }
     game.show.group_panel.groups.define_singleton_method(:refresh) { asked << :groups }

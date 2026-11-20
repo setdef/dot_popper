@@ -22,23 +22,23 @@ class ThemeReleasesTest < Minitest::Test
     @dated = Memory.new
     @worker = FakeWorker.new
     @themes = DotPopper::Themes.new(@store)
-    @feed = DotPopper::ThemeReleases.new(worker: @worker, themes: @themes, store: @dated, clock: -> { Time.utc(2026, 11, 8, 12) })
+    @feed = DotPopper::ThemeReleases.new(worker: @worker, themes: @themes, store: @dated, now: -> { Time.utc(2026, 11, 8, 12) })
   end
 
   def test_sends_the_first_play_date_and_keeps_it_for_good
     @feed.ask
     assert_equal "/themes?started_on=2026-11-08", @worker.started.path
-    feed = DotPopper::ThemeReleases.new(worker: @worker, themes: @themes, store: @dated, clock: -> { Time.utc(2027, 1, 1, 12) })
+    feed = DotPopper::ThemeReleases.new(worker: @worker, themes: @themes, store: @dated, now: -> { Time.utc(2027, 1, 1, 12) })
     feed.ask
     assert_equal "/themes?started_on=2026-11-08", @worker.started.path
   end
 
   def test_sends_the_utc_date_not_the_local_one
     late_in_los_angeles = Time.new(2026, 11, 8, 20, 0, 0, "-08:00")
-    DotPopper::ThemeReleases.new(worker: @worker, themes: @themes, store: Memory.new, clock: -> { late_in_los_angeles }).ask
+    DotPopper::ThemeReleases.new(worker: @worker, themes: @themes, store: Memory.new, now: -> { late_in_los_angeles }).ask
     assert_equal "/themes?started_on=2026-11-09", @worker.started.path
     early_in_auckland = Time.new(2026, 11, 9, 5, 0, 0, "+13:00")
-    DotPopper::ThemeReleases.new(worker: @worker, themes: @themes, store: Memory.new, clock: -> { early_in_auckland }).ask
+    DotPopper::ThemeReleases.new(worker: @worker, themes: @themes, store: Memory.new, now: -> { early_in_auckland }).ask
     assert_equal "/themes?started_on=2026-11-08", @worker.started.path
   end
 

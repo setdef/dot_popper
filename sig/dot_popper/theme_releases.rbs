@@ -8,11 +8,11 @@ module DotPopper
 
     @store: ScoreRecord::_Store
 
-    @clock: ^() -> Time
+    @now: ^() -> Time
 
     def self.keys: (untyped body) -> Array[String]?
 
-    def initialize: (worker: Network::_Worker, themes: Themes, store: ScoreRecord::_Store, ?clock: ^() -> Time) -> void
+    def initialize: (worker: Network::_Worker, themes: Themes, store: ScoreRecord::_Store, ?now: ^() -> Time) -> void
 
     def started_on: () -> String
 

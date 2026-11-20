@@ -51,7 +51,7 @@ class BuildForSaleTest < Minitest::Test
                 "games" => root.show.games_line, "pro" => root.entitlement.pro?,
                 "themes.txt" => engine.file("themes.txt").read.to_s, "theme" => root.pen.theme&.key.to_s,
                 "today" => settings.today.call.to_s, "date" => Date.today.to_s,
-                "utc clock off by" => (settings.utc_clock.call - Time.now.utc).abs.round }
+                "utc now off by" => (settings.utc_now.call - Time.now.utc).abs.round }
       root.entitlement.prove(receipt)
       built["pro after a test receipt"] = root.entitlement.pro?
       root.entitlement.enter(key)
@@ -150,7 +150,7 @@ class BuildForSaleTest < Minitest::Test
   def test_a_build_for_sale_plays_on_todays_date
     each_build do |_, built, where|
       assert_equal built["date"], built["today"], where
-      assert_operator built["utc clock off by"], :<=, 60, where
+      assert_operator built["utc now off by"], :<=, 60, where
     end
   end
 

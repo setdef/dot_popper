@@ -323,7 +323,7 @@ module DotPopper
       end
 
       # Whether a mouse press is its switch chattering (Chatter), to be
-      # dropped, wherever it lands, as its release will be. Its clock is
+      # dropped, wherever it lands, as its release will be. Its time is
       # the frames' time, unclamped: the real time in play, and the
       # scenario's in the GUI suite.
       def chattered?(event)

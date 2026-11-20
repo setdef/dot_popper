@@ -8,7 +8,7 @@ module DotPopper
     #
     # Nothing is sent until the player creates or joins a group: a Session
     # with no saved token makes no connection at all. +store+ answers
-    # read and write, as a SaveFile does, and +clock+ gives the time.
+    # read and write, as a SaveFile does, and +now+ gives the time.
     #
     # It is made of parts, each with its own rules: what the game owes the
     # server (Outbox), what it last heard from it (ReadModel), each kind of
@@ -46,10 +46,10 @@ module DotPopper
 
       attr_reader :error, :token, :game_result
 
-      def initialize(store:, worker:, clock: -> { Time.now }, available: true)
+      def initialize(store:, worker:, now: -> { Time.now }, available: true)
         @store = store
         @worker = worker
-        @clock = clock
+        @now = now
         @available = available
         @waiting = []
         @running = 0
@@ -278,10 +278,10 @@ module DotPopper
         ask(Jobs::ReadHistory.new(id))
       end
 
-      def waiting_out? = (wait_until = @wait_until) ? @clock.call.to_i < wait_until : false
+      def waiting_out? = (wait_until = @wait_until) ? @now.call.to_i < wait_until : false
 
       def wait_out(seconds)
-        @wait_until = @clock.call.to_i + (seconds || USUAL_WAIT).clamp(0, LONGEST_RETRY_WAIT)
+        @wait_until = @now.call.to_i + (seconds || USUAL_WAIT).clamp(0, LONGEST_RETRY_WAIT)
       end
 
       # What every kind of job's answer means alike: no network is an error

@@ -21,7 +21,7 @@ module DotPopper
       def initialize(env = ENV, channel: Build::CHANNEL)
         @settings = Composition::DeveloperSettings.new(env, channel:)
         Automation.guard!(exit_on_attempt: true) if @settings.automated?
-        @clock = Presentation::FrameClock.start
+        @frame_clock = Presentation::FrameClock.start
       end
 
       # Builds the game (Composition::Root) on what Lota gives it, then
@@ -66,7 +66,7 @@ module DotPopper
       # Lota's frame, which Lota measured as +measured+ seconds: the game
       # moves on by the time between frames starting to draw (FrameClock).
       def tick(measured)
-        @clock, seconds = @clock.tick(::Lota::Timer.time, measured)
+        @frame_clock, seconds = @frame_clock.tick(::Lota::Timer.time, measured)
         update(seconds)
       end
 
@@ -101,7 +101,7 @@ module DotPopper
       end
 
       def draw
-        @clock = @clock.drawing(::Lota::Timer.time)
+        @frame_clock = @frame_clock.drawing(::Lota::Timer.time)
         @renderer.draw(@inputs.cursor, @splash)
       end
 

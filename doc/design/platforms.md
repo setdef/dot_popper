@@ -89,7 +89,7 @@ When Vulkan fails to start the game, the game notes the day and runs itself agai
 | Part | What it does |
 | --- | --- |
 | `Shell::RendererChoice` | The renderers (`renderers` for `t.graphics.renderers`, `excluded` for `t.graphics.excluderenderers`), and whether Vulkan may be tried (`#vulkan_allowed?`) |
-| `Shell::VulkanFailure` | The note: the day Vulkan failed, as an ISO date. It holds for 30 days (`LASTS`); `#retry_on` is the first day Vulkan is tried again. A clock set back keeps the note |
+| `Shell::VulkanFailure` | The note: the day Vulkan failed, as an ISO date. It holds for 30 days (`LASTS`); `#retry_on` is the first day Vulkan is tried again. A device whose time is set back keeps the note |
 | `Shell::Relaunch` | The command that starts the game again as it first started, or nil where there is none |
 | `Shell::VulkanRescue` | Carries them out from `conf.rb`, and tells LÖVE's failure to start a renderer from other errors by its words (`FAILED_START`, `.failed_start?`) |
 | `conf.rb`'s `Lota.errorhandler` | Hands every error to `VulkanRescue#rescue` first, and to Lota's own error screen (`super`) when it answers nil |

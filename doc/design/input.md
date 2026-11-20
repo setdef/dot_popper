@@ -164,7 +164,7 @@ A failing mouse's switch can send one click as two, a few hundredths of a second
 - Each press is timed from its button's last press, dropped or not, so a run of chatter is dropped whole.
 - A press is never held back. It is heard on its frame, or dropped. It is dropped whatever it would hit, on every screen, the splash included, so the rule never depends on whether the press would have been a mistake. The maintainer approved this as a narrow exception.
 - Only the mouse is filtered (`InputHandler#chattered?`, `#released_chatter?`). Several fingers can land together on purpose, and a gamepad's buttons do not chatter this way.
-- Its clock is the frames' unclamped time (the `InputHandler`'s, from `App#update`), so the GUI scenarios, whose frames are a sixtieth of a second of game time, play as they would.
+- Its time is the frames' unclamped time (the `InputHandler`'s, from `App#update`), so the GUI scenarios, whose frames are a sixtieth of a second of game time, play as they would.
 - When the window loses focus, no release is waited for (`Chatter#let_go`).
 - The bot (`DOT_POPPER_AUTOPLAY`) and the fake drag never come through the mouse, so they are untouched.
 

@@ -17,7 +17,7 @@ module DotPopper
         end
 
         # Midnight UTC of DOT_POPPER_TODAY's day.
-        def utc_clock
+        def utc_now
           return super if store_build?
 
           pretend = Date.iso8601(fetch("DOT_POPPER_TODAY"))

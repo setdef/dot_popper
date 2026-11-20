@@ -391,7 +391,7 @@ module DotPopper
 
       @worker: _Worker
 
-      @clock: ^() -> Time
+      @now: ^() -> Time
 
       @available: bool
 
@@ -427,7 +427,7 @@ module DotPopper
 
       attr_reader game_result: GameResult?
 
-      def initialize: (store: ScoreRecord::_Store, worker: _Worker, ?clock: ^() -> Time, ?available: bool) -> void
+      def initialize: (store: ScoreRecord::_Store, worker: _Worker, ?now: ^() -> Time, ?available: bool) -> void
 
       def available?: () -> bool
 

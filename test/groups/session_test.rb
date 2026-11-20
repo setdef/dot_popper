@@ -23,7 +23,7 @@ class SessionTest < Minitest::Test
     @session = new_session
   end
 
-  def new_session = Groups::Session.new(store: @store, worker: @worker, clock: -> { @time })
+  def new_session = Groups::Session.new(store: @store, worker: @worker, now: -> { @time })
   def pump = @session.update(quiet: true)
   def job = @worker.started.first.first
   def paths = @worker.started.map { it.first.path }

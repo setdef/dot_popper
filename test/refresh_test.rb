@@ -12,7 +12,7 @@ class RefreshTest < Minitest::Test
     @now = 1_000.0
     @asked = []
     @game_flow = GameFlow.new(field, random: Random.new(3))
-    @refresh = Refresh.new([-> { @asked << :themes }, -> { @asked << :groups }], game_flow: @game_flow, clock: -> { @now })
+    @refresh = Refresh.new([-> { @asked << :themes }, -> { @asked << :groups }], game_flow: @game_flow, now: -> { @now })
     @game_flow.subscribe(@refresh)
   end
 

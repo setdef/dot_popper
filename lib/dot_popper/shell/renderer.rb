@@ -25,7 +25,7 @@ module DotPopper
         @pen = pen
         @pile = pile
         @bloom = bloom
-        @dots = DotPainter.new(pen:, clock: -> { @show.now })
+        @dots = DotPainter.new(pen:, now: -> { @show.now })
         @effects = EffectsPainter.new(pen:, particle_systems:)
         @hud = HudPainter.new(pen:, dots: @dots)
         @huds = Presentation::HudDrawings.new(type: pen.style::TYPE, measure: show.measure)

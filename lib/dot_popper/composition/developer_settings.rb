@@ -48,7 +48,7 @@ module DotPopper
       def today = -> { Date.today }
 
       # The moment the server's dates are told from, in UTC, as a callable.
-      def utc_clock = -> { Time.now.utc }
+      def utc_now = -> { Time.now.utc }
 
       # DOT_POPPER_WINDOW=400x850: a window of that size, no smaller than
       # +smallest+, for checking a narrow screen; nil without it.

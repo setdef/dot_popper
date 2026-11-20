@@ -66,7 +66,7 @@ class RendererChoiceTest < Minitest::Test
     assert note.holds?(Date.new(2026, 12, 6))
     refute note.holds?(Date.new(2026, 12, 7))
     assert_equal Date.new(2026, 12, 7), note.retry_on
-    assert note.holds?(Date.new(2026, 1, 1)), "a clock set back keeps it"
+    assert note.holds?(Date.new(2026, 1, 1)), "a device whose time is set back keeps it"
     assert_equal "2026-11-07", note.to_s
   end
 

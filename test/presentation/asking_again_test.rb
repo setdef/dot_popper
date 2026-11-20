@@ -39,7 +39,7 @@ class AskingAgainTest < Minitest::Test
     @show = new_show(game_flow: @game_flow, layout:, sounds: FakeSounds.new, radius: R, entitlement: DotPopper::Entitlement.new(forced: true),
                      themes: @themes, groups: @session)
     @feed.ask
-    @refresh = Refresh.new([-> { @feed.ask }, -> { @session.refresh }], game_flow: @game_flow, clock: -> { @now })
+    @refresh = Refresh.new([-> { @feed.ask }, -> { @session.refresh }], game_flow: @game_flow, now: -> { @now })
     @game_flow.subscribe(@refresh)
     launch
   end

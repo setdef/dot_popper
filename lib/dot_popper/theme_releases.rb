@@ -23,18 +23,18 @@ module DotPopper
       body.filter_map { it["key"] if it.is_a?(Hash) && it["key"].is_a?(String) }
     end
 
-    def initialize(worker:, themes:, store:, clock: -> { Time.now })
+    def initialize(worker:, themes:, store:, now: -> { Time.now })
       @worker = worker
       @themes = themes
       @store = store
-      @clock = clock
+      @now = now
     end
 
     # The UTC date to send, kept once, from the first run on. It is the
     # date in UTC, not the player's own, because that is the date the
-    # server asks for (+clock+ answers a Time).
+    # server asks for (+now+ answers a Time).
     def started_on
-      @store.read.to_s.strip.empty? ? @store.write(@clock.call.getutc.to_date.iso8601) : nil
+      @store.read.to_s.strip.empty? ? @store.write(@now.call.getutc.to_date.iso8601) : nil
       @store.read.to_s.strip
     end
 

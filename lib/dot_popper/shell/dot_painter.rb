@@ -13,12 +13,12 @@ module DotPopper
     # with a bright rim and a highlight for a bright dot, a dark disc with a
     # rim and a crater for a popped one.
     #
-    # A theme's shader moves with +clock+, the game's own seconds
+    # A theme's shader moves with +now+, the game's own seconds
     # (Presentation::Show#now), never the time on the wall: a frame drawn
     # at the same moment of the game looks the same however fast the
-    # machine draws it, as the GUI scenarios, which drive that clock,
+    # machine draws it, as the GUI scenarios, which drive that time,
     # compare.
-    class DotPainter < Data.define(:pen, :clock)
+    class DotPainter < Data.define(:pen, :now)
       G = ::Lota::Graphics
       SEGMENTS = 64
 
@@ -61,7 +61,7 @@ module DotPopper
         return yield(nil) unless name
 
         pen.shading(name) do |shader|
-          pen.tick_dot_shader(shader, clock.call, [0.0, 0.0]) if pen.art
+          pen.tick_dot_shader(shader, now.call, [0.0, 0.0]) if pen.art
           yield shader
         end
       end

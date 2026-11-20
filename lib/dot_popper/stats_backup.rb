@@ -19,10 +19,10 @@ module DotPopper
     NOTE = "cleared.txt"
     BACKUP = /\A(?:score_record|stats|achievements)-\d{8}-\d{6}\.txt\z/
 
-    def initialize(score_record:, stats_book:, achievements: nil, folder: Folder.new, clock: -> { Time.now })
+    def initialize(score_record:, stats_book:, achievements: nil, folder: Folder.new, now: -> { Time.now })
       @kept = { "score_record" => score_record, "stats" => stats_book, "achievements" => achievements }.compact
       @folder = folder
-      @clock = clock
+      @now = now
       @cleared = !folder.call(NOTE).read.to_s.empty?
     end
 
@@ -59,7 +59,7 @@ module DotPopper
     def back_up(texts)
       note = @folder.call(NOTE)
       note.read.to_s.lines.filter_map { it.strip.split("=", 2).last }.grep(BACKUP).each { @folder.call(it).remove }
-      time = @clock.call
+      time = @now.call
       stamp = time.strftime("%Y%m%d-%H%M%S")
       saved = texts.filter_map do |name, text|
         next unless text

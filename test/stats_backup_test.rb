@@ -112,6 +112,6 @@ class StatsBackupTest < Minitest::Test
   def keep
     @score_record = DotPopper::ScoreRecord.new(@folder.call("score_record.txt"))
     @stats_book = DotPopper::StatsBook.new(@folder.call("stats.txt"), today: -> { @today })
-    @keeper = DotPopper::StatsBackup.new(score_record: @score_record, stats_book: @stats_book, folder: @folder, clock: -> { @time })
+    @keeper = DotPopper::StatsBackup.new(score_record: @score_record, stats_book: @stats_book, folder: @folder, now: -> { @time })
   end
 end

@@ -17,10 +17,10 @@ module DotPopper
 
     HEADER = COLUMNS.join(",")
 
-    def initialize(store, clock: -> { Time.now }, today: -> { clock.call.to_date },
+    def initialize(store, now: -> { Time.now }, today: -> { now.call.to_date },
                    archive: ->(_name) { ScoreRecord::Memory.new })
       @store = store
-      @clock = clock
+      @now = now
       @today = today
       @archive = archive
       @recorder = GameStats::Recorder.new
@@ -35,7 +35,7 @@ module DotPopper
 
     def row(ended, stats)
       goal = DailyGoal.for(@today.call)
-      [@clock.call.iso8601, ended.seed, ended.score, seconds(stats.duration), stats.dots_popped, stats.mistakes, stats.softened,
+      [@now.call.iso8601, ended.seed, ended.score, seconds(stats.duration), stats.dots_popped, stats.mistakes, stats.softened,
        seconds(stats.mean_time_to_pop), seconds(stats.longest_time_to_pop), goal, goal.met?(stats)].join(",")
     end
 
@@ -58,7 +58,7 @@ module DotPopper
     end
 
     def set_aside(old)
-      @archive.call("games-#{@clock.call.strftime("%Y%m%d-%H%M%S")}.csv").write(old)
+      @archive.call("games-#{@now.call.strftime("%Y%m%d-%H%M%S")}.csv").write(old)
     end
   end
 end

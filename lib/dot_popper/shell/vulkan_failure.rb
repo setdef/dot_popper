@@ -20,7 +20,7 @@ module DotPopper
       end
 
       # Whether the game should still start without Vulkan on +today+. A
-      # clock set back keeps the note.
+      # device whose time is set back keeps the note.
       def holds?(today) = today - day < LASTS
 
       # The first day the game tries Vulkan again.

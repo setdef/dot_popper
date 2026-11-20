@@ -32,7 +32,7 @@ module DotPopper
     # [path(name)] where the save file +name+ is, to print
     #
     # +settings+ (DeveloperSettings) are the developer settings this build obeys,
-    # and +clock+ the wall clock in seconds, which Refresh keeps its floor
+    # and +now+ the time on the wall, in seconds, which Refresh keeps its floor
     # by. Nothing here starts a thread or asks anything of the network
     # until #start.
     class Root
@@ -43,10 +43,10 @@ module DotPopper
       attr_reader :settings, :platform, :dot_size, :window, :game_flow, :show, :pen, :sound_player, :splash, :storefront,
                   :entitlement, :theme_releases, :watch, :cursor, :bot, :haptics, :sharing, :refresh
 
-      def initialize(engine:, settings: DeveloperSettings.new, clock: -> { Time.now.to_f })
+      def initialize(engine:, settings: DeveloperSettings.new, now: -> { Time.now.to_f })
         @engine = engine
         @settings = settings
-        @clock = clock
+        @now = now
         @platform = engine.platform
         @dot_size = DotSize.for(platform, unit: engine.unit)
         engine.say("a dot's radius is #{dot_size.reason}")
@@ -189,7 +189,7 @@ module DotPopper
         @game_flow.subscribe(@show)
         use_cases[:finish_game].subscribe(@show)
         entitlement.subscribe(@show.offer)
-        @refresh = Refresh.new([-> { @theme_releases&.ask }, -> { groups.refresh }], game_flow: @game_flow, clock: @clock)
+        @refresh = Refresh.new([-> { @theme_releases&.ask }, -> { groups.refresh }], game_flow: @game_flow, now: @now)
         @game_flow.subscribe(@refresh)
         @game_flow.subscribe(GamesLog.new(file(GAMES_LOG), today:, archive: ->(name) { file(name) }))
         @engine.say("each game is logged in #{@engine.path(GAMES_LOG)}")
@@ -252,7 +252,7 @@ module DotPopper
       def theme_releases_for(themes)
         url = server_url or return
         ThemeReleases.new(worker: Network::Worker.new(Network::Link.new(url)), themes:,
-                          store: file("started_on.txt"), clock: settings.utc_clock)
+                          store: file("started_on.txt"), now: settings.utc_now)
       end
     end
   end
