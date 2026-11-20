@@ -16,7 +16,6 @@ unless ENV["DOT_POPPER_OPEN_WINDOWS"] == "1"
 end
 
 require "minitest/autorun"
-require "open3"
 require "fileutils"
 require_relative "displays"
 
@@ -191,18 +190,72 @@ class GuiScenariosTest < Minitest::Test
 
   private
 
+  # How long one game may take, by the wall's clock. The scenario drives
+  # the game's own clock, so a game takes as long as its frames take to
+  # draw: under a minute on a loaded runner. One that runs past this has
+  # hung, and is stopped, with everything it started.
+  LIMIT = 300
+
   # Plays scenario +name+ and returns what it printed, after checking it
   # passed and printed each of +lines+.
   def play(name, *lines, window: "1200x800", **env)
     output, status = DISPLAYS.lend do |display|
-      Open3.capture2e(environment(name, window, env).merge("DISPLAY" => display), "bundle", "exec", "lota", "run", ".",
-                      chdir: GAME)
+      bounded(environment(name, window, env).merge("DISPLAY" => display), "bundle", "exec", "lota", "run", ".")
     end
     clean_up(output)
+    refute_nil status, "Scenario #{name} did not end within #{LIMIT} s, so it was stopped:\n#{output}"
     assert status.success?, "Scenario #{name} exited with #{status.exitstatus}:\n#{output}"
     assert_includes output, "gui: scenario #{name} passed", output
     lines.each { assert_includes output, it, "Scenario #{name} should print #{it.inspect}:\n#{output}" }
     output
+  end
+
+  # Runs +command+ in a process group of its own, to its end or LIMIT
+  # seconds, and then ends whatever of the group is left. Answers what it
+  # printed and its status, or nil for a run that was stopped.
+  def bounded(env, *command)
+    reader, writer = IO.pipe
+    group = Gem.win_platform? ? { new_pgroup: true } : { pgroup: true }
+    pid = Process.spawn(env, *command, chdir: GAME, in: File::NULL, %i[out err] => writer, **group)
+    writer.close
+    output = Thread.new { reader.read }
+    status = wait(pid, LIMIT)
+    # On Windows a finished game's number may soon be another program's.
+    stop(pid) unless status && Gem.win_platform?
+    [output.value, status]
+  ensure
+    reader&.close
+  end
+
+  def wait(pid, seconds)
+    deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + seconds
+    loop do
+      _, status = Process.wait2(pid, Process::WNOHANG)
+      return status if status
+      return nil if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
+
+      sleep 0.1
+    end
+  end
+
+  # Ends the process group +pid+ led, if anything of it is left: Lota's
+  # game is a child of `bundle exec lota run`, and may hold the output
+  # open after it. Windows has no process groups to signal, so there the
+  # tree under +pid+ is ended.
+  def stop(pid)
+    return system("taskkill", "/T", "/F", "/PID", pid.to_s, %i[out err] => File::NULL) if Gem.win_platform?
+
+    Process.kill("TERM", -pid)
+    sleep 1
+    Process.kill("KILL", -pid)
+  rescue Errno::ESRCH, Errno::EPERM
+    nil
+  ensure
+    begin
+      Process.wait(pid, Process::WNOHANG)
+    rescue Errno::ECHILD
+      nil
+    end
   end
 
   def environment(name, window, env)
