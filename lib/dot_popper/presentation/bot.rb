@@ -82,7 +82,7 @@ module DotPopper
       end
 
       # Opens "Your stats" once it is offered, and presses Back after
-      # +records_wait+; Home's own wait then starts again.
+      # +stats_wait+; Home's own wait then starts again.
       def browse(show)
         if show.stats?
           return if @waited < @style.stats_wait

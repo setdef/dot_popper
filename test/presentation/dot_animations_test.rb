@@ -63,7 +63,7 @@ class DotAnimationsTest < Minitest::Test
     assert_in_delta 0.0, @animations.pose(popped, 1.2).bright_look
   end
 
-  def test_a_wrong_tap_shudders_the_dot_then_stops
+  def test_a_mistake_shudders_the_dot_then_stops
     @animations.wobble(3, 0.0)
     popped = dot(0, 0, id: 3, popped: true)
     shaking = (1..30).map { @animations.pose(popped, it * 0.01) }

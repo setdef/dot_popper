@@ -82,15 +82,15 @@ A pop is seen to take effect when time flows again, not at the tap. The rules po
 
 ## Numbers travel from the dot
 
-Every change to the HUD is carried by an object flying from the dot that caused it to where it counts (`TutorialScene#one_by_one`, `#fly_in`, `TravelingNumber`). Each flight is a `Tally`: a signed number, with a drawn stopwatch after it for the time, or a small dot after it for the row.
+Every change to the HUD is carried by an object flying from the dot that caused it to where it counts (`TutorialScene#one_by_one`, `#fly_in`, `TravelingNumber`). Each traveling number is a `Tally`: a signed number, with a drawn stopwatch after it for the time, or a small dot after it for the row.
 
-| On | From | Flights, in turn | Colors |
+| On | From | Numbers that travel, in turn | Colors |
 | --- | --- | --- | --- |
 | The first pop | The tapped bright dot | "+1" to SCORE, "+1" and a stopwatch to TIME, "+1" and a dot to the row | Cream, then mint (`gain`) twice |
 | The guide's mistake | The popped dot | "−1" to SCORE, "−2" and a stopwatch to TIME, "−1" and a dot to the row | `alarm` |
 | The last pop | The tapped bright dot | The same three as the first pop, all at once | As the first pop |
 
-In turn means each lands before the next leaves: `gap`, 0.12 s, then `flight`, 0.42 s, for each. A flight into the HUD eases in and out and melts into its number at the end (`TravelingNumber#progress`, `#alpha`). Each number changes the HUD the moment it lands: a point gained chimes (`:tick` at pitch 1.5), a second gained ticks (`:tick` at 1.0), and a dot joining the row ticks at 1.25. On the first pop the spotlight goes with each number (`light: true`); on the mistake it stays on the dot and the guide. The object carries the cause to the effect (Johnson's common fate; Swink's feedback from the thing acted on), and one thing lands at a time (Hodent, *The Gamer's Brain*).
+In turn means each lands before the next leaves: `gap`, 0.12 s, then `flight`, 0.42 s, for each. A number traveling into the HUD eases in and out and melts into its number at the end (`TravelingNumber#progress`, `#alpha`). Each number changes the HUD the moment it lands: a point gained chimes (`:tick` at pitch 1.5), a second gained ticks (`:tick` at 1.0), and a dot joining the row ticks at 1.25. On the first pop the spotlight goes with each number (`light: true`); on the mistake it stays on the dot and the guide. The object carries the cause to the effect (Johnson's common fate; Swink's feedback from the thing acted on), and one thing lands at a time (Hodent, *The Gamer's Brain*).
 
 The mistake's cost is what the game took for the guide's press (the `MistakeMade` event, `TutorialScene#losses`), and a number already at nothing is left out; a pop's numbers are what its `Popped` event earned (`TutorialScene#gains`). The HUD shows each number as it lands, so it runs behind the game until the last lands. At that moment the score is 1, so it shows "−1"; the clock is at 11, so "−2"; the row holds one, so "−1".
 
@@ -98,7 +98,7 @@ The mistake's cost is what the game took for the guide's press (the `MistakeMade
 
 The HUD starts at score 0 and 10 seconds, with the game's own row of `Rules::BONUS.dots_in_a_row` (eight) small dots hanging under it, none lit (`Hud#counting`). There is no label and no number for the row, as in the game.
 
-- The first pop's third flight lights the row's first dot, and the row rings mint for `notice`, 0.9 s (`RowNotice`, `TutorialPainter#row_ring`).
+- The first pop's third traveling number lights the row's first dot, and the row rings mint for `notice`, 0.9 s (`RowNotice`, `TutorialPainter#row_ring`).
 - The guide's mistake empties it, and it rings in the alarm's color (`TutorialScene#empty_the_row`).
 - The last pop lights its first dot again, with no ring.
 

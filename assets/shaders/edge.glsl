@@ -2,7 +2,7 @@
 //
 // A glow along the screen's edges only, in the vertex color, fading to
 // nothing within +band+ units of the edge, so it never covers the dots
-// in the middle of the field. A wrong tap lights it.
+// in the middle of the field. A mistake lights it.
 
 uniform vec2 size; // the screen, in graphics units
 uniform float band;

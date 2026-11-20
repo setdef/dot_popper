@@ -202,8 +202,8 @@ module DotPopper
       # on its way to Play (DotPopper::Refresh).
       NEW_THEME_CARD_GRACE = 0.5
 
-      # The stacking rule, taught on the first two Game Overs after a wrong
-      # tap that had the bright dot hidden under the popped one: the tap's
+      # The stacking rule, taught on the first two Game Overs after a
+      # mistake that had the bright dot hidden under the popped one: the tap's
       # mistake replays on the pile three times, 2.4 s apart, slowly
       # enough to watch, and then the pile is left in peace.
       LESSON = LessonStyle.new(times: 2, every: 2.4, replays: 3)

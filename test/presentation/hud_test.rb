@@ -79,7 +79,7 @@ class HudTest < Minitest::Test
     assert_in_delta 1.0, hud.read(@game, 2.0).dots_in_a_row_readout.scale
   end
 
-  def test_a_wrong_tap_empties_the_dots_in_a_row_without_a_bump
+  def test_a_mistake_empties_the_dots_in_a_row_without_a_bump
     @game.instance_variable_set(:@dots_in_a_row, 5)
     hud = @hud.read(@game, 1.0)
     @game.instance_variable_set(:@dots_in_a_row, 0)

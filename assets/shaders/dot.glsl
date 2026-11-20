@@ -6,7 +6,7 @@
 //
 //   red    how bright it looks, 1 for bright and 0 for popped (between the
 //          two only while a dot changes, for a moment after it pops)
-//   green  how strongly its rim glows from a wrong tap
+//   green  how strongly its rim glows from a mistake
 //   blue   how much of a bonus dot it is, 1 for a bonus dot and 0 for
 //          an ordinary one (it fades with its bright look as it pops)
 //   alpha  how opaque the whole dot is

@@ -58,7 +58,7 @@ class BonusTest < Minitest::Test
     refute event.spawned.bonus?, "the next bright dot is an ordinary one"
   end
 
-  def test_a_wrong_tap_starts_the_count_over
+  def test_a_mistake_starts_the_count_over
     game = calm_game
     (Rules::BONUS.dots_in_a_row - 1).times { pop_next(game) }
     popped = game.dots.find(&:popped?)

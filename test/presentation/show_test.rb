@@ -558,7 +558,7 @@ class ShowTest < Minitest::Test
     assert_equal 2, @show.effects.rings.size
   end
 
-  def test_a_pop_buzzes_briefly_and_a_wrong_tap_longer
+  def test_a_pop_buzzes_briefly_and_a_mistake_longer
     haptics = FakeHaptics.new
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, random: Random.new(3), haptics:)
     start_and_pop
@@ -585,7 +585,7 @@ class ShowTest < Minitest::Test
     assert_in_delta Style::SOUND.pop_highest, @sounds.played.last.last
   end
 
-  def test_a_wrong_tap_shows_only_what_was_lost
+  def test_a_mistake_shows_only_what_was_lost
     start_and_pop
     popped = @game_flow.game.dots.first
     clear_around!(live(@game_flow), popped)
@@ -596,7 +596,7 @@ class ShowTest < Minitest::Test
     assert_operator @show.effects.flash_alpha, :>, 0
   end
 
-  def test_a_wrong_tap_at_zero_shows_only_the_seconds
+  def test_a_mistake_at_zero_shows_only_the_seconds
     start_and_pop
     score!(live(@game_flow), 0)
     popped = @game_flow.game.dots.first
@@ -606,7 +606,7 @@ class ShowTest < Minitest::Test
     assert_equal "−2s", @show.effects.floating_texts.last.text
   end
 
-  def test_a_wrong_tap_over_the_bright_dot_outlines_it
+  def test_a_mistake_over_the_bright_dot_outlines_it
     start_and_pop
     popped = @game_flow.game.dots.first
     bright = @game_flow.game.dots.find(&:bright?)
@@ -621,7 +621,7 @@ class ShowTest < Minitest::Test
 
   # The stacking rule is taught on Game Over, never in play, and only
   # after a game whose mistake had the bright dot hidden beneath.
-  def test_game_over_teaches_the_stack_after_a_wrong_tap_over_the_bright_dot
+  def test_game_over_teaches_the_stack_after_a_mistake_over_the_bright_dot
     file = DotPopper::ScoreRecord::Memory.new
     @show = new_show(game_flow: @game_flow, layout:, sounds: @sounds, radius: R, random: Random.new(3),
                      tutor: Tutor.new(file, times: 1))
@@ -654,7 +654,7 @@ class ShowTest < Minitest::Test
   # score has counted, a few times: the popped dot's shudder and alarm
   # ring, and the dashed outline of the bright dot under it, which
   # pulses. The screen never shakes, and Continue works as ever.
-  def test_game_overs_lesson_replays_the_wrong_tap_on_the_pile
+  def test_game_overs_lesson_replays_the_mistake_on_the_pile
     hide_bright_under_a_popped_dot_and_tap_it
     popped = @game_flow.game.dots.first
     bright = @game_flow.game.dots.find(&:bright?)
@@ -680,7 +680,7 @@ class ShowTest < Minitest::Test
 
   # Once the bright dot it hid has been popped, the pile can't show which
   # it was, so Game Over shows nothing, and that Game Over doesn't count.
-  def test_a_wrong_tap_whose_bright_dot_was_popped_later_teaches_nothing
+  def test_a_mistake_whose_bright_dot_was_popped_later_teaches_nothing
     file = DotPopper::ScoreRecord::Memory.new
     @show = new_show(game_flow: @game_flow, layout:, sounds: @sounds, radius: R, random: Random.new(3),
                      tutor: Tutor.new(file, times: 2))
@@ -694,7 +694,7 @@ class ShowTest < Minitest::Test
     assert_nil file.read
   end
 
-  def test_a_wrong_tap_with_the_bright_dot_elsewhere_reveals_nothing
+  def test_a_mistake_with_the_bright_dot_elsewhere_reveals_nothing
     start_and_pop
     popped = @game_flow.game.dots.first
     clear_around!(live(@game_flow), popped)

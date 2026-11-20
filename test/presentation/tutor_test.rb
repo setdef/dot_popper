@@ -37,7 +37,7 @@ class TutorTest < Minitest::Test
     assert_nil MISTAKE.among(DotPopper::Stack.new(dots: [bright])), "nor without the popped dot"
   end
   
-  def test_its_wrong_tap_replays_a_few_times_after_the_score_has_counted
+  def test_its_mistake_replays_a_few_times_after_the_score_has_counted
     style = Style::LESSON
     assert style.replay_due?(0, 0.0)
     refute style.replay_due?(1, style.every - 0.01)
