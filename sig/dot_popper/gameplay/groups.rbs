@@ -79,6 +79,23 @@ module DotPopper
         def self.parse: (untyped data) -> Member?
       end
 
+      # A join code as a player taps it in (join_code.rb).
+      class JoinCode < ::Data
+        LENGTH: Integer
+
+        attr_reader digits: String
+
+        def self.new: (digits: String) -> instance
+
+        def self.empty: () -> JoinCode
+
+        def complete?: () -> bool
+
+        def add: (String digit) -> JoinCode
+
+        def erase: () -> JoinCode
+      end
+
       class Group < ::Data
         ID: Regexp
 

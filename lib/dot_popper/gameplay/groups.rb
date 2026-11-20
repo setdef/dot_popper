@@ -10,4 +10,4 @@ module DotPopper
   end
 end
 
-%w[requests group group_file unsent known_groups jobs session].each { require_relative "groups/#{it}" }
+%w[requests join_code group group_file unsent known_groups jobs session].each { require_relative "groups/#{it}" }

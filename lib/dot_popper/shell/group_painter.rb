@@ -94,7 +94,7 @@ module DotPopper
       def code_box(show, plan)
         rect = plan.code_box or return
         panel = show.group_panel
-        places = Presentation::CodeText.places(panel.code, Presentation::GroupWords::CODE_LENGTH)
+        places = Presentation::CodeText.places(panel.code, Gameplay::Groups::JoinCode::LENGTH)
         gap = 6.0
         hyphen = rect.height * 0.35
         width = [(rect.width - hyphen - (gap * places.size)) / places.size, rect.height * 0.85].min

@@ -7,8 +7,6 @@ module DotPopper
     # Every sentence about friend groups, kept apart from Words so that
     # they read together.
     module GroupWords
-      CODE_LENGTH = 7
-
       module_function
 
       def button = "Groups"
@@ -148,7 +146,7 @@ module DotPopper
       HOLD = 2.0
       PAGES = %i[list group history join].freeze
 
-      attr_reader :groups, :code, :announcement, :hold, :note, :page, :group_id
+      attr_reader :groups, :announcement, :hold, :note, :page, :group_id
 
       def initialize(groups:, joining:, sounds:, pro_offer: ->(_feature) {}, notice: GroupNotice.read, shown: ->(_open) {},
                      open: -> { false })
@@ -162,7 +160,7 @@ module DotPopper
         @sounds = sounds
         @page = :list
         @group_id = nil
-        @code = ""
+        @code = Gameplay::Groups::JoinCode.empty
         @hold = HoldToConfirm.idle(HOLD)
         @holding = nil
         @announcement = nil
@@ -304,7 +302,10 @@ module DotPopper
       end
 
       # Whether Join can be pressed: once all seven digits are in.
-      def code_complete? = code.size == GroupWords::CODE_LENGTH
+      def code_complete? = @code.complete?
+
+      # The digits of the code typed so far.
+      def code = @code.digits
 
       # A key typed on a keyboard, on the keypad's screen: a digit adds
       # itself, Backspace or Delete takes the last one away. Says whether
@@ -409,7 +410,7 @@ module DotPopper
         return offer_pro if @joining.start == :offer
         return ask(:join) if @notice.due?
 
-        @code = ""
+        @code = Gameplay::Groups::JoinCode.empty
         show(:join)
         @sounds.play(:tick)
       end
@@ -434,14 +435,15 @@ module DotPopper
       end
 
       def tap_digit(digit)
-        return unless digit.match?(/\A\d\z/) && code.size < GroupWords::CODE_LENGTH
+        typed = @code.add(digit)
+        return if typed == @code
 
-        @code += digit
+        @code = typed
         @sounds.play(:tick)
       end
 
       def erase
-        @code = code[0...-1].to_s
+        @code = @code.erase
         @sounds.play(:tick, pitch: 0.8)
       end
 

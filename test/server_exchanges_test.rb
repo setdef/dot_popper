@@ -68,7 +68,7 @@ class ServerExchangesTest < Minitest::Test
                  values.fetch("license_key").values_at("size", "version", "prefix", "alphabet", "letters")
     assert_equal C::SignedAnswers::VERDICTS, values.fetch("verdicts")
     assert_equal Groups::Unsent::HIGHEST_SCORE, values.fetch("highest_score")
-    assert_equal DotPopper::Presentation::GroupWords::CODE_LENGTH, values.fetch("join_code_digits")
+    assert_equal DotPopper::Gameplay::Groups::JoinCode::LENGTH, values.fetch("join_code_digits")
     assert_equal Groups::Session::LONGEST_RETRY_WAIT, values.fetch("retry_after")
     assert_includes File.read(File.expand_path("../doc/server.md", __dir__)),
                     "A player can be in at most #{values.fetch("max_groups")} groups; a group holds at most #{values.fetch("max_members")} at once."
