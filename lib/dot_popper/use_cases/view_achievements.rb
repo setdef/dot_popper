@@ -7,13 +7,13 @@ module DotPopper
     # earned is Pro's (+entitlement+, Entitlement). A Free player sees how
     # each is earned; Pro also sees which are earned, the day each was,
     # how many, and how far along the four the game measures are, from
-    # Stats (+stats_book+, StatsBook) and the score records
+    # Stats (+saved_stats+, SavedStats) and the score records
     # (+score_record+, ScoreRecord).
     class ViewAchievements
-      def initialize(achievements:, entitlement:, stats_book:, score_record:)
+      def initialize(achievements:, entitlement:, saved_stats:, score_record:)
         @achievements = achievements
         @entitlement = entitlement
-        @stats_book = stats_book
+        @saved_stats = saved_stats
         @score_record = score_record
       end
 
@@ -40,7 +40,7 @@ module DotPopper
       def progress(id)
         return if locked? || @achievements.earned?(id)
 
-        records = @stats_book.stats.records.values
+        records = @saved_stats.stats.records.values
         case id
         when :steady then [most_dots_in_a_row(records), Achievement::STEADY]
         when :unshaken then [most_dots_in_a_row(records), Achievement::UNSHAKEN]

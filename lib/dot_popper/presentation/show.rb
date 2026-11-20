@@ -10,7 +10,7 @@ module DotPopper
     # itself.
     #
     # +sounds+ answers play(name, pitch:, pan:), muted?, and toggle_mute;
-    # +haptics+ answers buzz(seconds). +stats_book+ (StatsBook) adds up every
+    # +haptics+ answers buzz(seconds). +saved_stats+ (SavedStats) adds up every
     # game the device has played. +sizing_store+ keeps the player's
     # DotSizing, chosen on Home. +radius+ is the usual dot's, which
     # sizes the buttons' reach; a game's effects follow its own dots.
@@ -37,13 +37,13 @@ module DotPopper
       SIZINGS = Screens::Settings::SIZINGS
 
       attr_reader :game_flow, :effects, :animations, :hud, :attract, :layout, :home_entrance, :game_over, :sounds, :now, :style,
-                  :stats_book, :input, :words, :clock_highlight, :window
+                  :saved_stats, :input, :words, :clock_highlight, :window
 
       def initialize(game_flow:, layout:, sounds:, radius:, start_game:, finish_game:, buy_pro:, use_theme:, join_or_create_friend_group:,
-                     view_achievements:, stats_book:, achievements:, themes:, groups:, style: Style, random: Random.new, calm: false,
+                     view_achievements:, saved_stats:, achievements:, themes:, groups:, style: Style, random: Random.new, calm: false,
                      tutor: Tutor.new(ScoreRecord::Memory.new, times: style::LESSON.times), haptics: NoHaptics.new, clipboard: MemoryClipboard.new,
                      sizing_store: ScoreRecord::Memory.new, input: InputKind::MOUSE, measure: RoughMeasure.new,
-                     keeper: StatsBackup.new(score_record: game_flow.score_record, stats_book:, achievements:), notices: Notices.none,
+                     keeper: StatsBackup.new(score_record: game_flow.score_record, saved_stats:, achievements:), notices: Notices.none,
                      sharing: InGameSharing.new, tutorial_flag: TutorialFlag.never, window: NoWindowControl.new,
                      links: NoLinks.new, group_notice: GroupNotice.read, server_choice: nil)
         @game_flow = game_flow
@@ -62,7 +62,7 @@ module DotPopper
         @stack = [] # the screens open over the game's state, the top one last
         @clock_highlight = nil
         @measure = measure
-        @stats_book = stats_book
+        @saved_stats = saved_stats
         @layout = layout
         @sounds = sounds
         @haptics = haptics
@@ -87,7 +87,7 @@ module DotPopper
         @keeper = keeper
         @pointer = nil
         @hover = Hover.none
-        @screens = Screens.made_for(self, clipboard:, buy_pro:, start_game:, sharing:, view_achievements:, keeper:, stats_book:,
+        @screens = Screens.made_for(self, clipboard:, buy_pro:, start_game:, sharing:, view_achievements:, keeper:, saved_stats:,
                                           achievements:, haptics:, notices:, sizing_store:, server_choice:, themes:, use_theme:,
                                           tutorial_flag:)
       end
@@ -235,7 +235,7 @@ module DotPopper
 
       # Whether a game has finished since Stats were last cleared:
       # Home shows today's goal only then.
-      def played? = stats_book.stats.games.positive?
+      def played? = saved_stats.stats.games.positive?
 
       # What stands under Stats' heading where the two dot sizes differ:
       # "Stats for smaller dots".

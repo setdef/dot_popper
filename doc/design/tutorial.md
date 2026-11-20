@@ -37,7 +37,7 @@ The cost: the tutorial is the most tuned part of the presentation (its beats, ti
 
 ## When it opens
 
-- **A first Play.** `Show#play` opens it, over a new game started paused (`UseCases::StartGame`, `GameFlow::Starter#paused`), when `TutorialFlag#due?(played: Show#stats_offered?)` is true. It is due once on a device, and never for a player who has played: a finished game in `stats.txt` (`StatsBook`), or Stats ever cleared (`StatsBackup#cleared?`).
+- **A first Play.** `Show#play` opens it, over a new game started paused (`UseCases::StartGame`, `GameFlow::Starter#paused`), when `TutorialFlag#due?(played: Show#stats_offered?)` is true. It is due once on a device, and never for a player who has played: a finished game in `stats.txt` (`SavedStats`), or Stats ever cleared (`StatsBackup#cleared?`).
 - **How to play.** Home's How to play button, the H key, and a gamepad's Y on Home open it at once, seen or not (`Show#how_to_play`). Home shows the button only after a game has been played (`HomeLayout#pill_names`), since before that Play opens the tutorial. H works on any Home. How to play opens over a new game exactly as a first Play's tutorial does.
 - **`tutorial.txt`** says `seen` from the moment the tutorial opens, by either road, so a skipped tutorial counts as seen (`TutorialFlag#seen!`). Anything else in the file counts as unseen. The file is kept apart from Stats, so clearing Stats leaves it: clearing starts the scores over, not the player.
 - **Development.** `DOT_POPPER_TUTORIAL=1` opens it on every Play. `DOT_POPPER_AUTOPLAY`, `DOT_POPPER_SCENARIO` (the GUI scenario runner) and `DOT_POPPER_NO_TUTORIAL` leave it out (`TutorialFlag.mode`); `DOT_POPPER_TUTORIAL=1` wins over them, which is how the GUI tutorial scenarios open it.

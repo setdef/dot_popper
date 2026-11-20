@@ -74,11 +74,11 @@ module DotPopperGui
     # A returning player's Stats: a score record of 24, three days in a row of
     # today's goal, and today's met once +done+.
     def returning(done:)
-      today = show.stats_book.today
-      stats = show.stats_book.stats
+      today = show.saved_stats.today
+      stats = show.saved_stats.stats
       met = done ? today : today - 1
       streak = stats.streak.with(current: done ? 4 : 3, longest: 4, last_met: met.iso8601)
-      show.stats_book.restore(stats.with(streak:).to_text)
+      show.saved_stats.restore(stats.with(streak:).to_text)
       game_flow.score_record.restore("#{game_flow.size_class.name}=24\n#{DotPopper::SizeClass::STANDARD.name}=24\n")
       show.score_record_changed
     end

@@ -7,7 +7,7 @@ module DotPopper
   # what it could read. A store written before records were kept by class
   # gives its records to +legacy+ and is saved again at once, as ScoreRecord
   # does.
-  class StatsBook
+  class SavedStats
     attr_reader :stats
 
     def initialize(store, today: -> { Date.today }, legacy: SizeClass::MEDIUM)

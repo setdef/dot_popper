@@ -27,7 +27,7 @@ module DotPopper
     end
 
     class FinishGame
-      @stats_book: StatsBook
+      @saved_stats: SavedStats
       @achievements: Achievements
       @entitlement: Entitlement
       @friend_groups: _FriendGroups
@@ -39,7 +39,7 @@ module DotPopper
         def call: (Finished finished) -> void
       end
 
-      def initialize: (stats_book: StatsBook, achievements: Achievements, entitlement: Entitlement, friend_groups: _FriendGroups) -> void
+      def initialize: (saved_stats: SavedStats, achievements: Achievements, entitlement: Entitlement, friend_groups: _FriendGroups) -> void
 
       def subscribe: (_FinishedListener listener) -> self
 
@@ -160,10 +160,10 @@ module DotPopper
     class ViewAchievements
       @achievements: Achievements
       @entitlement: Entitlement
-      @stats_book: StatsBook
+      @saved_stats: SavedStats
       @score_record: ScoreRecord
 
-      def initialize: (achievements: Achievements, entitlement: Entitlement, stats_book: StatsBook, score_record: ScoreRecord) -> void
+      def initialize: (achievements: Achievements, entitlement: Entitlement, saved_stats: SavedStats, score_record: ScoreRecord) -> void
 
       def status: (Achievement::id id) -> (:earned | :not_earned | :offer)
 

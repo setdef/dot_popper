@@ -247,9 +247,9 @@ class ShowTest < Minitest::Test
     start_and_pop
     @game_flow.update(20)
 
-    assert_equal 1, @show.stats_book.stats.games
-    assert_equal 1, @show.stats_book.stats.dots_popped
-    assert_equal [1], @show.stats_book.stats.recent
+    assert_equal 1, @show.saved_stats.stats.games
+    assert_equal 1, @show.saved_stats.stats.dots_popped
+    assert_equal [1], @show.saved_stats.stats.recent
   end
 
   def test_game_over_names_the_score_record_record_the_game_set
@@ -269,8 +269,8 @@ class ShowTest < Minitest::Test
 
   # 2026-11-01's goal is to pop 10 bright dots in the first 10 seconds.
   def test_the_game_that_meets_todays_goal_celebrates_it_once_the_score_has_counted
-    stats_book = DotPopper::StatsBook.new(DotPopper::ScoreRecord::Memory.new, today: -> { Date.new(2026, 11, 1) })
-    show = new_show(game_flow: @game_flow, layout:, sounds: @sounds, radius: R, random: Random.new(3), stats_book:)
+    saved_stats = DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new, today: -> { Date.new(2026, 11, 1) })
+    show = new_show(game_flow: @game_flow, layout:, sounds: @sounds, radius: R, random: Random.new(3), saved_stats:)
     press_main(show)
     10.times do
       bright = @game_flow.game.dots.find(&:bright?)
@@ -283,7 +283,7 @@ class ShowTest < Minitest::Test
     refute show.game_over.goal_due?(show.now), "not before the score has counted"
     show.update(Style::GAME_OVER.tally.duration)
     assert show.game_over.goal_celebrated
-    assert stats_book.goal_done?
+    assert saved_stats.goal_done?
   end
 
   def test_continue_goes_on_once_the_grace_is_over_and_empty_space_never_does
@@ -750,15 +750,15 @@ class ShowTest < Minitest::Test
     show = nil
     game_flow.subscribe { show&.call(it) }
     entitlement = DotPopper::Entitlement.free
-    stats_book = DotPopper::StatsBook.new(DotPopper::ScoreRecord::Memory.new)
+    saved_stats = DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new)
     achievements = DotPopper::Achievements.new(DotPopper::ScoreRecord::Memory.new)
     themes = DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new)
     groups = DotPopper::Groups::Session.off
     use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: DotPopper::FreeGames.unlimited, entitlement:, store: DotPopper::NoStore.new,
-                                                 achievements:, stats_book:, friend_groups: groups, starter: DotPopperTest.starter_of(game_flow))
+                                                 achievements:, saved_stats:, friend_groups: groups, starter: DotPopperTest.starter_of(game_flow))
     told = []
     use_cases[:finish_game].subscribe(told.method(:<<))
-    show = Show.new(game_flow:, layout:, sounds: FakeSounds.new, radius: R, stats_book:, achievements:, themes:, groups:,
+    show = Show.new(game_flow:, layout:, sounds: FakeSounds.new, radius: R, saved_stats:, achievements:, themes:, groups:,
                     use_theme: DotPopper::UseCases::UseTheme.new(themes:, entitlement:), **use_cases)
     use_cases[:finish_game].subscribe(show)
     [0, 3].each do |taps|

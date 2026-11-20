@@ -23,11 +23,11 @@ class FinishGameTest < Minitest::Test
   end
 
   def setup
-    @stats_book = DotPopper::StatsBook.new(Memory.new, today: -> { Date.new(2026, 11, 13) })
+    @saved_stats = DotPopper::SavedStats.new(Memory.new, today: -> { Date.new(2026, 11, 13) })
     @achievements = DotPopper::Achievements.new(Memory.new)
     @entitlement = DotPopper::Entitlement.new
     @groups = Groups.new
-    @finish = DotPopper::UseCases::FinishGame.new(stats_book: @stats_book, achievements: @achievements, entitlement: @entitlement,
+    @finish = DotPopper::UseCases::FinishGame.new(saved_stats: @saved_stats, achievements: @achievements, entitlement: @entitlement,
                                                   friend_groups: @groups)
   end
 
@@ -36,14 +36,14 @@ class FinishGameTest < Minitest::Test
   def test_a_game_is_finished_only_as_its_end_is_heard
     assert_raises(NoMethodError) { @finish.finish(ended, stats: stats) }
     assert_equal %i[call stats subscribe], DotPopper::UseCases::FinishGame.public_instance_methods(false).sort
-    assert_equal 0, @stats_book.stats.games
+    assert_equal 0, @saved_stats.stats.games
   end
 
   def test_the_game_goes_into_stats
     finish(ended, stats: stats(dots_popped: 3))
 
-    assert_equal 1, @stats_book.stats.games
-    assert_equal 3, @stats_book.stats.dots_popped
+    assert_equal 1, @saved_stats.stats.games
+    assert_equal 3, @saved_stats.stats.dots_popped
   end
 
   def test_game_over_names_the_most_impressive_record_the_game_set
@@ -65,7 +65,7 @@ class FinishGameTest < Minitest::Test
 
   def test_a_pro_player_sees_and_reports_only_those_first_earned_in_this_game
     finish(ended, stats: stats, earned: %i[big_score])
-    pro = DotPopper::UseCases::FinishGame.new(stats_book: @stats_book, achievements: @achievements, entitlement: DotPopper::Entitlement.new(forced: true),
+    pro = DotPopper::UseCases::FinishGame.new(saved_stats: @saved_stats, achievements: @achievements, entitlement: DotPopper::Entitlement.new(forced: true),
                                               friend_groups: @groups)
     result = finish(ended, by: pro, stats: stats, earned: %i[big_score blink])
 
@@ -97,7 +97,7 @@ class FinishGameTest < Minitest::Test
     game_flow.press(0, 0)
     play.(-> { start_paused!(game_flow, DotPopper::Stack.new(dots: [dot(300, 300, id: 0)])).unpause })
 
-    assert_equal 2, @stats_book.stats.games
+    assert_equal 2, @saved_stats.stats.games
     assert_equal [true, false], @groups.games.map(&:last), "the tutorial's game never counts"
     assert_equal game_flow.game.score, @finish.stats.score
     assert_equal [[], []], told.map { it.result.achievements }
@@ -110,7 +110,7 @@ class FinishGameTest < Minitest::Test
     game_flow = DotPopper::GameFlow.new(field, random: Random.new(3))
     told = []
     heard = []
-    @finish.subscribe(->(finished) { told << [finished, @stats_book.stats.games] })
+    @finish.subscribe(->(finished) { told << [finished, @saved_stats.stats.games] })
     game_flow.subscribe(@finish)
     game_flow.subscribe { heard << it if it.is_a?(DotPopper::Events::GameEnded) }
     2.times do

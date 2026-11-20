@@ -72,7 +72,7 @@ class PrivacyDeclaredTest < Minitest::Test
   def test_dated_names_match_their_patterns
     backups = []
     folder = ->(name) { backups << name; DotPopper::ScoreRecord::Memory.new }
-    keeper = DotPopper::StatsBackup.new(score_record: memory("1"), stats_book: memory("2"), achievements: memory("3"), folder:)
+    keeper = DotPopper::StatsBackup.new(score_record: memory("1"), saved_stats: memory("2"), achievements: memory("3"), folder:)
     keeper.clear
     made = backups.grep(/\d{8}/)
 

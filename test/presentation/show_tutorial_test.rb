@@ -14,7 +14,7 @@ class ShowTutorialTest < Minitest::Test
     @sounds = FakeSounds.new
     @store = DotPopper::ScoreRecord::Memory.new
     @score_record = DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new)
-    @stats_book = DotPopper::StatsBook.new(DotPopper::ScoreRecord::Memory.new)
+    @saved_stats = DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new)
     @game_flow = DotPopper::GameFlow.new(field, score_record: @score_record, random: Random.new(2))
     @events = []
     @game_flow.subscribe { @events << it.class }
@@ -49,7 +49,7 @@ class ShowTutorialTest < Minitest::Test
     assert_equal [1, 10], [@show.hud.score, @show.hud.seconds], "the HUD shows the same numbers"
     assert_equal [1, 1], [game.dots_in_a_row, @show.hud.dots_in_a_row], "and the row goes on as the player left it"
     assert_same scene.animations, @show.animations, "and the dots are drawn as they were"
-    assert_equal 0, @stats_book.stats.games
+    assert_equal 0, @saved_stats.stats.games
     assert_equal [DotPopper::Events::GameStarted], @events.uniq - [DotPopper::Events::HomeShown]
   end
 
@@ -57,7 +57,7 @@ class ShowTutorialTest < Minitest::Test
     play_through
     update_for(0.1) until @show.game_over?
 
-    assert_equal 1, @stats_book.stats.games
+    assert_equal 1, @saved_stats.stats.games
     assert_operator @show.game_stats.dots_popped, :>=, 2, "its two dots popped are the game's"
     assert_equal @game_flow.game.score, @show.game_stats.score
     assert_equal @game_flow.game.score, @score_record.of(@game_flow.size_class)
@@ -217,7 +217,7 @@ class ShowTutorialTest < Minitest::Test
   def test_it_never_opens_again_not_even_after_the_stats_are_cleared
     play_through
     finish_game
-    keeper = DotPopper::StatsBackup.new(score_record: @score_record, stats_book: @stats_book)
+    keeper = DotPopper::StatsBackup.new(score_record: @score_record, saved_stats: @saved_stats)
     keeper.clear
     @show = show(keeper:)
     press_main
@@ -227,7 +227,7 @@ class ShowTutorialTest < Minitest::Test
   end
 
   def test_a_player_who_has_played_before_goes_straight_to_the_game
-    @stats_book.record(DotPopper::GameStats.start.with(dots_popped: 3, duration: 13.0, score: 3), DotPopper::SizeClass::MEDIUM)
+    @saved_stats.record(DotPopper::GameStats.start.with(dots_popped: 3, duration: 13.0, score: 3), DotPopper::SizeClass::MEDIUM)
     press_main
 
     refute @show.tutorial?
@@ -289,8 +289,8 @@ class ShowTutorialTest < Minitest::Test
 
   private
 
-  def show(keeper: DotPopper::StatsBackup.new(score_record: @score_record, stats_book: @stats_book))
-    new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, random: Random.new(3), stats_book: @stats_book,
+  def show(keeper: DotPopper::StatsBackup.new(score_record: @score_record, saved_stats: @saved_stats))
+    new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, random: Random.new(3), saved_stats: @saved_stats,
              keeper:, tutorial_flag: TutorialFlag.new(@store))
   end
 

@@ -4,16 +4,16 @@ module DotPopper
   module Presentation
     module Screens
       # Stats, over Home (StatsLayout): the sheet of every game's numbers
-      # from +stats_book+ and the +achievements+, Back, and "Clear my
+      # from +saved_stats+ and the +achievements+, Back, and "Clear my
       # stats…", held to clear them through +keeper+ (StatsBackup), or
       # Undo for a while after.
       class Stats < Page
         include Scrolling
 
-        def initialize(show, keeper:, stats_book:, achievements:, haptics:)
+        def initialize(show, keeper:, saved_stats:, achievements:, haptics:)
           super(show)
           @keeper = keeper
-          @stats_book = stats_book
+          @saved_stats = saved_stats
           @achievements = achievements
           @haptics = haptics
           @sheet = nil
@@ -131,7 +131,7 @@ module DotPopper
         def build_sheet
           game_flow = show.game_flow
           size_class = game_flow.size_class
-          StatsSheet.build(@stats_book.stats, score_record: game_flow.score_record.of(size_class), words:, streak: @stats_book.streak,
+          StatsSheet.build(@saved_stats.stats, score_record: game_flow.score_record.of(size_class), words:, streak: @saved_stats.streak,
                                               size_class:, achievements: @achievements)
         end
       end

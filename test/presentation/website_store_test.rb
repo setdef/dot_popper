@@ -34,9 +34,9 @@ class WebsiteStoreTest < Minitest::Test
 
   def show
     game_flow = DotPopper::GameFlow.new(field(1200, 800), random: Random.new(2))
-    book = DotPopper::StatsBook.new(Memory.new)
+    book = DotPopper::SavedStats.new(Memory.new)
     book.record(DotPopper::GameStats.start, DotPopper::SizeClass::MEDIUM)
-    new_show(game_flow:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, stats_book: book, clipboard: @clipboard,
+    new_show(game_flow:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, saved_stats: book, clipboard: @clipboard,
              entitlement: @entitlement, storefront: @store, server_choice: @choice)
   end
 

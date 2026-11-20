@@ -1,5 +1,5 @@
 module DotPopper
-  class StatsBook
+  class SavedStats
     attr_reader stats: Stats
 
     @store: ScoreRecord::_Store

@@ -2,7 +2,7 @@
 
 module DotPopper
   # Clears the player's Stats, and brings them back: the ScoreRecord and
-  # the StatsBook, the two stores that hold every record, total, chart bar,
+  # the SavedStats, the two stores that hold every record, total, chart bar,
   # and goal streak, and the Achievements, the achievements earned, which are
   # part of what the player did as much as a record is. Nothing else is
   # cleared, so the games log, the settings, what the game has taught,
@@ -19,8 +19,8 @@ module DotPopper
     NOTE = "cleared.txt"
     BACKUP = /\A(?:score_record|stats|achievements)-\d{8}-\d{6}\.txt\z/
 
-    def initialize(score_record:, stats_book:, achievements: nil, folder: Folder.new, now: -> { Time.now })
-      @kept = { "score_record" => score_record, "stats" => stats_book, "achievements" => achievements }.compact
+    def initialize(score_record:, saved_stats:, achievements: nil, folder: Folder.new, now: -> { Time.now })
+      @kept = { "score_record" => score_record, "stats" => saved_stats, "achievements" => achievements }.compact
       @folder = folder
       @now = now
       @cleared = !folder.call(NOTE).read.to_s.empty?

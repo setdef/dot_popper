@@ -13,18 +13,18 @@ module DotPopper
     # and the sound player take the current theme from it before anything
     # is drawn. +starter+ is the game flow's one Starter, which StartGame
     # holds.
-    def self.use_cases(game_flow:, free_games:, entitlement:, store:, achievements:, stats_book:, friend_groups:,
+    def self.use_cases(game_flow:, free_games:, entitlement:, store:, achievements:, saved_stats:, friend_groups:,
                        starter: game_flow.starter)
       buy_pro = UseCases::BuyPro.new(store:, entitlement:, game_flow:, achievements:, friend_groups:)
       entitlement.subscribe(buy_pro)
-      finish_game = UseCases::FinishGame.new(stats_book:, achievements:, entitlement:, friend_groups:)
+      finish_game = UseCases::FinishGame.new(saved_stats:, achievements:, entitlement:, friend_groups:)
       game_flow.subscribe(finish_game)
       {
         start_game: UseCases::StartGame.new(game_flow:, free_games:, starter:),
         finish_game:,
         buy_pro:,
         join_or_create_friend_group: UseCases::JoinOrCreateFriendGroup.new(groups: friend_groups, entitlement:),
-        view_achievements: UseCases::ViewAchievements.new(achievements:, entitlement:, stats_book:, score_record: game_flow.score_record)
+        view_achievements: UseCases::ViewAchievements.new(achievements:, entitlement:, saved_stats:, score_record: game_flow.score_record)
       }
     end
   end

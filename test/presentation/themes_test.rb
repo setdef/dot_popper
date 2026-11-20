@@ -19,7 +19,7 @@ class ThemesTest < Minitest::Test
     @themes.release(unlocked)
     @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new))
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, entitlement:, themes: @themes,
-                     stats_book: DotPopper::StatsBook.new(DotPopper::ScoreRecord::Memory.new, today: -> { @day }))
+                     saved_stats: DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new, today: -> { @day }))
     settle
   end
 

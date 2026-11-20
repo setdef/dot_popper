@@ -57,13 +57,13 @@ module PresentationTest
   # game flow starts its games through the game flow's one Starter. The rest
   # of +options+ go to the Show as they are.
   def self.show(game_flow:, entitlement: DotPopper::Entitlement.free, storefront: DotPopper::NoStore.new, games: DotPopper::FreeGames.unlimited,
-                stats_book: DotPopper::StatsBook.new(DotPopper::ScoreRecord::Memory.new),
+                saved_stats: DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new),
                 achievements: DotPopper::Achievements.new(DotPopper::ScoreRecord::Memory.new), groups: DotPopper::Groups::Session.off,
                 themes: DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new), use_theme: DotPopper::UseCases::UseTheme.new(themes:, entitlement:),
                 **options)
-    use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: games, entitlement:, store: storefront, achievements:, stats_book:,
+    use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: games, entitlement:, store: storefront, achievements:, saved_stats:,
                                                  friend_groups: groups, starter: DotPopperTest.starter_of(game_flow))
-    show = Show.new(game_flow:, stats_book:, achievements:, groups:, themes:, use_theme:, **use_cases, **options)
+    show = Show.new(game_flow:, saved_stats:, achievements:, groups:, themes:, use_theme:, **use_cases, **options)
     game_flow.subscribe(show)
     use_cases[:finish_game].subscribe(show)
     entitlement.subscribe(show.offer)

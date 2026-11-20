@@ -14,9 +14,9 @@ class ClearingStatsTest < Minitest::Test
     @sounds = FakeSounds.new
     @folder = DotPopper::StatsBackup::Folder.new
     @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(@folder.call("score_record")))
-    @stats_book = DotPopper::StatsBook.new(@folder.call("stats"), today: -> { Date.new(2026, 11, 5) })
-    @keeper = DotPopper::StatsBackup.new(score_record: @game_flow.score_record, stats_book: @stats_book, folder: @folder)
-    @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, stats_book: @stats_book, keeper: @keeper)
+    @saved_stats = DotPopper::SavedStats.new(@folder.call("stats"), today: -> { Date.new(2026, 11, 5) })
+    @keeper = DotPopper::StatsBackup.new(score_record: @game_flow.score_record, saved_stats: @saved_stats, folder: @folder)
+    @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, saved_stats: @saved_stats, keeper: @keeper)
     finish_game
     @show.open_stats
   end
@@ -38,7 +38,7 @@ class ClearingStatsTest < Minitest::Test
     assert @show.undo_offer
     refute @show.clear_offered?
     assert_equal 0, @show.home_entrance.score_record
-    assert_equal 0, @stats_book.stats.games
+    assert_equal 0, @saved_stats.stats.games
   end
 
   def test_letting_go_too_soon_changes_nothing
@@ -49,7 +49,7 @@ class ClearingStatsTest < Minitest::Test
 
     assert @show.stats?
     refute @show.stats.empty
-    assert_equal 1, @stats_book.stats.games
+    assert_equal 1, @saved_stats.stats.games
     assert_in_delta HOLD, @show.clearing.let_go_ago(@show.now), 1e-9
   end
 
@@ -62,14 +62,14 @@ class ClearingStatsTest < Minitest::Test
   end
 
   def test_undo_puts_everything_back
-    before = @stats_book.stats
+    before = @saved_stats.stats
     score_record = @game_flow.score_record.of(@game_flow.size_class)
     clear_by(:mouse)
     @show.tap(*middle(@show.undo_reach), by: :mouse)
 
     assert @show.stats?, "Undo never goes back"
     refute @show.stats.empty
-    assert_equal before, @stats_book.stats
+    assert_equal before, @saved_stats.stats
     assert_equal score_record, @game_flow.score_record.of(@game_flow.size_class)
     assert_equal score_record, @show.home_entrance.score_record
     assert @show.clear_offered?

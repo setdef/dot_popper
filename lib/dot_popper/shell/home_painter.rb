@@ -53,12 +53,12 @@ module DotPopper
       def goal(show, rect, alpha)
         palette = pen.palette
         Card.new(pen:).draw(rect, alpha:)
-        card = Presentation::GoalCard.fit(rect, show.words.goal_sentence(show.stats_book.goal), FontMeasure.new(pen.fonts))
+        card = Presentation::GoalCard.fit(rect, show.words.goal_sentence(show.saved_stats.goal), FontMeasure.new(pen.fonts))
         pad = card.pad
         divider = card.divider
         label = pen.fonts.semibold(card.label_size)
         text = pen.fonts.bold(card.text_size)
-        done = show.stats_book.goal_done?
+        done = show.saved_stats.goal_done?
         tone = done ? palette.gain : palette.soft
         heading = show.words.goal_card_label
         pen.text(heading, label, rect.x + pad + (label.width(heading) / 2.0), rect.y + pad + (label.height / 2.0), tone, alpha)
@@ -76,7 +76,7 @@ module DotPopper
         palette = pen.palette
         x = (divider + rect.right) / 2.0
         digits = pen.fonts.bold([(rect.height * 0.32).round, 16].max)
-        days = show.stats_book.streak
+        days = show.saved_stats.streak
         top = rect.y + (rect.height * 0.3)
         Lettering.new(pen:).candy(days.to_s, digits, x, top, alpha, face: palette.bright_body, side: palette.bright_deep)
         pen.text(show.words.streak_days(days), label, x, top + (digits.height * 0.72), palette.soft, alpha)

@@ -13,7 +13,7 @@ Every file lives in Lota's save folder (paths per system are in [README.md](../.
 | File | Holds | Class |
 | --- | --- | --- |
 | `score_record.txt` | the highest score of each size class, as `class=score` lines | `ScoreRecord` |
-| `stats.txt` | totals, the last 20 scores, the goal streak, each class's records, as `key=value` lines | `StatsBook`, `Stats` |
+| `stats.txt` | totals, the last 20 scores, the goal streak, each class's records, as `key=value` lines | `SavedStats`, `Stats` |
 | `achievements.txt` | each achievement earned and the day, as `id=YYYY-MM-DD` lines | `Achievements` |
 | `games.csv` | one line per finished game | `GamesLog` |
 | `games-YYYYMMDD-HHMMSS.csv` | an older log, kept whole when its columns changed | `GamesLog` |
@@ -42,7 +42,7 @@ A game the tutorial played over (`GameStats.opening`) begins play with a pop for
 
 ## Stats
 
-`Stats` (`lib/dot_popper/stats.rb`) is every game this device has played, added up. `StatsBook` (`lib/dot_popper/stats_book.rb`) keeps it in `stats.txt` and adds each finished game (`StatsBook#record`, called as the game is finished, `UseCases::FinishGame`).
+`Stats` (`lib/dot_popper/stats.rb`) is every game this device has played, added up. `SavedStats` (`lib/dot_popper/saved_stats.rb`) keeps it in `stats.txt` and adds each finished game (`SavedStats#record`, called as the game is finished, `UseCases::FinishGame`).
 
 Across every screen:
 
@@ -68,7 +68,7 @@ Why keep all this: a player who comes back wants to see that they are improving,
 
 **Older files.** A `score_record.txt` holding one bare number, or a `stats.txt` whose records have no class name, gives those records to the class of the screen the game opens on (`legacy:`, `SizeClass.of(screen)` in `Composition::Root`), and is saved again in the new form at once, so they stay in that class whichever screen the game opens on next.
 
-Tests: `test/stats_test.rb`, `test/stats_book_test.rb`, `test/score_record_test.rb`, `test/game_stats_test.rb`.
+Tests: `test/stats_test.rb`, `test/saved_stats_test.rb`, `test/score_record_test.rb`, `test/game_stats_test.rb`.
 
 ## Size classes
 
@@ -134,7 +134,7 @@ The words are `goals:` in `Style::WORDS`. A bonus pop is a pop.
 
 **How the targets were set** (measured, with the simulator's model player on the 24 × 16 R window). The bonus dot lengthens games and raises scores, so the three targets that count time or points were raised to 50 s, 30 points and a comeback of 30. With the bonus dot, those were met by 14%, 49% and 49% of the model's games. The model taps fast and makes many mistakes, so its figures for the goals without a mistake mean little; 10 points without a mistake is a modest game for a careful player.
 
-**When the goal is met.** `StatsBook#record` says `goal_met` for the first game of the day to meet it; Game Over shows "You met today's goal!" with a check, once. Home's goal card shows "Today's goal", the sentence, and a check once it is met (`StatsBook#goal_done?`).
+**When the goal is met.** `SavedStats#record` says `goal_met` for the first game of the day to meet it; Game Over shows "You met today's goal!" with a check, once. Home's goal card shows "Today's goal", the sentence, and a check once it is met (`SavedStats#goal_done?`).
 
 **The streak** (`GoalStreak`, `lib/dot_popper/goal_streak.rb`) is the days in a row the goal was met: `current`, `longest`, and `last_met`, saved in `stats.txt` as `goal_streak`, `longest_goal_streak` and `goal_met_on`. Meeting the goal again the same day changes nothing. Meeting it the day after `last_met` adds one; any later day starts again at 1. `GoalStreak#current_on(today)` is the streak as it stands: still whole through the day after it was last met, and 0 once a day has gone by without it. `longest` keeps.
 
@@ -142,7 +142,7 @@ Home's goal card shows the current streak beside the goal, as a number over "day
 
 Home shows the goal card only once a game has finished, or Stats have been cleared (below), so a first-time player's Home says only how to play. On the smallest windows the card is left out; Stats shows the streak too.
 
-Tests: `test/daily_goal_test.rb`, `test/goal_streak_test.rb`, `test/stats_book_test.rb`.
+Tests: `test/daily_goal_test.rb`, `test/goal_streak_test.rb`, `test/saved_stats_test.rb`.
 
 ## Achievements
 
@@ -186,7 +186,7 @@ The Stats screen has **Clear my stats…**, offered while there is something to 
 
 Forgiveness, from Lidwell's *Universal Principles of Design*: an Undo serves the player better than a confirmation they learn to dismiss, and a held press is hard to make by accident yet the same with a finger, a mouse or a gamepad. The control is quiet because records aren't the point of the game (Ferrara).
 
-**What clears.** `StatsBackup` (`lib/dot_popper/stats_backup.rb`) clears the three stores that are records: `ScoreRecord`, `StatsBook` and `Achievements`. That is every class's highest score and records, the totals, the chart, the goal streaks and today's goal met, and every achievement earned. Achievements are records of what the player did, as a highest score is. Nothing else is touched: the games log, the settings (`dot_size.txt`, `sound.txt`), what the game has taught, themes, friend groups, free games and Pro stay as they are.
+**What clears.** `StatsBackup` (`lib/dot_popper/stats_backup.rb`) clears the three stores that are records: `ScoreRecord`, `SavedStats` and `Achievements`. That is every class's highest score and records, the totals, the chart, the goal streaks and today's goal met, and every achievement earned. Achievements are records of what the player did, as a highest score is. Nothing else is touched: the games log, the settings (`dot_size.txt`, `sound.txt`), what the game has taught, themes, friend groups, free games and Pro stay as they are.
 
 **Backup.** Before emptying anything, `StatsBackup#clear` copies each store's text exactly to `<name>-YYYYMMDD-HHMMSS.txt` (`score_record-…`, `stats-…`, `achievements-…`) and notes them in `cleared.txt` (`cleared=<time>`, then `score_record.txt=score_record-….txt` and so on). The next clearing first removes the backups the note names, and only names shaped like backups (`StatsBackup::BACKUP`), so the folder keeps one backup. A store never written gets no backup. Since the save folder can't rename, the copy is written before anything is lost.
 

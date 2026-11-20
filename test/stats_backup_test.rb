@@ -33,14 +33,14 @@ class StatsBackupTest < Minitest::Test
 
     assert @score_record.first?(MEDIUM)
     assert_equal 0, @score_record.of(MEDIUM)
-    stats = @stats_book.stats
-    assert_equal [0, 0, [], 0, 0], [stats.games, stats.dots_popped, stats.recent, stats.streak.longest, @stats_book.streak]
-    refute @stats_book.goal_done?
+    stats = @saved_stats.stats
+    assert_equal [0, 0, [], 0, 0], [stats.games, stats.dots_popped, stats.recent, stats.streak.longest, @saved_stats.streak]
+    refute @saved_stats.goal_done?
     refute_predicate stats.records_in(MEDIUM).most_dots_in_a_row, :positive?
 
     keep
     assert @score_record.first?(MEDIUM), "the store is cleared too, not only what is in memory"
-    assert_equal 0, @stats_book.stats.games
+    assert_equal 0, @saved_stats.stats.games
   end
 
   def test_clearing_keeps_the_games_log_settings_and_lessons
@@ -66,13 +66,13 @@ class StatsBackupTest < Minitest::Test
 
     assert_equal [SCORE_RECORD, STATS], [@folder["score_record.txt"], @folder["stats.txt"]]
     assert_equal 24, @score_record.of(MEDIUM)
-    assert_equal [3, 2, true], [@stats_book.stats.games, @stats_book.streak, @stats_book.goal_done?]
+    assert_equal [3, 2, true], [@saved_stats.stats.games, @saved_stats.streak, @saved_stats.goal_done?]
     assert_equal STATS, @folder["stats-20261105-093000.txt"]
   end
 
   def test_only_the_latest_backup_is_kept
     @keeper.clear
-    @stats_book.record(DotPopper::GameStats.start.with(score: 2, duration: 11.0), MEDIUM)
+    @saved_stats.record(DotPopper::GameStats.start.with(score: 2, duration: 11.0), MEDIUM)
     @time += 60
     @keeper.clear
 
@@ -93,7 +93,7 @@ class StatsBackupTest < Minitest::Test
     keep
     @keeper.restore(@keeper.clear)
 
-    assert_equal 3, @stats_book.stats.games
+    assert_equal 3, @saved_stats.stats.games
     assert_equal 0, @score_record.of(MEDIUM)
     refute @folder.names.include?("score_record-20261105-093000.txt")
   end
@@ -111,7 +111,7 @@ class StatsBackupTest < Minitest::Test
 
   def keep
     @score_record = DotPopper::ScoreRecord.new(@folder.call("score_record.txt"))
-    @stats_book = DotPopper::StatsBook.new(@folder.call("stats.txt"), today: -> { @today })
-    @keeper = DotPopper::StatsBackup.new(score_record: @score_record, stats_book: @stats_book, folder: @folder, now: -> { @time })
+    @saved_stats = DotPopper::SavedStats.new(@folder.call("stats.txt"), today: -> { @today })
+    @keeper = DotPopper::StatsBackup.new(score_record: @score_record, saved_stats: @saved_stats, folder: @folder, now: -> { @time })
   end
 end

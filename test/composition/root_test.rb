@@ -364,15 +364,15 @@ class RootTest < Minitest::Test
     assert_equal [DotPopper::UseCases::FinishGame, Show, DotPopper::Refresh, DotPopper::GamesLog], listeners
     game_flow = DotPopper::GameFlow.new(field)
     entitlement = DotPopper::Entitlement.free
-    stats_book = DotPopper::StatsBook.new(DotPopper::ScoreRecord::Memory.new)
+    saved_stats = DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new)
     achievements = DotPopper::Achievements.new(DotPopper::ScoreRecord::Memory.new)
     groups = DotPopper::Groups::Session.off
     themes = DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new)
     use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: DotPopper::FreeGames.unlimited, entitlement:, store: NoStore.new,
-                                                 achievements:, stats_book:, friend_groups: groups)
+                                                 achievements:, saved_stats:, friend_groups: groups)
     heard = -> { [game_flow, entitlement, use_cases[:finish_game]].map { it.instance_variable_get(:@listeners).size } }
     before = heard.call
-    Show.new(game_flow:, layout:, sounds: FakeSounds.new, radius: R, stats_book:, achievements:, themes:, groups:,
+    Show.new(game_flow:, layout:, sounds: FakeSounds.new, radius: R, saved_stats:, achievements:, themes:, groups:,
              use_theme: DotPopper::UseCases::UseTheme.new(themes:, entitlement:), **use_cases)
 
     assert_equal before, heard.call

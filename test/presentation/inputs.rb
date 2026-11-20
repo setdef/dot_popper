@@ -119,11 +119,11 @@ module Inputs
       themes = DotPopper::Themes.new(Memory.new)
       themes.release(THEMES.map(&:to_s))
       (new_theme ? themes.choices[0...-1] : themes.choices).each { themes.told(it) }
-      book = DotPopper::StatsBook.new(Memory.new, today: -> { @day })
+      book = DotPopper::SavedStats.new(Memory.new, today: -> { @day })
       book.record(DotPopper::GameStats.start, @game_flow.size_class) if played
       session = DotPopper::Groups::Session.new(store: Memory.new, worker: Server.new(groups:))
       @server_choice = DotPopper::ServerChoice.new(Memory.new, gone: @gone, clipboard:)
-      @show = new_show(game_flow:, layout: layout(width, height), sounds:, radius: R, random: Random.new(5), clipboard:, window:, stats_book: book,
+      @show = new_show(game_flow:, layout: layout(width, height), sounds:, radius: R, random: Random.new(5), clipboard:, window:, saved_stats: book,
                        sharing: P::SheetSharing.for(platform, opener:), links: opener, entitlement:, storefront:, games:,
                        themes:, groups: session, group_notice: P::GroupNotice.new(Memory.new),
                        tutorial_flag: P::TutorialFlag.new(Memory.new((P::TutorialFlag::SEEN if played))), input: P::InputKind.starting(touch: phone?),

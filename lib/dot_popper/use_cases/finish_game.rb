@@ -3,7 +3,7 @@
 module DotPopper
   module UseCases
     # Finishing a game, as its clock reaches zero: its numbers go into
-    # Stats (+stats_book+, StatsBook), with the records it set and today's
+    # Stats (+saved_stats+, SavedStats), with the records it set and today's
     # goal; the achievements its play earned are kept (+achievements+,
     # Achievements), by anyone; and the player's friend groups
     # (+friend_groups+, Groups::Session) hear of a game that counts. A new
@@ -29,8 +29,8 @@ module DotPopper
       # what Game Over shows of it (Result).
       Finished = Data.define(:ended, :stats, :result)
 
-      def initialize(stats_book:, achievements:, entitlement:, friend_groups:)
-        @stats_book = stats_book
+      def initialize(saved_stats:, achievements:, entitlement:, friend_groups:)
+        @saved_stats = saved_stats
         @achievements = achievements
         @entitlement = entitlement
         @friend_groups = friend_groups
@@ -68,9 +68,9 @@ module DotPopper
       # the tutorial opened never counts in a friend group; any other does,
       # whatever its dot size.
       def finish(ended, stats:, earned: [])
-        recorded = @stats_book.record(stats, ended.size_class)
+        recorded = @saved_stats.record(stats, ended.size_class)
         @friend_groups.game_finished(score: ended.score, counts: !ended.tutorial)
-        fresh = @achievements.award(earned, day: @stats_book.today.iso8601)
+        fresh = @achievements.award(earned, day: @saved_stats.today.iso8601)
         pro = @entitlement.pro?
         @friend_groups.report_achievements(fresh) if pro
         Result.new(record: recorded.records.first, goal_met: recorded.goal_met, achievements: pro ? fresh : [])

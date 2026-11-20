@@ -138,9 +138,9 @@ module DotPopper
         @game_flow = GameFlow.new(screen, score_record: ScoreRecord.new(file("score_record.txt"), legacy:), random:,
                                        sizing: DotSizing.parse(sizing_store.read))
         @engine.say("dots are standard, worked out from the screen as each game starts") if @game_flow.sizing.standard?
-        stats_book = StatsBook.new(file("stats.txt"), today:, legacy:)
+        saved_stats = SavedStats.new(file("stats.txt"), today:, legacy:)
         achievements = Achievements.new(file("achievements.txt"))
-        keeper = StatsBackup.new(score_record: @game_flow.score_record, stats_book:, achievements:, folder: ->(name) { file(name) })
+        keeper = StatsBackup.new(score_record: @game_flow.score_record, saved_stats:, achievements:, folder: ->(name) { file(name) })
         @gone = Continuity::Gone.new(file("setdef.txt"))
         # What this build trusts, and where it keeps a license key, as
         # Monetization decides by the channel alone (ADR-0010).
@@ -171,12 +171,12 @@ module DotPopper
         @sharing = Presentation::SheetSharing.for(platform, opener: @engine.opener)
         groups = groups_session
         use_cases = Composition.use_cases(game_flow: @game_flow, free_games: games, entitlement:, store: storefront, achievements:,
-                                          stats_book:, friend_groups: groups)
+                                          saved_stats:, friend_groups: groups)
         @show = Presentation::Show.new(
           groups:, game_flow: @game_flow, layout: @engine.layout, sounds: @sound_player, radius: dot_size.radius,
           random:, calm: settings.calm?, tutor: Presentation::Tutor.new(file("taught.txt"), times: Style::LESSON.times),
           haptics:, clipboard:, notices: @engine.notices, sharing:,
-          stats_book:, achievements:, keeper:, sizing_store:, input: starting_input, measure: @engine.measure(@pen),
+          saved_stats:, achievements:, keeper:, sizing_store:, input: starting_input, measure: @engine.measure(@pen),
           window: @window,
           tutorial_flag: Presentation::TutorialFlag.new(file("tutorial.txt"), mode: Presentation::TutorialFlag.mode(settings.env)),
           group_notice: Presentation::GroupNotice.new(file("group_notice.txt")),
