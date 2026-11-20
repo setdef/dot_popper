@@ -132,10 +132,14 @@ APP_NAME=$APP_NAME ruby -ryaml -e '
   File.write(ARGV[0], "# Written by script/android_build.sh for fledge build android, from fledge.yml.\n" + YAML.dump(config))
 ' "$phone/fledge.yml" "$repo/fledge.yml"
 
-# fledge build android, then Gradle.
+# fledge build android, then Gradle. The phone project's bundle is kept
+# for each Fledge tag: bundle lock reads Fledge's repository from the
+# copy a bundle fetched before, and fetches it again only for bundle
+# install, so a copy fetched before a newer tag was published stops the
+# lock with "Revision TAG does not exist" (Lota's doc/guide/phones.md).
 (
   cd "$phone"
-  export BUNDLE_GEMFILE=$phone/Gemfile BUNDLE_PATH=$cache/android-app-bundle
+  export BUNDLE_GEMFILE=$phone/Gemfile BUNDLE_PATH=$cache/android-app-bundle-${FLEDGE_TAG//[^A-Za-z0-9._-]/_}
   bundle config set --local build.lota \
     "--with-lota-source=$LOTA_SOURCE --with-lota-android-deps=$LOTA_SOURCE/tmp/android/deps --with-rice-dir=$RICE_DIR"
   bundle lock --add-platform ruby > /dev/null
