@@ -31,8 +31,8 @@
 # Xvfb and the app among them, is a process group that a watcher of its
 # own (Lifeline) ends, with the work folder and a half-made cache folder,
 # as soon as this process is gone, killed outright included. A cache
-# folder half made by a run killed before this watcher could end it is
-# removed by the next run that finds it.
+# folder half made, or a work folder left, by a run killed before its
+# watcher could act is removed by the next run that finds it.
 #
 # The play ends as soon as the game raises (Lota's "Error: " line), and
 # shows what the game printed.
@@ -105,7 +105,12 @@ module PlayPackagedApp
         groups.each { |group| signal("TERM", group) }
         sleep 1 unless groups.empty?
         groups.each { |group| signal("KILL", group) }
-        folders.each { FileUtils.rm_rf(it) }
+        # Again a moment later: a program a group started in a group of its
+        # own (lota fuse's Bundler) may write there until it notices.
+        2.times do |time|
+          sleep 2 if time.positive?
+          folders.each { FileUtils.rm_rf(it) }
+        end
         exit!(0)
       end
       Signal.trap("TERM") { finish.call }
@@ -151,6 +156,7 @@ module PlayPackagedApp
 
     started = now
     Lifeline.start
+    forget_work_left
     Dir.mktmpdir("dot_popper-play") do |work|
       Lifeline.folder(work)
       app = options[:archive] ? unpack(options[:archive], work) : assemble(work, options[:channel])
@@ -328,6 +334,24 @@ module PlayPackagedApp
     Dir.glob("**/*", File::FNM_DOTMATCH, base: to).each do |path|
       file = File.join(to, path)
       File.chmod(File.directory?(file) || File.stat(file).mode.anybits?(0o100) ? 0o755 : 0o644, file) unless File.symlink?(file)
+    end
+  end
+
+  # Removes the work folders of runs whose process is gone, which a run
+  # killed before its watcher could end it leaves: Dir.mktmpdir names
+  # each with its maker's process number.
+  def forget_work_left
+    Dir.glob(File.join(Dir.tmpdir, "dot_popper-play*")).each do |left|
+      pid = File.basename(left)[/\Adot_popper-play\d+-(\d+)-/, 1]&.to_i
+      next unless pid && File.owned?(left)
+
+      begin
+        Process.kill(0, pid)
+      rescue Errno::ESRCH
+        FileUtils.rm_rf(left)
+      rescue Errno::EPERM
+        nil
+      end
     end
   end
 
