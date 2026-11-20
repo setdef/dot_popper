@@ -97,6 +97,8 @@ class AreasTest < Minitest::Test
             def b = DotPopper::Presentation::Show
             def c = ::DotPopper::ReleaseEngineering::Build::CHANNEL
             def d = Rules
+            def e = ::Object::DotPopper::Monetization::Entitlement
+            def f = Object::DotPopper::Shell
           end
         end
       end
@@ -104,7 +106,7 @@ class AreasTest < Minitest::Test
     names = Resolver.new(definitions).names(Prism.parse(source).value)
 
     assert_equal %w[DotPopper::Monetization::Store DotPopper::Monetization::Entitlement DotPopper::Presentation::Show
-                    DotPopper::ReleaseEngineering::Build::CHANNEL], names.reject { allowed?("Gameplay", it) }
+                    DotPopper::ReleaseEngineering::Build::CHANNEL DotPopper::Monetization::Entitlement DotPopper::Shell], names.reject { allowed?("Gameplay", it) }
     assert_includes names, "DotPopper::Gameplay::Rules"
   end
 
@@ -183,13 +185,17 @@ class AreasTest < Minitest::Test
       end
     end
 
-    def resolve(text, nesting)
-      return text.delete_prefix("::") if text.start_with?("::")
+    # A name's full name. Object::X is the top level's X, so a leading
+    # Object:: (::Object::DotPopper::…) is dropped.
+    def resolve(text, nesting) = top_level(text.start_with?("::") ? text.delete_prefix("::") : nested(text, nesting))
 
+    def nested(text, nesting)
       first, rest = text.split("::", 2)
       root = nesting.reverse_each.lazy.filter_map { lookup(it, first) }.first || first
       [root, rest].compact.join("::")
     end
+
+    def top_level(name) = name.sub(/\A(?:Object::)+/, "")
 
     def lookup(scope, name)
       seen = {}
