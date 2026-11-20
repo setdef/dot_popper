@@ -20,9 +20,13 @@ require "prism"
 #   composition root or the privacy declarations, which are outside
 #   them and name them instead. Each may name what serves every area:
 #   the network client (Network), the system the game runs on
-#   (Platform) and the guard on automated runs (Automation).
+#   (Platform), the guard on automated runs (Automation) and a save
+#   file kept in memory (MemoryFile).
+# - That shared code names nothing of the three areas, so it never
+#   carries one area to another, and nothing outside it.
 #
-# Every constant an area's Ruby names is resolved as Ruby resolves it
+# An area's files are its folder and its loader (lib/dot_popper/gameplay.rb
+# and the like). Every constant an area's Ruby names is resolved as Ruby resolves it
 # (the module nesting, then the superclasses defined here, then the top
 # level), from the source, so this holds for code Steep does not type
 # (Monetization's continuity/ and receipt/) as for the rest. Steep holds
@@ -37,14 +41,24 @@ require "prism"
 class AreasTest < Minitest::Test
   ROOT = File.expand_path("..", __dir__)
 
-  AREAS = { "Gameplay" => "gameplay", "Monetization" => "monetization", "ReleaseEngineering" => "release_engineering" }.freeze
+  SHARED = %w[Network Platform Automation MemoryFile].freeze
 
-  # What each area may name besides itself, as DotPopper::<name> and
+  # The files of each area, and of the code the areas share, under
+  # lib/dot_popper.
+  FILES = {
+    "Gameplay" => %w[gameplay.rb gameplay/**/*.rb],
+    "Monetization" => %w[monetization.rb monetization/**/*.rb],
+    "ReleaseEngineering" => %w[release_engineering.rb release_engineering/**/*.rb],
+    "Shared" => %w[network.rb network/**/*.rb platform.rb automation.rb memory_file.rb]
+  }.freeze
+
+  # What each may name besides itself, as DotPopper::<name> and
   # everything inside it.
   ALLOWED = {
-    "Gameplay" => %w[Network Platform Automation MemoryFile],
-    "Monetization" => %w[Gameplay::Events Network Platform Automation MemoryFile],
-    "ReleaseEngineering" => %w[]
+    "Gameplay" => SHARED,
+    "Monetization" => ["Gameplay::Events", *SHARED],
+    "ReleaseEngineering" => %w[],
+    "Shared" => SHARED
   }.freeze
 
   # [file, the constant it names] => [times named, the step of the
@@ -54,8 +68,8 @@ class AreasTest < Minitest::Test
 
   def test_each_area_names_only_what_the_context_map_allows
     found = Hash.new(0)
-    AREAS.each do |area, folder|
-      Dir[File.join(ROOT, "lib/dot_popper/#{folder}/**/*.rb")].each do |path|
+    FILES.each do |area, patterns|
+      Dir[*patterns, base: File.join(ROOT, "lib/dot_popper")].map { File.join(ROOT, "lib/dot_popper", it) }.each do |path|
         file = path.delete_prefix("#{ROOT}/")
         named(path).each { found[[file, it]] += 1 unless allowed?(area, it) }
       end
@@ -63,6 +77,15 @@ class AreasTest < Minitest::Test
 
     assert_equal BREACHES.transform_values(&:first).sort, found.sort,
                  "an area names what the context map does not allow it (or a listed breach is gone: take it off BREACHES)"
+  end
+
+  def test_the_check_reads_each_area_s_loader_and_the_shared_code
+    files = FILES.values.flatten.flat_map { Dir[it, base: File.join(ROOT, "lib/dot_popper")] }
+
+    assert_includes files, "gameplay.rb"
+    assert_includes files, "network/link.rb"
+    assert_equal Dir["*.rb", base: File.join(ROOT, "lib/dot_popper")].sort - %w[presentation.rb shell.rb use_cases.rb],
+                 files.grep_v(%r{/}).sort, "every file at the top of lib/dot_popper but the outer layers' loaders"
   end
 
   def test_the_check_sees_a_name_written_in_any_way
