@@ -56,6 +56,7 @@ class ProKnowledgeTest < Minitest::Test
   KNOWS = %w[
     lib/dot_popper/composition/root.rb
     lib/dot_popper/composition/use_cases.rb
+    lib/dot_popper/monetization.rb
     lib/dot_popper/monetization/continuity/license.rb
     lib/dot_popper/monetization/entitlement.rb
     lib/dot_popper/monetization/free_games.rb
