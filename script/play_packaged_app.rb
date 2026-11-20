@@ -34,6 +34,9 @@
 # folder half made by a run killed before this watcher could end it is
 # removed by the next run that finds it.
 #
+# The play ends as soon as the game raises (Lota's "Error: " line), and
+# shows what the game printed.
+#
 # --channel stamps the build for a channel (script/set_build_channel.rb)
 # and leaves out what it leaves out (script/channel_contents.rb).
 # --archive plays an app that was already built, as CI's Linux job does.
@@ -65,6 +68,8 @@ module PlayPackagedApp
                /Ed25519 verifies the server's test vector/ => "the app's own Ruby does not verify Ed25519" }.freeze
   PLAY_LIMIT = 120
   FUSE_LIMIT = 900
+  # What Lota prints first when the game raises, before its error screen.
+  RAISED = /^Error: /
 
   class Failure < StandardError; end
 
@@ -363,12 +368,14 @@ module PlayPackagedApp
       with_display(work) do |display|
         env = PLAY_ENV.merge("HOME" => home, "PATH" => "/usr/bin:/bin", "DISPLAY" => display,
                              "DOT_POPPER_QUIT_AFTER" => seconds.to_s)
-        bounded(env, File.join(app, "Dot Popper"), limit: PLAY_LIMIT, out: log, unsetenv_others: true, chdir: home)
+        bounded(env, File.join(app, "Dot Popper"), limit: PLAY_LIMIT, out: log, unsetenv_others: true, chdir: home,
+                                                   until_line: RAISED)
       end
     end
     out = File.read(log)
     puts out.lines.grep(/Ed25519|frames a second|renderer|Error|error/).first(8)
     problems = EXPECTED.reject { |line, _| out.match?(line) }.values
+    problems.unshift("the game raised, and was stopped at Lota's error screen") if out.match?(RAISED)
     problems.unshift("the app exited with status #{status.inspect}") unless status&.success?
     return if problems.empty?
 
@@ -398,9 +405,11 @@ module PlayPackagedApp
     end
   end
 
-  # Runs a command, with +env+, to its end or +limit+ seconds, then stops
-  # it and everything it started. Answers its status, or nil if stopped.
-  def bounded(env, *command, limit:, out: File::NULL, **options)
+  # Runs a command, with +env+, to its end or +limit+ seconds, or, with
+  # +until_line+, until the file +out+ has a line that matches it, then
+  # stops it and everything it started. Answers its status, or nil if
+  # stopped.
+  def bounded(env, *command, limit:, out: File::NULL, until_line: nil, **options)
     # [program, program]: a path with a space is a program, not a shell's line.
     pid = spawn(env, [command.first, command.first], *command.drop(1), in: File::NULL, %i[out err] => out, pgroup: true, **options)
     Lifeline.group(pid)
@@ -409,6 +418,10 @@ module PlayPackagedApp
       _, status = Process.wait2(pid, Process::WNOHANG)
       return status if status
       return nil if now > deadline
+      if until_line && File.read(out).match?(until_line)
+        sleep 1 # for the lines after it
+        return nil
+      end
 
       sleep 0.1
     end

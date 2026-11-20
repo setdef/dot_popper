@@ -1,5 +1,11 @@
 # frozen_string_literal: true
 
+# Each line the game prints is written as it is printed. A packaged app's
+# output goes to a pipe or a file, where Ruby would hold it until the game
+# ends, and lose it if the game is killed or crashes. Lota loads this file
+# before anything else of the game's.
+$stdout.sync = true
+
 require_relative "lib/dot_popper/build"
 require_relative "lib/dot_popper/shell/vulkan_rescue"
 
