@@ -5,9 +5,9 @@ module DotPopper
 
       HEADER: String
 
-      @archive: ^(String name) -> ScoreRecord::_SaveFile
+      @archive: ^(String name) -> ::DotPopper::_SaveFile
 
-      @file: ScoreRecord::_SaveFile
+      @file: ::DotPopper::_SaveFile
 
       @now: ^() -> Time
 
@@ -15,8 +15,8 @@ module DotPopper
 
       @recorder: GameStats::Recorder
 
-      def initialize: (ScoreRecord::_SaveFile file, ?now: ^() -> Time, ?today: ^() -> Date,
-                       ?archive: ^(String name) -> ScoreRecord::_SaveFile) -> void
+      def initialize: (::DotPopper::_SaveFile file, ?now: ^() -> Time, ?today: ^() -> Date,
+                       ?archive: ^(String name) -> ::DotPopper::_SaveFile) -> void
 
       def call: (event event) -> void
 

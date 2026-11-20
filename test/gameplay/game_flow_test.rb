@@ -8,7 +8,7 @@ class GameFlowTest < Minitest::Test
   Events = DotPopper::Gameplay::Events
 
   def setup
-    @file = DotPopper::Gameplay::ScoreRecord::Memory.new
+    @file = DotPopper::MemoryFile.new
     @game_flow = GameFlow.new(field, score_record: DotPopper::Gameplay::ScoreRecord.new(@file), random: Random.new(9))
     @heard = []
     @game_flow.subscribe { @heard << it }

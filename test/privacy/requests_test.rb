@@ -30,7 +30,7 @@ class PrivacyRequestsTest < Minitest::Test
     @heard = []
     @server = TCPServer.new("127.0.0.1", 0)
     @thread = Thread.new { serve }
-    file = DotPopper::Gameplay::ScoreRecord::Memory.new
+    file = DotPopper::MemoryFile.new
     @session = Groups::Session.new(file:, worker: InlineWorker.new(Network::Link.new("http://127.0.0.1:#{@server.addr[1]}")))
   end
 
@@ -83,7 +83,7 @@ class PrivacyRequestsTest < Minitest::Test
     @session.leave(1)
     pump
     DotPopper::Gameplay::ThemeReleases.new(worker: InlineWorker.new(Network::Link.new("http://127.0.0.1:#{@server.addr[1]}")),
-                                 saved_themes: DotPopper::Gameplay::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new), file: DotPopper::Gameplay::ScoreRecord::Memory.new,
+                                 saved_themes: DotPopper::Gameplay::SavedThemes.new(DotPopper::MemoryFile.new), file: DotPopper::MemoryFile.new,
                                  now: -> { Time.utc(2026, 11, 8, 12) }).ask
     @session.delete_everything
     pump
@@ -105,7 +105,7 @@ class PrivacyRequestsTest < Minitest::Test
 
   # group.txt's +sent+: its token and unsent score really go out.
   def test_the_saved_token_and_unsent_score_leave_the_device
-    file = DotPopper::Gameplay::ScoreRecord::Memory.new("tok\n7\n1\n")
+    file = DotPopper::MemoryFile.new("tok\n7\n1\n")
     @session = Groups::Session.new(file:, worker: InlineWorker.new(Network::Link.new("http://127.0.0.1:#{@server.addr[1]}")))
     @session.refresh
     pump
@@ -184,7 +184,7 @@ class PrivacyRequestsTest < Minitest::Test
     c = DotPopper::Monetization::Continuity
     local = "http://127.0.0.1:#{@server.addr[1]}"
     server = c::SetdefServer.new(Network::Link.new(local))
-    license = c::License.new(DotPopper::Gameplay::ScoreRecord::Memory.new, pins: c::TEST_PINS)
+    license = c::License.new(DotPopper::MemoryFile.new, pins: c::TEST_PINS)
     license.enter(c::LicenseKey.issue(c::TestKeys::LICENSE).text)
     server.proof(c::SignedAnswers.fresh)
     server.ask(license.due(c::SignedAnswers.fresh))

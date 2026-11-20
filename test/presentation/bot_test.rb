@@ -94,7 +94,7 @@ class BotTest < Minitest::Test
   # there.
   def test_it_answers_a_new_themes_card_before_playing
     game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(4))
-    saved_themes = DotPopper::Gameplay::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
+    saved_themes = DotPopper::Gameplay::SavedThemes.new(DotPopper::MemoryFile.new)
     saved_themes.release(%w[ghost])
     show = new_show(game_flow:, layout: layout, sounds: FakeSounds.new, radius: R, saved_themes:)
     bot = Bot.new(Style::BOT, random: Random.new(5))

@@ -30,11 +30,11 @@ class AskingAgainTest < Minitest::Test
     @now = 0.0
     @themes_worker = ManualWorker.new
     @groups_worker = ManualWorker.new
-    file = DotPopper::Gameplay::ScoreRecord::Memory.new
+    file = DotPopper::MemoryFile.new
     file.write("t\n")
     @session = DotPopper::Gameplay::Groups::Session.new(file:, worker: @groups_worker)
-    @saved_themes = DotPopper::Gameplay::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
-    @theme_releases = DotPopper::Gameplay::ThemeReleases.new(worker: @themes_worker, saved_themes: @saved_themes, file: DotPopper::Gameplay::ScoreRecord::Memory.new)
+    @saved_themes = DotPopper::Gameplay::SavedThemes.new(DotPopper::MemoryFile.new)
+    @theme_releases = DotPopper::Gameplay::ThemeReleases.new(worker: @themes_worker, saved_themes: @saved_themes, file: DotPopper::MemoryFile.new)
     @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2))
     @show = new_show(game_flow: @game_flow, layout:, sounds: FakeSounds.new, radius: R, entitlement: DotPopper::Monetization::Entitlement.new(forced: true),
                      saved_themes: @saved_themes, groups: @session)

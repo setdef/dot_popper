@@ -7,13 +7,13 @@ module DotPopper
 
       @saved_themes: SavedThemes
 
-      @file: ScoreRecord::_SaveFile
+      @file: ::DotPopper::_SaveFile
 
       @now: ^() -> Time
 
       def self.keys: (untyped body) -> Array[String]?
 
-      def initialize: (worker: Network::_Worker, saved_themes: SavedThemes, file: ScoreRecord::_SaveFile, ?now: ^() -> Time) -> void
+      def initialize: (worker: Network::_Worker, saved_themes: SavedThemes, file: ::DotPopper::_SaveFile, ?now: ^() -> Time) -> void
 
       def started_on: () -> String
 

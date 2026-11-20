@@ -8,7 +8,7 @@ class TutorTest < Minitest::Test
   MISTAKE = Mistake.new(popped: 3, bright: 4)
 
   def test_it_teaches_a_few_times_and_remembers_across_sessions
-    file = DotPopper::Gameplay::ScoreRecord::Memory.new
+    file = DotPopper::MemoryFile.new
     tutor = Tutor.new(file, times: 2)
 
     assert_equal MISTAKE, tutor.lesson(MISTAKE)
@@ -19,7 +19,7 @@ class TutorTest < Minitest::Test
   end
 
   def test_a_player_taught_by_an_older_version_is_not_taught_again
-    file = DotPopper::Gameplay::ScoreRecord::Memory.new
+    file = DotPopper::MemoryFile.new
     file.write(Tutor::LEGACY)
 
     assert_nil Tutor.new(file, times: 2).lesson(MISTAKE)
@@ -46,7 +46,7 @@ class TutorTest < Minitest::Test
   end
   
   def test_a_damaged_count_starts_over
-    file = DotPopper::Gameplay::ScoreRecord::Memory.new
+    file = DotPopper::MemoryFile.new
     file.write("lots")
 
     assert_equal 0, Tutor.new(file, times: 2).shown

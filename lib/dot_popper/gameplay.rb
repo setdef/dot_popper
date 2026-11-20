@@ -2,6 +2,7 @@
 
 require "date"
 require_relative "network"
+require_relative "memory_file"
 
 module DotPopper
   # Gameplay and Metagame, the core of the domain: playing and learning

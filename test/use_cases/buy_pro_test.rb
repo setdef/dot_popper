@@ -38,7 +38,7 @@ class BuyProTest < Minitest::Test
     @store = Store.new
     @entitlement = DotPopper::Monetization::Entitlement.test
     @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(1))
-    @achievements = DotPopper::Gameplay::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
+    @achievements = DotPopper::Gameplay::Achievements.new(DotPopper::MemoryFile.new)
     @groups = Groups.new
     @buy = DotPopper::UseCases::BuyPro.new(store: @store, entitlement: @entitlement, game_flow: @game_flow, achievements: @achievements,
                                            friend_groups: @groups)
@@ -88,7 +88,7 @@ class BuyProTest < Minitest::Test
   end
 
   def test_a_license_key_entered_is_pro_arriving_too
-    license = DotPopper::Monetization::Continuity::License.new(DotPopper::Gameplay::ScoreRecord::Memory.new, pins: DotPopper::Monetization::Continuity::TEST_PINS)
+    license = DotPopper::Monetization::Continuity::License.new(DotPopper::MemoryFile.new, pins: DotPopper::Monetization::Continuity::TEST_PINS)
     entitlement = DotPopper::Monetization::Entitlement.new(license:)
     entitlement.subscribe(DotPopper::UseCases::BuyPro.new(store: @store, entitlement:, game_flow: @game_flow, achievements: @achievements,
                                                           friend_groups: @groups))

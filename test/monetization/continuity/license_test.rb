@@ -7,7 +7,7 @@ require "uri"
 # gone, played against the test build's fake server and fakes of the ports.
 class LicenseTest < Minitest::Test
   C = DotPopper::Monetization::Continuity
-  Memory = DotPopper::Gameplay::ScoreRecord::Memory
+  Memory = DotPopper::MemoryFile
   Reply = DotPopper::Network::Reply
   TODAY = Date.new(2026, 11, 9)
 

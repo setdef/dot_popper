@@ -71,7 +71,7 @@ class PrivacyDeclaredTest < Minitest::Test
 
   def test_dated_names_match_their_patterns
     backups = []
-    folder = ->(name) { backups << name; DotPopper::Gameplay::ScoreRecord::Memory.new }
+    folder = ->(name) { backups << name; DotPopper::MemoryFile.new }
     stats_backup = DotPopper::Gameplay::StatsBackup.new(score_record: memory("1"), saved_stats: memory("2"), achievements: memory("3"), folder:)
     stats_backup.clear
     made = backups.grep(/\d{8}/)
@@ -79,7 +79,7 @@ class PrivacyDeclaredTest < Minitest::Test
     refute_empty made
     made.each { DotPopper::Shell::SaveFile.new(name: it) }
     archived = []
-    log = DotPopper::Gameplay::GamesLog.new(DotPopper::Gameplay::ScoreRecord::Memory.new("old,columns\n1,2\n"), archive: ->(name) { archived << name; DotPopper::Gameplay::ScoreRecord::Memory.new })
+    log = DotPopper::Gameplay::GamesLog.new(DotPopper::MemoryFile.new("old,columns\n1,2\n"), archive: ->(name) { archived << name; DotPopper::MemoryFile.new })
     log.send(:current)
 
     refute_empty archived

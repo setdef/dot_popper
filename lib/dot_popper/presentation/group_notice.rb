@@ -12,7 +12,7 @@ module DotPopper
       READ = "read"
 
       # A notice already read, for a Show that asks nothing.
-      def self.read = new(Gameplay::ScoreRecord::Memory.new(READ))
+      def self.read = new(MemoryFile.new(READ))
 
       def initialize(file) = @file = file
 

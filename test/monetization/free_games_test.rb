@@ -4,7 +4,7 @@ require_relative "../test_helper"
 
 class FreeGamesTest < Minitest::Test
   FreeGames = DotPopper::Monetization::FreeGames
-  Memory = DotPopper::Gameplay::ScoreRecord::Memory
+  Memory = DotPopper::MemoryFile
 
   def setup
     @file = Memory.new

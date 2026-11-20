@@ -9,7 +9,7 @@ class ScoreRecordTest < Minitest::Test
   LARGE = DotPopper::Gameplay::SizeClass::LARGE
 
   def test_it_reads_each_class_of_screens_score_record
-    score_record = ScoreRecord.new(ScoreRecord::Memory.new("small=6\nmedium=24\n"))
+    score_record = ScoreRecord.new(DotPopper::MemoryFile.new("small=6\nmedium=24\n"))
 
     assert_equal 6, score_record.of(SMALL)
     assert_equal 24, score_record.of(MEDIUM)
@@ -17,13 +17,13 @@ class ScoreRecordTest < Minitest::Test
   end
 
   def test_a_missing_or_unreadable_record_counts_as_zero
-    assert_equal 0, ScoreRecord.new(ScoreRecord::Memory.new).of(MEDIUM)
-    assert_equal 0, ScoreRecord.new(ScoreRecord::Memory.new("lots")).of(MEDIUM)
-    assert_equal 0, ScoreRecord.new(ScoreRecord::Memory.new("medium=-4\nhuge=9\nsmall")).of(MEDIUM)
+    assert_equal 0, ScoreRecord.new(DotPopper::MemoryFile.new).of(MEDIUM)
+    assert_equal 0, ScoreRecord.new(DotPopper::MemoryFile.new("lots")).of(MEDIUM)
+    assert_equal 0, ScoreRecord.new(DotPopper::MemoryFile.new("medium=-4\nhuge=9\nsmall")).of(MEDIUM)
   end
 
   def test_only_a_higher_score_for_its_own_class_is_recorded
-    file = ScoreRecord::Memory.new("small=5\nmedium=30\n")
+    file = DotPopper::MemoryFile.new("small=5\nmedium=30\n")
     score_record = ScoreRecord.new(file)
 
     refute score_record.record(5, SMALL)
@@ -33,7 +33,7 @@ class ScoreRecordTest < Minitest::Test
   end
 
   def test_a_classs_first_game_sets_its_score_record_but_is_no_new_score_record
-    file = ScoreRecord::Memory.new("small=5\n")
+    file = DotPopper::MemoryFile.new("small=5\n")
     score_record = ScoreRecord.new(file)
 
     assert score_record.first?(LARGE)
@@ -48,7 +48,7 @@ class ScoreRecordTest < Minitest::Test
   # belongs to the class of the screen the game opens on, and is saved in
   # the new form at once, so it stays there.
   def test_an_older_score_record_goes_to_this_screens_class_and_is_saved_again
-    file = ScoreRecord::Memory.new("12\n")
+    file = DotPopper::MemoryFile.new("12\n")
     score_record = ScoreRecord.new(file, legacy: SMALL)
 
     assert_equal 12, score_record.of(SMALL)

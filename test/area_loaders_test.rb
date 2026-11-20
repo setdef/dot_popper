@@ -16,7 +16,7 @@ require "rbconfig"
 class AreaLoadersTest < Minitest::Test
   ROOT = File.expand_path("..", __dir__)
 
-  ALONE = { "gameplay" => %w[gameplay network], "release_engineering" => %w[release_engineering] }.freeze
+  ALONE = { "gameplay" => %w[gameplay network memory_file], "release_engineering" => %w[release_engineering] }.freeze
 
   def test_each_area_loads_by_itself
     ALONE.each do |area, own|

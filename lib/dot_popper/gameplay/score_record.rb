@@ -80,15 +80,6 @@ module DotPopper
 
         def self.to_text(values) = values.map { |size_class, score| "#{size_class.name}=#{score}\n" }.join
       end
-
-      # A save file that keeps the score in memory, for tests and for a device
-      # whose save folder cannot be written.
-      class Memory
-        def initialize(text = nil) = @text = text
-        def read = @text
-        def write(text) = @text = text
-        def remove = @text = nil
-      end
     end
   end
 end

@@ -7,7 +7,7 @@ require_relative "presentation_helper"
 class AchievementsOnStatsTest < Minitest::Test
   include PresentationTest
 
-  Memory = DotPopper::Gameplay::ScoreRecord::Memory
+  Memory = DotPopper::MemoryFile
   MEDIUM = DotPopper::Gameplay::SizeClass::MEDIUM
 
   def setup

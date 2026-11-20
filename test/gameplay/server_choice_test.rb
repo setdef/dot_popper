@@ -5,7 +5,7 @@ require "test_helper"
 # Which server friend groups and themes use: setdef's, or while setdef is
 # gone, one the player pasted.
 class ServerChoiceTest < Minitest::Test
-  Memory = DotPopper::Gameplay::ScoreRecord::Memory
+  Memory = DotPopper::MemoryFile
   OWN = "https://server.dot-popper.setdef.com"
   Gone = DotPopper::Gameplay::SetdefGone
   JAN1 = Date.new(2027, 1, 1)

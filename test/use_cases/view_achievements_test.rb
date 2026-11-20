@@ -7,7 +7,7 @@ require "dot_popper/use_cases"
 # was earned, when, how many and how far along is Pro's.
 class ViewAchievementsTest < Minitest::Test
   include DotPopperTest
-  Memory = DotPopper::Gameplay::ScoreRecord::Memory
+  Memory = DotPopper::MemoryFile
 
   def setup
     @achievements = DotPopper::Gameplay::Achievements.new(Memory.new)

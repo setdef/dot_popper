@@ -15,7 +15,7 @@
 # is then an unknown constant or type. A signature file of another area
 # that a target loads is a breach of the rules, listed with the step of
 # the refactoring list that removes it.
-SHARED = %w[sig/core sig/dot_popper.rbs sig/dot_popper/network.rbs sig/dot_popper/platform.rbs sig/dot_popper/automation.rbs].freeze
+SHARED = %w[sig/core sig/dot_popper.rbs sig/dot_popper/network.rbs sig/dot_popper/platform.rbs sig/dot_popper/automation.rbs sig/dot_popper/memory_file.rbs].freeze
 LIBRARIES = %w[date socket uri].freeze
 
 STRICT = lambda do |hash|
@@ -36,8 +36,6 @@ end
 # interface at run time.
 target :monetization do
   signature(*SHARED, "sig/dot_popper/monetization",
-            # The save file kept in memory is the score record's (step 2.3).
-            "sig/dot_popper/gameplay/score_record.rbs", "sig/dot_popper/gameplay/size_class.rbs",
             # The store and the receipts ask the build's channel (steps 5.1
             # to 5.4), and the license whether it keeps keys (6.2).
             "sig/dot_popper/release_engineering/build.rbs")

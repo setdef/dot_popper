@@ -196,7 +196,7 @@ class TutorialBeatsTest < Minitest::Test
     game_flow = DotPopper::Gameplay::GameFlow.new(DotPopper::Gameplay::Field.new(width, height, radius), random: Random.new(2))
     screen = Layout.new(width:, height:, safe: Rect.new(x: 0, y: 0, width:, height:), style: Style::LAYOUT)
     show = PresentationTest.show(game_flow:, layout: screen, sounds: FakeSounds.new, radius:, random: Random.new(3),
-                    tutorial_flag: TutorialFlag.new(DotPopper::Gameplay::ScoreRecord::Memory.new))
+                    tutorial_flag: TutorialFlag.new(DotPopper::MemoryFile.new))
     reach = show.play_reach
     show.tap(reach.center_x, reach.center_y)
     tapped = []

@@ -3,7 +3,7 @@
 require "test_helper"
 
 class StatsBackupTest < Minitest::Test
-  Memory = DotPopper::Gameplay::ScoreRecord::Memory
+  Memory = DotPopper::MemoryFile
   MEDIUM = DotPopper::Gameplay::SizeClass::MEDIUM
   SCORE_RECORD = "medium=24\nsmall=6\n"
   STATS = "games=3\npops=40\nrecent=12,24,4\ngoal_streak=2\nlongest_goal_streak=5\ngoal_met_on=2026-11-05\n" \

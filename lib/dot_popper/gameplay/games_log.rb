@@ -19,7 +19,7 @@ module DotPopper
       HEADER = COLUMNS.join(",")
 
       def initialize(file, now: -> { Time.now }, today: -> { now.call.to_date },
-                     archive: ->(_name) { ScoreRecord::Memory.new })
+                     archive: ->(_name) { MemoryFile.new })
         @file = file
         @now = now
         @today = today

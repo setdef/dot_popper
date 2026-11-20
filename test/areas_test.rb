@@ -42,17 +42,14 @@ class AreasTest < Minitest::Test
   # What each area may name besides itself, as DotPopper::<name> and
   # everything inside it.
   ALLOWED = {
-    "Gameplay" => %w[Network Platform Automation],
-    "Monetization" => %w[Gameplay::Events Network Platform Automation],
+    "Gameplay" => %w[Network Platform Automation MemoryFile],
+    "Monetization" => %w[Gameplay::Events Network Platform Automation MemoryFile],
     "ReleaseEngineering" => %w[]
   }.freeze
 
   # [file, the constant it names] => [times named, the step of the
   # refactoring list that removes it].
   BREACHES = {
-    # The save file kept in memory is the score record's (step 2.3).
-    ["lib/dot_popper/monetization/free_games.rb", "DotPopper::Gameplay::ScoreRecord::Memory"] => [1, "2.3"],
-    ["lib/dot_popper/monetization/continuity/license.rb", "DotPopper::Gameplay::ScoreRecord::Memory"] => [1, "2.3"],
     # Monetization asks the build's channel at run time, which one
     # registry of channels and one store per build remove (steps 5.1 to
     # 5.4), and whether a channel keeps license keys, which goes to the

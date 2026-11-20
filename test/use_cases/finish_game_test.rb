@@ -7,7 +7,7 @@ require "dot_popper/use_cases"
 # Game Over shows and friend groups hear of an achievement is Pro's.
 class FinishGameTest < Minitest::Test
   include DotPopperTest
-  Memory = DotPopper::Gameplay::ScoreRecord::Memory
+  Memory = DotPopper::MemoryFile
 
   # Friend groups as a local fake: what they were told.
   class Groups

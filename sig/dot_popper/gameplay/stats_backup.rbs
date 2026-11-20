@@ -9,7 +9,7 @@ module DotPopper
         def restore: (String? text) -> void
       end
 
-      type folder = ^(String name) -> ScoreRecord::_Removable
+      type folder = ^(String name) -> ::DotPopper::_RemovableSaveFile
 
       NOTE: String
 
@@ -38,11 +38,11 @@ module DotPopper
       end
 
       class Folder
-        @files: Hash[String, ScoreRecord::Memory]
+        @files: Hash[String, ::DotPopper::MemoryFile]
 
         def initialize: () -> void
 
-        def call: (String name) -> ScoreRecord::Memory
+        def call: (String name) -> ::DotPopper::MemoryFile
       end
 
       private

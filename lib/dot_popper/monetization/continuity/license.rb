@@ -29,7 +29,7 @@ module DotPopper
         # on disk grants nothing and is never sent, and keeps nothing in its
         # place.
         def self.kept_in(channel)
-          ReleaseEngineering::Build.license_keys?(channel) ? yield : Gameplay::ScoreRecord::Memory.new
+          ReleaseEngineering::Build.license_keys?(channel) ? yield : MemoryFile.new
         end
 
         def initialize(file, pins: PINNED, fresh: -> { SignedAnswers.fresh })

@@ -1,0 +1,28 @@
+module DotPopper
+  # What an object that keeps something saved reads and writes: a save
+  # file (Shell::SaveFile in the game, MemoryFile in tests).
+  interface _SaveFile
+    def read: () -> String?
+
+    def write: (String text) -> void
+  end
+
+  # A save file that can also be removed (a backup's).
+  interface _RemovableSaveFile
+    include _SaveFile
+
+    def remove: () -> void
+  end
+
+  class MemoryFile
+    @text: String?
+
+    def initialize: (?String? text) -> void
+
+    def read: () -> String?
+
+    def write: (String text) -> String
+
+    def remove: () -> nil
+  end
+end

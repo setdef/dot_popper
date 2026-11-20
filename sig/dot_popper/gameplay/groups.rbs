@@ -386,7 +386,7 @@ module DotPopper
 
         NO_WORKER: NoWorker
 
-        @file: ScoreRecord::_SaveFile
+        @file: ::DotPopper::_SaveFile
 
         @worker: _Worker
 
@@ -418,7 +418,7 @@ module DotPopper
 
         def self.off: () -> Session
 
-        def self.at: (String? url, file: ScoreRecord::_SaveFile) -> Session
+        def self.at: (String? url, file: ::DotPopper::_SaveFile) -> Session
 
         attr_reader error: Symbol?
 
@@ -426,7 +426,7 @@ module DotPopper
 
         attr_reader game_result: GameResult?
 
-        def initialize: (file: ScoreRecord::_SaveFile, worker: _Worker, ?now: ^() -> Time, ?available: bool) -> void
+        def initialize: (file: ::DotPopper::_SaveFile, worker: _Worker, ?now: ^() -> Time, ?available: bool) -> void
 
         def available?: () -> bool
 

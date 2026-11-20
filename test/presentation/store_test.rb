@@ -54,7 +54,7 @@ class StoreTest < Minitest::Test
   end
 
   # The fake store's adapter, which only a test build chooses.
-  def fake = @fake ||= DotPopper::Monetization::FakeStore.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
+  def fake = @fake ||= DotPopper::Monetization::FakeStore.new(DotPopper::MemoryFile.new)
 
   def hear(text)
     @answers.text = text
@@ -77,7 +77,7 @@ class StoreTest < Minitest::Test
     assert_nil Store::BUILD_CHANNEL
     %w[iOS Android].each do |os|
       store = Store.of_test_build(DotPopperTest.platform(os), fake:, entitlement: @entitlement)
-      games = DotPopper::Monetization::FreeGames.new(DotPopper::Gameplay::ScoreRecord::Memory.new, today: -> { Date.today }, entitlement: @entitlement,
+      games = DotPopper::Monetization::FreeGames.new(DotPopper::MemoryFile.new, today: -> { Date.today }, entitlement: @entitlement,
                                                                          metered: store.offered?)
 
       assert_predicate games, :metered?, os

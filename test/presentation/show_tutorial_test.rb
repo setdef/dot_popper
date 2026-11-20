@@ -12,9 +12,9 @@ class ShowTutorialTest < Minitest::Test
 
   def setup
     @sounds = FakeSounds.new
-    @file = DotPopper::Gameplay::ScoreRecord::Memory.new
-    @score_record = DotPopper::Gameplay::ScoreRecord.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
-    @saved_stats = DotPopper::Gameplay::SavedStats.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
+    @file = DotPopper::MemoryFile.new
+    @score_record = DotPopper::Gameplay::ScoreRecord.new(DotPopper::MemoryFile.new)
+    @saved_stats = DotPopper::Gameplay::SavedStats.new(DotPopper::MemoryFile.new)
     @game_flow = DotPopper::Gameplay::GameFlow.new(field, score_record: @score_record, random: Random.new(2))
     @events = []
     @game_flow.subscribe { @events << it.class }

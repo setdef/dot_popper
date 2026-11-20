@@ -22,7 +22,7 @@ module DotPopper
 
       attr_reader :state, :score_record, :screen, :sizing
 
-      def initialize(screen, score_record: ScoreRecord.new(ScoreRecord::Memory.new), random: Random.new,
+      def initialize(screen, score_record: ScoreRecord.new(MemoryFile.new), random: Random.new,
                      sizing: DotSizing::BIGGER_OR_SMALLER)
         @screen = screen
         @sizing = sizing

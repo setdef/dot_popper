@@ -9,7 +9,7 @@ module DotPopper
 
       CHOSEN: String
 
-      @file: ScoreRecord::_SaveFile
+      @file: ::DotPopper::_SaveFile
 
       @themes: Array[Theme]
 
@@ -19,7 +19,7 @@ module DotPopper
 
       @chosen: theme_key?
 
-      def initialize: (ScoreRecord::_SaveFile file, ?themes: Array[Theme]) -> void
+      def initialize: (::DotPopper::_SaveFile file, ?themes: Array[Theme]) -> void
 
       def ordinary: () -> theme_key
 

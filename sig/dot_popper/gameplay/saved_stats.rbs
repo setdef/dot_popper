@@ -3,13 +3,13 @@ module DotPopper
     class SavedStats
       attr_reader stats: Stats
 
-      @file: ScoreRecord::_SaveFile
+      @file: ::DotPopper::_SaveFile
 
       @today: ^() -> Date
 
       @legacy: SizeClass
 
-      def initialize: (ScoreRecord::_SaveFile file, ?today: ^() -> Date, ?legacy: SizeClass) -> void
+      def initialize: (::DotPopper::_SaveFile file, ?today: ^() -> Date, ?legacy: SizeClass) -> void
 
       def record: (GameStats game, SizeClass size_class) -> Result
 

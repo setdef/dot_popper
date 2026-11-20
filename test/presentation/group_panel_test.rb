@@ -27,7 +27,7 @@ class GroupPanelTest < Minitest::Test
   def setup
     @sounds = FakeSounds.new
     @worker = ManualWorker.new
-    @session = Groups::Session.new(file: DotPopper::Gameplay::ScoreRecord::Memory.new, worker: @worker)
+    @session = Groups::Session.new(file: DotPopper::MemoryFile.new, worker: @worker)
     @pro = DotPopper::Monetization::Entitlement.new(forced: true)
     @game_flow = DotPopper::Gameplay::GameFlow.new(field)
     build
@@ -207,7 +207,7 @@ class GroupPanelTest < Minitest::Test
   end
 
   def with_notice(saved = nil)
-    @notice_file = DotPopper::Gameplay::ScoreRecord::Memory.new(saved)
+    @notice_file = DotPopper::MemoryFile.new(saved)
     @links = Links.new
     build(group_notice: DotPopper::Presentation::GroupNotice.new(@notice_file), links: @links)
   end
@@ -455,7 +455,7 @@ class GroupPanelTest < Minitest::Test
   end
 
   def test_a_list_too_long_for_its_window_scrolls
-    @session = Groups::Session.new(file: DotPopper::Gameplay::ScoreRecord::Memory.new, worker: @worker)
+    @session = Groups::Session.new(file: DotPopper::MemoryFile.new, worker: @worker)
     build(width: 400, height: 500)
     join!
     groups = (1..20).map { group(id: it) }
@@ -499,7 +499,7 @@ class GroupPanelTest < Minitest::Test
   end
 
   def test_a_controller_labels_a_group_and_steps_through_the_groups
-    @session = Groups::Session.new(file: DotPopper::Gameplay::ScoreRecord::Memory.new, worker: @worker)
+    @session = Groups::Session.new(file: DotPopper::MemoryFile.new, worker: @worker)
     build
     join!
     groups = [group(id: 1), group(id: 2)]
@@ -573,7 +573,7 @@ class GroupPanelTest < Minitest::Test
   # friend groups' screen overlaps or leaves the safe area, at any size.
   def test_labeled_screens_and_the_notice_fit_every_size
     SIZES.each do |width, height|
-      @session = Groups::Session.new(file: DotPopper::Gameplay::ScoreRecord::Memory.new, worker: @worker)
+      @session = Groups::Session.new(file: DotPopper::MemoryFile.new, worker: @worker)
       build(width:, height:)
       join!
       groups = [group(id: 1), group(id: 2)]
@@ -588,7 +588,7 @@ class GroupPanelTest < Minitest::Test
       @show.pad(:x)
       assert_apart("#{width}x#{height} keypad")
       @show.back
-      build(width:, height:, group_notice: DotPopper::Presentation::GroupNotice.new(DotPopper::Gameplay::ScoreRecord::Memory.new))
+      build(width:, height:, group_notice: DotPopper::Presentation::GroupNotice.new(DotPopper::MemoryFile.new))
       gamepad!
       panel.open
       @show.pad(:y)

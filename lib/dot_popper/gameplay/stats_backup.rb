@@ -52,7 +52,7 @@ module DotPopper
       # folder.
       class Folder
         def initialize = @files = {}
-        def call(name) = @files[name] ||= ScoreRecord::Memory.new
+        def call(name) = @files[name] ||= MemoryFile.new
       end
 
       private

@@ -7,7 +7,7 @@ require_relative "presentation_helper"
 class GamesTest < Minitest::Test
   include PresentationTest
 
-  Memory = DotPopper::Gameplay::ScoreRecord::Memory
+  Memory = DotPopper::MemoryFile
 
   class Store
     def offered? = true

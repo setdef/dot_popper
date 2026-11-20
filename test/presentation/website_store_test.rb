@@ -19,7 +19,7 @@ class WebsiteStoreTest < Minitest::Test
   FakeCheckout = DotPopper::Monetization::FakeCheckout
 
   C = DotPopper::Monetization::Continuity
-  Memory = DotPopper::Gameplay::ScoreRecord::Memory
+  Memory = DotPopper::MemoryFile
 
   def setup
     @clipboard = MemoryClipboard.new

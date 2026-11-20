@@ -6,7 +6,7 @@ class GamesLogTest < Minitest::Test
   include DotPopperTest
 
   def setup
-    @file = DotPopper::Gameplay::ScoreRecord::Memory.new
+    @file = DotPopper::MemoryFile.new
     @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(9))
     @game_flow.subscribe(DotPopper::Gameplay::GamesLog.new(@file, now: -> { Time.utc(2026, 11, 5, 9, 30) },
                                                today: -> { Date.new(2026, 11, 5) }))
@@ -29,11 +29,11 @@ class GamesLogTest < Minitest::Test
 
   def test_a_log_with_other_columns_is_set_aside_and_a_new_one_begins
     old = "time,mode,seed,score\n2026-11-04T20:00:00Z,daily,7,12\n"
-    file = DotPopper::Gameplay::ScoreRecord::Memory.new(old)
+    file = DotPopper::MemoryFile.new(old)
     archives = {}
     game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(9))
     game_flow.subscribe(DotPopper::Gameplay::GamesLog.new(file, now: -> { Time.utc(2026, 11, 5, 9, 30, 15) },
-                                              archive: ->(name) { archives[name] = DotPopper::Gameplay::ScoreRecord::Memory.new }))
+                                              archive: ->(name) { archives[name] = DotPopper::MemoryFile.new }))
     @game_flow = game_flow
     play_game(dots_popped: 1)
     play_game(dots_popped: 1)

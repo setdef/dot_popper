@@ -12,6 +12,7 @@ require_relative "dot_popper/release_engineering"
 require_relative "dot_popper/platform"
 require_relative "dot_popper/automation"
 require_relative "dot_popper/network"
+require_relative "dot_popper/memory_file"
 # Monetization has no loader of its own yet: its store names Release
 # Engineering's Build as it loads (test/area_loaders_test.rb).
 require_relative "dot_popper/monetization/receipt"

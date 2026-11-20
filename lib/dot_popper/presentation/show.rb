@@ -41,8 +41,8 @@ module DotPopper
 
       def initialize(game_flow:, layout:, sounds:, radius:, start_game:, finish_game:, buy_pro:, use_theme:, join_or_create_friend_group:,
                      view_achievements:, saved_stats:, achievements:, saved_themes:, groups:, style: Style, random: Random.new, calm: false,
-                     tutor: Tutor.new(Gameplay::ScoreRecord::Memory.new, times: style::LESSON.times), haptics: NoHaptics.new, clipboard: MemoryClipboard.new,
-                     sizing_file: Gameplay::ScoreRecord::Memory.new, input: InputKind::MOUSE, measure: RoughMeasure.new,
+                     tutor: Tutor.new(MemoryFile.new, times: style::LESSON.times), haptics: NoHaptics.new, clipboard: MemoryClipboard.new,
+                     sizing_file: MemoryFile.new, input: InputKind::MOUSE, measure: RoughMeasure.new,
                      stats_backup: Gameplay::StatsBackup.new(score_record: game_flow.score_record, saved_stats:, achievements:), notices: Notices.none,
                      sharing: InGameSharing.new, tutorial_flag: TutorialFlag.never, window: NoWindowControl.new,
                      links: NoLinks.new, group_notice: GroupNotice.read, server_choice: nil)

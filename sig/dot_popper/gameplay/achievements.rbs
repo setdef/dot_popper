@@ -1,11 +1,11 @@
 module DotPopper
   module Gameplay
     class Achievements
-      @file: ScoreRecord::_SaveFile
+      @file: ::DotPopper::_SaveFile
 
       @days: Hash[Achievement::id, String]
 
-      def initialize: (ScoreRecord::_SaveFile file) -> void
+      def initialize: (::DotPopper::_SaveFile file) -> void
 
       def earned?: (Achievement::id id) -> bool
 

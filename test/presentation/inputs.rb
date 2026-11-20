@@ -11,7 +11,7 @@ require "platforms_helper"
 module Inputs
   include PresentationTest
 
-  Memory = DotPopper::Gameplay::ScoreRecord::Memory
+  Memory = DotPopper::MemoryFile
   P = DotPopper::Presentation
 
   # Opens nothing, and remembers what it was asked to open: the share

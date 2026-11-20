@@ -12,7 +12,7 @@ require "dot_popper/privacy/save_files"
 class FakeEngine
   include PresentationTest
 
-  Memory = DotPopper::Gameplay::ScoreRecord::Memory
+  Memory = DotPopper::MemoryFile
 
   # A computer's window control, made with whether its fullscreen is
   # exclusive.

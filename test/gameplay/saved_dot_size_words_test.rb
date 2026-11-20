@@ -43,7 +43,7 @@ class SavedDotSizeWordsTest < Minitest::Test
 
   def test_score_record_txt_reads_and_writes_the_same_bytes
     text = "fitted=12\nsmall=5\nmedium=24\nlarge=40\n"
-    file = ScoreRecord::Memory.new(text)
+    file = DotPopper::MemoryFile.new(text)
     score_record = ScoreRecord.new(file)
 
     assert_equal 12, score_record.of(DotSizing.parse("fitted").size_class(PHONE))
