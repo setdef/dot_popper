@@ -16,7 +16,7 @@ module DotPopper
       # The server for the settings +env+ (Build.settings, so a store
       # build ignores DOT_POPPER_SERVER). An automated run (Automation)
       # has no server unless it names a local fake.
-      def self.server_url(env)
+      def self.url(env)
         fallback = Automation.on?(env) ? "" : SERVER_URL
         env.fetch(OVERRIDE, fallback).then { it.empty? ? nil : it }
       end

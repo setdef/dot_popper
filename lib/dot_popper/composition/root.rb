@@ -105,7 +105,7 @@ module DotPopper
       # is gone, a replacement the player chose (ServerChoice),
       # or none in an automated run.
       def server_url
-        own = Network::Server.server_url(settings.env) or return
+        own = Network::Server.url(settings.env) or return
         @server_choice.server_url(own)
       end
 
@@ -222,7 +222,7 @@ module DotPopper
       # so setdef's is never sent to a replacement.
       def groups_session
         url = server_url
-        own = url.nil? || url == Network::Server.server_url(settings.env)
+        own = url.nil? || url == Network::Server.url(settings.env)
         Groups::Session.at(url, file: own ? file("group.txt") : file("group-#{URI(url).host.to_s.downcase}.txt"))
       end
 
