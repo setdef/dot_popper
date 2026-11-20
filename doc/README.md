@@ -87,7 +87,7 @@ The game reads these from its environment. `main.rb` lists them all.
 
 | Setting | What it does |
 | --- | --- |
-| `DOT_POPPER_AUTOPLAY=1` | A bot plays: the title, a game, Game Over, and again. It sometimes taps a popped dot, so mistakes show |
+| `DOT_POPPER_AUTOPLAY=1` | A bot plays: Home, a game, Game Over, and again. It sometimes taps a popped dot, so mistakes show |
 | `DOT_POPPER_NO_SPLASH=1` | Skips setdef's splash screen |
 | `DOT_POPPER_SAVE_AS=test` | Saves in a folder of this name, so a run starts with no records |
 | `DOT_POPPER_SEED=42` | Makes the dots' randomness repeatable |

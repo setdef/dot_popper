@@ -116,7 +116,7 @@ module DotPopper
 
       # A phone's or tablet's game fills its screen; a computer's window is
       # sized to the play area, or to DOT_POPPER_WINDOW's size. A desktop's
-      # title offers "Full screen" and Quit; a phone's or tablet's game
+      # Home offers "Full screen" and Quit; a phone's or tablet's game
       # leaves by the system.
       def open_window
         if platform.touch?
