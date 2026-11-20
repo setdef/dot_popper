@@ -11,7 +11,8 @@
 # With MISE_ENV=android or MISE_ENV=ios it also installs what
 # mise.android.toml or mise.ios.toml pins for the phone builds.
 #
-# On Windows, run it from an MSYS2 UCRT64 shell (PACKAGING.md says why).
+# On Windows, run it from a bash (MSYS2's, or Git for Windows'): mise.toml
+# brings the MSYS2 with GCC that the Windows Ruby needs.
 set -euo pipefail
 
 root=$(cd "$(dirname "$0")/.." && pwd)

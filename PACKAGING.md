@@ -120,7 +120,7 @@ What parts cost: a reader of the shared code doesn't see the test build's answer
 
 ## Building on your own computer
 
-You need the Ruby `mise.toml` pins (4.1.0-preview1, the version in `.ruby-version`; on Windows RubyInstaller's head build of 2026-11-10, from an MSYS2 UCRT64 shell, where `mise.toml` points `RUBY_DLL_PATH` at a folder with `zlib1.dll`, as [the README](doc/README.md) says), and Git. Each platform can build only its own app, so build the macOS app on a Mac, the Windows app on Windows, and the Linux app on Linux.
+Set the clone up with `script/setup`, which installs the Ruby `mise.toml` pins (4.1.0-preview1, the version in `.ruby-version`; on Windows RubyInstaller's head build of 2026-11-10, with the MSYS2 it needs) and the bundle, as [the developer guide](doc/README.md#getting-started) says, and run the commands below with that Ruby (`mise exec --`, or in a shell where mise is activated). You also need Git. Each platform can build only its own app, so build the macOS app on a Mac, the Windows app on Windows, and the Linux app on Linux.
 
 ```console
 $ gem install --local vendor/cache/lota-0.5.2-arm64-darwin.gem
@@ -132,7 +132,7 @@ Built the app for arm64-darwin only. Run lota fuse on each platform you ship for
 
 Use the gem for your platform: `x64-mingw-ucrt` on Windows with RubyInstaller's Ruby, `x86_64-linux-gnu` on Linux. The first build downloads Fledge's Ruby runtime for your platform, which takes about a minute. The `dist/` folder is ignored by git.
 
-On a Mac with Apple silicon, `script/macos_app.sh` builds and checks the macOS app as the Package workflow does, short of playing it. It needs the game's Ruby (`mise install`), Git, and Xcode's command line tools, and nothing else beyond macOS's own:
+On a Mac with Apple silicon, `script/macos_app.sh` builds and checks the macOS app as the Package workflow does, short of playing it. It needs the game's Ruby (`script/setup`), Git, and Xcode's command line tools, and nothing else beyond macOS's own:
 
 ```console
 $ script/macos_app.sh test             # the playtest build: the app's Info.plist and program, and the .dmg
@@ -209,7 +209,7 @@ This kit is **experimental**, as Lota's phone route is. The Kits workflow takes 
 3. lay out the guide's phone project: the game's files in `game/dot_popper` (less what only the repository needs: tests, docs, CI, `ios/`, `android/`, and `vendor/`), a `main.rb` that loads its `bin/dot_popper`, Lota's iOS host from the gem in `host/ios` with Dot Popper's `ios/host` over it, a Gemfile with `gem "lota", path: <that folder>` and Fledge v0.12.0, and a `fledge.yml` with the name `DotPopper`, the identifier, the version, the icon, and `ios: host: host/ios`;
 4. `bundle config set --local build.lota "--with-lota-source=... --with-lota-sdl3=.../tmp/ios/sdl3 --with-rice-dir=..."`, `bundle lock --add-platform ruby`, `bundle install`, and `bundle exec fledge build ios`.
 
-Beyond Xcode, the route needs XcodeGen, which `fledge build ios` writes the Xcode project with, and the CMake and Ninja that `rake ios:sdl3` builds with. The workflow takes them from Homebrew. `mise.ios.toml` pins them for any other Mac, at the CMake and Ninja that `mise.android.toml` pins for Lota, and mise reads it only with `MISE_ENV=ios` (`MISE_ENV=ios mise install`), so the desktop game's setup downloads none of it. `ios/store_check` needs the same XcodeGen.
+Beyond Xcode, the route needs XcodeGen, which `fledge build ios` writes the Xcode project with, and the CMake and Ninja that `rake ios:sdl3` builds with. The workflow takes them from Homebrew. `mise.ios.toml` pins them for any other Mac, at the CMake and Ninja that `mise.android.toml` pins for Lota, and mise reads it only with `MISE_ENV=ios` (`MISE_ENV=ios script/setup`), so the desktop game's setup downloads none of it. `ios/store_check` needs the same XcodeGen.
 
 On a Mac, `MISE_ENV=ios mise exec -- script/ios_app.sh` builds the app the same way from the commit at HEAD, unsigned, and makes the workflows' checks short of running it: that the project stands on its own (no path of the computer it was built on, the audio session, the display name, the night's ink, the store), and that the Debug app for the Simulator and the Debug and Release apps for devices each carry the privacy manifest and Lota's notices. It takes Lota and Fledge from `Gemfile.lock` (`script/lota_pins.sh`), keeps Lota's clone with SDL3 built in `~/.cache/dot_popper/ios-lota` (or `$XDG_CACHE_HOME/dot_popper/ios-lota`), so only its first build takes long, and with `--out DIR` keeps the unsigned Debug app for devices. It signs and installs nothing: only the Kits workflow's Simulator job plays the app.
 
@@ -232,7 +232,7 @@ This kit is **experimental**, as Lota's phone route is. The [Android workflow](.
 To build the APK on your own Linux x86_64 computer, with Ruby 4.1.0-preview1, Git, curl, unzip, and a C compiler:
 
 ```console
-$ MISE_ENV=android mise install
+$ MISE_ENV=android script/setup
 $ MISE_ENV=android mise exec -- script/android_build.sh
 tmp/android/out/DotPopper-debug.apk
 ```
@@ -248,7 +248,7 @@ A second job, on a fresh runner, unzips the kit, installs its APK on an `x86_64`
 To run the emulator checks on your own Linux x86_64 computer with KVM, on the app this commit builds:
 
 ```console
-$ MISE_ENV=android mise install
+$ MISE_ENV=android script/setup
 $ MISE_ENV=android mise exec -- script/android_check.sh
 android check: the app: this commit's game laid into app-3269838aa9ea7403.apk (2 s)
 android check: booted from the snapshot (6 s)

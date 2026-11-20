@@ -65,12 +65,11 @@ Clone the repository, install Ruby and the gems, and run the game:
 ```console
 $ git clone https://github.com/setdef/dot_popper.git
 $ cd dot_popper
-$ mise install
-$ bundle install
-$ bundle exec lota run
+$ script/setup
+$ mise exec -- bundle exec lota run
 ```
 
-`mise install` installs Ruby 4.1.0-preview1, or on Windows the head build. Any Ruby version manager that reads `.ruby-version` works as well on macOS and Linux. On Windows, run it from an MSYS2 UCRT64 shell (RubyInstaller's devkit has one): the head build carries no `zlib1.dll`, and `mise.toml` points `RUBY_DLL_PATH` at that MSYS2's UCRT64 `bin` folder, which has one. Without mise, set `RUBY_DLL_PATH` to such a folder yourself before `bundle install`. `bundle exec lota run` opens the game in a window and prints what it found, such as:
+`script/setup` needs [mise](https://mise.jdx.dev) and a bash, and nothing else: on Windows, MSYS2's or Git for Windows' bash. It installs what `mise.toml` pins for your system, and then the bundle: on macOS and Linux Ruby 4.1.0-preview1, the prebuilt archive `mise.lock` names, which it unpacks rather than compiles; on Windows RubyInstaller's head build, with an MSYS2 whose UCRT64 GCC builds the gems' native extensions and whose `zlib1.dll` the head build loads. Run it again whenever the pins or `Gemfile.lock` change: with nothing to do, it prints nothing and takes a second or two. Every command after it runs the game's Ruby through `mise exec --`, or in a shell where mise is activated. `MISE_ENV=android script/setup` or `MISE_ENV=ios script/setup` also installs what the phone builds need ([PACKAGING.md](../PACKAGING.md)). `bundle exec lota run` opens the game in a window and prints what it found, such as:
 
 ```text
 Dot Popper: a dot's radius is 50 logical pixels
