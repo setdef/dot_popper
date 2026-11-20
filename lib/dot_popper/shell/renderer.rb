@@ -65,7 +65,7 @@ module DotPopper
         else game(width, height, layout)
         end
         screens(state, width, height, layout)
-        banner(layout) if @show.screen.announces?
+        announcement(layout) if @show.screen.announces?
         splash ? @splash.draw(splash) : @cursor.draw(cursor)
       end
 
@@ -183,7 +183,7 @@ module DotPopper
       end
 
       # A title change's announcement, for the few seconds it shows.
-      def banner(layout) = @group.banner(@show.group_panel.banner, @show.now, layout, @show.banner_y)
+      def announcement(layout) = @group.announcement(@show.group_panel.announcement, @show.now, layout, @show.announcement_y)
 
       def radius = @show.game_flow.field.radius
 

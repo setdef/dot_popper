@@ -144,11 +144,11 @@ module DotPopper
     # Show's stack of screens says so, and the panel keeps no flag of its
     # own beside it.
     class GroupPanel
-      BANNER_SECONDS = 4.0
+      ANNOUNCEMENT_SECONDS = 4.0
       HOLD = 2.0
       PAGES = %i[list group history join].freeze
 
-      attr_reader :groups, :code, :banner, :hold, :note, :page, :group_id
+      attr_reader :groups, :code, :announcement, :hold, :note, :page, :group_id
 
       def initialize(groups:, joining:, sounds:, pro_offer: ->(_feature) {}, notice: GroupNotice.read, shown: ->(_open) {},
                      open: -> { false })
@@ -165,7 +165,7 @@ module DotPopper
         @code = ""
         @hold = HoldToConfirm.idle(HOLD)
         @holding = nil
-        @banner = nil
+        @announcement = nil
         @note = nil
         groups.refresh
       end
@@ -220,11 +220,11 @@ module DotPopper
         finish_hold if hold.done?(now)
         arrive
         leave_page_if_gone
-        @banner = nil if @banner&.over?(now)
-        return if @banner || !showing || open?
+        @announcement = nil if @announcement&.over?(now)
+        return if @announcement || !showing || open?
 
         item = groups.next_announcement or return
-        @banner = ShownAnnouncement.new(text: GroupWords.announcement(item), at: now, seconds: BANNER_SECONDS,
+        @announcement = ShownAnnouncement.new(text: GroupWords.announcement(item), at: now, seconds: ANNOUNCEMENT_SECONDS,
                                   group_id: item.group_id, number: item.champion_number)
       end
 

@@ -620,7 +620,7 @@ class GroupPanelTest < Minitest::Test
     tap_control(:back)
     panel.update(1.0, quiet: false, showing: false)
 
-    assert_nil panel.banner
+    assert_nil panel.announcement
     tick
     groups_moved = group(top: 40, champion: 1)
     @session.refresh
@@ -630,8 +630,8 @@ class GroupPanelTest < Minitest::Test
     reply(200, [{ "id" => 9, "champion_number" => 1, "previous_champion_number" => 2, "score" => 40 }])
     tick
 
-    assert_match(/took your title/, panel.banner.text)
-    assert_equal 1, panel.banner.number
+    assert_match(/took your title/, panel.announcement.text)
+    assert_equal 1, panel.announcement.number
   end
 
   # An announcement shows only where the renderer draws one, over Home
@@ -650,11 +650,11 @@ class GroupPanelTest < Minitest::Test
     reply(200, [{ "id" => 9, "champion_number" => 1, "previous_champion_number" => 2, "score" => 40 }])
     tick(5.0)
 
-    assert_nil panel.banner, "not over Themes"
+    assert_nil panel.announcement, "not over Themes"
     @show.back
     tick
 
-    assert_match(/took your title/, panel.banner&.text.to_s)
+    assert_match(/took your title/, panel.announcement&.text.to_s)
   end
 
   def test_game_over_holds_a_blank_for_the_line_and_then_says_it

@@ -108,6 +108,6 @@ class AskingAgainTest < Minitest::Test
     @groups_worker.answer(Reply.new(status: 200, body: [{ "id" => 9, "champion_number" => 1, "previous_champion_number" => 2, "score" => 40 }]))
     tick
 
-    assert_match(/took your title/, @show.group_panel.banner.text)
+    assert_match(/took your title/, @show.group_panel.announcement.text)
   end
 end

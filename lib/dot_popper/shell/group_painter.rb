@@ -62,23 +62,23 @@ module DotPopper
 
       # The announcement at +y+, on a dark pill so it reads over anything,
       # for the moment it shows, with the group's crest and the champion's
-      # icon. +banner+ is nil most of the time.
-      def banner(banner, now, layout, y)
-        return unless banner
+      # icon. +announcement+ is nil most of the time.
+      def announcement(announcement, now, layout, y)
+        return unless announcement
 
-        alpha = banner.alpha(now)
+        alpha = announcement.alpha(now)
         font = context.fonts.semibold(Presentation::Pixels.font_size(layout.scaled(context.style::GROUPS.text)))
         height = font.height * 1.9
-        width = font.width(banner.text) + (height * 2.7)
+        width = font.width(announcement.text) + (height * 2.7)
         pixels = context.pixels
         x = pixels.snap(layout.center_x - (width / 2.0))
         top = pixels.snap(y)
         middle = top + (height / 2.0)
         context.color(context.palette.ink_bottom, 0.94 * alpha)
         G.rectangle(:fill, x, top, width, height, height / 2.0, height / 2.0, 32)
-        icons.crest(x + (height * 0.55), middle, height * 0.34, banner.group_id, alpha)
-        icons.draw(x + (height * 1.2), middle, height * 0.34, banner.group_id, banner.number, alpha)
-        context.text(banner.text, font, x + (height * 1.7) + (font.width(banner.text) / 2.0), middle, context.palette.cream, alpha)
+        icons.crest(x + (height * 0.55), middle, height * 0.34, announcement.group_id, alpha)
+        icons.draw(x + (height * 1.2), middle, height * 0.34, announcement.group_id, announcement.number, alpha)
+        context.text(announcement.text, font, x + (height * 1.7) + (font.width(announcement.text) / 2.0), middle, context.palette.cream, alpha)
       end
 
       private

@@ -215,7 +215,7 @@ module DotPopper
 
       # Where an announcement goes: under the HUD at Game Over, and at
       # the top of Home, clear of the Group button's row.
-      def banner_y = layout.top
+      def announcement_y = layout.top
 
       # What the Stats screen shows, while it is open.
       def stats = @screens[:stats].sheet
