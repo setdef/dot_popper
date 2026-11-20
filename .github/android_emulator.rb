@@ -19,8 +19,10 @@
 #     [--expect-order REGEX]... [--until-met]
 #
 # --pop taps where the app last printed "kit probe: dot at X, Y in WxH"
-# (graphics units in a window W by H), until it prints "kit probe: event
-# Popped", at most five times. --pull copies, with run-as, every file the
+# (graphics units in a window W by H), until the probe says the game
+# heard a finger let go ("kit probe: touchreleased"), at most five times:
+# the bot may pop the dot first, so the tap is a finger's press and
+# release reaching the game, not a pop of its own. --pull copies, with run-as, every file the
 # app names in a line the REGEX's first group captures. It exits 1 unless
 # every --expect matches a line of the app's, and the --expect-order
 # patterns match lines in the order given; and, whatever was met, if the
@@ -202,7 +204,7 @@ loop do
     adb("shell", "input", "keyevent", key[:code])
     say "sent #{key[:code]}, #{key[:seconds]} s after a line matched #{key[:pattern].source}; #{focused_window}"
   end
-  if pop && pop_taps < 5 && lines.none? { it.include?("kit probe: event Popped") }
+  if pop && pop_taps < 5 && lines.none? { it.start_with?("kit probe: touchreleased") }
     probe = lines.reverse.find { it.include?("kit probe: dot at") }
     match = probe&.match(/dot at ([\d.]+), ([\d.]+) in ([\d.]+)x([\d.]+)/)
     if match && probe != last_tap

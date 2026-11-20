@@ -22,14 +22,17 @@ wanted() { [ -z "${ANDROID_CHECKS:-}" ] || [[ " $ANDROID_CHECKS " == *" $1 "* ]]
 # Game Over, whose "Share my score" would open Android's share sheet
 # over the next run. DOT_POPPER_QUIT_AFTER only makes sure the game
 # ends if it never gets there, since a bonus dot can stretch a game.
+# A finger taps the bright dot in the first game (--pop), and the game
+# must hear it pressed and let go, the touch every phone player gives.
 if wanted autoplay; then
   ruby "$here/android_emulator.rb" "$apk" "$package" "$out/autoplay" \
   --env DOT_POPPER_AUTOPLAY=1 --env DOT_POPPER_SEED=7 --env DOT_POPPER_QUIT_AFTER=120 --env ALSOFT_DRIVERS=null \
   --env DOT_POPPER_SAVE_AS=ci_autoplay --env DOT_POPPER_SHOTS=3,12,25,38 --env DOT_POPPER_KIT_PROBE=1 --env DOT_POPPER_PERF=1 \
-  --ready "Dot Popper: " --shot 5 --shot 20 --timeout 300 --pull "Dot Popper: screenshot (\\S+)" --until-met \
+  --ready "Dot Popper: " --shot 5 --shot 20 --timeout 300 --pull "Dot Popper: screenshot (\\S+)" --until-met --pop \
   --key-after "3:KEYCODE_BACK:kit probe: event GameStarted" \
   --key-after "1:KEYCODE_BACK:kit probe: event GameEnded" \
   --expect "Dot Popper: a dot's radius is 50 dp, about 8 mm" --expect "Dot Popper: screenshot" --expect "Dot Popper: Ed25519 verifies the server's test vector" \
+  --expect "kit probe: touchpressed" --expect "kit probe: touchreleased" \
   --expect-order "kit probe: keypressed :escape, :acback, false in Playing" \
   --expect-order "kit probe: event GameEnded" \
   --expect-order "kit probe: keypressed :escape, :acback, false in GameOver" \

@@ -11,10 +11,10 @@
 # that copy's bin/dot_popper unchanged. Only with
 # DOT_POPPER_KIT_PROBE=1, which the emulator runs pass as an intent extra
 # and a launch from the launcher never has, it also logs what Lota's
-# window reports on frames 60 and 600, each touch and key the game
-# receives (with the state it arrives in), each time the window gains or
-# loses focus and each time the game hears it came back (Refresh),
-# each event the game announces,
+# window reports on frames 60 and 600, each touch pressed and let go and
+# each key the game receives (a key with the state it arrives in), each
+# time the window gains or loses focus and each time the game hears it
+# came back (Refresh), each event the game announces,
 # the frame the setdef splash is over on (a key before then only skips
 # the splash), and, every 15 frames of a game, where its topmost bright
 # dot is.
@@ -26,6 +26,7 @@ if ENV["DOT_POPPER_KIT_PROBE"] == "1"
       super
       kit_wrap_draw if name == :draw && !@kit_draw
       kit_wrap_touch if name == :touchpressed && !@kit_touch
+      kit_wrap_release if name == :touchreleased && !@kit_release
       kit_wrap_load if name == :load && !@kit_load
       kit_wrap_key if name == :keypressed && !@kit_key
       kit_wrap_focus if name == :focus && !@kit_focus
@@ -79,6 +80,15 @@ if ENV["DOT_POPPER_KIT_PROBE"] == "1"
       define_singleton_method(:touchpressed) do |*arguments|
         puts "kit probe: touchpressed #{arguments.map(&:inspect).join(', ')}"
         touch.call(*(touch.arity.negative? ? arguments : arguments.first(touch.arity)))
+      end
+    end
+
+    def kit_wrap_release
+      @kit_release = true
+      release = method(:touchreleased)
+      define_singleton_method(:touchreleased) do |*arguments|
+        puts "kit probe: touchreleased #{arguments.map(&:inspect).join(', ')}"
+        release.call(*(release.arity.negative? ? arguments : arguments.first(release.arity)))
       end
     end
 

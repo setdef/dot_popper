@@ -127,6 +127,7 @@ class KitTest < Minitest::Test
       when "--shell" then drive["shells"] << value.split(":", 2).then { |seconds, command| [Float(seconds), command] }
       when "--ready" then drive["ready"] = value
       when "--timeout" then drive["timeout"] = Float(value)
+      when "--pop" then drive["pop"] = true
       end
     end
     drive

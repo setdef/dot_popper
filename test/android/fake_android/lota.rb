@@ -13,7 +13,11 @@
 # FAKE_ANDROID_DRIVE (JSON) says what to do and when:
 #
 #   {"keys": [[SECONDS, "KEYCODE_BACK", "REGEX"], ...],
-#    "shells": [[SECONDS, "am start ..."], ...], "ready": "REGEX", "timeout": SECONDS}
+#    "shells": [[SECONDS, "am start ..."], ...], "ready": "REGEX", "timeout": SECONDS,
+#    "pop": true}
+#
+# "pop" taps a finger where the probe last said the bright dot is, as
+# the driver's --pop does, until the probe says the game heard it let go.
 #
 # Every line the game prints goes to standard output, as Fledge's host
 # sends it to the log; the host's own last line, "Dot Popper exited with
@@ -140,6 +144,8 @@ module Lota
       @shells = drive.fetch("shells", []).sort_by(&:first)
       @ready = Regexp.new(drive.fetch("ready", "loaded"))
       @timeout = drive.fetch("timeout", 240).to_f
+      @pop = drive.fetch("pop", false)
+      @taps = 0
       @lines = []
     end
 
@@ -200,6 +206,7 @@ module Lota
         ready_at ||= now if @lines.drop(seen).any? { @ready.match?(it) }
         seen = @lines.size
         press_keys(now)
+        tap_the_dot if @pop
         @shells.shift.then { shell(it[1]) } while ready_at && @shells.first && now - ready_at >= @shells.first[0]
       end
       Event.quit_asked ? 0 : 1
@@ -226,6 +233,24 @@ module Lota
         key[5] = @lines.size
         press(key[1])
       end
+    end
+
+    # A finger's tap on the bright dot the probe last named, as SDL hands
+    # it over: pressed, then let go, at most five times, until the probe
+    # says the game heard it let go.
+    def tap_the_dot
+      return if @taps >= 5 || @lines.any? { it.start_with?("kit probe: touchreleased") }
+
+      probe = @lines.reverse.find { it.include?("kit probe: dot at") }
+      match = probe&.match(/dot at ([\d.]+), ([\d.]+) in /)
+      return unless match && probe != @tapped
+
+      @tapped = probe
+      @taps += 1
+      x, y = match.captures.map { Float(it) }
+      STDOUT.puts "fake android: tapped #{x}, #{y}"
+      Lota.touchpressed(1, x, y, 0.0, 0.0, 1.0, "touchscreen", false) if Lota.respond_to?(:touchpressed)
+      Lota.touchreleased(1, x, y, 0.0, 0.0, 1.0, "touchscreen", false) if Lota.respond_to?(:touchreleased)
     end
 
     # What SDL hands the game for each key the checks send.
