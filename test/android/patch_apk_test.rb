@@ -60,6 +60,21 @@ class PatchApkTest < Minitest::Test
     assert_equal ["assets/fledge.zip!app/game/dot_popper/lib/rules.rb"], P.differences(patched, P.patch(base, @project))
   end
 
+  # Gradle's Ant writes every file as 0100644, whatever its mode on disk,
+  # and every folder as 040755 with DOS's folder bit, so a full build's
+  # entries carry those, and the patched app's must too.
+  def test_the_game_entries_carry_the_attributes_a_full_build_gives_them
+    FileUtils.mkdir_p(File.join(@project, "game/dot_popper/bin"))
+    File.binwrite(File.join(@project, "game/dot_popper/bin/dot_popper"), "#!/usr/bin/env ruby\n")
+    File.chmod(0o755, File.join(@project, "game/dot_popper/bin/dot_popper"))
+    inner = P.entries(P.data(P.entries(P.patch(base, @project)).find { it.name == P::ASSET }))
+    attributes = ->(name) { inner.find { it.name == name }.central.unpack1("@38V") }
+
+    assert_equal (0o40755 << 16) | 0x10, attributes.("app/game/dot_popper/bin/")
+    assert_equal 0o100644 << 16, attributes.("app/game/dot_popper/bin/dot_popper")
+    assert_equal 0o100644 << 16, attributes.("app/main.rb")
+  end
+
   def test_a_file_that_is_not_a_zip_is_refused
     assert_raises(ArgumentError) { P.patch("not a zip", @project) }
   end

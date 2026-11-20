@@ -57,9 +57,12 @@ module AndroidPatch
   end
 
   # A stored (uncompressed) entry named +name+ holding +data+, or a
-  # folder's entry for a name that ends in "/", with Unix permissions
-  # +mode+ and the DOS time of 1981-01-01, as Android's packaging writes.
-  def stored(name, data = "", mode: name.end_with?("/") ? 0o40755 : 0o100644)
+  # folder's entry for a name that ends in "/", with the DOS time of
+  # 1981-01-01, as Android's packaging writes, and the attributes Gradle's
+  # Ant gives fledge.zip's entries: 0100644 for every file, whatever its
+  # mode on disk, and 040755 with DOS's folder bit for a folder.
+  def stored(name, data = "")
+    attributes = name.end_with?("/") ? (0o40755 << 16) | 0x10 : 0o100644 << 16
     name = name.b
     data = data.b
     crc = Zlib.crc32(data)
@@ -67,7 +70,7 @@ module AndroidPatch
     date = (1 << 9) | (1 << 5) | 1
     local = ["PK\x03\x04".b, 10, 0x0800, 0, time, date, crc, data.bytesize, data.bytesize, name.bytesize, 0].pack("a4vvvvvVVVvv")
     central = ["PK\x01\x02".b, (3 << 8) | 20, 10, 0x0800, 0, time, date, crc, data.bytesize, data.bytesize, name.bytesize, 0, 0, 0, 0,
-               mode << 16, 0].pack("a4vvvvvvVVVvvvvvVV")
+               attributes, 0].pack("a4vvvvvvVVVvvvvvVV")
     Entry.new(name.force_encoding(Encoding::UTF_8), local + name + data, central + name)
   end
 
@@ -106,7 +109,7 @@ module AndroidPatch
       if File.directory?(path)
         stored("#{GAME}#{name}/")
       else
-        stored("#{GAME}#{name}", File.binread(path), mode: File.executable?(path) ? 0o100755 : 0o100644)
+        stored("#{GAME}#{name}", File.binread(path))
       end
     end + [stored(MAIN, File.binread(File.join(project, "main.rb")))]
   end
