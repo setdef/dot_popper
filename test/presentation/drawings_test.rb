@@ -39,6 +39,33 @@ class DrawingsTest < Minitest::Test
     assert_in_delta 1.0, screen.drawing.paste_hover
   end
 
+  # The mouse over a button lights that button alone, Back included, and
+  # each heading stands where the layout puts it.
+  def test_each_button_is_lit_by_the_mouse_over_it_alone
+    fixture = fixture(gone: true, member: true)
+    show = fixture.show
+    show.open_settings
+    show.open_change_server
+    show.paste_server if fixture.clipboard.copy("https://groups.example.org")
+    lit = lambda do |name|
+      frame = show.screen.controls.find { it.name == name }.frame
+      show.pointer_at(frame.center_x, frame.center_y)
+      fixture.tick(1.0)
+      show.screen.drawing
+    end
+    server = lit.call(:server_reset)
+    assert_equal [1.0, 0.0, 0.0], [server.reset_hover, server.paste_hover, server.header.back_hover].map { it.round(2) }
+    assert_equal show.layout.heading_y, server.header.y
+    assert_in_delta 1.0, lit.call(:back).header.back_hover
+    show.pointer_gone
+    show.back
+    show.open_privacy
+    privacy = lit.call(:policy)
+    assert_equal [1.0, 0.0], [privacy.policy_hover, privacy.delete_hover].map { it.round(2) }
+    assert_equal show.layout.heading_y, privacy.header.y
+    assert_equal privacy.plan.delete.center_x, privacy.note_x, "the note is centered under Delete"
+  end
+
   # For a player the friend-group server knows: Delete, and under it how
   # to hold it and that Stats stay, said once, on one row where it fits
   # and wrapped to Delete's width where it does not, inside the window,

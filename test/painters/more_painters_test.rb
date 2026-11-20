@@ -71,16 +71,21 @@ class MorePaintersTest < Minitest::Test
       draw = ->(given) { Shell::SharePreviewPainter.new(context:, dots:).draw(given, width, height) }
       assert_draws_every_field(coming, unused: [*SHARE_PLAN, %i[plan sizes note], [:copied_word], %i[plan placed rects note]], &draw)
       assert_draws_every_field(copied, unused: SHARE_PLAN, &draw)
+      signs = copied.runs.flatten.grep(Symbol)
+      refute_empty signs
+      assert_equal signs.count { %i[bright popped].include?(it) }, marks_of(copied, &draw).count { it.kind == :dot }, "each dot sign is a dot"
     end
   end
 
-  def test_the_hud_draws_every_field
+  def test_the_hud_draws_every_field_with_and_without_a_row_toward_a_bonus
     SIZES.each do |width, height|
       made = fixture(width, height)
       show = made.show
       huds = P::HudDrawings.new(type: P::Style::TYPE, measure: show.measure)
-      given = huds.call(show.hud, show.layout, 1.0)
-      assert_draws_every_field(given, unused: HUD_SIZES) { Shell::HudPainter.new(context:, dots:).draw(it) }
+      [show.hud, show.hud.counting(3, 5, show.now)].each do |hud|
+        given = huds.call(hud, show.layout, 1.0)
+        assert_draws_every_field(given, unused: HUD_SIZES) { Shell::HudPainter.new(context:, dots:).draw(it) }
+      end
     end
   end
 end
