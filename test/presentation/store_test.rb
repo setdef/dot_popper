@@ -119,7 +119,7 @@ class StoreTest < Minitest::Test
     assert_match %r{\Adotpopper-store://open\?n=1&}, @opener.urls.last
     assert_equal :loading, @store.status
 
-    @entitlement.prove(RECEIPT)
+    @entitlement.verify_receipt(RECEIPT)
     @store.connect
 
     assert_equal 1, @opener.urls.size
@@ -206,7 +206,7 @@ class StoreTest < Minitest::Test
   end
 
   def test_a_store_that_later_says_not_owned_takes_nothing_back
-    @entitlement.prove(RECEIPT)
+    @entitlement.verify_receipt(RECEIPT)
     hear("answer=9\nowned=0\nstate=ready\n")
 
     assert_predicate @entitlement, :pro?

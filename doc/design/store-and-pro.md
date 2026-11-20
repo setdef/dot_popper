@@ -23,7 +23,7 @@ Pro never changes how the game plays or scores. Join, Create, Achievements and T
 
 Every Pro feature asks `Entitlement#pro?` (`lib/dot_popper/entitlement.rb`) and nothing else. It is true from exactly three sources:
 
-1. **A receipt that verified during this run** (`Entitlement#prove`), handed over by the store. Nothing is saved: the next launch asks the store again. A receipt already refused is not checked again, since the store's answer is read four times a second.
+1. **A receipt that verified during this run** (`Entitlement#verify_receipt`), handed over by the store. Nothing is saved: the next launch asks the store again. A receipt already refused is not checked again, since the store's answer is read four times a second.
 2. **A license key that verifies** against the pinned keys (`Continuity::License#pro?`), on a website copy.
 3. **`DOT_POPPER_PRO=1` in a test build** (`Entitlement.forced?`). `DOT_POPPER_PRO=0` is a Free player. A store build never reads it (`Build.settings`).
 
@@ -102,7 +102,7 @@ What it costs: a build for sale must be stamped with its channel, or it is a tes
 - `#restore` asks unless something is under way.
 - `#update` reads the answer every `Store::EVERY` (0.25 s). `UseCases::BuyPro#update`, which the offer of Pro (`Screens::Offer#update`) calls each frame through the `Show`, calls it only while no game is in play, so a purchase never lands mid-game (`test_a_store_is_not_read_during_a_game`).
 
-**When Pro arrives.** `Entitlement` announces `Entitlement::ProGranted` to its listeners the moment Pro first arrives in a run: `by: :receipt` when a store's receipt verifies (`#prove`), `by: :license_key` when a key is entered (`#enter`, which the website store enters keys through). Pro the game starts with, from a key already entered or `DOT_POPPER_PRO`, is not an arrival. `UseCases::BuyPro` hears it first and reports the achievements already earned to the player's friend groups, whichever way Pro came; the offer of Pro (`Screens::Offer#call`) hears it next and, for a store's purchase while it is open, plays a tick (a key entered has its own tick as it is pressed). The composition root subscribes both, in that order.
+**When Pro arrives.** `Entitlement` announces `Entitlement::ProGranted` to its listeners the moment Pro first arrives in a run: `by: :receipt` when a store's receipt verifies (`#verify_receipt`), `by: :license_key` when a key is entered (`#enter`, which the website store enters keys through). Pro the game starts with, from a key already entered or `DOT_POPPER_PRO`, is not an arrival. `UseCases::BuyPro` hears it first and reports the achievements already earned to the player's friend groups, whichever way Pro came; the offer of Pro (`Screens::Offer#call`) hears it next and, for a store's purchase while it is open, plays a tick (a key entered has its own tick as it is pressed). The composition root subscribes both, in that order.
 
 ### The adapters
 

@@ -127,7 +127,7 @@ class FreeGamesTest < Minitest::Test
   end
 
   def test_the_pro_version_counts_nothing_and_never_refuses
-    @entitlement.prove(DotPopper::Receipt.issue)
+    @entitlement.verify_receipt(DotPopper::Receipt.issue)
     games = games(first_games: 0, daily: 0)
 
     assert_predicate games, :can_play?
@@ -139,7 +139,7 @@ class FreeGamesTest < Minitest::Test
   def test_buying_part_way_stops_the_counting_and_keeps_what_was_left
     games = games()
     (FreeGames::DAILY + 1).times { games.spend! }
-    @entitlement.prove(DotPopper::Receipt.issue)
+    @entitlement.verify_receipt(DotPopper::Receipt.issue)
 
     10.times { assert games.spend! }
     assert_equal FreeGames::FIRST_GAMES - 1, games.first_games_left
@@ -148,7 +148,7 @@ class FreeGamesTest < Minitest::Test
   def test_buying_when_out_of_games_lets_play_go_on
     games = games(first_games: 0)
     FreeGames::DAILY.times { games.spend! }
-    @entitlement.prove(DotPopper::Receipt.issue)
+    @entitlement.verify_receipt(DotPopper::Receipt.issue)
 
     assert_predicate games, :can_play?
   end

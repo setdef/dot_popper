@@ -176,8 +176,8 @@ class RootTest < Minitest::Test
   def test_only_a_test_build_takes_the_fake_stores_receipts
     receipt = DotPopper::Receipt.issue
 
-    refute root("iOS", channel: B::APP_STORE, env: SETTINGS).entitlement.prove(receipt)
-    assert root(env: SETTINGS).entitlement.prove(receipt)
+    refute root("iOS", channel: B::APP_STORE, env: SETTINGS).entitlement.verify_receipt(receipt)
+    assert root(env: SETTINGS).entitlement.verify_receipt(receipt)
   end
 
   # Windows' word for a license is taken in the Microsoft Store's build
@@ -185,9 +185,9 @@ class RootTest < Minitest::Test
   def test_only_the_microsoft_store_build_takes_windows_word
     word = "microsoft:#{DotPopper::Receipt::PRODUCT_ID}:9NBLGGH4R315/000N"
 
-    assert root("Windows", channel: B::MICROSOFT_STORE, env: SETTINGS).entitlement.prove(word)
+    assert root("Windows", channel: B::MICROSOFT_STORE, env: SETTINGS).entitlement.verify_receipt(word)
     [nil, B::APP_STORE, B::MAC_APP_STORE, B::WEBSITE].each do |channel|
-      refute root("Windows", channel:, env: SETTINGS).entitlement.prove(word), channel.inspect
+      refute root("Windows", channel:, env: SETTINGS).entitlement.verify_receipt(word), channel.inspect
     end
   end
 
@@ -321,7 +321,7 @@ class RootTest < Minitest::Test
 
     assert_equal [DotPopper::UseCases::BuyPro, Screens::Offer], listeners.map(&:class)
     game.show.offer.open_led_by(:themes)
-    game.entitlement.prove(DotPopper::Receipt.issue)
+    game.entitlement.verify_receipt(DotPopper::Receipt.issue)
 
     assert_equal [:tick, 1.3], game.sound_player.played.last
   end

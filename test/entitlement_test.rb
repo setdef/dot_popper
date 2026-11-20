@@ -12,12 +12,12 @@ class EntitlementTest < Minitest::Test
     entitlement = Entitlement.test
     refute_predicate entitlement, :pro?
 
-    assert entitlement.prove(Receipt.issue)
+    assert entitlement.verify_receipt(Receipt.issue)
     assert_predicate entitlement, :pro?
   end
 
   def test_nothing_is_kept_so_each_launch_asks_the_store_again
-    Entitlement.test.prove(Receipt.issue)
+    Entitlement.test.verify_receipt(Receipt.issue)
 
     refute_predicate Entitlement.test, :pro?
   end
@@ -26,21 +26,21 @@ class EntitlementTest < Minitest::Test
   def test_text_a_player_could_write_is_never_proof
     entitlement = Entitlement.test
     ["pro", "4", "owned", "1", "", nil, "play:", "play:cHJv:cHJv", "apple:a.b.c", "apple:#{"A" * 400}"].each do |text|
-      refute entitlement.prove(text), text.inspect
+      refute entitlement.verify_receipt(text), text.inspect
     end
     refute_predicate entitlement, :pro?
   end
 
   def test_a_refused_receipt_does_not_stop_a_good_one
     entitlement = Entitlement.test
-    refute entitlement.prove("pro")
-    refute entitlement.prove("pro")
+    refute entitlement.verify_receipt("pro")
+    refute entitlement.verify_receipt("pro")
 
-    assert entitlement.prove(Receipt.issue)
+    assert entitlement.verify_receipt(Receipt.issue)
   end
 
   def test_a_test_receipt_proves_nothing_in_a_store_build
-    refute Entitlement.free.prove(Receipt.issue)
+    refute Entitlement.free.verify_receipt(Receipt.issue)
     refute_predicate Entitlement.free, :pro?
   end
 
@@ -59,9 +59,9 @@ class EntitlementTest < Minitest::Test
     entitlement = Entitlement.test
     heard = []
     entitlement.subscribe(->(event) { heard << event })
-    entitlement.prove("pro")
-    entitlement.prove(Receipt.issue)
-    entitlement.prove(Receipt.issue)
+    entitlement.verify_receipt("pro")
+    entitlement.verify_receipt(Receipt.issue)
+    entitlement.verify_receipt(Receipt.issue)
 
     assert_equal [Entitlement::ProGranted.new(by: :receipt)], heard
   end
@@ -83,7 +83,7 @@ class EntitlementTest < Minitest::Test
     entitlement = Entitlement.new(forced: true, trust: Receipt::TEST)
     heard = []
     entitlement.subscribe(->(event) { heard << event })
-    entitlement.prove(Receipt.issue)
+    entitlement.verify_receipt(Receipt.issue)
 
     assert_empty heard
     assert_equal :invalid, Entitlement.free.enter("DP-ANYTHING"), "a copy with no license takes no key"

@@ -4,7 +4,7 @@ module DotPopper
   # Whether this player has Pro. Pro comes only from proof the game checks
   # by itself, offline, every launch, and never from anything it stored
   # (ADR-0010): a store copy's
-  # receipt, which the store hands over at each launch and #prove verifies
+  # receipt, which the store hands over at each launch and #verify_receipt verifies
   # (Receipt), or a website copy's license key (+license+,
   # Continuity::License), whose signature is checked against the pinned
   # keys. Pro features ask +pro?+ and nothing else.
@@ -59,7 +59,7 @@ module DotPopper
     # launch asks the store again. Says whether it verified. A receipt
     # already refused is not checked again, since the store's answer is
     # read a few times a second.
-    def prove(receipt)
+    def verify_receipt(receipt)
       return @proven if @proven || receipt == @refused
 
       before = pro?

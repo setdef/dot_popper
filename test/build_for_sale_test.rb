@@ -52,7 +52,7 @@ class BuildForSaleTest < Minitest::Test
                 "themes.txt" => engine.file("themes.txt").read.to_s, "theme" => root.context.theme&.key.to_s,
                 "today" => settings.today.call.to_s, "date" => Date.today.to_s,
                 "utc now off by" => (settings.utc_now.call - Time.now.utc).abs.round }
-      root.entitlement.prove(receipt)
+      root.entitlement.verify_receipt(receipt)
       built["pro after a test receipt"] = root.entitlement.pro?
       root.entitlement.enter(key)
       built["pro after a test key"] = root.entitlement.pro?

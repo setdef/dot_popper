@@ -152,7 +152,7 @@ module DotPopper
       return unless text
 
       answer = text.lines.to_h { (_ = it.chomp.split("=", 2)) }
-      @entitlement.prove(answer["receipt"]) if answer["receipt"] && !@entitlement.pro?
+      @entitlement.verify_receipt(answer["receipt"]) if answer["receipt"] && !@entitlement.pro?
       return unless answer["answer"].to_i >= @number
 
       @price = answer["price"] unless answer["price"].to_s.empty?

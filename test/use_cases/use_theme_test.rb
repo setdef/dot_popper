@@ -72,7 +72,7 @@ class UseThemeTest < Minitest::Test
     entitlement = DotPopper::Entitlement.test
     @saved_themes.use(:ghost)
     theme = DotPopper::UseCases::UseTheme.new(saved_themes: @saved_themes, entitlement:)
-    entitlement.prove(DotPopper::Receipt.issue)
+    entitlement.verify_receipt(DotPopper::Receipt.issue)
 
     assert_equal :plain, theme.current, "never mid-game"
     theme.refresh
