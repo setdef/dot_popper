@@ -12,7 +12,7 @@ module DotPopper
     # The dim is drawn without a stencil (the window has none): rings of
     # quads from the light's edge out past the screen's corners, a few one
     # inside the next, so its edge feathers out.
-    class TutorialPainter < Data.define(:pen)
+    class TutorialPainter < Data.define(:context)
       G = ::Lota::Graphics
       SEGMENTS = 64
       LAYERS = 8 # rings in the dim's soft edge
@@ -34,14 +34,14 @@ module DotPopper
         light = scene.spotlight
         halo(light.to.name, pill, light.strength(now), now - light.at) if light.to&.hud? && light.to.name != :dots_in_a_row
         row_ring(scene.row_notice, now, spots.fetch(:dots_in_a_row), pill, scene.hud.size) if scene.row_notice
-        font = pen.fonts.bold(layout.scaled(pen.style::TYPE.floating_text))
+        font = context.fonts.bold(layout.scaled(context.style::TYPE.floating_text))
         scene.traveling_numbers.each { traveling_number(it, now, scene.dots, spots, scene.radius, font) }
-        GuidePainter.new(pen:).draw(scene.guide_pose, show.input, scene.radius)
+        GuidePainter.new(context:).draw(scene.guide_pose, show.input, scene.radius)
         return unless show.skip_reach
 
         # Skip, bottom right, its sign before its word, so it reads without English.
-        PillButton.new(pen:).draw(layout.skip_button, show.words.button(:skip), hover: show.hover.level(:skip),
-                                  icon: ->(x, y, size) { Glyphs.new(pen:).draw(:skip, x, y, size * 0.36) })
+        PillButton.new(context:).draw(layout.skip_button, show.words.button(:skip), hover: show.hover.level(:skip),
+                                  icon: ->(x, y, size) { Glyphs.new(context:).draw(:skip, x, y, size * 0.36) })
       end
 
       # The clock lit as the game's first second runs (Presentation::
@@ -49,7 +49,7 @@ module DotPopper
       def clock_highlight_under(highlight, now, pill, spots, radius)
         x, y = spots.fetch(:time)
         strength = highlight.strength(now)
-        style = pen.style::TUTORIAL.spotlight
+        style = context.style::TUTORIAL.spotlight
         dim_around(x, y, pill.height * HUD_LIGHT, style.feather * radius, style.dim * strength) if strength.positive?
       end
 
@@ -63,7 +63,7 @@ module DotPopper
       def halo(name, pill, alpha, age)
         return unless alpha.positive?
 
-        pixels = pen.pixels
+        pixels = context.pixels
         pulse = (Math.cos(age * 2 * Math::PI) + 1) / 2
         grow = pixels.snap(pill.height * (0.06 + (0.05 * pulse)))
         half = pill.width / 2.0
@@ -72,7 +72,7 @@ module DotPopper
         width = pixels.snap(half + (2 * grow))
         height = pixels.snap(pill.height + (2 * grow))
         corner = height / 2.0
-        pen.color(pen.palette.gain, alpha * (0.55 + (0.4 * pulse)))
+        context.color(context.palette.gain, alpha * (0.55 + (0.4 * pulse)))
         G.line_width = pixels.line_width(2)
         G.rectangle(:line, left, top, width, height, corner, corner, 32)
       end
@@ -84,13 +84,13 @@ module DotPopper
         strength = notice.strength(now)
         return unless strength.positive?
 
-        palette = pen.palette
-        pixels = pen.pixels
+        palette = context.palette
+        pixels = context.pixels
         radius = pill.height * Presentation::Hud::PIP
         reach = radius * 1.9
         half = (radius * Presentation::Hud::PIP_STEP * (size - 1) / 2.0) + reach
         pulse = (Math.cos((now - notice.at) * 2 * Math::PI * 2.0) + 1) / 2
-        pen.color(notice.tone == :alarm ? palette.alarm : palette.gain, strength * (0.55 + (0.4 * pulse)))
+        context.color(notice.tone == :alarm ? palette.alarm : palette.gain, strength * (0.55 + (0.4 * pulse)))
         G.line_width = pixels.line_width(2)
         G.rectangle(:line, pixels.line_at(spot[0] - half, 2), pixels.line_at(spot[1] - reach, 2),
                     pixels.snap(2 * half), pixels.snap(2 * reach), reach, reach, 32)
@@ -122,7 +122,7 @@ module DotPopper
       # How far the light reaches around +anchor+: the row's row is wider
       # than one number.
       def reach(anchor, pill, radius)
-        return radius * pen.style::TUTORIAL.spotlight.dot unless anchor.hud?
+        return radius * context.style::TUTORIAL.spotlight.dot unless anchor.hud?
 
         pill.height * (anchor.name == :dots_in_a_row ? DOTS_IN_A_ROW_LIGHT : HUD_LIGHT)
       end
@@ -133,7 +133,7 @@ module DotPopper
         width, height = G.dimensions
         far = (Math.hypot(width, height) * 1.1) + light + feather
         layer = 1 - ((1 - alpha)**(1.0 / LAYERS))
-        pen.color(pen.palette.ink_bottom, layer)
+        context.color(context.palette.ink_bottom, layer)
         LAYERS.times { ring(x, y, light + (feather * (it + 0.5) / LAYERS), far) }
       end
 
@@ -156,7 +156,7 @@ module DotPopper
         x = from[0] + ((to[0] - from[0]) * share)
         y = from[1] + ((to[1] - from[1]) * share)
         tally = Presentation::Tally.new(text: number.text, stopwatch: number.icon == :stopwatch, dot: number.icon == :dot)
-        TallyPainter.new(pen:).centered(tally, font, x, y, number.color, number.alpha(now))
+        TallyPainter.new(context:).centered(tally, font, x, y, number.color, number.alpha(now))
       end
     end
   end

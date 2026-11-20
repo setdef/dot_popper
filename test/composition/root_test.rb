@@ -381,9 +381,9 @@ class RootTest < Minitest::Test
   def test_a_scenarios_theme_is_used_in_a_test_build_and_ignored_in_a_store_build
     env = { "DOT_POPPER_PRO" => "1", "DOT_POPPER_THEME" => "ghost", "DOT_POPPER_THEME_UNLOCKS" => "ghost" }
 
-    assert_equal :ghost, root(env:).pen.theme.key
+    assert_equal :ghost, root(env:).context.theme.key
     assert_equal :ghost, root(env:).sound_player.theme.key
-    refute_equal :ghost, root(channel: B::WEBSITE, env:).pen.theme.key
+    refute_equal :ghost, root(channel: B::WEBSITE, env:).context.theme.key
   end
 
   # A device that saved Jingle bell, a theme since removed, as its choice
@@ -400,16 +400,16 @@ class RootTest < Minitest::Test
       game = root(engine:, env: pro)
 
       assert_instance_of DotPopper::GameFlow::Home, game.game_flow.state, saved
-      assert_equal in_use, game.pen.theme.key, saved
+      assert_equal in_use, game.context.theme.key, saved
       assert_equal in_use, game.sound_player.theme.key, saved
       assert_equal %i[classic ghost], DotPopper::Themes.new(engine.file("themes.txt")).choices, saved
     end
   end
 
-  def test_the_pen_draws_without_shaders_when_asked_in_any_build
+  def test_the_context_draws_without_shaders_when_asked_in_any_build
     BUILDS.each do |channel|
-      assert root(channel:).pen.shaders
-      refute root(channel:, env: { "DOT_POPPER_NO_SHADERS" => "1" }).pen.shaders, channel.inspect
+      assert root(channel:).context.shaders
+      refute root(channel:, env: { "DOT_POPPER_NO_SHADERS" => "1" }).context.shaders, channel.inspect
     end
   end
 

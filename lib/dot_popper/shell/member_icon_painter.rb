@@ -4,10 +4,10 @@ module DotPopper
   module Shell
     # A Presentation::MemberIcon drawn at +radius+ around +x+, +y+. The
     # stars are drawn fan by fan, since LÖVE fills only convex polygons.
-    class MemberIconPainter < Data.define(:pen, :icons)
+    class MemberIconPainter < Data.define(:context, :icons)
       G = ::Lota::Graphics
 
-      def initialize(pen:, icons: {}) = super
+      def initialize(context:, icons: {}) = super
 
       def draw(x, y, radius, group_id, number, alpha = 1.0)
         icon = fetch([group_id, number]) { Presentation::MemberIcon.of(group_id, number) }
@@ -24,10 +24,10 @@ module DotPopper
       def fetch(key) = icons[key] ||= yield
 
       def paint(icon, x, y, radius, alpha)
-        pen.color(icon.base, alpha)
+        context.color(icon.base, alpha)
         G.circle(:fill, x, y, radius, 48)
         icon.shapes.each do |shape|
-          pen.color(icon.color(shape.tone), alpha)
+          context.color(icon.color(shape.tone), alpha)
           case shape
           in Presentation::IconDot then G.circle(:fill, x + (shape.x * radius), y + (shape.y * radius), shape.r * radius, 24)
           in Presentation::IconShape then fill(shape.points, x, y, radius)

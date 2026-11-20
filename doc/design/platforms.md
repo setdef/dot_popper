@@ -80,7 +80,7 @@ LÖVE tries its renderers in its own fixed order, Vulkan first wherever it may, 
 - `DOT_POPPER_RENDERERS=opengl` (or `vulkan`, or `metal`, comma-separated) replaces the list, to compare renderers on a device (`RendererChoice.asked`). `DOT_POPPER_NO_VULKAN=1` leaves Vulkan out, as after it failed. A store build still obeys both (`Build::HARMLESS`).
 - `DOT_POPPER_FULLSCREEN=exclusive` makes the desktop's fullscreen LÖVE's exclusive one (`DesktopWindow`); the usual fullscreen is borderless.
 
-**Every shader is optional.** If a shader fails to compile, `Shell::Pen` warns once ("drawing without shaders", or "drawing NAME without its shader (...)") and draws plain shapes, which keep bright and popped dots distinct. `DOT_POPPER_NO_SHADERS=1` forces this. A driver that rejects a shader shouldn't stop anyone from playing.
+**Every shader is optional.** If a shader fails to compile, `Shell::DrawingContext` warns once ("drawing without shaders", or "drawing NAME without its shader (...)") and draws plain shapes, which keep bright and popped dots distinct. `DOT_POPPER_NO_SHADERS=1` forces this. A driver that rejects a shader shouldn't stop anyone from playing.
 
 ## The Vulkan rescue
 

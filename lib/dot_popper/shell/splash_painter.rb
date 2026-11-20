@@ -16,26 +16,26 @@ module DotPopper
     class SplashPainter
       G = ::Lota::Graphics
 
-      def initialize(pen:)
-        @pen = pen
+      def initialize(context:)
+        @context = context
         refresh
       end
 
       # Makes the glow again for the window's size now, after a resize.
       def refresh
         width, height = G.dimensions
-        @glow = Bloom.new(@pen, Presentation::Logotype.fit(width, height).glow(G.dpi_scale))
+        @glow = Bloom.new(@context, Presentation::Logotype.fit(width, height).glow(G.dpi_scale))
       end
 
       def draw(splash)
         width, height = G.dimensions
-        @pen.color(@pen.style::SPLASH_INK, splash.ground)
+        @context.color(@context.style::SPLASH_INK, splash.ground)
         G.rectangle(:fill, 0, 0, width + 1, height + 1)
         return unless splash.mark.positive?
 
         logotype = Presentation::Logotype.fit(width, height)
-        font = @pen.fonts.wordmark(logotype.size)
-        pixels = @pen.pixels
+        font = @context.fonts.wordmark(logotype.size)
+        pixels = @context.pixels
         left = pixels.snap(logotype.left(width / 2.0))
         baseline = pixels.snap(logotype.baseline(height / 2.0))
         @glow.glow(splash.mark) do
@@ -49,17 +49,17 @@ module DotPopper
       private
 
       def letters(logotype, font, left, baseline, alpha)
-        pixels = @pen.pixels
-        @pen.color(@pen.style::SPLASH_YELLOW, alpha)
+        pixels = @context.pixels
+        @context.color(@context.style::SPLASH_YELLOW, alpha)
         logotype.letters(left).each do |char, x|
           G.print(char, font, pixels.snap(x), pixels.snap(baseline - font.baseline))
         end
       end
 
       def block(logotype, left, baseline, alpha)
-        pixels = @pen.pixels
+        pixels = @context.pixels
         x, width = logotype.block(left)
-        @pen.color(@pen.style::SPLASH_YELLOW, alpha)
+        @context.color(@context.style::SPLASH_YELLOW, alpha)
         G.rectangle(:fill, pixels.snap(x), pixels.snap(logotype.block_top(baseline)), pixels.whole(width),
                     pixels.whole(logotype.block_height))
       end

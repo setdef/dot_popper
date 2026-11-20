@@ -9,8 +9,8 @@ module DotPopper
     class Scene
       G = ::Lota::Graphics
 
-      def initialize(pen)
-        @pen = pen
+      def initialize(context)
+        @context = context
       end
 
       # Whether there is a baked night to draw.
@@ -19,7 +19,7 @@ module DotPopper
       # Bakes +art+ for the screen, or forgets it for the ordinary night.
       def bake(art)
         @canvas = nil
-        return unless art&.sky && @pen.shader?(:scene)
+        return unless art&.sky && @context.shader?(:scene)
 
         width, height = G.dimensions
         @canvas = G::Canvas.new(width, height, dpiscale: G.dpi_scale)
@@ -47,20 +47,20 @@ module DotPopper
       private
 
       def sky(sky, width, height, pass)
-        @pen.shading(:scene) do |shader|
-          @pen.uniform(shader, "pass", pass)
-          @pen.uniform(shader, "size", [width.to_f, height.to_f])
+        @context.shading(:scene) do |shader|
+          @context.uniform(shader, "pass", pass)
+          @context.uniform(shader, "size", [width.to_f, height.to_f])
           sky.to_h.each do |name, value|
-            @pen.uniform(shader, name.to_s, value.respond_to?(:r) ? @pen.rgb(value) : value)
+            @context.uniform(shader, name.to_s, value.respond_to?(:r) ? @context.rgb(value) : value)
           end
           G.color = [1, 1, 1, 1]
-          @pen.square(width / 2.0, height / 2.0, width / 2.0, height / 2.0)
+          @context.square(width / 2.0, height / 2.0, width / 2.0, height / 2.0)
         end
       end
 
       def shapes(list)
         list.each do |shape|
-          @pen.color(shape.color)
+          @context.color(shape.color)
           case shape
           in Presentation::Scenery::Dot then G.circle(:fill, shape.x, shape.y, shape.radius, 16)
           in Presentation::Scenery::Fan then fan(shape.points)

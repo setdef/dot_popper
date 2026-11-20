@@ -22,7 +22,7 @@
 # Every line the game prints goes to standard output, as Fledge's host
 # sends it to the log; the host's own last line, "Dot Popper exited with
 # status N", follows once the game quits or fails. What draws, sounds or
-# senses (the pen, the renderer, the sound player, the pile's physics, the
+# senses (the drawing context, the renderer, the sound player, the pile's physics, the
 # accelerometer) is left out: a stand-in that answers nil to everything.
 
 require "json"
@@ -168,8 +168,8 @@ module Lota
         shell.const_set(name, Class.new(Nothing))
       end
       engine = Class.new(shell::Engine) do
-        def pen(shaders:) = Nothing.new
-        def measure(_pen) = DotPopper::Presentation::RoughMeasure.new
+        def context(shaders:) = Nothing.new
+        def measure(_context) = DotPopper::Presentation::RoughMeasure.new
         def sound_player(file:) = Nothing.new
       end
       shell.send(:remove_const, :Engine)

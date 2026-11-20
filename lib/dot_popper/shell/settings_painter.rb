@@ -5,12 +5,12 @@ module DotPopper
     # Settings, as Presentation::SettingsLayout lays it out: each row's
     # name and its choices, then Credits and licenses and Privacy, and Back,
     # as the screen hands it (Presentation::SettingsDrawing).
-    class SettingsPainter < Data.define(:pen, :dots)
+    class SettingsPainter < Data.define(:context, :dots)
       def draw(drawing)
         plan = drawing.plan
-        Header.new(pen:).draw(drawing.header)
+        Header.new(context:).draw(drawing.header)
         clip = drawing.clip
-        pixels = pen.pixels
+        pixels = context.pixels
         ::Lota::Graphics.scissor = pixels.snap(clip.x), pixels.snap(clip.y), pixels.snap(clip.width), pixels.snap(clip.height)
         plan.rows.zip(drawing.choices).each { |row, choices| row(drawing, row, choices) }
         pill(drawing, :credits, plan.credits, :document, drawing.credits)
@@ -24,19 +24,19 @@ module DotPopper
       def row(drawing, row, choices)
         label(row)
         drawn = choices.map { |text, chosen, hover, name| [text, chosen, hover, icon(drawing, row, name)] }
-        ChoiceRow.new(pen:).draw(row.frame, row.rects, drawn)
+        ChoiceRow.new(context:).draw(row.frame, row.rects, drawn)
       end
 
       # The name and its small mark, on one line.
       def label(row)
         x, y = row.label_at
-        font = pen.fonts.semibold(18)
+        font = context.fonts.semibold(18)
         if row.glyph == :dot
           dots.icon(x + 11, y, 11, bright: true)
         else
-          Glyphs.new(pen:).draw(row.glyph, x + 11, y, 22, color: pen.palette.cream, weight: 1.6)
+          Glyphs.new(context:).draw(row.glyph, x + 11, y, 22, color: context.palette.cream, weight: 1.6)
         end
-        pen.text(row.label, font, x + 32 + (font.width(row.label) / 2.0), y, pen.palette.cream)
+        context.text(row.label, font, x + 32 + (font.width(row.label) / 2.0), y, context.palette.cream)
       end
 
       # A bright dot at the size a Dot size choice gives, its right edge a
@@ -53,23 +53,23 @@ module DotPopper
       end
 
       def pill(drawing, name, rect, glyph, text)
-        PillButton.new(pen:).draw(rect, text, hover: drawing.lit.fetch(name),
-                                  icon: ->(x, y, size) { Glyphs.new(pen:).draw(glyph, x, y, size * 0.42) })
+        PillButton.new(context:).draw(rect, text, hover: drawing.lit.fetch(name),
+                                  icon: ->(x, y, size) { Glyphs.new(context:).draw(glyph, x, y, size * 0.42) })
       end
     end
 
     # A screen's heading and Back (Presentation::HeaderDrawing): top left
     # beside the heading on a short window. Until every screen hands it a
     # HeaderDrawing, it makes one from the Show, its +layout+ and +heading+.
-    class Header < Data.define(:pen)
+    class Header < Data.define(:context)
       def draw(header, layout = nil, heading = nil)
         if layout
           show = header
           header = Presentation::HeaderDrawing.for(heading, layout:, measure: show.measure, words: show.words, hover: show.hover)
         end
-        pen.text(header.text, pen.fonts.bold(header.size), header.x, header.y, pen.palette.cream)
-        PillButton.new(pen:).draw(header.back, header.back_word, hover: header.back_hover,
-                                  icon: ->(x, y, size) { Glyphs.new(pen:).draw(:chevron_left, x, y, size * 0.38) })
+        context.text(header.text, context.fonts.bold(header.size), header.x, header.y, context.palette.cream)
+        PillButton.new(context:).draw(header.back, header.back_word, hover: header.back_hover,
+                                  icon: ->(x, y, size) { Glyphs.new(context:).draw(:chevron_left, x, y, size * 0.38) })
       end
     end
   end

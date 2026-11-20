@@ -6,19 +6,19 @@ module DotPopper
     # with four ticks and a pip at its center, each on a dark edge so it
     # reads over a light dot or the night. Its center and strokes sit on
     # whole device pixels; the press lands where the cursor really is.
-    class CursorPainter < Data.define(:pen)
+    class CursorPainter < Data.define(:context)
       G = ::Lota::Graphics
 
       def draw(cursor)
         return unless cursor.visible
 
-        style = pen.style::GAMEPAD
-        pixels = pen.pixels
+        style = context.style::GAMEPAD
+        pixels = context.pixels
         line = [(style.line * cursor.radius * pixels.scale).round, 1].max
         x = pixels.line_at(cursor.x, line)
         y = pixels.line_at(cursor.y, line)
-        [[pen.palette.shadow, 0.75, line + 2], [pen.palette.cream, 1.0, line]].each do |color, alpha, width|
-          pen.color(color, alpha)
+        [[context.palette.shadow, 0.75, line + 2], [context.palette.cream, 1.0, line]].each do |color, alpha, width|
+          context.color(color, alpha)
           reticle(x, y, width, style.pip + width - line, cursor.radius, style)
         end
       end
@@ -26,7 +26,7 @@ module DotPopper
       private
 
       def reticle(x, y, width, pip, radius, style)
-        pixels = pen.pixels
+        pixels = context.pixels
         G.line_width = pixels.line_width(width)
         G.circle(:line, x, y, style.ring * radius, 48)
         from = pixels.snap(style.ticks.begin * radius)

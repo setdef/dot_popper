@@ -7,7 +7,7 @@ module DotPopper
     # immediate switch beside "Not now". Calm, and always answerable.
     # Presentation::NewThemeCardPlan decides where each part goes, and the
     # screen hands it all (Presentation::NewThemeCardDrawing).
-    class NewThemeCardPainter < Data.define(:pen, :dots)
+    class NewThemeCardPainter < Data.define(:context, :dots)
       G = ::Lota::Graphics
 
       def draw(drawing)
@@ -15,27 +15,27 @@ module DotPopper
         veil(drawing.veil)
         card(plan)
         preview(plan, drawing.theme)
-        cream = pen.palette.cream
-        pen.text(drawing.heading, pen.fonts.semibold(plan.heading_size), plan.card.center_x, plan.heading_y, pen.palette.soft)
-        pen.text(drawing.name, pen.fonts.bold(plan.name_size), plan.card.center_x, plan.name_y, cream)
-        PrimaryButton.new(pen:).draw(plan.use_button, drawing.use, hover: drawing.use_hover)
-        PillButton.new(pen:).draw(plan.later_button, drawing.later, hover: drawing.later_hover)
+        cream = context.palette.cream
+        context.text(drawing.heading, context.fonts.semibold(plan.heading_size), plan.card.center_x, plan.heading_y, context.palette.soft)
+        context.text(drawing.name, context.fonts.bold(plan.name_size), plan.card.center_x, plan.name_y, cream)
+        PrimaryButton.new(context:).draw(plan.use_button, drawing.use, hover: drawing.use_hover)
+        PillButton.new(context:).draw(plan.later_button, drawing.later, hover: drawing.later_hover)
       end
 
       private
 
       def veil(rect)
-        pen.color(pen.palette.ink_edge, 0.72)
+        context.color(context.palette.ink_edge, 0.72)
         G.rectangle(:fill, rect.x, rect.y, rect.width, rect.height)
       end
 
       def card(plan)
         rect = plan.card
-        corner = pen.pixels.snap(rect.height * 0.06)
-        pen.color(pen.palette.ink_top)
+        corner = context.pixels.snap(rect.height * 0.06)
+        context.color(context.palette.ink_top)
         G.rectangle(:fill, rect.x, rect.y, rect.width, rect.height, corner, corner, 32)
-        pen.color(pen.palette.pill_edge)
-        G.line_width = pen.pixels.line_width(1.5)
+        context.color(context.palette.pill_edge)
+        G.line_width = context.pixels.line_width(1.5)
         G.rectangle(:line, rect.x, rect.y, rect.width, rect.height, corner, corner, 32)
       end
 
@@ -43,7 +43,7 @@ module DotPopper
         r = plan.preview_radius
         x = plan.card.center_x
         y = plan.preview_y
-        pen.using(theme) do
+        context.using(theme) do
           dots.icon(x - (r * 1.15), y, r, bright: true)
           dots.icon(x + (r * 1.15), y, r, bright: false)
         end

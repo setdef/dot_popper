@@ -6,7 +6,7 @@ module DotPopper
     # light dot or a dark one, and for the clock, the small stopwatch after
     # it, in the same color. The Tutorial flies these into the HUD, and
     # Home's legend shows the same ones, so they read as one language.
-    class TallyPainter < Data.define(:pen)
+    class TallyPainter < Data.define(:context)
       G = ::Lota::Graphics
 
       # +tally+ in +font+, its middle at +x+, +y+.
@@ -17,7 +17,7 @@ module DotPopper
       # +tally+ in +font+, from +x+ rightward, its middle at +y+.
       def left(tally, font, x, y, color, alpha)
         text = font.width(tally.text)
-        pen.outlined(tally.text, font, x + (text / 2.0), y, color, alpha)
+        context.outlined(tally.text, font, x + (text / 2.0), y, color, alpha)
         return unless tally.stopwatch || tally.dot
 
         icon = Presentation::Tally.icon(font.height)
@@ -28,26 +28,26 @@ module DotPopper
       # A small round dot, +size+ across, for a dot in the row, over a dark
       # edge.
       def small_dot(x, y, size, color, alpha)
-        pixels = pen.pixels
+        pixels = context.pixels
         x = pixels.snap(x)
         y = pixels.snap(y)
-        pen.color(pen.palette.shadow, alpha * 0.7)
+        context.color(context.palette.shadow, alpha * 0.7)
         G.circle(:fill, x, y, (size * 0.42) + pixels.line_width(2), 32)
-        pen.color(color, alpha)
+        context.color(color, alpha)
         G.circle(:fill, x, y, size * 0.42, 32)
       end
 
       # A small stopwatch, +size+ across, centered on +x+, +y+: its face, a
       # hand, and the button on top, over a dark edge.
       def stopwatch(x, y, size, color, alpha)
-        pixels = pen.pixels
+        pixels = context.pixels
         x = pixels.snap(x)
         y = pixels.snap(y)
         face = size * 0.42
         middle = y + (size * 0.08)
         line = pixels.whole(size * 0.12)
-        [[pen.palette.shadow, alpha * 0.7, line + pixels.line_width(2)], [color, alpha, line]].each do |ink, strength, width|
-          pen.color(ink, strength)
+        [[context.palette.shadow, alpha * 0.7, line + pixels.line_width(2)], [color, alpha, line]].each do |ink, strength, width|
+          context.color(ink, strength)
           G.line_width = width
           G.circle(:line, x, middle, face, 32)
           G.line(x, middle, x + (face * 0.45), middle - (face * 0.55))

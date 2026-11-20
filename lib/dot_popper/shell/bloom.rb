@@ -17,8 +17,8 @@ module DotPopper
     class Bloom
       G = ::Lota::Graphics
 
-      def initialize(pen, style)
-        @pen = pen
+      def initialize(context, style)
+        @context = context
         @style = style
         @kernel = style.kernel
         refresh
@@ -29,7 +29,7 @@ module DotPopper
       # Makes the canvases again, for the screen's size and density now.
       def refresh
         @source = @across = @down = nil
-        return unless @style.strength.positive? && @pen.shader?(:blur)
+        return unless @style.strength.positive? && @context.shader?(:blur)
 
         width, height = G.dimensions
         density = G.dpi_scale
@@ -73,8 +73,8 @@ module DotPopper
 
       def blur(from, to, step)
         into(to) do
-          @pen.shading(:blur) do |shader|
-            @pen.uniform(shader, "texel_step", step)
+          @context.shading(:blur) do |shader|
+            @context.uniform(shader, "texel_step", step)
             shader.send("offsets", *@kernel.offsets) if shader.uniform?("offsets")
             shader.send("weights", *@kernel.weights) if shader.uniform?("weights")
             G.blend_mode = %i[replace premultiplied]

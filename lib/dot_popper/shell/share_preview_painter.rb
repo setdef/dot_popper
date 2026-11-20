@@ -9,7 +9,7 @@ module DotPopper
     # "Copied! Paste it anywhere." with a check once Copy has copied it,
     # and Close beside Copy, the card's one
     # filled gold button. It lifts into place as it fades in.
-    class SharePreviewPainter < Data.define(:pen, :dots)
+    class SharePreviewPainter < Data.define(:context, :dots)
       G = ::Lota::Graphics
 
       # Draws what the screen hands it (Presentation::ShareDrawing), over a
@@ -19,13 +19,13 @@ module DotPopper
         veil(width, height, drawing.veil)
         plan = drawing.plan
         G.push do
-          G.translate(0, pen.pixels.snap(drawing.lift))
+          G.translate(0, context.pixels.snap(drawing.lift))
           card(plan.card, drawing.corner, shown)
           heading(drawing, plan, shown)
           message(drawing, plan, shown)
           note(drawing, plan, shown)
-          PillButton.new(pen:).draw(plan.close, drawing.close, alpha: shown, hover: drawing.close_hover)
-          PrimaryButton.new(pen:).draw(plan.copy, drawing.copy, alpha: shown, hover: drawing.copy_hover,
+          PillButton.new(context:).draw(plan.close, drawing.close, alpha: shown, hover: drawing.close_hover)
+          PrimaryButton.new(context:).draw(plan.copy, drawing.copy, alpha: shown, hover: drawing.copy_hover,
                                          ratio: PillButton::LABEL)
         end
       end
@@ -33,17 +33,17 @@ module DotPopper
       private
 
       def veil(width, height, alpha)
-        pen.color(pen.palette.ink_bottom, alpha)
+        context.color(context.palette.ink_bottom, alpha)
         G.rectangle(:fill, 0, 0, width, height)
       end
 
       def card(rect, corner, alpha)
-        palette = pen.palette
-        pixels = pen.pixels
+        palette = context.palette
+        pixels = context.pixels
         x, y, width, height = [rect.x, rect.y, rect.width, rect.height].map { pixels.snap(it) }
-        pen.color(palette.ink_top, 0.97 * alpha)
+        context.color(palette.ink_top, 0.97 * alpha)
         G.rectangle(:fill, x, y, width, height, corner, corner, 48)
-        pen.color(palette.soft, 0.35 * alpha)
+        context.color(palette.soft, 0.35 * alpha)
         G.line_width = pixels.line_width(1)
         inset = pixels.line_at(x) - x
         G.rectangle(:line, x + inset, y + inset, width - (2 * inset), height - (2 * inset), corner, corner, 48)
@@ -52,19 +52,19 @@ module DotPopper
       def heading(drawing, plan, alpha)
         rect = plan[:heading] or return
 
-        pen.text(drawing.heading, pen.fonts.bold(plan.size(:heading)), rect.center_x, rect.center_y,
-                 pen.palette.cream, alpha)
+        context.text(drawing.heading, context.fonts.bold(plan.size(:heading)), rect.center_x, rect.center_y,
+                 context.palette.cream, alpha)
       end
 
       # The result's lines, in a bubble of the night's darkest ink.
       def message(drawing, plan, alpha)
         rect = plan[:message]
-        pixels = pen.pixels
+        pixels = context.pixels
         x, y, width, height = [rect.x, rect.y, rect.width, rect.height].map { pixels.snap(it) }
         bubble = plan.bubble
-        pen.color(pen.palette.ink_bottom, 0.9 * alpha)
+        context.color(context.palette.ink_bottom, 0.9 * alpha)
         G.rectangle(:fill, x, y, width, height, bubble, bubble, 32)
-        font = pen.fonts.semibold(plan.size(:message))
+        font = context.fonts.semibold(plan.size(:message))
         step = font.height * Presentation::ShareLayout::LINE
         drawing.runs.each_with_index do |runs, i|
           runs(runs, font, x + plan.side, y + bubble + (font.height / 2.0) + (step * i), alpha)
@@ -79,7 +79,7 @@ module DotPopper
             glyph(run, x + (room / 2.0), y, font.height * 0.34, alpha)
             x += room
           else
-            pen.text(run, font, x + (font.width(run) / 2.0), y, pen.palette.cream, alpha)
+            context.text(run, font, x + (font.width(run) / 2.0), y, context.palette.cream, alpha)
             x += font.width(run)
           end
         end
@@ -95,8 +95,8 @@ module DotPopper
 
       # A stopwatch: a ring, a hand, and the button on top.
       def stopwatch(x, y, radius, alpha)
-        pixels = pen.pixels
-        pen.color(pen.palette.soft, alpha)
+        pixels = context.pixels
+        context.color(context.palette.soft, alpha)
         G.line_width = pixels.whole(radius * 0.22)
         G.circle(:line, x, y + (radius * 0.1), radius * 0.85, 32)
         G.line(x, y + (radius * 0.1), x + (radius * 0.4), y - (radius * 0.3))
@@ -110,8 +110,8 @@ module DotPopper
         return unless copied.positive?
 
         rect = plan[:note]
-        font = pen.fonts.semibold(plan.size(:note))
-        CheckMark.new(pen:).labeled(drawing.copied_word, font, rect.center_x, rect.center_y, alpha * copied)
+        font = context.fonts.semibold(plan.size(:note))
+        CheckMark.new(context:).labeled(drawing.copied_word, font, rect.center_x, rect.center_y, alpha * copied)
       end
     end
   end

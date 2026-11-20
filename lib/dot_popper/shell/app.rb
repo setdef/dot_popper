@@ -35,7 +35,7 @@ module DotPopper
         @window = @game.window
         @game_flow = @game.game_flow
         @show = @game.show
-        @pen = @game.pen
+        @context = @game.context
         @sound_player = @game.sound_player
         @splash = @game.splash
         @theme_releases = @game.theme_releases
@@ -52,8 +52,8 @@ module DotPopper
         @dragging = Dragging.new(pile: @pile, show: @show, style: @game.grab_style)
         @game_flow.subscribe(@dragging)
         @particle_systems = ParticleSystems.new(Style)
-        @bloom = Bloom.new(@pen, Style::BLOOM)
-        @renderer = Renderer.new(@show, @pen, pile: @pile, particle_systems: @particle_systems, bloom: @bloom,
+        @bloom = Bloom.new(@context, Style::BLOOM)
+        @renderer = Renderer.new(@show, @context, pile: @pile, particle_systems: @particle_systems, bloom: @bloom,
                                              diagnostic: flag?("DOT_POPPER_DIAGNOSTIC_COLORS"))
         @renderer.prepare
         @input = LotaInput.new
@@ -174,7 +174,7 @@ module DotPopper
 
         @hooks&.happened("a resize")
         @engine.report_screen
-        @pen.refresh
+        @context.refresh
         @particle_systems.refresh
         @bloom.refresh
         @game_flow.screen = screen
@@ -201,7 +201,7 @@ module DotPopper
       # Puts on the Show's look if it has changed (UseCases::UseTheme),
       # which is only ever between games.
       def use_theme
-        return unless @pen.use(@show.in_use)
+        return unless @context.use(@show.in_use)
 
         @renderer.prepare
         @sound_player.use(@show.in_use)

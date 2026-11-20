@@ -56,8 +56,8 @@ module DotPopper
       end
 
       def desktop_window(exclusive:) = DesktopWindow.new(exclusive:)
-      def pen(shaders:) = Pen.new(Style, shaders:)
-      def measure(pen) = FontMeasure.new(pen.fonts)
+      def context(shaders:) = DrawingContext.new(Style, shaders:)
+      def measure(context) = FontMeasure.new(context.fonts)
       def sound_player(file:) = SoundPlayer.new(Style::PATCHES, file:, volume: Style::SOUND.volume)
       def clipboard = Clipboard.new
       def opener = UrlOpener.new

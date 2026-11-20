@@ -8,7 +8,7 @@ module DotPopper
     # stroked path, [:circle, x, y, r] a ring, [:disc, x, y, r] a filled
     # circle, [:arc, x, y, r, from, to] an open arc in degrees, and
     # [:fill, x, y, ...] a filled polygon.
-    class Glyphs < Data.define(:pen)
+    class Glyphs < Data.define(:context)
       G = ::Lota::Graphics
       TABLE = {
         bars: [[:line, 4, 21, 4, 11], [:line, 10, 21, 10, 5], [:line, 16, 21, 16, 9], [:line, 22, 21, 22, 13]],
@@ -55,10 +55,10 @@ module DotPopper
 
       # The icon +name+, in a square +size+ across around +x+, +y+. Thin
       # strokes unless +weight+ (in grid units) says otherwise.
-      def draw(name, x, y, size, color: pen.palette.cream, alpha: 1.0, weight: 1.6)
+      def draw(name, x, y, size, color: context.palette.cream, alpha: 1.0, weight: 1.6)
         unit = size / 24.0
-        pen.color(color, alpha)
-        G.line_width = pen.pixels.whole([weight * unit, 1.0].max)
+        context.color(color, alpha)
+        G.line_width = context.pixels.whole([weight * unit, 1.0].max)
         G.line_join = :bevel if G.respond_to?(:line_join=)
         place = ->(px, py) { [x + ((px - 12) * unit), y + ((py - 12) * unit)] }
         TABLE.fetch(name).each { |part| stroke(part, unit, place) }
@@ -79,18 +79,18 @@ module DotPopper
 
     # The dark rounded card the screens set their parts on, and the tiles
     # and choices built from it, on whole device pixels.
-    class Card < Data.define(:pen)
+    class Card < Data.define(:context)
       G = ::Lota::Graphics
 
       def draw(rect, corner: nil, alpha: 1.0, lit: 0.0, edge: nil)
-        pixels = pen.pixels
+        pixels = context.pixels
         x, y, width, height = [rect.x, rect.y, rect.width, rect.height].map { pixels.snap(it) }
         corner ||= [height * 0.26, 18.0].min
-        palette = pen.palette
-        fill = palette.pill.mix(pen.lit.fill, lit)
-        pen.color(fill, [fill.a, 0.7].max * alpha)
+        palette = context.palette
+        fill = palette.pill.mix(context.lit.fill, lit)
+        context.color(fill, [fill.a, 0.7].max * alpha)
         G.rectangle(:fill, x, y, width, height, corner, corner, 16)
-        pen.color(edge || palette.soft.mix(pen.lit.edge, lit), (edge ? 1.0 : 0.3 + (0.7 * lit)) * alpha)
+        context.color(edge || palette.soft.mix(context.lit.edge, lit), (edge ? 1.0 : 0.3 + (0.7 * lit)) * alpha)
         G.line_width = pixels.line_width(1)
         inset = pixels.line_at(x) - x
         G.rectangle(:line, x + inset, y + inset, width - (2 * inset), height - (2 * inset), corner, corner, 16)
@@ -100,21 +100,21 @@ module DotPopper
     # A row of choices in one pill, the chosen one filled in cream.
     # +choices+ are [text, chosen?, hover, icon], where +icon+ draws at
     # x, y in a square of the given size, or is nil.
-    class ChoiceRow < Data.define(:pen)
+    class ChoiceRow < Data.define(:context)
       G = ::Lota::Graphics
 
       def draw(frame, rects, choices)
-        pixels = pen.pixels
-        palette = pen.palette
-        Card.new(pen:).draw(frame, corner: frame.height / 2.0)
+        pixels = context.pixels
+        palette = context.palette
+        Card.new(context:).draw(frame, corner: frame.height / 2.0)
         rects.zip(choices).each do |rect, (text, chosen, hover, icon)|
           inner = rect.inset(pixels.snap(frame.height * 0.08))
           x, y, width, height = [inner.x, inner.y, inner.width, inner.height].map { pixels.snap(it) }
           if chosen
-            pen.color(palette.cream, 0.92 + (0.08 * hover))
+            context.color(palette.cream, 0.92 + (0.08 * hover))
             G.rectangle(:fill, x, y, width, height, height / 2.0, height / 2.0, 32)
           elsif hover.positive?
-            pen.color(pen.lit.fill, pen.lit.fill.a * hover)
+            context.color(context.lit.fill, context.lit.fill.a * hover)
             G.rectangle(:fill, x, y, width, height, height / 2.0, height / 2.0, 32)
           end
           label(text, x + (width / 2.0), y + (height / 2.0), height, chosen, icon, width)
@@ -125,13 +125,13 @@ module DotPopper
 
       def label(text, x, y, height, chosen, icon, room)
         size = (height * 0.34).round
-        size -= 1 while size > 11 && pen.fonts.semibold(size).width(text) + (icon ? height : 0) > room - (height * 0.4)
-        font = pen.fonts.semibold(size)
-        return pen.text(text, font, x, y, chosen ? pen.palette.ink_bottom : pen.palette.cream) unless icon
+        size -= 1 while size > 11 && context.fonts.semibold(size).width(text) + (icon ? height : 0) > room - (height * 0.4)
+        font = context.fonts.semibold(size)
+        return context.text(text, font, x, y, chosen ? context.palette.ink_bottom : context.palette.cream) unless icon
 
         left = x - ((height * 0.5) + font.width(text)) / 2.0
         icon.call(left + (height * 0.2), y, height, chosen)
-        pen.text(text, font, left + (height * 0.5) + (font.width(text) / 2.0), y, chosen ? pen.palette.ink_bottom : pen.palette.cream)
+        context.text(text, font, left + (height * 0.5) + (font.width(text) / 2.0), y, chosen ? context.palette.ink_bottom : context.palette.cream)
       end
     end
   end

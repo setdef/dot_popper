@@ -9,7 +9,7 @@ module DotPopper
     # else: FinishGame hears the rules' events, before anything made after
     # it, and BuyPro hears Pro arrive (Entitlement::ProGranted). Answers
     # them by the names Presentation::Show takes. UseTheme is not among
-    # them: it hears nothing, and is made before the rest, since the pen
+    # them: it hears nothing, and is made before the rest, since the drawing context
     # and the sound player take the current theme from it before anything
     # is drawn. +starter+ is the game flow's one Starter, which StartGame
     # holds.

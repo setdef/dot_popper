@@ -19,34 +19,34 @@ module DotPopper
       # With +diagnostic+ (DOT_POPPER_DIAGNOSTIC_COLORS), each frame clears
       # to pure blue and draws no night, so any pixel the game's drawing
       # reaches but nothing paints shows blue (doc/ios.md).
-      def initialize(show, pen, pile:, particle_systems:, bloom:, diagnostic: false)
+      def initialize(show, context, pile:, particle_systems:, bloom:, diagnostic: false)
         @show = show
         @diagnostic = diagnostic
-        @pen = pen
+        @context = context
         @pile = pile
         @bloom = bloom
-        @dots = DotPainter.new(pen:, now: -> { @show.now })
-        @effects = EffectsPainter.new(pen:, particle_systems:)
-        @hud = HudPainter.new(pen:, dots: @dots)
-        @huds = Presentation::HudDrawings.new(type: pen.style::TYPE, measure: show.measure)
-        @home = HomePainter.new(pen:, dots: @dots)
-        @stats = StatsPainter.new(pen:)
-        @settings = SettingsPainter.new(pen:, dots: @dots)
-        @achievements = AchievementsPainter.new(pen:)
-        @privacy = PrivacyPainter.new(pen:)
-        @server = ServerPainter.new(pen:)
-        @credits = CreditsPainter.new(pen:)
-        @themes = ThemesPainter.new(pen:, dots: @dots)
-        @offer = OfferPainter.new(pen:, dots: @dots)
-        @game_over = GameOverPainter.new(pen:, dots: @dots)
-        @group = GroupPainter.new(pen:)
-        @share = SharePreviewPainter.new(pen:, dots: @dots)
-        @cursor = CursorPainter.new(pen:)
-        @splash = SplashPainter.new(pen:)
-        @scene = Scene.new(pen)
-        @new_theme_card = NewThemeCardPainter.new(pen:, dots: @dots)
-        @tutorial = TutorialPainter.new(pen:)
-        @at_rest = Presentation::DotAnimations.new(pen.style::MOTION)
+        @dots = DotPainter.new(context:, now: -> { @show.now })
+        @effects = EffectsPainter.new(context:, particle_systems:)
+        @hud = HudPainter.new(context:, dots: @dots)
+        @huds = Presentation::HudDrawings.new(type: context.style::TYPE, measure: show.measure)
+        @home = HomePainter.new(context:, dots: @dots)
+        @stats = StatsPainter.new(context:)
+        @settings = SettingsPainter.new(context:, dots: @dots)
+        @achievements = AchievementsPainter.new(context:)
+        @privacy = PrivacyPainter.new(context:)
+        @server = ServerPainter.new(context:)
+        @credits = CreditsPainter.new(context:)
+        @themes = ThemesPainter.new(context:, dots: @dots)
+        @offer = OfferPainter.new(context:, dots: @dots)
+        @game_over = GameOverPainter.new(context:, dots: @dots)
+        @group = GroupPainter.new(context:)
+        @share = SharePreviewPainter.new(context:, dots: @dots)
+        @cursor = CursorPainter.new(context:)
+        @splash = SplashPainter.new(context:)
+        @scene = Scene.new(context)
+        @new_theme_card = NewThemeCardPainter.new(context:, dots: @dots)
+        @tutorial = TutorialPainter.new(context:)
+        @at_rest = Presentation::DotAnimations.new(context.style::MOTION)
       end
 
       # The frame, with the setdef +splash+ over it while there is one:
@@ -99,7 +99,7 @@ module DotPopper
       def nothing(_screen, _width, _height, _layout) = nil
 
       def home_screen(_screen, width, height, layout)
-        veil(width, height, @pen.style::HOME.dim)
+        veil(width, height, @context.style::HOME.dim)
         @home.draw(@show, layout)
       end
 
@@ -146,7 +146,7 @@ module DotPopper
       def achievement_dialog_screen(_screen, _width, _height, layout) = @achievements.dialog(@show, layout)
 
       def friend_groups_screen(_screen, width, height, layout)
-        veil(width, height, @pen.style::GROUPS.veil)
+        veil(width, height, @context.style::GROUPS.veil)
         @group.draw(@show, layout)
       end
 
@@ -158,7 +158,7 @@ module DotPopper
       def share_preview_screen(screen, width, height, _layout) = @share.draw(screen.drawing, width, height)
 
       # The veil over Home's dots under a screen over Home.
-      def page_veil(width, height) = veil(width, height, @pen.style::STATS.veil)
+      def page_veil(width, height) = veil(width, height, @context.style::STATS.veil)
 
       # A game, and after it, Game Over over its pile: the dots over their
       # glow, the effects, the veil and words of Game Over, the clock highlight
@@ -245,7 +245,7 @@ module DotPopper
       # the HUD shakes, by whole device pixels; the dots never do, since a
       # tap is judged where a dot really is.
       def hud(drawing)
-        pixels = @pen.pixels
+        pixels = @context.pixels
         G.push do
           G.translate(pixels.snap(@show.effects.shake_x), pixels.snap(@show.effects.shake_y))
           @hud.draw(drawing)
@@ -254,7 +254,7 @@ module DotPopper
 
       # What the HUD painter draws for +hud+ (Presentation::HudDrawing), laid
       # out for +layout+ at the screen's density.
-      def hud_drawing(hud, layout) = @huds.call(hud, layout, @pen.pixels.scale)
+      def hud_drawing(hud, layout) = @huds.call(hud, layout, @context.pixels.scale)
 
       public
 
@@ -263,8 +263,8 @@ module DotPopper
       # night's darkest ink, so a pixel nothing draws is never black or
       # another color.
       def prepare
-        G.background_color = @pen.palette.ink_edge.to_a
-        @scene.bake(@pen.art)
+        G.background_color = @context.palette.ink_edge.to_a
+        @scene.bake(@context.art)
         @splash.refresh
         @hud.prepare(@show.layout)
       end
@@ -272,21 +272,21 @@ module DotPopper
       def backdrop(width, height)
         return G.clear(0, 0, 1, 1) if @diagnostic
         return @scene.draw if @scene.on?
-        return flat_backdrop(width, height) unless @pen.shader?(:backdrop)
+        return flat_backdrop(width, height) unless @context.shader?(:backdrop)
 
-        @pen.shading(:backdrop) do |shader|
-          @pen.uniform(shader, "size", [width.to_f, height.to_f])
+        @context.shading(:backdrop) do |shader|
+          @context.uniform(shader, "size", [width.to_f, height.to_f])
           G.color = [1, 1, 1, 1]
-          @pen.square(width / 2.0, height / 2.0, width / 2.0, height / 2.0)
+          @context.square(width / 2.0, height / 2.0, width / 2.0, height / 2.0)
         end
       end
 
       # Without its shader, the night is bands from top to bottom.
       def flat_backdrop(width, height)
-        palette = @pen.palette
+        palette = @context.palette
         bands = 16
         bands.times do |i|
-          @pen.color(palette.ink_top.mix(palette.ink_bottom, i / (bands - 1.0)))
+          @context.color(palette.ink_top.mix(palette.ink_bottom, i / (bands - 1.0)))
           G.rectangle(:fill, 0, height * i / bands, width, (height / bands.to_f) + 1)
         end
       end
@@ -295,7 +295,7 @@ module DotPopper
       def veil(width, height, alpha)
         return if alpha <= 0.0
 
-        @pen.color(@pen.palette.ink_bottom, alpha)
+        @context.color(@context.palette.ink_bottom, alpha)
         G.rectangle(:fill, 0, 0, width, height)
       end
     end

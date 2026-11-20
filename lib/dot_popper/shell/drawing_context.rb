@@ -9,7 +9,7 @@ module DotPopper
     # Every shader is optional. One that will not compile on this GPU, or
     # all of them with DOT_POPPER_NO_SHADERS=1, is left out with a warning,
     # and the painters draw that part with plain shapes instead.
-    class Pen
+    class DrawingContext
       G = ::Lota::Graphics
       SHADERS = %i[dot edge backdrop blur scene].freeze
       THEMED = %i[extent shadow_offset shadow_reach shadow_alpha halo_width halo_alpha].freeze

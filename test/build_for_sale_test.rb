@@ -49,7 +49,7 @@ class BuildForSaleTest < Minitest::Test
       settings = root.settings
       built = { "system" => system, "settings" => label, "offered" => root.store.offered?,
                 "games" => root.show.games_line, "pro" => root.entitlement.pro?,
-                "themes.txt" => engine.file("themes.txt").read.to_s, "theme" => root.pen.theme&.key.to_s,
+                "themes.txt" => engine.file("themes.txt").read.to_s, "theme" => root.context.theme&.key.to_s,
                 "today" => settings.today.call.to_s, "date" => Date.today.to_s,
                 "utc now off by" => (settings.utc_now.call - Time.now.utc).abs.round }
       root.entitlement.prove(receipt)

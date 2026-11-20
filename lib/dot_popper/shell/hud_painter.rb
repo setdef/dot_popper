@@ -5,7 +5,7 @@ module DotPopper
     # The score and the time left, in a see-through pill at the top of the
     # safe area, over every dot, outlined so they stay crisp over one. A number that changes bumps by drawing in
     # a bigger font for a moment; glyphs are never stretched.
-    class HudPainter < Data.define(:pen, :dots)
+    class HudPainter < Data.define(:context, :dots)
       G = ::Lota::Graphics
 
       # Draws +drawing+ (Presentation::HudDrawing) and answers the pill.
@@ -26,7 +26,7 @@ module DotPopper
       # Where the pill goes, on whole device pixels, without drawing it.
       def bounds(drawing)
         plan = drawing.plan
-        pixels = pen.pixels
+        pixels = context.pixels
         Presentation::Rect.new(x: pixels.snap(plan.center_x - plan.cell), y: pixels.snap(plan.top),
                                width: pixels.snap(plan.cell * 2), height: pixels.snap(plan.height))
       end
@@ -45,10 +45,10 @@ module DotPopper
       # Makes every size a bump or an urgent pulse passes through, an
       # elastic one's undershoot included, before the first number changes.
       def prepare(layout)
-        hud = pen.style::HUD
-        size = layout.scaled(pen.style::TYPE.hud_number)
+        hud = context.style::HUD
+        size = layout.scaled(context.style::TYPE.hud_number)
         largest = [hud.bump.from, hud.pulse.from].max
-        largest.step(0.85, -0.01) { pen.fonts.bold(Presentation::Pixels.font_size(size * it, step: Presentation::Hud::BUMP_STEP)) }
+        largest.step(0.85, -0.01) { context.fonts.bold(Presentation::Pixels.font_size(size * it, step: Presentation::Hud::BUMP_STEP)) }
       end
 
       private
@@ -58,7 +58,7 @@ module DotPopper
       # ones are still to come, and all of them mint when the bonus dot is
       # out there to pop.
       def dots_in_a_row(readout, pill)
-        pixels = pen.pixels
+        pixels = context.pixels
         radius = pill.height * Presentation::Hud::PIP
         step = radius * Presentation::Hud::PIP_STEP
         left = pill.center_x - (step * (readout.size - 1) / 2.0)
@@ -73,18 +73,18 @@ module DotPopper
       # The middle of the row's row of dots, hung under the +pill+.
       def dots_in_a_row_top(pill) = pill.bottom + (pill.height * Presentation::Hud::PIP * 1.7)
 
-      def fonts(plan) = [pen.fonts.bold(plan.number_size), pen.fonts.semibold(plan.label_size)]
+      def fonts(plan) = [context.fonts.bold(plan.number_size), context.fonts.semibold(plan.label_size)]
 
       # The middle of a readout's number, under its label, from the top of
       # the readout.
       def number_middle(top, plan) = top + plan.label_height + (plan.number_height * 0.42)
 
       def pill(rect)
-        pixels = pen.pixels
+        pixels = context.pixels
         corner = rect.height / 2.0
-        pen.color(pen.palette.pill, pen.style::HUD.backing)
+        context.color(context.palette.pill, context.style::HUD.backing)
         G.rectangle(:fill, rect.x, rect.y, rect.width, rect.height, corner, corner, 48)
-        pen.color(pen.palette.pill_edge)
+        context.color(context.palette.pill_edge)
         G.line_width = pixels.line_width(1)
         inset = pixels.line_at(rect.x) - rect.x
         G.rectangle(:line, rect.x + inset, rect.y + inset, rect.width - (2 * inset), rect.height - (2 * inset),
@@ -93,19 +93,19 @@ module DotPopper
       end
 
       def divider(x, top, bottom)
-        pixels = pen.pixels
-        pen.color(pen.palette.pill_edge)
+        pixels = context.pixels
+        context.color(context.palette.pill_edge)
         G.line_width = pixels.line_width(1)
         at = pixels.line_at(x)
         G.line(at, pixels.snap(top), at, pixels.snap(bottom))
       end
 
       def readout(readout, size, x, top, number, label)
-        palette = pen.palette
-        pen.outlined(readout.label, label, x, top + (label.height / 2.0), palette.soft)
+        palette = context.palette
+        context.outlined(readout.label, label, x, top + (label.height / 2.0), palette.soft)
         center = top + label.height + (number.height * 0.42)
         color = palette.cream.mix(palette.urgent, readout.urgency)
-        pen.outlined(readout.text, pen.fonts.bold(size), x, center, color)
+        context.outlined(readout.text, context.fonts.bold(size), x, center, color)
       end
     end
   end

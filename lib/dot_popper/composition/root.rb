@@ -20,7 +20,7 @@ module DotPopper
     # [fill_screen] fills a phone's or tablet's screen
     # [open_window(radius:, wanted:, smallest:)] sizes a computer's window
     # [desktop_window(exclusive:)] a computer's window control
-    # [pen(shaders:)], [measure(pen)] what draws, and how wide text is in
+    # [context(shaders:)], [measure(context)] what draws, and how wide text is in
     #   its fonts
     # [sound_player(file:)] what plays the sounds
     # [clipboard], [opener], [buzzer] the system's clipboard, its URL
@@ -40,7 +40,7 @@ module DotPopper
       GAMES_LOG = "games.csv"
       SMALLEST_WINDOW = [400, 320].freeze
 
-      attr_reader :settings, :platform, :dot_size, :window, :game_flow, :show, :pen, :sound_player, :splash, :store,
+      attr_reader :settings, :platform, :dot_size, :window, :game_flow, :show, :context, :sound_player, :splash, :store,
                   :entitlement, :theme_releases, :watch, :cursor, :bot, :haptics, :sharing, :refresh
 
       def initialize(engine:, settings: DeveloperSettings.new, now: -> { Time.now.to_f })
@@ -157,9 +157,9 @@ module DotPopper
         themes.open_by_date(today.call, @gone.days(today.call))
         @gone.subscribe(@server_choice).subscribe(themes)
         @theme_releases = theme_releases_for(themes)
-        @pen = @engine.pen(shaders: !flag?("DOT_POPPER_NO_SHADERS"))
+        @context = @engine.context(shaders: !flag?("DOT_POPPER_NO_SHADERS"))
         current = Style::THEMES.find { it.key == use_theme.current }
-        @pen.use(current)
+        @context.use(current)
         @sound_player = @engine.sound_player(file: file("sound.txt"))
         @sound_player.use(current)
         unless Presentation::Splash.skipped?(settings.env)
@@ -176,7 +176,7 @@ module DotPopper
           groups:, game_flow: @game_flow, layout: @engine.layout, sounds: @sound_player, radius: dot_size.radius,
           random:, calm: settings.calm?, tutor: Presentation::Tutor.new(file("taught.txt"), times: Style::LESSON.times),
           haptics:, clipboard:, notices: @engine.notices, sharing:,
-          saved_stats:, achievements:, keeper:, sizing_file:, input: starting_input, measure: @engine.measure(@pen),
+          saved_stats:, achievements:, keeper:, sizing_file:, input: starting_input, measure: @engine.measure(@context),
           window: @window,
           tutorial_flag: Presentation::TutorialFlag.new(file("tutorial.txt"), mode: Presentation::TutorialFlag.mode(settings.env)),
           group_notice: Presentation::GroupNotice.new(file("group_notice.txt")),

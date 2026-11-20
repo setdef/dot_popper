@@ -10,15 +10,15 @@ module DotPopper
     # thanks. Calm: no motion, no clock, and Back always there.
     # Presentation::OfferLayout decides where each goes; this only draws,
     # on whole device pixels.
-    class OfferPainter < Data.define(:pen, :dots)
+    class OfferPainter < Data.define(:context, :dots)
       G = ::Lota::Graphics
       SIGNS = { "Unlimited games" => :infinity, "Achievements" => :ribbon, "Friend groups" => :crown }.freeze
 
       def draw(show, layout)
         plan = show.offer_plan
         words = show.words.offer
-        palette = pen.palette
-        Header.new(pen:).draw(show, layout, words[:heading])
+        palette = context.palette
+        Header.new(context:).draw(show, layout, words[:heading])
         note(plan) if plan.key?(:note)
         art(show, plan[:art]) if plan.key?(:art)
         centered(plan, :focus, :bold, :focus, show.offer_layout.focus_word, palette.cream)
@@ -31,13 +31,13 @@ module DotPopper
 
       def centered(plan, name, face, size, text, color)
         rect = plan[name] or return
-        pen.text(text, pen.fonts.public_send(face, plan.size(size)), rect.center_x, rect.center_y, color)
+        context.text(text, context.fonts.public_send(face, plan.size(size)), rect.center_x, rect.center_y, color)
       end
 
       def note(plan)
-        font = pen.fonts.semibold(plan.size(:note))
+        font = context.fonts.semibold(plan.size(:note))
         plan.note_lines.each_with_index do |line, i|
-          pen.text(line, font, plan[:note].center_x, plan[:note].y + (font.height * (i + 0.5)), pen.palette.alarm)
+          context.text(line, font, plan[:note].center_x, plan[:note].y + (font.height * (i + 0.5)), context.palette.alarm)
         end
       end
 
@@ -46,8 +46,8 @@ module DotPopper
         case show.offer_focus
         when :themes then themes(show, rect)
         when :achievements then achievement(show, rect)
-        else Glyphs.new(pen:).draw(show.offer_focus == :groups ? :crown : :infinity, rect.center_x, rect.center_y, rect.height,
-                                   color: pen.palette.bright_body, weight: 2.0)
+        else Glyphs.new(context:).draw(show.offer_focus == :groups ? :crown : :infinity, rect.center_x, rect.center_y, rect.height,
+                                   color: context.palette.bright_body, weight: 2.0)
         end
       end
 
@@ -62,10 +62,10 @@ module DotPopper
         left = rect.center_x - (((list.size * width) + ((list.size - 1) * gap)) / 2.0)
         list.each_with_index do |theme, i|
           box = Presentation::Rect.new(x: left + (i * (width + gap)), y: rect.y, width:, height: rect.height)
-          pen.color(theme.palette.ink_top)
+          context.color(theme.palette.ink_top)
           G.rectangle(:fill, box.x, box.y, box.width, box.height, 12, 12, 24)
           radius = [box.height * 0.24, box.width * 0.17].min
-          pen.using(theme) do
+          context.using(theme) do
             dots.icon(box.center_x - (radius * 0.6), box.y + (box.height * 0.4), radius, bright: true)
             dots.icon(box.center_x + (radius * 0.6), box.y + (box.height * 0.4), radius, bright: false)
           end
@@ -73,8 +73,8 @@ module DotPopper
           art = theme.art
           name = name.upcase if art&.wordmark && art.dotted_name
           size = [(box.height * 0.16).round, 18].min
-          size -= 1 while size > 9 && pen.fonts.face(art&.wordmark || pen.style::TYPE.bold, size).width(name) > box.width * 0.9
-          pen.text(name, pen.fonts.face(art&.wordmark || pen.style::TYPE.bold, size), box.center_x, box.bottom - (box.height * 0.18),
+          size -= 1 while size > 9 && context.fonts.face(art&.wordmark || context.style::TYPE.bold, size).width(name) > box.width * 0.9
+          context.text(name, context.fonts.face(art&.wordmark || context.style::TYPE.bold, size), box.center_x, box.bottom - (box.height * 0.18),
                    theme.palette.bright_body)
         end
       end
@@ -84,36 +84,36 @@ module DotPopper
       # adds (doc/design/store-and-pro.md).
       def achievement(show, rect)
         id = show.offer_achievement or return
-        Card.new(pen:).draw(rect)
+        Card.new(context:).draw(rect)
         radius = rect.height * 0.32
         x = rect.x + 16 + radius
-        AchievementsPainter.new(pen:).emblem(id, x, rect.center_y, radius, show.achievement_earned?(id))
+        AchievementsPainter.new(context:).emblem(id, x, rect.center_y, radius, show.achievement_earned?(id))
         left = x + radius + 16
         room = rect.right - left - 16
-        bold = pen.fonts.bold(18)
-        small = pen.fonts.semibold(14)
+        bold = context.fonts.bold(18)
+        small = context.fonts.semibold(14)
         lines = Presentation::Words.wrap(Presentation::AchievementWords.how(id), room) { small.width(it) }.first(3)
         top = rect.center_y - (((lines.size * small.height) + bold.height) / 2.0)
         name = Presentation::AchievementWords.name(id)
-        pen.text(name, bold, left + (bold.width(name) / 2.0), top + (bold.height / 2.0), pen.palette.cream)
+        context.text(name, bold, left + (bold.width(name) / 2.0), top + (bold.height / 2.0), context.palette.cream)
         lines.each_with_index do |line, i|
-          pen.text(line, small, left + (small.width(line) / 2.0), top + bold.height + (small.height * (i + 0.5)), pen.palette.cream)
+          context.text(line, small, left + (small.width(line) / 2.0), top + bold.height + (small.height * (i + 0.5)), context.palette.cream)
         end
       end
 
       def items(plan, list)
         rect = plan[:items] or return
-        font = pen.fonts.semibold(plan.size(:item))
+        font = context.fonts.semibold(plan.size(:item))
         line = font.height * Presentation::OfferLayout::LINE
         list.each_with_index do |item, i|
-          y = pen.pixels.snap(rect.y + (font.height / 2.0) + (i * line))
+          y = context.pixels.snap(rect.y + (font.height / 2.0) + (i * line))
           sign = font.height * 1.1
           if SIGNS.key?(item)
-            Glyphs.new(pen:).draw(SIGNS[item], rect.x + (sign / 2.0), y, sign, color: pen.palette.bright_body)
+            Glyphs.new(context:).draw(SIGNS[item], rect.x + (sign / 2.0), y, sign, color: context.palette.bright_body)
           else
             dots.icon(rect.x + (sign / 2.0), y, sign * 0.45, bright: true)
           end
-          pen.text(item, font, rect.x + (font.height * 1.6) + (font.width(item) / 2.0), y, pen.palette.cream)
+          context.text(item, font, rect.x + (font.height * 1.6) + (font.width(item) / 2.0), y, context.palette.cream)
         end
       end
 
@@ -121,16 +121,16 @@ module DotPopper
       def status(plan, text)
         rect = plan[:status] or return
         size = plan.size(:note)
-        size -= 1 while size > 10 && pen.fonts.semibold(size).width(text) > rect.width
-        pen.text(text, pen.fonts.semibold(size), rect.center_x, rect.center_y, pen.palette.cream)
+        size -= 1 while size > 10 && context.fonts.semibold(size).width(text) > rect.width
+        context.text(text, context.fonts.semibold(size), rect.center_x, rect.center_y, context.palette.cream)
       end
 
       # Buy, while Pro is sold, and Restore Purchases or Paste license key.
       def buttons(show, plan, words)
         if plan.key?(:buy)
-          PrimaryButton.new(pen:).draw(plan[:buy], show.buy_label, hover: show.hover.level(:buy))
+          PrimaryButton.new(context:).draw(plan[:buy], show.buy_label, hover: show.hover.level(:buy))
         end
-        %i[restore paste].each { PillButton.new(pen:).draw(plan[it], words[it], hover: show.hover.level(it)) if plan.key?(it) }
+        %i[restore paste].each { PillButton.new(context:).draw(plan[it], words[it], hover: show.hover.level(it)) if plan.key?(it) }
       end
     end
   end

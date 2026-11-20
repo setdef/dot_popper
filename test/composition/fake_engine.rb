@@ -26,7 +26,7 @@ class FakeEngine
   end
 
   # What draws, which remembers the theme it was last told to use.
-  class Pen
+  class DrawingContext
     attr_reader :shaders, :theme
 
     def initialize(shaders:) = @shaders = shaders
@@ -101,8 +101,8 @@ class FakeEngine
   def fill_screen = @opened = :filled
   def open_window(radius:, wanted:, smallest:) = @opened = { radius:, wanted:, smallest: }
   def desktop_window(exclusive:) = DesktopWindow.new(exclusive:)
-  def pen(shaders:) = Pen.new(shaders:)
-  def measure(_pen) = RoughMeasure.new
+  def context(shaders:) = DrawingContext.new(shaders:)
+  def measure(_context) = RoughMeasure.new
   def sound_player(file:) = SoundPlayer.new(file:)
   def notices = Notices.none
   def store_helper(automated:) = StoreHelper.new(automated:)
