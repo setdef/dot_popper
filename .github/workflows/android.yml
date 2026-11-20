@@ -80,6 +80,13 @@ jobs:
         with:
           ruby-version: .ruby-version
 
+      # Before 1.0.0 a playtest tag names the app's version, stamped into
+      # this working tree's fledge.yml, which script/android_build.sh reads;
+      # from 1.0.0 on a tag that disagrees with fledge.yml fails here
+      # (script/release_version.rb).
+      - name: Take the version from the tag
+        run: ruby script/release_version.rb stamp "$GITHUB_REF_NAME"
+
       - name: Clone Lota at ${{ env.LOTA_REF }}, with LÖVE's sources
         run: |
           lota=$RUNNER_TEMP/lota
