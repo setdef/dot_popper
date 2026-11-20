@@ -124,6 +124,8 @@ jobs:
         with:
           platform: x64-mingw-ucrt
 
+      - uses: ./.github/actions/windows-mesa
+
       # Unpacked under a folder with a space, Mesa's llvmpipe beside the
       # program (SDL loads opengl32.dll from there first), and a clean
       # environment with no Ruby. Then again allowed only Vulkan, to see
@@ -131,16 +133,11 @@ jobs:
       - name: Play the unpacked app with no Ruby on its PATH
         shell: pwsh
         run: |
-          C:\msys64\usr\bin\pacman.exe -S --noconfirm --needed mingw-w64-ucrt-x86_64-mesa | Out-Host
           $zip = Get-ChildItem -LiteralPath "$env:RUNNER_TEMP/fuse" -Filter 'Dot Popper-*.zip' | Select-Object -First 1
           $place = Join-Path $env:RUNNER_TEMP 'play\My Games'
           Expand-Archive -LiteralPath $zip.FullName -DestinationPath $place
           $program = Get-ChildItem -LiteralPath $place -Recurse -File -Filter 'Dot Popper.exe' | Select-Object -First 1
-          foreach ($pattern in 'opengl32.dll', 'libgallium_wgl.dll', 'libffi-*.dll', 'libgcc_s_seh-1.dll', 'libiconv-2.dll', 'libintl-8.dll',
-              'libLLVM*.dll', 'libSPIRV-Tools*.dll', 'libstdc++-6.dll', 'libsystre-0.dll', 'libtre-5.dll', 'libwinpthread-1.dll',
-              'libxml2*.dll', 'libzstd.dll', 'zlib1.dll') {
-            Get-ChildItem -LiteralPath 'C:\msys64\ucrt64\bin' -Filter $pattern | Copy-Item -Destination $program.DirectoryName
-          }
+          Copy-Item -Path "$env:MESA_DIR\*" -Destination $program.DirectoryName
           $system = $env:SystemRoot
           # Runs the app with PLAY_ENV and $extra, and returns its status and output.
           function Play([hashtable] $extra) {
@@ -242,6 +239,8 @@ jobs:
           & "$helper\dot-popper-store.exe" --self-test
           if ($LASTEXITCODE -ne 0) { exit 1 }
 
+      - uses: ./.github/actions/windows-mesa
+
       - name: Lay out the package and write its manifest
         shell: pwsh
         run: |
@@ -253,18 +252,6 @@ jobs:
           # The store helper beside the program, where Shell::StoreHelper
           # looks; started by the game, it has the package's identity.
           Copy-Item (Join-Path $env:RUNNER_TEMP 'helper\dot-popper-store.exe') $root
-
-          # The runner has no GPU: Mesa's software OpenGL goes beside the
-          # program for the check below. (The Store build is this folder
-          # too; a player's GPU driver takes over from opengl32.dll's own.)
-          C:\msys64\usr\bin\pacman.exe -S --noconfirm --needed mingw-w64-ucrt-x86_64-mesa | Out-Host
-          $mesa = Join-Path $env:RUNNER_TEMP 'mesa'
-          New-Item -ItemType Directory -Force -Path $mesa | Out-Null
-          foreach ($pattern in 'opengl32.dll', 'libgallium_wgl.dll', 'libffi-*.dll', 'libgcc_s_seh-1.dll', 'libiconv-2.dll', 'libintl-8.dll',
-              'libLLVM*.dll', 'libSPIRV-Tools*.dll', 'libstdc++-6.dll', 'libsystre-0.dll', 'libtre-5.dll', 'libwinpthread-1.dll',
-              'libxml2*.dll', 'libzstd.dll', 'zlib1.dll') {
-            Get-ChildItem -LiteralPath 'C:\msys64\ucrt64\bin' -Filter $pattern | Copy-Item -Destination $mesa
-          }
 
           # The app's version (the fuse action's APP_VERSION, X.Y.Z), as X.Y.Z.0.
           $version = "$env:APP_VERSION.0"
@@ -324,7 +311,9 @@ jobs:
           New-Item -ItemType Directory -Force -Path $out | Out-Null
           & $makeappx.FullName pack /d $root /p "$out\Dot-Popper-$version.msix" /o
           if ($LASTEXITCODE -ne 0) { exit 1 }
-          Copy-Item "$mesa\*" $root
+          # The runner has no GPU: Mesa's software OpenGL (MESA_DIR) goes
+          # beside the program for the check below.
+          Copy-Item "$env:MESA_DIR\*" $root
           & $makeappx.FullName pack /d $root /p "$env:RUNNER_TEMP\check.msix" /o
           if ($LASTEXITCODE -ne 0) { exit 1 }
           "SIGNTOOL=$(Join-Path $makeappx.DirectoryName 'signtool.exe')" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
@@ -627,20 +616,17 @@ jobs:
               check "$temp/appimage/squashfs-root" ;;
           esac
 
+      - if: runner.os == 'Windows'
+        uses: ./.github/actions/windows-mesa
       - name: Play the unpacked app with no Ruby on its PATH
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          C:\msys64\usr\bin\pacman.exe -S --noconfirm --needed mingw-w64-ucrt-x86_64-mesa | Out-Host
           $zip = Get-ChildItem -LiteralPath "$env:RUNNER_TEMP/fuse" -Filter 'Dot Popper-*.zip' | Select-Object -First 1
           $place = Join-Path $env:RUNNER_TEMP 'play\My Games'
           Expand-Archive -LiteralPath $zip.FullName -DestinationPath $place
           $program = Get-ChildItem -LiteralPath $place -Recurse -File -Filter 'Dot Popper.exe' | Select-Object -First 1
-          foreach ($pattern in 'opengl32.dll', 'libgallium_wgl.dll', 'libffi-*.dll', 'libgcc_s_seh-1.dll', 'libiconv-2.dll', 'libintl-8.dll',
-              'libLLVM*.dll', 'libSPIRV-Tools*.dll', 'libstdc++-6.dll', 'libsystre-0.dll', 'libtre-5.dll', 'libwinpthread-1.dll',
-              'libxml2*.dll', 'libzstd.dll', 'zlib1.dll') {
-            Get-ChildItem -LiteralPath 'C:\msys64\ucrt64\bin' -Filter $pattern | Copy-Item -Destination $program.DirectoryName
-          }
+          Copy-Item -Path "$env:MESA_DIR\*" -Destination $program.DirectoryName
           $system = $env:SystemRoot
           $start = [Diagnostics.ProcessStartInfo]::new($program.FullName)
           $start.UseShellExecute = $false

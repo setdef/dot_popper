@@ -134,17 +134,10 @@ jobs:
 
       # CI only: the runner has no GPU, so Mesa's llvmpipe goes beside the
       # game in this copy, where SDL finds its opengl32.dll first.
+      - uses: ./.github/actions/windows-mesa
       - name: Put Mesa's software OpenGL beside the game
         shell: pwsh
-        run: |
-          C:\msys64\usr\bin\pacman.exe -S --noconfirm --needed mingw-w64-ucrt-x86_64-mesa | Out-Host
-          $game = Join-Path $env:KIT 'Dot Popper'
-          $bin = 'C:\msys64\ucrt64\bin'
-          foreach ($pattern in 'opengl32.dll', 'libgallium_wgl.dll', 'libffi-*.dll', 'libgcc_s_seh-1.dll', 'libiconv-2.dll', 'libintl-8.dll',
-              'libLLVM*.dll', 'libSPIRV-Tools*.dll', 'libstdc++-6.dll', 'libsystre-0.dll', 'libtre-5.dll', 'libwinpthread-1.dll',
-              'libxml2*.dll', 'libzstd.dll', 'zlib1.dll') {
-            Get-ChildItem -LiteralPath $bin -Filter $pattern | Copy-Item -Destination $game
-          }
+        run: Copy-Item -Path "$env:MESA_DIR\*" -Destination (Join-Path $env:KIT 'Dot Popper')
 
       - name: Run playtest.ps1 in Windows PowerShell 5.1, answers on standard input
         shell: cmd

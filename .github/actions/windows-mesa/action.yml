@@ -1,0 +1,40 @@
+# Mesa's software OpenGL (llvmpipe), pinned, for a Windows job that plays
+# the app on a runner with no GPU: opengl32.dll and libgallium_wgl.dll
+# from the release-mingw archive of pal1000/mesa-dist-win at the version
+# below, refused unless its SHA-256 is the one below, put in
+# $RUNNER_TEMP\mesa, whose path it sets as MESA_DIR. A play step copies
+# that folder's two files beside the program, where SDL loads
+# opengl32.dll from first, and sets GALLIUM_DRIVER=llvmpipe. The two
+# files need only Windows' own DLLs, so nothing else goes beside the
+# program.
+#
+# The play steps once installed MSYS2's mesa package with pacman and
+# copied a list of DLLs from it: whatever version the runner image's
+# package database named that day. Mesa 26.2.7 made libgallium_wgl.dll
+# need zlib 1.4's libz-1.dll, which the list did not name, so
+# opengl32.dll could not load on the newer image. MSYS2's repository
+# also drops old packages, so it can't be pinned there; GitHub keeps a
+# release's files.
+name: Set up the pinned Mesa for Windows
+description: Mesa's llvmpipe opengl32.dll and libgallium_wgl.dll, checked by SHA-256, in MESA_DIR
+runs:
+  using: composite
+  steps:
+    - name: Fetch, check, and unpack the pinned Mesa
+      shell: bash
+      run: |
+        url=https://github.com/pal1000/mesa-dist-win/releases/download/26.2.6/mesa3d-26.2.6-release-mingw.7z
+        sha256=da0f71d9181b672c1918f3c342f11118c687f6059a46b16502845160733cc388
+        work=$RUNNER_TEMP/mesa-download
+        mkdir -p "$work"
+        curl --fail --location --silent --show-error --retry 3 -o "$work/mesa.7z" "$url"
+        # From standard input: given a path with a backslash in it, sha256sum
+        # escapes the name and puts a backslash before the sum.
+        actual=$(sha256sum < "$work/mesa.7z" | cut -d' ' -f1)
+        echo "pinned: $sha256"; echo "fetched: $actual"
+        [ "$actual" = "$sha256" ]
+        "/c/Program Files/7-Zip/7z.exe" x -y -o"$(cygpath -w "$work/unpacked")" "$(cygpath -w "$work/mesa.7z")" > /dev/null
+        mkdir -p "$RUNNER_TEMP/mesa"
+        cp "$work/unpacked/x64/opengl32.dll" "$work/unpacked/x64/libgallium_wgl.dll" "$RUNNER_TEMP/mesa/"
+        ls -la "$RUNNER_TEMP/mesa"
+        echo "MESA_DIR=$(cygpath -w "$RUNNER_TEMP/mesa")" >> "$GITHUB_ENV"
