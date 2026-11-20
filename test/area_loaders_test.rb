@@ -8,15 +8,11 @@ require "rbconfig"
 # nothing else of the game loaded, and brings nothing with it but its
 # own folder and the shared code it names, so what an area needs is in
 # its own loader.
-#
-# Monetization has no loader yet: its store names Release Engineering's
-# Build as it loads (Store::BUILD_CHANNEL and the channels' names, in
-# lib/dot_popper/monetization/store.rb), a breach test/areas_test.rb lists
-# with the steps that remove it (5.1, 5.4).
 class AreaLoadersTest < Minitest::Test
   ROOT = File.expand_path("..", __dir__)
 
-  ALONE = { "gameplay" => %w[gameplay network memory_file], "release_engineering" => %w[release_engineering] }.freeze
+  ALONE = { "gameplay" => %w[gameplay network memory_file], "monetization" => %w[monetization network memory_file],
+            "release_engineering" => %w[release_engineering] }.freeze
 
   def test_each_area_loads_by_itself
     ALONE.each do |area, own|

@@ -13,13 +13,6 @@ require_relative "dot_popper/platform"
 require_relative "dot_popper/automation"
 require_relative "dot_popper/network"
 require_relative "dot_popper/memory_file"
-# Monetization has no loader of its own yet: its store names Release
-# Engineering's Build as it loads (test/area_loaders_test.rb).
-require_relative "dot_popper/monetization/receipt"
-require_relative "dot_popper/monetization/entitlement"
-require_relative "dot_popper/monetization/store"
-require_relative "dot_popper/monetization/website_store"
-require_relative "dot_popper/monetization/free_games"
-require_relative "dot_popper/monetization/continuity"
+require_relative "dot_popper/monetization"
 require_relative "dot_popper/gameplay"
 DotPopper::ReleaseEngineering::Build::PARTS.each { require_relative "dot_popper/#{it}/core" }
