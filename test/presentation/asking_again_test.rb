@@ -34,12 +34,12 @@ class AskingAgainTest < Minitest::Test
     file.write("t\n")
     @session = DotPopper::Groups::Session.new(file:, worker: @groups_worker)
     @saved_themes = DotPopper::SavedThemes.new(DotPopper::ScoreRecord::Memory.new)
-    @feed = DotPopper::ThemeReleases.new(worker: @themes_worker, saved_themes: @saved_themes, file: DotPopper::ScoreRecord::Memory.new)
+    @theme_releases = DotPopper::ThemeReleases.new(worker: @themes_worker, saved_themes: @saved_themes, file: DotPopper::ScoreRecord::Memory.new)
     @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2))
     @show = new_show(game_flow: @game_flow, layout:, sounds: FakeSounds.new, radius: R, entitlement: DotPopper::Entitlement.new(forced: true),
                      saved_themes: @saved_themes, groups: @session)
-    @feed.ask
-    @refresh = Refresh.new([-> { @feed.ask }, -> { @session.refresh }], game_flow: @game_flow, now: -> { @now })
+    @theme_releases.ask
+    @refresh = Refresh.new([-> { @theme_releases.ask }, -> { @session.refresh }], game_flow: @game_flow, now: -> { @now })
     @game_flow.subscribe(@refresh)
     launch
   end
@@ -60,7 +60,7 @@ class AskingAgainTest < Minitest::Test
   def tick(seconds = 0.016)
     @game_flow.update(seconds)
     @show.update(seconds)
-    @feed.update
+    @theme_releases.update
   end
 
   def play_until_game_over

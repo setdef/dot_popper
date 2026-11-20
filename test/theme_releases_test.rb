@@ -22,14 +22,14 @@ class ThemeReleasesTest < Minitest::Test
     @dated = Memory.new
     @worker = FakeWorker.new
     @saved_themes = DotPopper::SavedThemes.new(@file)
-    @feed = DotPopper::ThemeReleases.new(worker: @worker, saved_themes: @saved_themes, file: @dated, now: -> { Time.utc(2026, 11, 8, 12) })
+    @theme_releases = DotPopper::ThemeReleases.new(worker: @worker, saved_themes: @saved_themes, file: @dated, now: -> { Time.utc(2026, 11, 8, 12) })
   end
 
   def test_sends_the_first_play_date_and_keeps_it_for_good
-    @feed.ask
+    @theme_releases.ask
     assert_equal "/themes?started_on=2026-11-08", @worker.started.path
-    feed = DotPopper::ThemeReleases.new(worker: @worker, saved_themes: @saved_themes, file: @dated, now: -> { Time.utc(2027, 1, 1, 12) })
-    feed.ask
+    theme_releases = DotPopper::ThemeReleases.new(worker: @worker, saved_themes: @saved_themes, file: @dated, now: -> { Time.utc(2027, 1, 1, 12) })
+    theme_releases.ask
     assert_equal "/themes?started_on=2026-11-08", @worker.started.path
   end
 
@@ -44,21 +44,21 @@ class ThemeReleasesTest < Minitest::Test
 
   def test_an_empty_answer_shows_no_trace_of_any_theme
     @worker.finished_list = [[nil, Reply.new(status: 200, body: [])]]
-    refute @feed.update
+    refute @theme_releases.update
     refute_predicate @saved_themes, :offered?
     assert_nil @saved_themes.new_theme
   end
 
   def test_a_release_arrives_and_unknown_keys_are_ignored
     @worker.finished_list = [[nil, Reply.new(status: 200, body: [{ "key" => "ghost" }, { "key" => "zombie" }])]]
-    assert @feed.update
+    assert @theme_releases.update
     assert_equal [:ghost], @saved_themes.choices.drop(1)
   end
 
   def test_offline_keeps_what_was_saved
     @saved_themes.release(["ghost"])
     @worker.finished_list = [[nil, Reply.offline]]
-    refute @feed.update
+    refute @theme_releases.update
     assert_equal [:ghost], @saved_themes.choices.drop(1)
   end
 
@@ -66,7 +66,7 @@ class ThemeReleasesTest < Minitest::Test
   # holds.
   def test_an_error_answer_releases_nothing
     @worker.finished_list = [[nil, Reply.new(status: 500, body: [{ "key" => "ghost" }])]]
-    refute @feed.update
+    refute @theme_releases.update
     assert_equal [:classic], @saved_themes.choices
   end
 end
