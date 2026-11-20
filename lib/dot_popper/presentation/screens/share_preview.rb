@@ -41,7 +41,7 @@ module DotPopper
           words = self.words
           hover = show.hover
           look = style::SHARE_PREVIEW
-          shown = preview.arrival(now, look).clamp(0.0, 1.0)
+          shown = preview.entrance(now, look).clamp(0.0, 1.0)
           copied = preview.confirmation(now, look)
           drawn(plan, words, hover, shown, copied) do
             ShareDrawing.new(shown:, veil: look.veil * shown, lift: (1 - shown) * look.lift * layout.ui, corner: look.corner * layout.ui, plan:,

@@ -197,7 +197,7 @@ module DotPopper
 
       @announcements: Array[Announcement]
 
-      @arrival: group_id?
+      @joined: group_id?
 
       attr_reader groups: Array[Group]
 
@@ -229,9 +229,9 @@ module DotPopper
 
       def next_announcement: () -> Announcement?
 
-      def arrived: (group_id id) -> void
+      def joined: (group_id id) -> void
 
-      def take_arrival: () -> group_id?
+      def take_joined: () -> group_id?
 
       def forget: () -> void
 
@@ -252,7 +252,7 @@ module DotPopper
 
       def read_group: (untyped body) -> void
 
-      def arrived: (untyped body, loud: bool) -> void
+      def joined: (untyped body, loud: bool) -> void
 
       def history_settled: (group_id id) -> void
 
@@ -467,7 +467,7 @@ module DotPopper
 
       def next_announcement: () -> Announcement?
 
-      def take_arrival: () -> group_id?
+      def take_joined: () -> group_id?
 
       private
 

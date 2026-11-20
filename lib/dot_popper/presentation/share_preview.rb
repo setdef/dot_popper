@@ -19,7 +19,7 @@ module DotPopper
       def copied? = !copied_at.nil?
 
       # How far the preview has come in, by +style+ (SharePreviewStyle).
-      def arrival(now, style) = style.arrive.at(now - at)
+      def entrance(now, style) = style.arrive.at(now - at)
 
       # How far "Copied!" has come in since the last copy.
       def confirmation(now, style) = copied? ? style.confirm.at(now - copied_at) : 0.0

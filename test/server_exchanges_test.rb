@@ -152,7 +152,7 @@ class ServerExchangesTest < Minitest::Test
     founder.create
     pump(founder)
     group = founder.groups.first
-    assert_equal group.id, founder.take_arrival
+    assert_equal group.id, founder.take_joined
     founder.game_finished(score: score_of("the founder's first game wins the vacant title"), counts: true)
     pump(founder)
     assert_equal 1, founder.game_result.won

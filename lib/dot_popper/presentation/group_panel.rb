@@ -218,7 +218,7 @@ module DotPopper
       def update(now, quiet:, showing: quiet)
         groups.update(quiet:)
         finish_hold if hold.done?(now)
-        arrive
+        open_joined
         leave_page_if_gone
         @announcement = nil if @announcement&.over?(now)
         return if @announcement || !showing || open?
@@ -423,8 +423,8 @@ module DotPopper
         open_group(list[(at + by) % list.size].id)
       end
 
-      def arrive
-        id = groups.take_arrival or return
+      def open_joined
+        id = groups.take_joined or return
         open_group(id) if open?
       end
 

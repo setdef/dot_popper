@@ -41,7 +41,7 @@ module DotPopper
       def new_score_record? = new_score_record
 
       def dim(now) = style.dim.at(now - at)
-      def arrival(now) = style.arrive.at(now - at)
+      def entrance(now) = style.arrive.at(now - at)
 
       def shown_score(now) = (score * style.tally.progress(now - at)).round
       def counted?(now) = style.tally.done?(now - at)
@@ -66,7 +66,7 @@ module DotPopper
     class ShareButtonEntranceStyle < Data.define(:arrive, :lift, :score_record_lift, :score_record_delay, :ring, :ring_reach,
                                                  :ring_alpha, :score_record_ring_reach, :score_record_ring_alpha); end
 
-    # Where "Share my score" is in its arrival: how much of it shows
+    # Where "Share my score" is in its entrance: how much of it shows
     # (+alpha+), how far below its place it is (+drop+, in units), and its
     # ring's distance out from the button's edge (+ring+, in units) and
     # opacity (+ring_alpha+, 0 for no ring).

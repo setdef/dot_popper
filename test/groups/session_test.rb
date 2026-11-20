@@ -84,8 +84,8 @@ class SessionTest < Minitest::Test
 
     assert_predicate @session, :member?
     assert_equal "t", new_session.token
-    assert_equal 1, @session.take_arrival
-    assert_nil @session.take_arrival
+    assert_equal 1, @session.take_joined
+    assert_nil @session.take_joined
   end
 
   def test_a_player_sends_only_a_join_code

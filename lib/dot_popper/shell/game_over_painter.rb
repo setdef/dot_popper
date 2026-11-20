@@ -20,11 +20,11 @@ module DotPopper
         now = show.now
         palette = context.palette
         words = show.words
-        arrival = game_over.arrival(now)
-        shown = arrival.clamp(0.0, 1.0)
+        entrance = game_over.entrance(now)
+        shown = entrance.clamp(0.0, 1.0)
         if (heading = plan[:heading])
           context.text(words.time_up, context.fonts.bold(plan.size(:heading)), heading.center_x,
-                   heading.center_y - ((1 - arrival) * 30), palette.soft, shown)
+                   heading.center_y - ((1 - entrance) * 30), palette.soft, shown)
         end
         score = context.fonts.bold(plan.size(:score))
         Lettering.new(context:).candy(game_over.shown_score(now).to_s, score, plan[:score].center_x,

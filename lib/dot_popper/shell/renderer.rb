@@ -172,7 +172,7 @@ module DotPopper
         @effects.words(@show.effects, layout)
         @game_over.draw(@show, layout) unless @show.playing?
         highlight = @show.clock_highlight
-        shown = !@show.game_over&.then { it.arrival(@show.now) >= 1.0 }
+        shown = !@show.game_over&.then { it.entrance(@show.now) >= 1.0 }
         hud = hud_drawing(@show.hud, layout) if highlight || shown
         if highlight
           pill = @hud.bounds(hud)

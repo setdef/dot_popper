@@ -27,7 +27,7 @@ The composition root (`Composition::Root`) builds the session with `Groups::Sess
 
 ### Session
 
-`Groups::Session` (`lib/dot_popper/groups/session.rb`, Lota-free) is what this device knows of its groups and everything it asks the server for. It is called only from the game's thread. What it last heard from the server (the groups, their title changes and history, whether the player was last known to be in a group, and the announcements and arrival still to take) is `Groups::KnownGroups` (`known_groups.rb`), which the server's answers replace; it decides only what to announce from them and when a group's history is worth reading again; what the game owes the server is `Groups::Unsent` ([Waiting games](#waiting-games)); `group.txt` is `Groups::GroupFile`.
+`Groups::Session` (`lib/dot_popper/groups/session.rb`, Lota-free) is what this device knows of its groups and everything it asks the server for. It is called only from the game's thread. What it last heard from the server (the groups, their title changes and history, whether the player was last known to be in a group, and the announcements and the group just joined, still to take) is `Groups::KnownGroups` (`known_groups.rb`), which the server's answers replace; it decides only what to announce from them and when a group's history is worth reading again; what the game owes the server is `Groups::Unsent` ([Waiting games](#waiting-games)); `group.txt` is `Groups::GroupFile`.
 
 - **Nothing is sent until a Pro player creates or joins a group.** A session with no saved token makes no connection. The first Create or Join first sends `POST /player`, which answers an anonymous token, and then the Create or Join. A player is only a token: no name, nothing they supply.
 - **Every job comes from a declaration.** Each kind of request is one class in `Groups::Jobs` (`lib/dot_popper/groups/jobs.rb`), named for what it does (`CreatePlayer`, `ListGroups`, `CreateGroup`, `JoinGroup`, `ReadGroup`, `ReadHistory`, `SendAchievement`, `LeaveGroup`, `SendGame`, `DeletePlayer`), which says what it sends and what each answer means: what is taken, what a refusal's status means for the player (`#refusals`), and which refusals it deals with itself. Its base, `Groups::Job`, takes the verb and path from `Groups::REQUESTS`, friend groups' own declarations, by `Network::Job.of`, which refuses a body whose fields differ from the declared ones ([privacy.md](privacy.md)). Adding a kind is its declaration and its class; `Session` answers only what every kind shares (no network, a 401, a 429, a loud job's error), and a job's answers reach it through its answer methods (`Groups::_Answers` in `sig/`).
@@ -99,7 +99,7 @@ A member of a group is a number the server gives, in join order, never reused (`
 
 **Lists scroll**, in a window under the heading, by touch, mouse wheel or controller; they are not paged. Every button is a thumb's height, and Leave sits apart from the rest. Leave and delete are long presses (`GroupPanel::HOLD`, 2 seconds); letting go too soon does nothing.
 
-Back goes up a level: History to its group, a group or the keypad to the list, the list out. Opening a group just created or joined happens by itself (`Session#take_arrival`). A group left or lost takes its screens with it.
+Back goes up a level: History to its group, a group or the keypad to the list, the list out. Opening a group just created or joined happens by itself (`Session#take_joined`). A group left or lost takes its screens with it.
 
 ### Joining by a seven-digit code
 

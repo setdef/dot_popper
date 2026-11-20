@@ -20,7 +20,7 @@ class JobsTest < Minitest::Test
       define_method(name) { |*args| @calls << [name, *args] }
     end
 
-    def arrived(body, loud:) = @calls << [:arrived, body, loud]
+    def joined(body, loud:) = @calls << [:joined, body, loud]
     def read_history(id, body) = @calls << [:read_history, id, body]
     def achievement_taken(key, body) = @calls << [:achievement_taken, key, body]
     def game_taken(score, body) = @calls << [:game_taken, score, body]
@@ -79,7 +79,7 @@ class JobsTest < Minitest::Test
   def test_what_each_does_with_an_answer_taken
     every_kind.each { it.taken(@heard, reply(200, "body")) }
 
-    assert_equal [[:adopt, "body"], [:read_groups, "body"], [:arrived, "body", true], [:arrived, "body", true], [:read_group, "body"],
+    assert_equal [[:adopt, "body"], [:read_groups, "body"], [:joined, "body", true], [:joined, "body", true], [:read_group, "body"],
                   [:read_history, 3, "body"], [:achievement_taken, "steady", "body"], [:gone, 3], [:game_taken, 60, "body"], [:forget_identity]],
                  @heard.calls
   end

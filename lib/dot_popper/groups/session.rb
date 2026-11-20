@@ -144,7 +144,7 @@ module DotPopper
       def next_announcement = @known.next_announcement
 
       # The group just created or joined, once, for a screen to open.
-      def take_arrival = @known.take_arrival
+      def take_joined = @known.take_joined
 
       # What the server's answers do (_Answers). Each kind of job (Jobs)
       # calls these from its #settled, #taken and #refused; nothing else
@@ -172,13 +172,13 @@ module DotPopper
 
       # A group just created or joined; a reply that is no group is a
       # failure the player hears of when they asked.
-      def arrived(body, loud:)
+      def joined(body, loud:)
         group = Group.parse(body)
         return @error = :failed if group.nil? && loud
         return unless group
 
         upsert(group)
-        @known.arrived(group.id)
+        @known.joined(group.id)
       end
 
       def history_settled(id) = @fetching.delete(id)

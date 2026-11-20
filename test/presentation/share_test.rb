@@ -27,8 +27,8 @@ class ShareTest < Minitest::Test
     copied = preview.copy(3.0)
     assert copied.copied?
     assert_in_delta 1.0, copied.confirmation(5.0, Style::SHARE_PREVIEW)
-    assert_in_delta 1.0, copied.arrival(5.0, Style::SHARE_PREVIEW)
-    assert_in_delta 0.0, copied.arrival(2.0, Style::SHARE_PREVIEW)
+    assert_in_delta 1.0, copied.entrance(5.0, Style::SHARE_PREVIEW)
+    assert_in_delta 0.0, copied.entrance(2.0, Style::SHARE_PREVIEW)
   end
 
   # The card says nothing about Copy before it is pressed, and keeps room

@@ -96,7 +96,7 @@ module DotPopper
       class CreateGroup < Job
         def initialize = super(:create, loud: true)
         def refusals = TOO_MANY_TRIES
-        def taken(session, reply) = session.arrived(reply.body, loud: loud?)
+        def taken(session, reply) = session.joined(reply.body, loud: loud?)
       end
 
       # :join, a group by the code the player tapped in.
@@ -105,7 +105,7 @@ module DotPopper
 
         def initialize(code) = super(:join, body: { join_code: code }, loud: true)
         def refusals = REFUSALS
-        def taken(session, reply) = session.arrived(reply.body, loud: loud?)
+        def taken(session, reply) = session.joined(reply.body, loud: loud?)
       end
 
       # :group, one group, as the player opens it.

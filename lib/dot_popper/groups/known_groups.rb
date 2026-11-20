@@ -24,7 +24,7 @@ module DotPopper
         @changes = {}
         @history = {}
         @announcements = []
-        @arrival = nil
+        @joined = nil
       end
 
       # Whether the player is in a group, as far as is known: after a
@@ -85,12 +85,12 @@ module DotPopper
       def next_announcement = @announcements.shift
 
       # A group just created or joined, for a screen to open once.
-      def arrived(id) = @arrival = id
+      def joined(id) = @joined = id
 
-      def take_arrival
-        arrival = @arrival
-        @arrival = nil
-        arrival
+      def take_joined
+        joined = @joined
+        @joined = nil
+        joined
       end
 
       # The player is forgotten, and with them everything heard.

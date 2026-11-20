@@ -135,11 +135,11 @@ class KnownGroupsTest < Minitest::Test
     assert_equal 9, @known.seen.fetch(1).last
   end
 
-  def test_an_arrival_is_taken_once
-    @known.arrived(3)
+  def test_a_group_just_joined_is_taken_once
+    @known.joined(3)
 
-    assert_equal 3, @known.take_arrival
-    assert_nil @known.take_arrival
+    assert_equal 3, @known.take_joined
+    assert_nil @known.take_joined
   end
 
   def test_a_forgotten_player_has_heard_nothing
