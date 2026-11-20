@@ -61,7 +61,7 @@ class BuyProTest < Minitest::Test
     @store.sold = false
     refute @buy.buy
     @store.sold = true
-    @entitlement.verify_receipt(DotPopper::Receipt.issue)
+    @entitlement.verify_receipt(DotPopper::Monetization::Receipt.issue)
 
     refute @buy.buy
     refute @buy.type(:a)
@@ -82,7 +82,7 @@ class BuyProTest < Minitest::Test
 
   def test_when_pro_arrives_friend_groups_hear_of_every_achievement_earned_while_free
     @achievements.award(%i[blink big_score], day: "2026-11-01")
-    @entitlement.verify_receipt(DotPopper::Receipt.issue)
+    @entitlement.verify_receipt(DotPopper::Monetization::Receipt.issue)
 
     assert_equal [%i[blink big_score]], @groups.reported
   end

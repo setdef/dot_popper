@@ -167,7 +167,7 @@ class PrivacyRequestsTest < Minitest::Test
     # receipt.rb and receipt/ check stores' signatures and certificates, and
     # the test build's receipt test key signs a fake store's, and nothing
     # that connects.
-    receipts = ruby_files.select { it.end_with?("dot_popper/receipt.rb", "test_build/receipt_test_key.rb") || it.include?("dot_popper/receipt/") }
+    receipts = ruby_files.select { it.end_with?("dot_popper/monetization/receipt.rb", "test_build/receipt_test_key.rb") || it.include?("dot_popper/monetization/receipt/") }
 
     assert_empty ruby_files.reject { it.end_with?("network/link.rb", "dot_popper/automation.rb") || signatures.include?(it) || receipts.include?(it) }.select { uncommented(it).match?(banned) }
     signatures.each { assert_empty uncommented(it).gsub(/OpenSSL::PKey\b|require "openssl"/, "").scan(banned), it }

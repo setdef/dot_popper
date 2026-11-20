@@ -34,7 +34,7 @@ class FakeStoreContractTest < Minitest::Test
   # lowercased; it still owns Pro, under today's id.
   def test_a_pretend_purchase_under_the_earlier_product_id_carries_over
     ledger = DotPopper::Gameplay::ScoreRecord::Memory.new
-    ledger.write(DotPopper::Receipt.issue(product_id: "com.setdef.DotPopper.pro"))
+    ledger.write(DotPopper::Monetization::Receipt.issue(product_id: "com.setdef.DotPopper.pro"))
     entitlement = DotPopper::Monetization::Entitlement.test
     front = Store.new(port: new_store(ledger:), entitlement:)
     front.connect
@@ -42,7 +42,7 @@ class FakeStoreContractTest < Minitest::Test
     3.times { front.update(Store::EVERY) }
 
     assert_predicate entitlement, :pro?
-    assert DotPopper::Receipt.valid?(ledger.read, DotPopper::Receipt::TEST)
+    assert DotPopper::Monetization::Receipt.valid?(ledger.read, DotPopper::Monetization::Receipt::TEST)
   end
 
   def test_a_failure_is_for_a_developers_setting_only
@@ -69,7 +69,7 @@ class NativeStoreContractTest < Minitest::Test
       @path = path
       @price = ""
       @owned = false
-      @receipt = DotPopper::Receipt.issue
+      @receipt = DotPopper::Monetization::Receipt.issue
     end
 
     def open(url)

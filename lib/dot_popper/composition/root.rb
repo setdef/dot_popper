@@ -148,7 +148,7 @@ module DotPopper
         pins = Continuity.pins_for(channel)
         license = Continuity::License.new(Continuity::License.kept_in(channel) { file("license.txt") }, pins:)
         @watch = watch_for(license, pins)
-        @entitlement = Monetization::Entitlement.new(forced: Monetization::Entitlement.forced?(settings.env, platform:), license:, trust: Receipt.trusted(channel))
+        @entitlement = Monetization::Entitlement.new(forced: Monetization::Entitlement.forced?(settings.env, platform:), license:, trust: Monetization::Receipt.trusted(channel))
         clipboard = @engine.clipboard
         @server_choice = Gameplay::ServerChoice.new(file("server.txt"), gone: @gone, clipboard:)
         saved_themes = Gameplay::SavedThemes.new(file("themes.txt"))

@@ -145,7 +145,7 @@ class RedesignTest < Minitest::Test
     assert_equal :themes, s.offer_focus
     assert_includes s.controls.map(&:name), :buy
 
-    entitlement.verify_receipt(DotPopper::Receipt.issue)
+    entitlement.verify_receipt(DotPopper::Monetization::Receipt.issue)
     s.update(0.1)
     assert_equal Style::WORDS.offer[:thanks], s.offer_status
     refute_includes s.controls.map(&:name), :buy

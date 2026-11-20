@@ -11,7 +11,7 @@
 # are. Run as:
 #
 #   ruby -Ilib store_helper_stand_in.rb FOLDER FAILS URL
-require "dot_popper/receipt"
+require "dot_popper/monetization/receipt"
 require "dot_popper/test_build/receipt_test_key"
 
 folder, fails, url = ARGV
@@ -27,7 +27,7 @@ owned = -> { File.exist?(owned_at) }
 price = -> { File.exist?(priced_at) ? "$1.99" : "" }
 
 answer = lambda do |state|
-  receipt = owned.call ? "receipt=#{DotPopper::Receipt.issue}\n" : ""
+  receipt = owned.call ? "receipt=#{DotPopper::Monetization::Receipt.issue}\n" : ""
   $stdout.write("answer=#{number}\nowned=#{owned.call ? 1 : 0}\nstate=#{state}\nprice=#{price.call}\n#{receipt}\n")
   $stdout.flush
 end

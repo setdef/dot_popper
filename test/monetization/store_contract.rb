@@ -75,8 +75,8 @@ module StoreContract
     ask(store, :buy)
     receipt = settled(store)["receipt"]
 
-    assert DotPopper::Receipt.valid?(receipt, DotPopper::Receipt::TEST), receipt
-    assert DotPopper::Receipt.valid?(open_it(relaunched(store))["receipt"], DotPopper::Receipt::TEST), "a relaunch hands one over again"
+    assert DotPopper::Monetization::Receipt.valid?(receipt, DotPopper::Monetization::Receipt::TEST), receipt
+    assert DotPopper::Monetization::Receipt.valid?(open_it(relaunched(store))["receipt"], DotPopper::Monetization::Receipt::TEST), "a relaunch hands one over again"
   end
 
   def test_buying_without_asking_the_price_fails

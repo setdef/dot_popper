@@ -36,7 +36,7 @@ class StoreTest < Minitest::Test
     def path = "/save dir/answer.txt"
   end
 
-  RECEIPT = DotPopper::Receipt.issue
+  RECEIPT = DotPopper::Monetization::Receipt.issue
 
   def setup
     @opener = FakeOpener.new
@@ -65,7 +65,7 @@ class StoreTest < Minitest::Test
   # id, and one id serves every store.
   def test_pro_has_one_product_id_every_store_accepts
     assert_match(/\A[a-z][a-z0-9_.]*\z/, Store::PRODUCT_ID)
-    assert_equal DotPopper::Receipt::PRODUCT_ID, Store::PRODUCT_ID
+    assert_equal DotPopper::Monetization::Receipt::PRODUCT_ID, Store::PRODUCT_ID
   end
 
   def test_a_url_names_the_action_the_request_the_product_and_where_to_answer

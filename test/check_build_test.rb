@@ -149,7 +149,7 @@ class CheckBuildTest < Minitest::Test
     stamp("google-play")
     ok, out = check("google-play")
 
-    assert_equal DotPopper::Receipt::PLAY_KEYS.any?, ok, out
+    assert_equal DotPopper::Monetization::Receipt::PLAY_KEYS.any?, ok, out
     assert_match(/it pins the app's Play key/, out)
   end
 end

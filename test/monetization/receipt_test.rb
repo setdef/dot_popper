@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "test_helper"
+require_relative "../test_helper"
 require "openssl"
 require "json"
 
@@ -9,7 +9,7 @@ require "json"
 # check runs against a chain this test makes with Apple's markings, and
 # against Apple's real root only to show that chain is refused there.
 class ReceiptTest < Minitest::Test
-  Receipt = DotPopper::Receipt
+  Receipt = DotPopper::Monetization::Receipt
   TEST = Receipt::TEST
 
   # Whose receipts a build trusts, by its channel alone (ADR-0010): in a

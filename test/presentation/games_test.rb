@@ -278,7 +278,7 @@ class GamesTest < Minitest::Test
 
   def test_buying_makes_play_unlimited_and_hides_the_count
     3.times { @games.spend! }
-    @entitlement.verify_receipt(DotPopper::Receipt.issue)
+    @entitlement.verify_receipt(DotPopper::Monetization::Receipt.issue)
 
     assert_nil @show.games_line
     press_main

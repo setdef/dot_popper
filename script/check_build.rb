@@ -47,13 +47,13 @@ MAKE_PROOFS = <<~RUBY
   hex = ->(bytes) { bytes.unpack1("H*") }
   keys = [c::TestKeys::ROOT, c::TestKeys::LICENSE, c::TestKeys::ONLINE].map { c::LicenseKey.issue(it).text }
   certificate = c::TestKeys.online_certificate
-  receipt = DotPopper::Receipt.issue
+  receipt = DotPopper::Monetization::Receipt.issue
   controls = {
     "this Ruby verifies Ed25519" => c::Ed25519.available?,
     "a key signed by the test key unlocks a test build" => c::LicenseKey.parse(keys[1])&.valid?(c::TEST_PINS) == true,
     "a test build takes a proof certified by the test root" =>
       !c::Certificate.verified(certificate, roots: c::TEST_PINS.roots, purpose: c::Certificate::PROOF).nil?,
-    "the fake store's receipt proves Pro in a test build" => DotPopper::Monetization::Entitlement.new(trust: DotPopper::Receipt::TEST).verify_receipt(receipt) == true
+    "the fake store's receipt proves Pro in a test build" => DotPopper::Monetization::Entitlement.new(trust: DotPopper::Monetization::Receipt::TEST).verify_receipt(receipt) == true
   }
   puts JSON.generate("roots" => c::TEST_PINS.roots.map(&hex), "license_keys" => c::TEST_PINS.license_keys.map(&hex),
                      "keys" => keys, "certificate" => hex.(certificate), "receipt" => receipt, "controls" => controls)
@@ -97,7 +97,7 @@ check.call("it holds nothing a #{channel} build leaves out, and is stamped for i
 end
 check.call("it loads none of the test build's part") do
   $LOADED_FEATURES.none? { it.include?("/dot_popper/test_build/") } && !defined?(c::TestKeys) && !defined?(c::TEST_PINS) &&
-    !defined?(DotPopper::Monetization::FakeStore) && !DotPopper::Receipt.const_defined?(:TEST, false)
+    !defined?(DotPopper::Monetization::FakeStore) && !DotPopper::Monetization::Receipt.const_defined?(:TEST, false)
 end
 check.call("#{channel.inspect} is a channel the game names (#{build::CHANNEL_NAMES.join(", ")})") { build::CHANNEL_NAMES.include?(channel) }
 check.call("the app was built for #{channel.inspect} (Build::CHANNEL is #{build::CHANNEL.inspect})") { build::CHANNEL == channel }
@@ -119,7 +119,7 @@ check.call("it takes no proof certified by the test root") do
   c::Certificate.verified([proofs.fetch("certificate")].pack("H*"), roots: pins.roots, purpose: c::Certificate::PROOF).nil?
 end
 check.call("the fake store's receipt proves nothing in it") do
-  !DotPopper::Monetization::Entitlement.new(trust: DotPopper::Receipt.trusted(build::CHANNEL)).verify_receipt(proofs.fetch("receipt"))
+  !DotPopper::Monetization::Entitlement.new(trust: DotPopper::Monetization::Receipt.trusted(build::CHANNEL)).verify_receipt(proofs.fetch("receipt"))
 end
 check.call("no setting grants Pro or changes the server in it") do
   env = build.settings({ "DOT_POPPER_PRO" => "1", "DOT_POPPER_SERVER" => "http://localhost:1" })
@@ -131,7 +131,7 @@ check.call("its version is #{version} (the app's fledge.yml says #{shipped})") {
 
 # What only some channels need.
 if channel == build::GOOGLE_PLAY
-  check.call("it pins the app's Play key (Receipt::PLAY_KEYS)") { DotPopper::Receipt::PLAY_KEYS.any? }
+  check.call("it pins the app's Play key (Receipt::PLAY_KEYS)") { DotPopper::Monetization::Receipt::PLAY_KEYS.any? }
 end
 if channel == build::WEBSITE
   check.call("it keeps and checks a license key") { build.license_keys?(build::CHANNEL) }

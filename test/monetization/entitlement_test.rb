@@ -6,7 +6,7 @@ require_relative "../test_helper"
 # (ADR-0010).
 class EntitlementTest < Minitest::Test
   Entitlement = DotPopper::Monetization::Entitlement
-  Receipt = DotPopper::Receipt
+  Receipt = DotPopper::Monetization::Receipt
 
   def test_a_new_player_is_free_until_a_receipt_verifies
     entitlement = Entitlement.test

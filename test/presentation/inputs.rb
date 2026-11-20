@@ -108,7 +108,7 @@ module Inputs
       @gone = DotPopper::Continuity::Gone.new(Memory.new)
       @gone.heard(:gone, @day - 200) if gone
       license = DotPopper::Continuity::License.new(Memory.new, pins: DotPopper::Continuity::TEST_PINS)
-      @entitlement = DotPopper::Monetization::Entitlement.new(forced: pro, license:, trust: DotPopper::Receipt::TEST)
+      @entitlement = DotPopper::Monetization::Entitlement.new(forced: pro, license:, trust: DotPopper::Monetization::Receipt::TEST)
       @store = if channel
                       DotPopper::Monetization::Store.for(platform, entitlement:, native: DotPopper::Monetization::FakeStore.new(Memory.new), website: -> { website(fake: false) }, channel:)
                     else
