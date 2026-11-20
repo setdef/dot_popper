@@ -18,14 +18,22 @@
 # CI's Windows jobs the same file, checked the same way.
 #
 # The head build carries no zlib1.dll, which its zlib extension loads, and
+# no compiler for the gems in the bundle that build native extensions. So
+# on Windows mise also installs an MSYS2 with UCRT64's GCC, make and zlib:
+# the archive ruby/setup-msys2-gcc publishes for each dated release, which
+# setup-ruby unpacks for a head Ruby, checked by its SHA-256. It is a whole
+# MSYS2 folder, so a bash with mise on the PATH is all a clone needs.
 # RubyInstaller's Ruby looks for DLLs it does not carry only in the folders
-# RUBY_DLL_PATH names. So on Windows, run from an MSYS2 UCRT64 shell (such
-# as RubyInstaller's devkit gives, or Git for Windows' bash with MSYS2's
-# UCRT64 on the PATH), RUBY_DLL_PATH names that MSYS2's UCRT64 bin folder,
-# as Lota's own .github/windows_prepush.sh sets it.
+# RUBY_DLL_PATH names, so that names this MSYS2's UCRT64 bin folder, as
+# Lota's own .github/windows_prepush.sh sets it; and it builds a native
+# extension with the MSYS2 that MSYS2_PATH names
+# (RubyInstaller::Runtime.enable_msys_apps). The same bin folder is on the
+# PATH, for the GCC the Windows store helper's test builds with.
 [tools]
 ruby = { version = "4.1.0-preview1", os = ["linux", "macos"] }
 "http:rubyinstaller-head" = { version = "4.1.0-6-20261110", url = "https://github.com/setdef/Fledge/releases/download/inputs-rubyinstaller-head-20261110/rubyinstaller-head-x64.7z", checksum = "sha256:901473edafd6b174d79978fc109d3df3ab73b1436719233f35c1a31b5b18bf58", strip_components = 1, bin_path = "bin", os = ["windows"] }
+"http:msys2_ucrt64" = { version = "20261115.002214", url = "https://github.com/ruby/setup-msys2-gcc/releases/download/v20261115.002214/msys2-ucrt64.7z", checksum = "sha256:e9ca55648fe65bf701222a9fadf197103e5433d418a16b0962db430b61adbe6c", bin_path = "ucrt64/bin", os = ["windows"] }
 
 [env]
-RUBY_DLL_PATH = "{% if os() == 'windows' %}{{ exec(command='cygpath -w /ucrt64/bin') }}{% endif %}"
+RUBY_DLL_PATH = { value = "{% if tools.msys2_ucrt64 is defined %}{{ tools.msys2_ucrt64.path }}\\ucrt64\\bin{% endif %}", tools = true }
+MSYS2_PATH = { value = "{% if tools.msys2_ucrt64 is defined %}{{ tools.msys2_ucrt64.path }}{% endif %}", tools = true }
