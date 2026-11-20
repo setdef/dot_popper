@@ -11,7 +11,7 @@ module DotPopper
     # read and write, as a SaveFile does, and +now+ gives the time.
     #
     # It is made of parts, each with its own rules: what the game owes the
-    # server (Unsent), what it last heard from it (ReadModel), each kind of
+    # server (Unsent), what it last heard from it (KnownGroups), each kind of
     # request and what its answers mean (Jobs), and group.txt (GroupFile).
     # Session holds the player's token, the queue of jobs and a 429's wait,
     # and ties the parts together.
@@ -64,14 +64,14 @@ module DotPopper
       # Whether this player belongs to any group, as far as is known: after
       # a launch with no network the groups are unknown, but their games
       # still count.
-      def member? = @read.member?
-      def groups = @read.groups
-      def group(id) = @read.group(id)
+      def member? = @known.member?
+      def groups = @known.groups
+      def group(id) = @known.group(id)
       # A group's title changes, newest first, or nil before they are read.
-      def title_changes(id) = @read.title_changes(id)
+      def title_changes(id) = @known.title_changes(id)
       # A group's history, title changes and members' achievements together,
       # newest first, or nil before it is read.
-      def history(id) = @read.history(id)
+      def history(id) = @known.history(id)
       # Whether a counting game has ended and its result is still awaited.
       def result_due? = @result_due
 
@@ -141,10 +141,10 @@ module DotPopper
       end
 
       # The next title change to tell the player, once, or nil.
-      def next_announcement = @read.next_announcement
+      def next_announcement = @known.next_announcement
 
       # The group just created or joined, once, for a screen to open.
-      def take_arrival = @read.take_arrival
+      def take_arrival = @known.take_arrival
 
       # What the server's answers do (_Answers). Each kind of job (Jobs)
       # calls these from its #settled, #taken and #refused; nothing else
@@ -162,7 +162,7 @@ module DotPopper
       def read_groups(body)
         return unless body.is_a?(Array)
 
-        @read.replace(body.filter_map { Group.parse(it) })
+        @known.replace(body.filter_map { Group.parse(it) })
         remember_membership
         groups.each { follow(it) }
         send_owed
@@ -178,17 +178,17 @@ module DotPopper
         return unless group
 
         upsert(group)
-        @read.arrived(group.id)
+        @known.arrived(group.id)
       end
 
       def history_settled(id) = @fetching.delete(id)
 
       def read_history(id, body)
-        save if @read.read_history(id, body)
+        save if @known.read_history(id, body)
       end
 
       def gone(id)
-        @read.gone(id)
+        @known.gone(id)
         remember_membership
         save
       end
@@ -229,7 +229,7 @@ module DotPopper
       def forget_identity
         @token = nil
         @unsent.forget
-        @read.forget
+        @known.forget
         @wait_until = nil
         @result_due = false
         @game_result = nil
@@ -309,7 +309,7 @@ module DotPopper
       end
 
       def upsert(group)
-        @read.upsert(group)
+        @known.upsert(group)
         remember_membership
         follow(group)
         send_owed
@@ -317,7 +317,7 @@ module DotPopper
 
       # Reads a group's history if its title has moved since it last was.
       def follow(group)
-        fetch_changes(group.id) if @read.title_moved?(group)
+        fetch_changes(group.id) if @known.title_moved?(group)
       end
 
       # A group's part in a game's reply, as [group, won_title, raised],
@@ -341,7 +341,7 @@ module DotPopper
       # Leaving the last group drops the score waiting, as it has no group
       # to go to.
       def remember_membership
-        return unless @read.remember_membership || (!member? && @unsent.score)
+        return unless @known.remember_membership || (!member? && @unsent.score)
 
         @unsent.drop_score unless member?
         save
@@ -352,11 +352,11 @@ module DotPopper
         saved = GroupFile.parse(@store.read)
         @token = saved.token
         @unsent = Unsent.new(score: saved.unsent_score, achievements: saved.unsent_achievements)
-        @read = ReadModel.new(last_known_member: saved.member, seen: saved.seen)
+        @known = KnownGroups.new(last_known_member: saved.member, seen: saved.seen)
       end
 
       def save
-        @store.write(GroupFile.new(token: @token, unsent_score: @unsent.score, member: @read.last_known_member, seen: @read.seen,
+        @store.write(GroupFile.new(token: @token, unsent_score: @unsent.score, member: @known.last_known_member, seen: @known.seen,
                                    unsent_achievements: @unsent.achievements).to_s)
       end
     end

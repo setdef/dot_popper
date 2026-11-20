@@ -184,7 +184,7 @@ module DotPopper
       def self.of: (Array[outcome] outcomes, Integer score) -> GameResult
     end
 
-    class ReadModel
+    class KnownGroups
       @last_known_member: bool
 
       @seen: Hash[group_id, Seen]
@@ -411,7 +411,7 @@ module DotPopper
 
       @unsent: Unsent
 
-      @read: ReadModel
+      @known: KnownGroups
 
       @wait_until: Integer?
 

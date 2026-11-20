@@ -14,7 +14,7 @@ module DotPopper
     # a title change is announced once, from the history alone: a group
     # met for the first time announces nothing of its past, and only the
     # newest change in a group is told.
-    class ReadModel
+    class KnownGroups
       attr_reader :groups, :seen, :last_known_member
 
       def initialize(last_known_member: false, seen: {})
