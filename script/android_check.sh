@@ -32,12 +32,14 @@
 #   snapshot, so it writes nothing there, and its own changes go to its
 #   own folder, which is deleted when it ends.
 #
-# The emulator and its adb server run on ports each run picks at random,
-# so several runs can share a computer, and both end with the script, as
-# does everything else it starts, however it ends: a watcher in a session
-# of its own ends them, and removes the run's folder, once the script is
-# gone, killed outright included. The cache is
-# ${XDG_CACHE_HOME:-~/.cache}/dot_popper.
+# The emulator and its adb server run on ports each run picks at random
+# among those free, so several runs can share a computer, and both end
+# with the script, as does everything else it starts, however it ends:
+# a watcher in a session of its own ends them, and removes the run's
+# folder, once the script is gone, killed outright included. The cache
+# is ${XDG_CACHE_HOME:-~/.cache}/dot_popper; it keeps the apps of the
+# last three sets of inputs, and the emulator's snapshots of the last
+# two sets of its pieces, but never one that another run is booted from.
 set -euo pipefail
 
 repo=$(cd "$(dirname "$0")/.." && pwd)
@@ -113,6 +115,8 @@ app_key() {
 
 apk=$run/DotPopper-debug.apk
 base=$keep/app-$(app_key).apk
+# Touched as it is chosen, so the eviction below, by last use, keeps it.
+[ -f "$base" ] && touch "$base"
 full_build() {
   script/android_build.sh > "$run/build.log" 2>&1 || { tail -60 "$run/build.log"; exit 1; }
   cp tmp/android/out/DotPopper-debug.apk "$1"
@@ -145,7 +149,7 @@ else
   if [ -z "${LOTA_SOURCE:-}" ]; then cp "$apk" "$base.$$" && mv "$base.$$" "$base"; fi
   say "the app: built in full"
 fi
-ls -t "$keep"/app-*.apk 2> /dev/null | tail -n +4 | xargs -r rm -f # the last three sets of inputs
+ls -t "$keep"/app-*.apk 2> /dev/null | tail -n +4 | xargs -r rm -f # the last three sets of inputs used
 
 # The emulator, from a snapshot saved after a cold boot, keyed by the
 # pinned pieces (script/android_sdk.sh) and the settings below.
@@ -153,11 +157,21 @@ SYSTEM_IMAGE="system-images;android-33;google_apis;x86_64"
 EMULATOR_FLAGS=(-no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -memory 4096 -cores 4)
 avd_key=$({ git rev-parse HEAD:script/android_sdk.sh; echo "$SYSTEM_IMAGE ${EMULATOR_FLAGS[*]} settled-1"; } | sha256sum | cut -c1-16)
 avd_home=$keep/avd-$avd_key
+# Whether nothing on this computer listens on port $1.
+free() { ! (exec 3<> "/dev/tcp/127.0.0.1/$1") 2> /dev/null; }
+# Ports for adb's server and the emulator (its console and adb's, the
+# next), chosen at random among those free, so another run's are not
+# taken; another run could still take one between this and its start.
 pick_ports() {
-  export ANDROID_ADB_SERVER_PORT=$((7100 + RANDOM % 800))
-  port=$((5600 + 2 * (RANDOM % 150)))
+  local adb_port
+  for _ in $(seq 100); do
+    adb_port=$((7100 + RANDOM % 800))
+    port=$((5600 + 2 * (RANDOM % 150)))
+    free "$adb_port" && free "$port" && free $((port + 1)) && break
+  done
+  export ANDROID_ADB_SERVER_PORT=$adb_port
   export ANDROID_SERIAL=emulator-$port
-  echo "$ANDROID_HOME/platform-tools/adb $ANDROID_ADB_SERVER_PORT" > "$run/adb"
+  echo "$ANDROID_HOME/platform-tools/adb $adb_port" > "$run/adb"
 }
 start_emulator() { # LOG FLAGS...
   local log=$1; shift
@@ -180,6 +194,9 @@ stop_emulator() {
 }
 export ANDROID_USER_HOME=$run/android-user ANDROID_EMULATOR_HOME=$run/android-user TMPDIR=$run
 mkdir -p "$ANDROID_USER_HOME"
+# Held while this run is booted from the snapshot, so no run removes it.
+exec 8> "$avd_home.lock"
+flock -s 8
 exec 7> "$keep/avd.lock"
 flock 7
 if [ ! -f "$avd_home/.complete" ]; then
@@ -210,6 +227,12 @@ if [ ! -f "$avd_home/.complete" ]; then
   touch "$avd_home/.complete"
 fi
 flock -u 7
+touch "$avd_home"
+# The snapshots of other pieces, all but the newest one other than this
+# run's, and none that a run holds: each is 9 GB.
+ls -dt "$keep"/avd-*/ 2> /dev/null | sed 's#/$##' | grep -vxF "$avd_home" | tail -n +2 | while read -r old; do
+  ( flock -n -x 9 && rm -rf "$old" ) 9> "$old.lock"
+done
 say "the emulator's snapshot is ready"
 
 pick_ports
