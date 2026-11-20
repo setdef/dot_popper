@@ -164,7 +164,7 @@ module Lota
       engine = Class.new(shell::Engine) do
         def pen(shaders:) = Nothing.new
         def measure(_pen) = DotPopper::Presentation::RoughMeasure.new
-        def sound_player(store:) = Nothing.new
+        def sound_player(file:) = Nothing.new
       end
       shell.send(:remove_const, :Engine)
       shell.const_set(:Engine, engine)

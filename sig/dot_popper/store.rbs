@@ -162,7 +162,7 @@ module DotPopper
     READS: Integer
     EARLIER: Receipt::Trust
 
-    @ledger: ScoreRecord::_Store
+    @ledger: ScoreRecord::_SaveFile
     @fails: String?
     @reads: Integer
     @text: String?
@@ -172,7 +172,7 @@ module DotPopper
 
     def self.failure: (untyped env) -> String?
 
-    def initialize: (ScoreRecord::_Store ledger, ?fails: String?, ?reads: Integer) -> void
+    def initialize: (ScoreRecord::_SaveFile ledger, ?fails: String?, ?reads: Integer) -> void
 
     def path: () -> String
 

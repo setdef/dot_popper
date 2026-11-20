@@ -8,7 +8,7 @@ module DotPopper
 
     CHOSEN: String
 
-    @store: ScoreRecord::_Store
+    @file: ScoreRecord::_SaveFile
 
     @themes: Array[Theme]
 
@@ -18,7 +18,7 @@ module DotPopper
 
     @chosen: theme_key?
 
-    def initialize: (ScoreRecord::_Store store, ?themes: Array[Theme]) -> void
+    def initialize: (ScoreRecord::_SaveFile file, ?themes: Array[Theme]) -> void
 
     def ordinary: () -> theme_key
 

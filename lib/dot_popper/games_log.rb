@@ -5,11 +5,11 @@ module DotPopper
   # ended, the seed its dots were drawn from, its score, how long it ran,
   # its GameStats, and the day's goal (DailyGoal, for the date +today+
   # gives) with whether the game met it. It listens to a GameFlow (GameFlow#subscribe) and appends
-  # through a store that answers +read+ and +write(text)+, as ScoreRecord
+  # through a save file that answers +read+ and +write(text)+, as ScoreRecord
   # does, so it never touches a file system itself.
   #
   # A log whose first line names other columns, because it was written
-  # by an older version, is kept whole in a store of its own, named
+  # by an older version, is kept whole in a save file of its own, named
   # games-<when>.csv and made by +archive+, and a new log starts under
   # the current header.
   class GamesLog
@@ -17,9 +17,9 @@ module DotPopper
 
     HEADER = COLUMNS.join(",")
 
-    def initialize(store, now: -> { Time.now }, today: -> { now.call.to_date },
+    def initialize(file, now: -> { Time.now }, today: -> { now.call.to_date },
                    archive: ->(_name) { ScoreRecord::Memory.new })
-      @store = store
+      @file = file
       @now = now
       @today = today
       @archive = archive
@@ -44,13 +44,13 @@ module DotPopper
     def append(line)
       before = current
       before += "\n" unless before.end_with?("\n")
-      @store.write("#{before}#{line}\n")
+      @file.write("#{before}#{line}\n")
     end
 
     # The log so far, under the current header: as it was, or new, after
     # setting aside an older log or starting the first.
     def current
-      before = @store.read.to_s
+      before = @file.read.to_s
       return before if before.lines.first&.chomp == HEADER
 
       set_aside(before) unless before.strip.empty?

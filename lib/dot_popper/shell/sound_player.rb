@@ -6,14 +6,14 @@ module DotPopper
     # starts, each in mono so a pop or a mistake can be panned to where
     # it happened. Each sound has a few voices, so quick taps overlap rather
     # than cut each other off. With no audio device, or muted, it plays
-    # nothing and the game goes on. Muting is remembered in +store+.
+    # nothing and the game goes on. Muting is remembered in +file+.
     class SoundPlayer
       VOICES = 4
 
-      def initialize(patches, store:, volume: 1.0)
-        @store = store
+      def initialize(patches, file:, volume: 1.0)
+        @file = file
         @volume = volume
-        @muted = store.read.to_s.strip == "muted"
+        @muted = file.read.to_s.strip == "muted"
         @voices = @base = build(patches)
         @next = Hash.new(0)
       end
@@ -22,7 +22,7 @@ module DotPopper
 
       def toggle_mute
         @muted = !@muted
-        @store.write(@muted ? "muted" : "on")
+        @file.write(@muted ? "muted" : "on")
         @voices.each_value { |voices| voices.each(&:stop) } if @muted
         @muted
       rescue StandardError

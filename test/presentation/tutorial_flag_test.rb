@@ -6,33 +6,33 @@ class TutorialFlagTest < Minitest::Test
   include PresentationTest
 
   def setup
-    @store = DotPopper::ScoreRecord::Memory.new
+    @file = DotPopper::ScoreRecord::Memory.new
   end
 
   def test_it_is_due_once_on_a_bright_install_and_remembered_across_sessions
-    flag = TutorialFlag.new(@store)
+    flag = TutorialFlag.new(@file)
     assert flag.due?(played: false)
 
     flag.seen!
     refute flag.due?(played: false)
-    refute TutorialFlag.new(@store).due?(played: false)
-    assert_equal "seen", @store.read
+    refute TutorialFlag.new(@file).due?(played: false)
+    assert_equal "seen", @file.read
   end
 
   def test_a_player_who_has_played_before_never_sees_it
-    refute TutorialFlag.new(@store).due?(played: true)
+    refute TutorialFlag.new(@file).due?(played: true)
   end
 
   def test_a_damaged_flag_counts_as_unseen
-    @store.write("maybe")
+    @file.write("maybe")
 
-    assert TutorialFlag.new(@store).due?(played: false)
+    assert TutorialFlag.new(@file).due?(played: false)
   end
 
   def test_forced_it_shows_on_every_play_and_skipped_never
-    @store.write("seen")
+    @file.write("seen")
 
-    assert TutorialFlag.new(@store, mode: :forced).due?(played: true)
+    assert TutorialFlag.new(@file, mode: :forced).due?(played: true)
     refute TutorialFlag.new(DotPopper::ScoreRecord::Memory.new, mode: :skipped).due?(played: false)
   end
 

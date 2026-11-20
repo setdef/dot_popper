@@ -9,14 +9,14 @@ class StatsBackupTest < Minitest::Test
   STATS = "games=3\npops=40\nrecent=12,24,4\ngoal_streak=2\nlongest_goal_streak=5\ngoal_met_on=2026-11-05\n" \
              "medium.games=3\nmedium.most_dots_in_a_row=11\n"
 
-  # A save folder of stores in memory, as the game's is of files.
+  # A save folder in memory, as the game's is on disk.
   class FakeFolder
-    attr_reader :stores
+    attr_reader :files
 
-    def initialize(files = {}) = @stores = files.transform_values { Memory.new(it) }
-    def call(name) = @stores[name] ||= Memory.new
-    def names = @stores.reject { |_, store| store.read.nil? }.keys.sort
-    def [](name) = @stores[name]&.read
+    def initialize(files = {}) = @files = files.transform_values { Memory.new(it) }
+    def call(name) = @files[name] ||= Memory.new
+    def names = @files.reject { |_, file| file.read.nil? }.keys.sort
+    def [](name) = @files[name]&.read
   end
 
   def setup
@@ -39,7 +39,7 @@ class StatsBackupTest < Minitest::Test
     refute_predicate stats.records_in(MEDIUM).most_dots_in_a_row, :positive?
 
     keep
-    assert @score_record.first?(MEDIUM), "the store is cleared too, not only what is in memory"
+    assert @score_record.first?(MEDIUM), "the file is cleared too, not only what is in memory"
     assert_equal 0, @saved_stats.stats.games
   end
 

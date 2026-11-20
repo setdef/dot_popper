@@ -3,7 +3,7 @@
 module DotPopper
   module Presentation
     # Whether the first Play opens the Tutorial. It does once, on a fresh
-    # install, and never again: the store, which answers +read+ and
+    # install, and never again: the save file, which answers +read+ and
     # +write(text)+ as ScoreRecord's does, keeps that it was seen, apart from
     # Stats, so clearing them leaves it. A player who has played
     # before, as everyone on 0.9 has, has seen enough of the game already,
@@ -31,13 +31,13 @@ module DotPopper
 
       attr_reader :mode
 
-      def initialize(store, mode: :usual)
-        @store = store
+      def initialize(file, mode: :usual)
+        @file = file
         @mode = mode
       end
 
       # Whether the tutorial has been seen on this device.
-      def seen? = @store.read.to_s.strip == SEEN
+      def seen? = @file.read.to_s.strip == SEEN
 
       # Whether this Play should open the tutorial, for a player who has
       # +played+ a game before or not.
@@ -50,7 +50,7 @@ module DotPopper
       end
 
       # The tutorial opened: it is seen from now on.
-      def seen! = (@store.write(SEEN) unless seen?)
+      def seen! = (@file.write(SEEN) unless seen?)
     end
   end
 end

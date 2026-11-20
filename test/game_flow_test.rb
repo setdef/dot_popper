@@ -8,8 +8,8 @@ class GameFlowTest < Minitest::Test
   Events = DotPopper::Events
 
   def setup
-    @store = DotPopper::ScoreRecord::Memory.new
-    @game_flow = GameFlow.new(field, score_record: DotPopper::ScoreRecord.new(@store), random: Random.new(9))
+    @file = DotPopper::ScoreRecord::Memory.new
+    @game_flow = GameFlow.new(field, score_record: DotPopper::ScoreRecord.new(@file), random: Random.new(9))
     @heard = []
     @game_flow.subscribe { @heard << it }
   end
@@ -147,7 +147,7 @@ class GameFlowTest < Minitest::Test
     @game_flow.update(20)
 
     assert_equal 2, @game_flow.score_record.of(DotPopper::SizeClass::SMALL)
-    assert_equal "small=2\n", @store.read
+    assert_equal "small=2\n", @file.read
     assert @heard.last.first
     refute @heard.last.new_score_record
 

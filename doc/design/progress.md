@@ -8,7 +8,7 @@ What Dot Popper keeps about a player's games, and how: the games log, Stats, rec
 
 ## Saved files
 
-Every file lives in Lota's save folder (paths per system are in [README.md](../../README.md)), is read and written through a store that answers `read` and `write(text)` (`Shell::SaveFile` in the game, `ScoreRecord::Memory` in tests), and is declared in [doc/privacy.json](../privacy.json) ([privacy.md](privacy.md)). Every file here is read leniently: a line that can't be read keeps its starting value, so a damaged or missing file costs some numbers, never the game.
+Every file lives in Lota's save folder (paths per system are in [README.md](../../README.md)), is read and written through a save file that answers `read` and `write(text)` (`Shell::SaveFile` in the game, `ScoreRecord::Memory` in tests), and is declared in [doc/privacy.json](../privacy.json) ([privacy.md](privacy.md)). Every file here is read leniently: a line that can't be read keeps its starting value, so a damaged or missing file costs some numbers, never the game.
 
 | File | Holds | Class |
 | --- | --- | --- |

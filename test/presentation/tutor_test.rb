@@ -8,21 +8,21 @@ class TutorTest < Minitest::Test
   MISTAKE = Mistake.new(popped: 3, bright: 4)
 
   def test_it_teaches_a_few_times_and_remembers_across_sessions
-    store = DotPopper::ScoreRecord::Memory.new
-    tutor = Tutor.new(store, times: 2)
+    file = DotPopper::ScoreRecord::Memory.new
+    tutor = Tutor.new(file, times: 2)
 
     assert_equal MISTAKE, tutor.lesson(MISTAKE)
-    refute Tutor.new(store, times: 2).taught?
+    refute Tutor.new(file, times: 2).taught?
     assert_equal MISTAKE, tutor.lesson(MISTAKE)
     assert_nil tutor.lesson(MISTAKE)
-    assert Tutor.new(store, times: 2).taught?
+    assert Tutor.new(file, times: 2).taught?
   end
 
   def test_a_player_taught_by_an_older_version_is_not_taught_again
-    store = DotPopper::ScoreRecord::Memory.new
-    store.write(Tutor::LEGACY)
+    file = DotPopper::ScoreRecord::Memory.new
+    file.write(Tutor::LEGACY)
 
-    assert_nil Tutor.new(store, times: 2).lesson(MISTAKE)
+    assert_nil Tutor.new(file, times: 2).lesson(MISTAKE)
   end
 
 # Game Over points at the mistake only while its bright dot is still the
@@ -46,9 +46,9 @@ class TutorTest < Minitest::Test
   end
   
   def test_a_damaged_count_starts_over
-    store = DotPopper::ScoreRecord::Memory.new
-    store.write("lots")
+    file = DotPopper::ScoreRecord::Memory.new
+    file.write("lots")
 
-    assert_equal 0, Tutor.new(store, times: 2).shown
+    assert_equal 0, Tutor.new(file, times: 2).shown
   end
 end

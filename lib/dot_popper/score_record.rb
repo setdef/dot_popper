@@ -3,19 +3,19 @@
 module DotPopper
   # The highest score on this device, kept for each SizeClass, since a
   # phone's score record and a big monitor's are different contests. It reads and
-  # writes through a store that answers +read+ and +write(text)+, so the
+  # writes through a save file that answers +read+ and +write(text)+, so the
   # rules never touch a file system themselves (Lota's save folder in the
   # game, memory in tests). It saves as lines of +class=score+.
   #
-  # A store written before scores were kept by class holds one bare
+  # A save file written before scores were kept by class holds one bare
   # number. That record belongs to +legacy+, the class of the screen the
   # game opens on, and is saved again in the new form at once, so it
   # stays there whichever screen the game opens on next.
   class ScoreRecord
-    def initialize(store, legacy: SizeClass::MEDIUM)
-      @store = store
+    def initialize(file, legacy: SizeClass::MEDIUM)
+      @file = file
       @legacy = legacy
-      text = store.read.to_s
+      text = file.read.to_s
       @values = Table.parse(text, legacy:)
       save if Table.old?(text)
     end
@@ -38,26 +38,26 @@ module DotPopper
       !first
     end
 
-    # The store's whole text, as saved, for #restore (StatsBackup).
-    def saved = @store.read
+    # The save file's whole text, as saved, for #restore (StatsBackup).
+    def saved = @file.read
 
     # Forgets every class's score record, as on a new device.
     def clear
       @values = {}
-      @store.write("")
+      @file.write("")
     end
 
-    # Puts back +text+, the store's whole text as #saved gave it.
+    # Puts back +text+, the save file's whole text as #saved gave it.
     def restore(text)
-      @store.write(text.to_s)
+      @file.write(text.to_s)
       @values = Table.parse(text.to_s, legacy: @legacy)
     end
 
     private
 
-    def save = @store.write(Table.to_text(@values))
+    def save = @file.write(Table.to_text(@values))
 
-    # How a store's text reads and writes.
+    # How a save file's text reads and writes.
     module Table
       OLD = /\A\s*\d+\s*\z/
 
@@ -80,7 +80,7 @@ module DotPopper
       def self.to_text(values) = values.map { |size_class, score| "#{size_class.name}=#{score}\n" }.join
     end
 
-    # A store that keeps the score in memory, for tests and for a device
+    # A save file that keeps the score in memory, for tests and for a device
     # whose save folder cannot be written.
     class Memory
       def initialize(text = nil) = @text = text

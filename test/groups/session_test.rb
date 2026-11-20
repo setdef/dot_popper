@@ -17,13 +17,13 @@ class SessionTest < Minitest::Test
   end
 
   def setup
-    @store = DotPopper::ScoreRecord::Memory.new
+    @file = DotPopper::ScoreRecord::Memory.new
     @worker = ManualWorker.new
     @time = Time.at(1_000_000)
     @session = new_session
   end
 
-  def new_session = Groups::Session.new(store: @store, worker: @worker, now: -> { @time })
+  def new_session = Groups::Session.new(file: @file, worker: @worker, now: -> { @time })
   def pump = @session.update(quiet: true)
   def job = @worker.started.first.first
   def paths = @worker.started.map { it.first.path }
@@ -578,7 +578,7 @@ class SessionTest < Minitest::Test
   def test_group_txt_is_written_line_by_line
     joined(changes: [change(4)])
 
-    assert_equal "t\n\n1\n1|4|1~50\n", @store.read
+    assert_equal "t\n\n1\n1|4|1~50\n", @file.read
     played(score: 60)
     answer(0)
     @session.report_achievements(%w[steady blink])
@@ -586,10 +586,10 @@ class SessionTest < Minitest::Test
     answer(0)
     answer(0)
 
-    assert_equal "t\n60\n1\n1|4|1~50\nsteady,blink", @store.read
+    assert_equal "t\n60\n1\n1|4|1~50\nsteady,blink", @file.read
     refreshed([group, group(id: "a-b", top: 7, champion: nil)], changes: [])
 
-    assert_equal "t\n60\n1\n1|4|1~50 a-b|0|~7\nsteady,blink", @store.read
+    assert_equal "t\n60\n1\n1|4|1~50 a-b|0|~7\nsteady,blink", @file.read
   end
 
   def test_group_txt_once_forgotten_is_five_empty_lines
@@ -598,15 +598,15 @@ class SessionTest < Minitest::Test
     pump
     answer(401)
 
-    assert_equal "\n\n\n\n", @store.read
+    assert_equal "\n\n\n\n", @file.read
   end
 
   def test_group_txt_reads_back_what_it_wrote
-    @store.write("t\n60\n1\n1|4|1~50 a-b|0|~7\nsteady")
+    @file.write("t\n60\n1\n1|4|1~50 a-b|0|~7\nsteady")
     @session = new_session
     @session.report_achievements(["blink"])
 
-    assert_equal "t\n60\n1\n1|4|1~50 a-b|0|~7\nsteady,blink", @store.read
+    assert_equal "t\n60\n1\n1|4|1~50 a-b|0|~7\nsteady,blink", @file.read
     assert_predicate @session, :known?
     assert_predicate @session, :member?
   end
@@ -614,28 +614,28 @@ class SessionTest < Minitest::Test
   # A build from before achievements were sent (never released) wrote four
   # lines; their file is read, and the next save adds the fifth.
   def test_group_txt_of_four_lines_is_read
-    @store.write("t\n7\n1\n1|4|1~50")
+    @file.write("t\n7\n1\n1|4|1~50")
     @session = new_session
     refreshed
 
     assert_equal [{ score: 7 }], @worker.started.map { it.first.body }, "the unsent score goes, and no history: the title has not moved"
     @session.report_achievements(["blink"])
 
-    assert_equal "t\n7\n1\n1|4|1~50\nblink", @store.read
+    assert_equal "t\n7\n1\n1|4|1~50\nblink", @file.read
   end
 
   def test_group_txt_reads_leniently
-    @store.write("t\nseven\nyes\nnot-an-entry 2|x\n")
+    @file.write("t\nseven\nyes\nnot-an-entry 2|x\n")
     @session = new_session
     @session.report_achievements(["blink"])
 
     refute_predicate @session, :member?
-    assert_equal "t\n\n\nnot-an-entry|0| 2|0|\nblink", @store.read
+    assert_equal "t\n\n\nnot-an-entry|0| 2|0|\nblink", @file.read
   end
 
   def test_an_empty_or_missing_group_txt_is_a_new_player
     [nil, "", "\n\n\n\n"].each do |text|
-      @session = Groups::Session.new(store: DotPopper::ScoreRecord::Memory.new(text), worker: @worker)
+      @session = Groups::Session.new(file: DotPopper::ScoreRecord::Memory.new(text), worker: @worker)
 
       refute_predicate @session, :known?
       refute_predicate @session, :member?
@@ -648,18 +648,18 @@ class SessionTest < Minitest::Test
   # Nor does such a device owe a game or wait for its result, so Game
   # Over's groups line is not left blank for good.
   def test_a_member_with_no_token_owes_no_game_and_awaits_no_result
-    @store.write("\n\n1\n\nwin_one")
+    @file.write("\n\n1\n\nwin_one")
     @session = new_session
     @session.game_finished(score: 120, counts: true)
     pump
 
     refute_predicate @session, :result_due?
     assert_empty @worker.started
-    assert_equal "\n\n1\n\nwin_one", @store.read
+    assert_equal "\n\n1\n\nwin_one", @file.read
   end
 
   def test_nothing_owed_is_sent_without_a_token
-    @store.write("\n7\n1\n\n")
+    @file.write("\n7\n1\n\n")
     @session = new_session
     @session.game_finished(score: 9, counts: true)
     @session.report_achievements(["steady"])
@@ -674,7 +674,7 @@ class SessionTest < Minitest::Test
     pump
 
     assert_empty @worker.started
-    assert_equal "\n\n\n\nsteady", @store.read
+    assert_equal "\n\n\n\nsteady", @file.read
     joined
     pump
 
@@ -691,7 +691,7 @@ class SessionTest < Minitest::Test
     answer(201, { "groups" => [group(top: 70)] })
     answer(201, {})
 
-    assert_equal "t\n\n1\n1|0|1~50\n", @store.read
+    assert_equal "t\n\n1\n1|0|1~50\n", @file.read
     assert_equal 70, @session.group(1).top_score
     assert_equal ["/groups/1/history"], paths
   end
@@ -703,7 +703,7 @@ class SessionTest < Minitest::Test
       pump
       answer(status)
 
-      assert_equal "t\n\n1\n1|0|1~50\n", @store.read
+      assert_equal "t\n\n1\n1|0|1~50\n", @file.read
       assert_nil @session.error
     end
   end
@@ -715,7 +715,7 @@ class SessionTest < Minitest::Test
       pump
       answer(status, {}, retry_after: 1)
 
-      assert_equal "t\n\n1\n1|0|1~50\nsteady", @store.read
+      assert_equal "t\n\n1\n1|0|1~50\nsteady", @file.read
       @time += 5
       refreshed
 
@@ -751,7 +751,7 @@ class SessionTest < Minitest::Test
     answer(401)
 
     assert_nil @session.token
-    assert_equal "\n\n\n\n", @store.read
+    assert_equal "\n\n\n\n", @file.read
   end
 
   def test_a_group_opened_twice_reads_its_history_once_at_a_time
@@ -782,7 +782,7 @@ class SessionTest < Minitest::Test
     answer(0)
 
     assert_equal :offline, @session.error
-    @store.write("t\n\n\n\n")
+    @file.write("t\n\n\n\n")
     @session = new_session
     @session.create
     pump
@@ -875,7 +875,7 @@ class SessionTest < Minitest::Test
   end
 
   def test_no_server_means_no_groups
-    refute_predicate Groups::Session.at(nil, store: @store), :available?
+    refute_predicate Groups::Session.at(nil, file: @file), :available?
   end
 
   def test_session_off_offers_nothing

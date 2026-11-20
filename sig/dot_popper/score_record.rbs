@@ -1,24 +1,24 @@
 module DotPopper
   class ScoreRecord
-    interface _Store
+    interface _SaveFile
       def read: () -> String?
 
       def write: (String text) -> void
     end
 
     interface _Removable
-      include _Store
+      include _SaveFile
 
       def remove: () -> void
     end
 
-    @store: _Store
+    @file: _SaveFile
 
     @legacy: SizeClass
 
     @values: Hash[SizeClass, Integer]
 
-    def initialize: (_Store store, ?legacy: SizeClass) -> void
+    def initialize: (_SaveFile file, ?legacy: SizeClass) -> void
 
     def of: (SizeClass size_class) -> Integer
 

@@ -208,7 +208,7 @@ class ServerExchangesTest < Minitest::Test
     started_on = asking.dig("request", "path")[/started_on=([\d-]+)/, 1]
     themes = Themes.new
     feed = DotPopper::ThemeReleases.new(worker: InlineWorker.new(Network::Link.new(@url)), themes:,
-                                        store: DotPopper::ScoreRecord::Memory.new, now: -> { Time.utc(*started_on.split("-").map(&:to_i), 12) })
+                                        file: DotPopper::ScoreRecord::Memory.new, now: -> { Time.utc(*started_on.split("-").map(&:to_i), 12) })
     feed.ask
     feed.update
 
@@ -216,7 +216,7 @@ class ServerExchangesTest < Minitest::Test
     refute_empty themes.keys
   end
 
-  def session = Groups::Session.new(store: DotPopper::ScoreRecord::Memory.new, worker: InlineWorker.new(Network::Link.new(@url)))
+  def session = Groups::Session.new(file: DotPopper::ScoreRecord::Memory.new, worker: InlineWorker.new(Network::Link.new(@url)))
 
   # Lets the whole conversation finish.
   def pump(session) = 6.times { session.update(quiet: true) }

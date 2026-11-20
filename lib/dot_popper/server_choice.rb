@@ -5,13 +5,13 @@ module DotPopper
   # only while setdef is gone (+gone+, Continuity::Gone), to one someone
   # else runs from the game's published API. The address comes from the
   # clipboard, so nothing is typed, and must be HTTPS. It is kept in the
-  # +store+ (server.txt) and used from the next start, since a group
+  # +file+ (server.txt) and used from the next start, since a group
   # belongs to one server. A server only ever holds groups and themes: it
   # never grants Pro. When setdef's server answers again, Change Server
   # goes away and the game goes back to setdef's (#forget).
   class ServerChoice
-    def initialize(store, gone:, clipboard:)
-      @store = store
+    def initialize(file, gone:, clipboard:)
+      @file = file
       @gone = gone
       @clipboard = clipboard
       @status = nil
@@ -26,7 +26,7 @@ module DotPopper
 
     # The replacement's address, or nil for setdef's own.
     def address
-      text = @store.read.to_s.strip
+      text = @file.read.to_s.strip
       text.empty? ? nil : text
     end
 
@@ -43,13 +43,13 @@ module DotPopper
       return @status = :empty if text.empty?
       return @status = :not_https unless self.class.https?(text)
 
-      @store.write("#{text}\n")
+      @file.write("#{text}\n")
       @status = :chosen
     end
 
     # Back to setdef's own address.
     def reset
-      @store.write("")
+      @file.write("")
       @status = nil
     end
 

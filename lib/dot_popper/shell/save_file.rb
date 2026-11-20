@@ -4,7 +4,7 @@ require_relative "../privacy/save_files"
 
 module DotPopper
   module Shell
-    # A small text file in the game's save folder, as a store for
+    # A small text file in the game's save folder, as a save file for
     # ScoreRecord and for settings: it answers read, write(text), and
     # remove, for StatsBackup's backups. A save
     # folder that cannot be read or written loses the value, never the

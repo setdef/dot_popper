@@ -7,12 +7,12 @@ class FreeGamesTest < Minitest::Test
   Memory = DotPopper::ScoreRecord::Memory
 
   def setup
-    @store = Memory.new
+    @file = Memory.new
     @day = Date.new(2026, 11, 8)
     @entitlement = DotPopper::Entitlement.test
   end
 
-  def games(metered: true, **) = FreeGames.new(@store, today: -> { @day }, entitlement: @entitlement, metered:, **)
+  def games(metered: true, **) = FreeGames.new(@file, today: -> { @day }, entitlement: @entitlement, metered:, **)
 
   def test_a_fresh_save_holds_every_first_game_and_the_days_games
     games = games()
@@ -84,12 +84,12 @@ class FreeGamesTest < Minitest::Test
   def test_the_save_counts_the_first_games_used
     (FreeGames::DAILY + 2).times { games().spend! }
 
-    assert_equal "day=2026-11-08\nspent=#{FreeGames::DAILY}\nfirst_games_used=2\n", @store.read
+    assert_equal "day=2026-11-08\nspent=#{FreeGames::DAILY}\nfirst_games_used=2\n", @file.read
   end
 
   # Before the save counted the first games used, it kept those left.
   def test_an_earlier_save_of_the_first_games_left_carries_over
-    @store.write("day=2026-11-08\nspent=1\nbank=17\n")
+    @file.write("day=2026-11-08\nspent=1\nbank=17\n")
     games = games()
 
     assert_equal 17, games.first_games_left
@@ -97,18 +97,18 @@ class FreeGamesTest < Minitest::Test
     FreeGames::DAILY.times { games.spend! }
 
     assert_equal 16, games().first_games_left
-    assert_includes @store.read, "first_games_used=4"
-    refute_includes @store.read, "bank"
+    assert_includes @file.read, "first_games_used=4"
+    refute_includes @file.read, "bank"
   end
 
   def test_an_earlier_save_with_more_left_than_the_first_games_has_used_none
-    @store.write("bank=#{FreeGames::FIRST_GAMES + 5}\n")
+    @file.write("bank=#{FreeGames::FIRST_GAMES + 5}\n")
 
     assert_equal FreeGames::FIRST_GAMES, games().first_games_left
   end
 
   def test_more_used_than_the_first_games_leaves_none
-    @store.write("first_games_used=#{FreeGames::FIRST_GAMES + 5}\n")
+    @file.write("first_games_used=#{FreeGames::FIRST_GAMES + 5}\n")
 
     assert_equal 0, games().first_games_left
   end
@@ -121,7 +121,7 @@ class FreeGamesTest < Minitest::Test
   end
 
   def test_a_save_that_is_not_readable_is_a_fresh_one
-    @store.write("day=never\nspent=-3\nbank=lots\nfirst_games_used=-1\n")
+    @file.write("day=never\nspent=-3\nbank=lots\nfirst_games_used=-1\n")
 
     assert_equal FreeGames::DAILY + FreeGames::FIRST_GAMES, games().left
   end
@@ -133,7 +133,7 @@ class FreeGamesTest < Minitest::Test
     assert_predicate games, :can_play?
     refute_predicate games, :metered?
     assert games.spend!
-    assert_nil @store.read
+    assert_nil @file.read
   end
 
   def test_buying_part_way_stops_the_counting_and_keeps_what_was_left
@@ -155,10 +155,10 @@ class FreeGamesTest < Minitest::Test
 
   def test_forcing_the_pro_version_counts_nothing
     forced = DotPopper::Entitlement.new(forced: true)
-    games = FreeGames.new(@store, today: -> { @day }, entitlement: forced)
+    games = FreeGames.new(@file, today: -> { @day }, entitlement: forced)
 
     5.times { assert games.spend! }
-    assert_nil @store.read
+    assert_nil @file.read
   end
 
   def test_a_build_that_cannot_sell_is_not_metered

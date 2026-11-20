@@ -13,7 +13,7 @@ module DotPopper
   # and that only Pro uses one other than the ordinary, is
   # UseCases::UseTheme's to say.
   #
-  # The store (themes.txt) keeps three lines: "unlocked: ghost eclipse",
+  # The save file (themes.txt) keeps three lines: "unlocked: ghost eclipse",
   # "told: ghost", and "chosen: ghost".
   class Themes
     # How long setdef must have been gone before a theme opens by its
@@ -25,8 +25,8 @@ module DotPopper
     TOLD = "told"
     CHOSEN = "chosen"
 
-    def initialize(store, themes: Theme::ALL)
-      @store = store
+    def initialize(file, themes: Theme::ALL)
+      @file = file
       @themes = themes
       @released, @told, @chosen = read
     end
@@ -104,7 +104,7 @@ module DotPopper
     def known?(key) = @themes.any? { it.key == key && !it.ordinary? }
 
     def read
-      lines = @store.read.to_s.lines.filter_map { it.split(":", 2).map(&:strip) if it.include?(":") }.to_h
+      lines = @file.read.to_s.lines.filter_map { it.split(":", 2).map(&:strip) if it.include?(":") }.to_h
       known = @themes.map(&:key)
       [keys(lines.fetch(RELEASED, "")) & known, keys(lines.fetch(TOLD, "")) & known, lines[CHOSEN]&.to_sym]
     end
@@ -112,7 +112,7 @@ module DotPopper
     def keys(line) = line.split.map(&:to_sym)
 
     def save
-      @store.write("#{RELEASED}: #{@released.join(" ")}\n#{TOLD}: #{@told.join(" ")}\n#{CHOSEN}: #{@chosen}\n")
+      @file.write("#{RELEASED}: #{@released.join(" ")}\n#{TOLD}: #{@told.join(" ")}\n#{CHOSEN}: #{@chosen}\n")
     end
   end
 end

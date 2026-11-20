@@ -2,19 +2,19 @@
 
 module DotPopper
   # Clears the player's Stats, and brings them back: the ScoreRecord and
-  # the SavedStats, the two stores that hold every record, total, chart bar,
+  # the SavedStats, the two save files that hold every record, total, chart bar,
   # and goal streak, and the Achievements, the achievements earned, which are
   # part of what the player did as much as a record is. Nothing else is
   # cleared, so the games log, the settings, what the game has taught,
   # and whether Pro was bought stay as they are.
   #
-  # Clearing copies each store's text, exactly, to a backup named for
+  # Clearing copies each save file's text, exactly, to a backup named for
   # when it happened (score_record-20261105-093000.txt), through +folder+,
-  # which gives the store of a name, as GamesLog's +archive+ does, and
-  # stores there answer +remove+ too. NOTE lists the latest backups, and
+  # which gives the save file of a name, as GamesLog's +archive+ does, and
+  # save files there answer +remove+ too. NOTE lists the latest backups, and
   # the next clearing removes them, so the folder only ever keeps one.
   # Lota's save folder cannot rename a file, so nothing is moved: the
-  # copies are written, then the stores are emptied.
+  # copies are written, then the save files are emptied.
   class StatsBackup
     NOTE = "cleared.txt"
     BACKUP = /\A(?:score_record|stats|achievements)-\d{8}-\d{6}\.txt\z/
@@ -44,14 +44,14 @@ module DotPopper
     # backup stays.
     def restore(cleared) = cleared.texts.each { |name, text| @kept.fetch(name).restore(text) }
 
-    # The stores' texts as they were, by the name of each store.
+    # The save files' texts as they were, by the name of each save file.
     class Cleared < Data.define(:texts); end
 
     # Stores in memory by name, for tests and for a game with no save
     # folder.
     class Folder
-      def initialize = @stores = {}
-      def call(name) = @stores[name] ||= ScoreRecord::Memory.new
+      def initialize = @files = {}
+      def call(name) = @files[name] ||= ScoreRecord::Memory.new
     end
 
     private

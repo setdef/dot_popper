@@ -2,15 +2,15 @@
 
 module DotPopper
   # The Achievements this device has earned, and the day each was first earned
-  # (an ISO date), kept in a store that answers +read+ and +write(text)+,
+  # (an ISO date), kept in a save file that answers +read+ and +write(text)+,
   # as ScoreRecord's does. They are earned and kept whether or not the
   # player has bought Pro; only showing them waits for that.
   # Text it cannot read is left out, and a achievement a newer version knows and
   # this one does not is dropped.
   class Achievements
-    def initialize(store)
-      @store = store
-      @days = parse(store.read)
+    def initialize(file)
+      @file = file
+      @days = parse(file.read)
     end
 
     def earned?(id) = @days.key?(id)
@@ -30,22 +30,22 @@ module DotPopper
       return fresh if fresh.empty?
 
       @days = @days.merge(fresh.to_h { [it, day.to_s] })
-      @store.write(text)
+      @file.write(text)
       fresh
     end
 
-    # The store's whole text, as saved, for #restore (StatsBackup).
-    def saved = @store.read
+    # The save file's whole text, as saved, for #restore (StatsBackup).
+    def saved = @file.read
 
     # Forgets every achievement, as on a new device.
     def clear
       @days = {}
-      @store.write("")
+      @file.write("")
     end
 
-    # Puts back +text+, the store's whole text as #saved gave it.
+    # Puts back +text+, the save file's whole text as #saved gave it.
     def restore(text)
-      @store.write(text.to_s)
+      @file.write(text.to_s)
       @days = parse(text)
     end
 

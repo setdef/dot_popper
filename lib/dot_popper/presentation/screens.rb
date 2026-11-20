@@ -16,7 +16,7 @@ module DotPopper
 
       # One of each screen for +show+, by name, each given the collaborators
       # its constructor names from +collaborators+ (the use cases, the
-      # clipboard, the presentation's own stores; Show#initialize lists
+      # clipboard, the presentation's own save files; Show#initialize lists
       # them), so that a new screen is a class and a line in ALL.
       def self.made_for(show, **collaborators)
         ALL.transform_values do |name|

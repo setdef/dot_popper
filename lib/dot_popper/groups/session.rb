@@ -7,7 +7,7 @@ module DotPopper
     # asks for nothing while a game is in play (#update's +quiet+).
     #
     # Nothing is sent until the player creates or joins a group: a Session
-    # with no saved token makes no connection at all. +store+ answers
+    # with no saved token makes no connection at all. +file+ answers
     # read and write, as a SaveFile does, and +now+ gives the time.
     #
     # It is made of parts, each with its own rules: what the game owes the
@@ -37,15 +37,15 @@ module DotPopper
       NO_WORKER = NoWorker.new
 
       # A Session with no server, for a game that offers no groups.
-      def self.off = new(store: ScoreRecord::Memory.new, worker: NO_WORKER, available: false)
+      def self.off = new(file: ScoreRecord::Memory.new, worker: NO_WORKER, available: false)
 
       # The Session for a game whose server is at +url+, or Session.off.
-      def self.at(url, store:) = url ? new(store:, worker: Network::Worker.new(Network::Link.new(url))) : off
+      def self.at(url, file:) = url ? new(file:, worker: Network::Worker.new(Network::Link.new(url))) : off
 
       attr_reader :error, :token, :game_result
 
-      def initialize(store:, worker:, now: -> { Time.now }, available: true)
-        @store = store
+      def initialize(file:, worker:, now: -> { Time.now }, available: true)
+        @file = file
         @worker = worker
         @now = now
         @available = available
@@ -349,14 +349,14 @@ module DotPopper
 
       # group.txt (GroupFile).
       def load_saved
-        saved = GroupFile.parse(@store.read)
+        saved = GroupFile.parse(@file.read)
         @token = saved.token
         @unsent = Unsent.new(score: saved.unsent_score, achievements: saved.unsent_achievements)
         @known = KnownGroups.new(last_known_member: saved.member, seen: saved.seen)
       end
 
       def save
-        @store.write(GroupFile.new(token: @token, unsent_score: @unsent.score, member: @known.last_known_member, seen: @known.seen,
+        @file.write(GroupFile.new(token: @token, unsent_score: @unsent.score, member: @known.last_known_member, seen: @known.seen,
                                    unsent_achievements: @unsent.achievements).to_s)
       end
     end

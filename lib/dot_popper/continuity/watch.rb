@@ -22,11 +22,11 @@ module DotPopper
     # announced to its listeners (#subscribe): SetdefHere when setdef
     # answered, and SetdefGone whenever setdef is gone after it.
     class Gone
-      def initialize(store)
-        @store = store
+      def initialize(file)
+        @file = file
         @listeners = []
         @since = begin
-          Date.iso8601(store.read.to_s.strip)
+          Date.iso8601(file.read.to_s.strip)
         rescue Date::Error
           nil
         end
@@ -50,13 +50,13 @@ module DotPopper
       def heard(answer, today)
         case answer
         when :here
-          @store.write("") if gone?
+          @file.write("") if gone?
           @since = nil
           return announce(SetdefHere.new)
         when :gone
           unless gone?
             @since = today
-            @store.write(today.iso8601)
+            @file.write(today.iso8601)
           end
         end
         announce(SetdefGone.new(since:, today:)) if gone?

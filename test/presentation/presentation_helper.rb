@@ -51,7 +51,7 @@ module PresentationTest
 
   # A Show on +game_flow+, built as the composition root builds the game's:
   # its use cases made by Composition.use_cases from the areas' objects
-  # (memory stores and harmless stand-ins unless given), the Show
+  # (save files in memory and harmless stand-ins unless given), the Show
   # subscribed to the rules' events and to each game FinishGame finishes,
   # and the offer to Pro arriving, each after them. Every Show a test makes on one
   # game flow starts its games through the game flow's one Starter. The rest

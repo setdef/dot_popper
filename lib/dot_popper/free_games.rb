@@ -11,9 +11,9 @@ module DotPopper
   # +metered+ false counts nothing: for a machine playing, and for a build
   # with no store to pay in, as no one could then get past the limit.
   #
-  # The store answers +read+ and +write(text)+ as ScoreRecord's does; its
+  # The save file answers +read+ and +write(text)+ as ScoreRecord's does; its
   # lines are +day=2026-11-08+, +spent=2+ and +first_games_used=3+. A
-  # store with nothing in it, as on every save made before games were
+  # save file with nothing in it, as on every save made before games were
   # counted, has all its first games. An earlier save kept the first games
   # left instead, as +bank=17+; it is read as FIRST_GAMES less those, and
   # written the new way at the next game. A player's clock is trusted, as
@@ -43,14 +43,14 @@ module DotPopper
 
     # +today+ answers the player's local Date; +first_games+ and +daily+ are
     # what a new save starts with and each day gives.
-    def initialize(store, today:, entitlement:, metered: true, first_games: FIRST_GAMES, daily: DAILY)
-      @store = store
+    def initialize(file, today:, entitlement:, metered: true, first_games: FIRST_GAMES, daily: DAILY)
+      @file = file
       @today = today
       @entitlement = entitlement
       @metered = metered
       @daily = daily
       values = {} #: Hash[String, String]
-      store.read.to_s.each_line do |line|
+      file.read.to_s.each_line do |line|
         name, value = line.strip.split("=", 2)
         values[name] = value if name && value
       end
@@ -86,7 +86,7 @@ module DotPopper
       else
         @used += 1
       end
-      @store.write("day=#{@day&.iso8601}\nspent=#{@spent}\nfirst_games_used=#{@used}\n")
+      @file.write("day=#{@day&.iso8601}\nspent=#{@spent}\nfirst_games_used=#{@used}\n")
       true
     end
 

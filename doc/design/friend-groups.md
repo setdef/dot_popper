@@ -21,7 +21,7 @@ Only a game that counts is sent: one played by a member of a group, not the tuto
 - An automated run (`Automation`) has no server unless `DOT_POPPER_SERVER` names a local one.
 - While setdef is gone, a player may choose another server with Change Server ([store-and-pro.md](store-and-pro.md#when-setdef-is-gone)). `Composition::Root#server_url` gives friend groups and the themes check that server from the next start, and `Composition::Root#groups_session` keeps its token in `group-<host>.txt` so setdef's token, in `group.txt`, is never sent elsewhere.
 
-The composition root (`Composition::Root`) builds the session with `Groups::Session.at(url, store:)`, or `Session.off` with no server. Home's Friend groups button shows only where a server is available (`Show#group_offered?`).
+The composition root (`Composition::Root`) builds the session with `Groups::Session.at(url, file:)`, or `Session.off` with no server. Home's Friend groups button shows only where a server is available (`Show#group_offered?`).
 
 ## The client
 

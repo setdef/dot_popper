@@ -29,7 +29,7 @@ class LicenseTest < Minitest::Test
     watch.verdict
   end
 
-  # The keys a build trusts, by its channel alone: setdef's in a store
+  # The keys a build trusts, by its channel alone: setdef's in a save file
   # build, the test keys in a test build (ADR-0010).
   def test_a_build_trusts_setdefs_keys_by_its_channel_alone
     assert_same C::TEST_PINS, C.pins_for(nil)
@@ -70,7 +70,7 @@ class LicenseTest < Minitest::Test
     C::License.new(saved, pins: C::TEST_PINS).enter(@key.text)
 
     assert_predicate C::License.new(Memory.new(saved.read), pins: C::TEST_PINS), :pro?, "a relaunch, offline"
-    refute_predicate C::License.new(Memory.new(saved.read), pins: C::PINNED), :pro?, "a store build"
+    refute_predicate C::License.new(Memory.new(saved.read), pins: C::PINNED), :pro?, "a file build"
     ["key: pro\n", "pro: yes\nregistered: yes\n", "key: #{@key.text.sub(/.\z/) { it == "0" ? "1" : "0" }}\n", "4"].each do |text|
       refute_predicate C::License.new(Memory.new(text), pins: C::TEST_PINS), :pro?, text
     end
@@ -156,8 +156,8 @@ class LicenseTest < Minitest::Test
   end
 
   def test_gone_lasts_through_no_internet_and_ends_when_setdef_proves_itself
-    store = Memory.new
-    gone = C::Gone.new(store)
+    file = Memory.new
+    gone = C::Gone.new(file)
     gone.heard(:gone, TODAY)
     gone.heard(:gone, TODAY + 3)
     gone.heard(:unknown, TODAY + 9)

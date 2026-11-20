@@ -11,10 +11,10 @@ class ThemeRulesTest < Minitest::Test
   Continuity = DotPopper::Continuity
 
   def setup
-    @store = Memory.new
+    @file = Memory.new
   end
 
-  def themes = DotPopper::Themes.new(@store)
+  def themes = DotPopper::Themes.new(@file)
 
   def test_the_ordinary_theme_comes_first_and_every_key_is_its_own
     assert_predicate Theme::ALL.first, :ordinary?
@@ -56,7 +56,7 @@ class ThemeRulesTest < Minitest::Test
   # Jingle bell was a theme in playtest builds and is gone from the game,
   # but the server still lists it and devices still have it saved.
   def test_a_removed_theme_saved_on_a_device_gives_way_to_the_ordinary_one_and_the_rest_are_kept
-    @store.write("unlocked: ghost jingle_bell turkey\ntold: ghost jingle_bell\nchosen: jingle_bell\n")
+    @file.write("unlocked: ghost jingle_bell turkey\ntold: ghost jingle_bell\nchosen: jingle_bell\n")
     t = themes
     assert_equal %i[classic ghost turkey], t.choices
     assert_equal :classic, t.chosen
@@ -98,13 +98,13 @@ class ThemeRulesTest < Minitest::Test
     t.release(%w[turkey ghost])
     t.told(:turkey)
     t.use(:ghost)
-    assert_equal "unlocked: turkey ghost\ntold: turkey\nchosen: ghost\n", @store.read
+    assert_equal "unlocked: turkey ghost\ntold: turkey\nchosen: ghost\n", @file.read
   end
 
   def test_a_saved_choice_no_longer_in_the_game_is_written_back_as_it_was
-    @store.write("unlocked: ghost\ntold: \nchosen: jingle_bell\n")
+    @file.write("unlocked: ghost\ntold: \nchosen: jingle_bell\n")
     themes.told(:ghost)
-    assert_equal "unlocked: ghost\ntold: ghost\nchosen: jingle_bell\n", @store.read
+    assert_equal "unlocked: ghost\ntold: ghost\nchosen: jingle_bell\n", @file.read
   end
 
   def test_themes_open_by_their_dates_only_once_setdef_has_been_gone_180_days

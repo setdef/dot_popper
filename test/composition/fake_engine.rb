@@ -34,14 +34,14 @@ class FakeEngine
     def fonts = nil
   end
 
-  # What plays the sounds, with the store its mute is kept in.
+  # What plays the sounds, with the save file its mute is kept in.
   class SoundPlayer < FakeSounds
-    attr_reader :store, :theme
+    attr_reader :file, :theme
 
-    def initialize(store:)
+    def initialize(file:)
       super()
-      @store = store
-      @muted = store.read == "muted"
+      @file = file
+      @muted = file.read == "muted"
     end
 
     def use(theme) = @theme = theme
@@ -103,7 +103,7 @@ class FakeEngine
   def desktop_window(exclusive:) = DesktopWindow.new(exclusive:)
   def pen(shaders:) = Pen.new(shaders:)
   def measure(_pen) = RoughMeasure.new
-  def sound_player(store:) = SoundPlayer.new(store:)
+  def sound_player(file:) = SoundPlayer.new(file:)
   def notices = Notices.none
   def store_helper(automated:) = StoreHelper.new(automated:)
   def store_answers = Answers.new(path: "/save/store_answer.txt")

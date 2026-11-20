@@ -15,14 +15,14 @@ class ServerChoiceTest < Minitest::Test
   end
 
   def setup
-    @store = Memory.new
+    @file = Memory.new
     @gone = DotPopper::Continuity::Gone.new(Memory.new)
     @clipboard = Clipboard.new
-    @choice = DotPopper::ServerChoice.new(@store, gone: @gone, clipboard: @clipboard)
+    @choice = DotPopper::ServerChoice.new(@file, gone: @gone, clipboard: @clipboard)
   end
 
   def test_while_setdef_answers_nothing_is_offered_and_setdefs_server_is_used
-    @store.write("https://groups.example.org\n")
+    @file.write("https://groups.example.org\n")
 
     refute_predicate @choice, :offered?
     assert_equal OWN, @choice.server_url(OWN)
@@ -41,7 +41,7 @@ class ServerChoiceTest < Minitest::Test
     @clipboard.text = " https://groups.example.org \n"
     assert_equal :chosen, @choice.paste
     assert_equal :chosen, @choice.status
-    assert_equal "https://groups.example.org\n", @store.read
+    assert_equal "https://groups.example.org\n", @file.read
     assert_equal "https://groups.example.org", @choice.server_url(OWN)
   end
 
@@ -55,7 +55,7 @@ class ServerChoiceTest < Minitest::Test
     assert_equal "https://groups.example.org", @choice.address, "kept while setdef is still gone"
     @gone.heard(:here, Date.new(2027, 1, 3))
     assert_nil @choice.address
-    assert_equal "", @store.read
+    assert_equal "", @file.read
     assert_equal OWN, @choice.server_url(OWN)
   end
 

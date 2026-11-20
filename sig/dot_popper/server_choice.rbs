@@ -6,7 +6,7 @@ module DotPopper
       def paste: () -> String?
     end
 
-    @store: ScoreRecord::_Store
+    @file: ScoreRecord::_SaveFile
 
     @gone: Continuity::Gone
 
@@ -16,7 +16,7 @@ module DotPopper
 
     attr_reader status: (:chosen | :not_https | :empty)?
 
-    def initialize: (ScoreRecord::_Store store, gone: Continuity::Gone, clipboard: _Clipboard) -> void
+    def initialize: (ScoreRecord::_SaveFile file, gone: Continuity::Gone, clipboard: _Clipboard) -> void
 
     def offered?: () -> bool
 

@@ -27,7 +27,7 @@ class GroupPanelTest < Minitest::Test
   def setup
     @sounds = FakeSounds.new
     @worker = ManualWorker.new
-    @session = Groups::Session.new(store: DotPopper::ScoreRecord::Memory.new, worker: @worker)
+    @session = Groups::Session.new(file: DotPopper::ScoreRecord::Memory.new, worker: @worker)
     @pro = DotPopper::Entitlement.new(forced: true)
     @game_flow = DotPopper::GameFlow.new(field)
     build
@@ -188,7 +188,7 @@ class GroupPanelTest < Minitest::Test
   def test_creating_after_pro_is_gone_leads_to_the_offer_and_sends_nothing
     license = License.new(true)
     with_notice
-    build(entitlement: DotPopper::Entitlement.new(license:), group_notice: DotPopper::Presentation::GroupNotice.new(@notice_store))
+    build(entitlement: DotPopper::Entitlement.new(license:), group_notice: DotPopper::Presentation::GroupNotice.new(@notice_file))
     panel.open
     tap_control(:group_create)
     assert_equal :create, panel.asking
@@ -207,9 +207,9 @@ class GroupPanelTest < Minitest::Test
   end
 
   def with_notice(saved = nil)
-    @notice_store = DotPopper::ScoreRecord::Memory.new(saved)
+    @notice_file = DotPopper::ScoreRecord::Memory.new(saved)
     @links = Links.new
-    build(group_notice: DotPopper::Presentation::GroupNotice.new(@notice_store), links: @links)
+    build(group_notice: DotPopper::Presentation::GroupNotice.new(@notice_file), links: @links)
   end
 
   # A first Join or Create says who keeps the scores, once, before any
@@ -240,7 +240,7 @@ class GroupPanelTest < Minitest::Test
     tick
 
     refute_empty @worker.started
-    assert_equal "read", @notice_store.read
+    assert_equal "read", @notice_file.read
     panel.close
     panel.open
     tap_control(:group_join_open)
@@ -270,7 +270,7 @@ class GroupPanelTest < Minitest::Test
   def test_a_free_player_sees_the_offer_not_the_notice
     %i[group_join_open group_create].each do |pressed|
       with_notice
-      build(entitlement: DotPopper::Entitlement.free, group_notice: DotPopper::Presentation::GroupNotice.new(@notice_store))
+      build(entitlement: DotPopper::Entitlement.free, group_notice: DotPopper::Presentation::GroupNotice.new(@notice_file))
       panel.open
       tap_control(pressed)
 
@@ -455,7 +455,7 @@ class GroupPanelTest < Minitest::Test
   end
 
   def test_a_list_too_long_for_its_window_scrolls
-    @session = Groups::Session.new(store: DotPopper::ScoreRecord::Memory.new, worker: @worker)
+    @session = Groups::Session.new(file: DotPopper::ScoreRecord::Memory.new, worker: @worker)
     build(width: 400, height: 500)
     join!
     groups = (1..20).map { group(id: it) }
@@ -499,7 +499,7 @@ class GroupPanelTest < Minitest::Test
   end
 
   def test_a_controller_labels_a_group_and_steps_through_the_groups
-    @session = Groups::Session.new(store: DotPopper::ScoreRecord::Memory.new, worker: @worker)
+    @session = Groups::Session.new(file: DotPopper::ScoreRecord::Memory.new, worker: @worker)
     build
     join!
     groups = [group(id: 1), group(id: 2)]
@@ -573,7 +573,7 @@ class GroupPanelTest < Minitest::Test
   # friend groups' screen overlaps or leaves the safe area, at any size.
   def test_labeled_screens_and_the_notice_fit_every_size
     SIZES.each do |width, height|
-      @session = Groups::Session.new(store: DotPopper::ScoreRecord::Memory.new, worker: @worker)
+      @session = Groups::Session.new(file: DotPopper::ScoreRecord::Memory.new, worker: @worker)
       build(width:, height:)
       join!
       groups = [group(id: 1), group(id: 2)]

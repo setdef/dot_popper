@@ -12,7 +12,7 @@ class ShowTutorialTest < Minitest::Test
 
   def setup
     @sounds = FakeSounds.new
-    @store = DotPopper::ScoreRecord::Memory.new
+    @file = DotPopper::ScoreRecord::Memory.new
     @score_record = DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new)
     @saved_stats = DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new)
     @game_flow = DotPopper::GameFlow.new(field, score_record: @score_record, random: Random.new(2))
@@ -29,7 +29,7 @@ class ShowTutorialTest < Minitest::Test
     refute @show.playing?
     assert_instance_of DotPopper::GameFlow::Paused, @game_flow.state
     assert_empty @events.grep(->(it) { it == DotPopper::Events::GameStarted })
-    assert_equal "seen", @store.read, "it is seen from the moment it opens"
+    assert_equal "seen", @file.read, "it is seen from the moment it opens"
   end
 
   def test_the_game_plays_on_as_it_is_with_only_the_clock_starting
@@ -245,7 +245,7 @@ class ShowTutorialTest < Minitest::Test
 
     assert @show.tutorial?
     assert_instance_of DotPopper::GameFlow::Paused, @game_flow.state
-    assert_equal "seen", @store.read
+    assert_equal "seen", @file.read
     play_through(opened: true)
     assert @show.playing?
     assert_equal [true, true, false], @game_flow.game.dots.map(&:popped?)
@@ -291,7 +291,7 @@ class ShowTutorialTest < Minitest::Test
 
   def show(keeper: DotPopper::StatsBackup.new(score_record: @score_record, saved_stats: @saved_stats))
     new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, random: Random.new(3), saved_stats: @saved_stats,
-             keeper:, tutorial_flag: TutorialFlag.new(@store))
+             keeper:, tutorial_flag: TutorialFlag.new(@file))
   end
 
   def update_for(seconds)

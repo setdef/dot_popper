@@ -43,14 +43,14 @@ class SavedDotSizeWordsTest < Minitest::Test
 
   def test_score_record_txt_reads_and_writes_the_same_bytes
     text = "fitted=12\nsmall=5\nmedium=24\nlarge=40\n"
-    store = ScoreRecord::Memory.new(text)
-    score_record = ScoreRecord.new(store)
+    file = ScoreRecord::Memory.new(text)
+    score_record = ScoreRecord.new(file)
 
     assert_equal 12, score_record.of(DotSizing.parse("fitted").size_class(PHONE))
     assert_equal 5, score_record.of(DotSizing.parse("standard").size_class(PHONE))
     score_record.record(13, DotSizing.parse("fitted").size_class(PHONE))
 
-    assert_equal "fitted=13\nsmall=5\nmedium=24\nlarge=40\n", store.read
+    assert_equal "fitted=13\nsmall=5\nmedium=24\nlarge=40\n", file.read
   end
 
   def test_stats_txt_reads_and_writes_the_same_bytes

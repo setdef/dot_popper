@@ -30,8 +30,8 @@ class PrivacyRequestsTest < Minitest::Test
     @heard = []
     @server = TCPServer.new("127.0.0.1", 0)
     @thread = Thread.new { serve }
-    store = DotPopper::ScoreRecord::Memory.new
-    @session = Groups::Session.new(store:, worker: InlineWorker.new(Network::Link.new("http://127.0.0.1:#{@server.addr[1]}")))
+    file = DotPopper::ScoreRecord::Memory.new
+    @session = Groups::Session.new(file:, worker: InlineWorker.new(Network::Link.new("http://127.0.0.1:#{@server.addr[1]}")))
   end
 
   def teardown
@@ -83,7 +83,7 @@ class PrivacyRequestsTest < Minitest::Test
     @session.leave(1)
     pump
     DotPopper::ThemeReleases.new(worker: InlineWorker.new(Network::Link.new("http://127.0.0.1:#{@server.addr[1]}")),
-                                 themes: DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new), store: DotPopper::ScoreRecord::Memory.new,
+                                 themes: DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new), file: DotPopper::ScoreRecord::Memory.new,
                                  now: -> { Time.utc(2026, 11, 8, 12) }).ask
     @session.delete_everything
     pump
@@ -105,8 +105,8 @@ class PrivacyRequestsTest < Minitest::Test
 
   # group.txt's +sent+: its token and unsent score really go out.
   def test_the_saved_token_and_unsent_score_leave_the_device
-    store = DotPopper::ScoreRecord::Memory.new("tok\n7\n1\n")
-    @session = Groups::Session.new(store:, worker: InlineWorker.new(Network::Link.new("http://127.0.0.1:#{@server.addr[1]}")))
+    file = DotPopper::ScoreRecord::Memory.new("tok\n7\n1\n")
+    @session = Groups::Session.new(file:, worker: InlineWorker.new(Network::Link.new("http://127.0.0.1:#{@server.addr[1]}")))
     @session.refresh
     pump
 

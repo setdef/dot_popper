@@ -23,10 +23,10 @@ module DotPopper
       body.filter_map { it["key"] if it.is_a?(Hash) && it["key"].is_a?(String) }
     end
 
-    def initialize(worker:, themes:, store:, now: -> { Time.now })
+    def initialize(worker:, themes:, file:, now: -> { Time.now })
       @worker = worker
       @themes = themes
-      @store = store
+      @file = file
       @now = now
     end
 
@@ -34,8 +34,8 @@ module DotPopper
     # date in UTC, not the player's own, because that is the date the
     # server asks for (+now+ answers a Time).
     def started_on
-      @store.read.to_s.strip.empty? ? @store.write(@now.call.getutc.to_date.iso8601) : nil
-      @store.read.to_s.strip
+      @file.read.to_s.strip.empty? ? @file.write(@now.call.getutc.to_date.iso8601) : nil
+      @file.read.to_s.strip
     end
 
     # Starts one read.

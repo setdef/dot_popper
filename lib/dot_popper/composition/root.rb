@@ -14,7 +14,7 @@ module DotPopper
     #
     # [platform] the Platform the game runs on
     # [unit] what a graphics unit is called there, to print
-    # [file(name)] the store for a save file (read, write, remove)
+    # [file(name)] a save file (read, write, remove)
     # [dimensions] the window's width and height in graphics units
     # [layout] the window's Presentation::Layout, with its safe area
     # [fill_screen] fills a phone's or tablet's screen
@@ -22,7 +22,7 @@ module DotPopper
     # [desktop_window(exclusive:)] a computer's window control
     # [pen(shaders:)], [measure(pen)] what draws, and how wide text is in
     #   its fonts
-    # [sound_player(store:)] what plays the sounds
+    # [sound_player(file:)] what plays the sounds
     # [clipboard], [opener], [buzzer] the system's clipboard, its URL
     #   opener, and its vibration motor
     # [notices] the notices Credits shows
@@ -85,9 +85,9 @@ module DotPopper
       # The games a free player has left, counted as +metered+ says
       # (FreeGames.metered?), starting as a developer may ask
       # (FreeGames.starting).
-      def free_games(entitlement, metered:, store: file("games.txt"))
+      def free_games(entitlement, metered:, file: file("games.txt"))
         start = FreeGames.starting(settings.env, channel: settings.channel)
-        FreeGames.new(store, today: settings.today, entitlement:, metered:,
+        FreeGames.new(file, today: settings.today, entitlement:, metered:,
                              **(start ? { first_games: start, daily: start } : {}))
       end
 
@@ -134,9 +134,9 @@ module DotPopper
         # A record saved before records were kept by size of screen goes to
         # this screen's class.
         legacy = SizeClass.of(screen)
-        sizing_store = file("dot_size.txt")
+        sizing_file = file("dot_size.txt")
         @game_flow = GameFlow.new(screen, score_record: ScoreRecord.new(file("score_record.txt"), legacy:), random:,
-                                       sizing: DotSizing.parse(sizing_store.read))
+                                       sizing: DotSizing.parse(sizing_file.read))
         @engine.say("dots are standard, worked out from the screen as each game starts") if @game_flow.sizing.standard?
         saved_stats = SavedStats.new(file("stats.txt"), today:, legacy:)
         achievements = Achievements.new(file("achievements.txt"))
@@ -160,7 +160,7 @@ module DotPopper
         @pen = @engine.pen(shaders: !flag?("DOT_POPPER_NO_SHADERS"))
         current = Style::THEMES.find { it.key == use_theme.current }
         @pen.use(current)
-        @sound_player = @engine.sound_player(store: file("sound.txt"))
+        @sound_player = @engine.sound_player(file: file("sound.txt"))
         @sound_player.use(current)
         unless Presentation::Splash.skipped?(settings.env)
           @splash = Presentation::Splash.start(calm: settings.calm?, sounding: !@sound_player.muted?)
@@ -176,7 +176,7 @@ module DotPopper
           groups:, game_flow: @game_flow, layout: @engine.layout, sounds: @sound_player, radius: dot_size.radius,
           random:, calm: settings.calm?, tutor: Presentation::Tutor.new(file("taught.txt"), times: Style::LESSON.times),
           haptics:, clipboard:, notices: @engine.notices, sharing:,
-          saved_stats:, achievements:, keeper:, sizing_store:, input: starting_input, measure: @engine.measure(@pen),
+          saved_stats:, achievements:, keeper:, sizing_file:, input: starting_input, measure: @engine.measure(@pen),
           window: @window,
           tutorial_flag: Presentation::TutorialFlag.new(file("tutorial.txt"), mode: Presentation::TutorialFlag.mode(settings.env)),
           group_notice: Presentation::GroupNotice.new(file("group_notice.txt")),
@@ -223,7 +223,7 @@ module DotPopper
       def groups_session
         url = server_url
         own = url.nil? || url == Network::Server.server_url(settings.env)
-        Groups::Session.at(url, store: own ? file("group.txt") : file("group-#{URI(url).host.to_s.downcase}.txt"))
+        Groups::Session.at(url, file: own ? file("group.txt") : file("group-#{URI(url).host.to_s.downcase}.txt"))
       end
 
       # What asks whether setdef is gone, and where a license key is: a test
@@ -252,7 +252,7 @@ module DotPopper
       def theme_releases_for(themes)
         url = server_url or return
         ThemeReleases.new(worker: Network::Worker.new(Network::Link.new(url)), themes:,
-                          store: file("started_on.txt"), now: settings.utc_now)
+                          file: file("started_on.txt"), now: settings.utc_now)
       end
     end
   end

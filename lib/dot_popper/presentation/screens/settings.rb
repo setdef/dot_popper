@@ -13,10 +13,10 @@ module DotPopper
         # default, Standard, first.
         SIZINGS = [DotSizing::STANDARD, DotSizing::BIGGER_OR_SMALLER].freeze
 
-        # +sizing_store+ keeps the player's DotSizing.
-        def initialize(show, sizing_store:)
+        # +sizing_file+ keeps the player's DotSizing.
+        def initialize(show, sizing_file:)
           super(show)
-          @sizing_store = sizing_store
+          @sizing_file = sizing_file
         end
 
         # Where its rows and buttons go (SettingsPlan), with its list fitted
@@ -60,7 +60,7 @@ module DotPopper
           return sounds.play(:tick, pitch: 0.8) if sizing == game_flow.sizing
 
           game_flow.sizing = sizing
-          @sizing_store.write(game_flow.sizing.to_text)
+          @sizing_file.write(game_flow.sizing.to_text)
           show.sizing_changed
           sounds.play(:tick, pitch: game_flow.sizing.standard? ? 1.2 : 0.9)
         end

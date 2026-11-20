@@ -9,9 +9,9 @@ class ShowTest < Minitest::Test
     @sounds = FakeSounds.new
     @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2))
     @clipboard = MemoryClipboard.new
-    @sizing_store = DotPopper::ScoreRecord::Memory.new
+    @sizing_file = DotPopper::ScoreRecord::Memory.new
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, random: Random.new(3),
-                     clipboard: @clipboard, sizing_store: @sizing_store)
+                     clipboard: @clipboard, sizing_file: @sizing_file)
   end
 
   def test_a_tap_on_a_home_dot_pops_it_for_fun_and_starts_nothing
@@ -622,9 +622,9 @@ class ShowTest < Minitest::Test
   # The stacking rule is taught on Game Over, never in play, and only
   # after a game whose mistake had the bright dot hidden beneath.
   def test_game_over_teaches_the_stack_after_a_wrong_tap_over_the_bright_dot
-    store = DotPopper::ScoreRecord::Memory.new
+    file = DotPopper::ScoreRecord::Memory.new
     @show = new_show(game_flow: @game_flow, layout:, sounds: @sounds, radius: R, random: Random.new(3),
-                     tutor: Tutor.new(store, times: 1))
+                     tutor: Tutor.new(file, times: 1))
     start_and_pop
     popped = @game_flow.game.dots.first
     clear_around!(live(@game_flow), popped)
@@ -639,7 +639,7 @@ class ShowTest < Minitest::Test
     bright = @game_flow.game.dots.find(&:bright?)
     @game_flow.update(20)
     assert_equal Mistake.new(popped: popped.id, bright: bright.id), @show.game_over.lesson, "the mistake is the lesson"
-    assert_equal "1", store.read
+    assert_equal "1", file.read
     refute @show.game_over_plan.placed.key?(:lesson), "with no word"
 
     @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
@@ -681,9 +681,9 @@ class ShowTest < Minitest::Test
   # Once the bright dot it hid has been popped, the pile can't show which
   # it was, so Game Over shows nothing, and that Game Over doesn't count.
   def test_a_wrong_tap_whose_bright_dot_was_popped_later_teaches_nothing
-    store = DotPopper::ScoreRecord::Memory.new
+    file = DotPopper::ScoreRecord::Memory.new
     @show = new_show(game_flow: @game_flow, layout:, sounds: @sounds, radius: R, random: Random.new(3),
-                     tutor: Tutor.new(store, times: 2))
+                     tutor: Tutor.new(file, times: 2))
     hide_bright_under_a_popped_dot_and_tap_it
     bright = @game_flow.game.dots.find(&:bright?)
     clear_around!(live(@game_flow), bright)
@@ -691,7 +691,7 @@ class ShowTest < Minitest::Test
     @game_flow.update(20)
 
     assert_nil @show.game_over.lesson
-    assert_nil store.read
+    assert_nil file.read
   end
 
   def test_a_wrong_tap_with_the_bright_dot_elsewhere_reveals_nothing

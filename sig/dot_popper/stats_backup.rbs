@@ -37,7 +37,7 @@ module DotPopper
     end
 
     class Folder
-      @stores: Hash[String, ScoreRecord::Memory]
+      @files: Hash[String, ScoreRecord::Memory]
 
       def initialize: () -> void
 

@@ -14,7 +14,7 @@ module DotPopper
     # +next+, both kept until a signed answer comes, so a retry is always
     # the same request; "current" keeps only +next+, as the new secret.
     #
-    # The store (read, write(text), as ScoreRecord's) keeps four lines:
+    # The save file (read, write(text), as ScoreRecord's) keeps four lines:
     # "key: DP-…", "secret: <hex>", "next: <hex>" while a check waits,
     # and "registered: yes" once the server has answered the entry.
     class License
@@ -31,8 +31,8 @@ module DotPopper
         Build.license_keys?(channel) ? yield : ScoreRecord::Memory.new
       end
 
-      def initialize(store, pins: PINNED, fresh: -> { SignedAnswers.fresh })
-        @store = store
+      def initialize(file, pins: PINNED, fresh: -> { SignedAnswers.fresh })
+        @file = file
         @pins = pins
         @fresh = fresh
         @lines = read
@@ -112,9 +112,9 @@ module DotPopper
         save
       end
 
-      def read = @store.read.to_s.lines.filter_map { it.split(":", 2).map(&:strip) if it.include?(":") }.to_h
+      def read = @file.read.to_s.lines.filter_map { it.split(":", 2).map(&:strip) if it.include?(":") }.to_h
 
-      def save = @store.write(@lines.map { |name, value| "#{name}: #{value}\n" }.join)
+      def save = @file.write(@lines.map { |name, value| "#{name}: #{value}\n" }.join)
     end
   end
 end

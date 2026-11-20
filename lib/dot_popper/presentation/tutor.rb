@@ -28,17 +28,17 @@ module DotPopper
     # in which the player tapped a popped dot with the bright one hidden
     # beneath it, and never in play: the Show replays that tap's penalty on
     # the pile (Mistake). It counts the Game Overs it has taught on, up to
-    # +times+, and keeps the count in a store that answers +read+ and
+    # +times+, and keeps the count in a save file that answers +read+ and
     # +write(text)+, as ScoreRecord does.
     class Tutor
       # What an older version saved once it had shown its hint, in play.
       # A player who saw that has been taught.
       LEGACY = "taught"
 
-      def initialize(store, times:)
-        @store = store
+      def initialize(file, times:)
+        @file = file
         @times = times
-        saved = store.read.to_s.strip
+        saved = file.read.to_s.strip
         @shown = saved == LEGACY ? times : Integer(saved, exception: false) || 0
       end
 
@@ -52,7 +52,7 @@ module DotPopper
         return if taught?
 
         @shown += 1
-        @store.write(@shown.to_s)
+        @file.write(@shown.to_s)
         lesson
       end
     end

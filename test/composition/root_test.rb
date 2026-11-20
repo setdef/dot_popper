@@ -214,10 +214,10 @@ class RootTest < Minitest::Test
   end
 
   def test_a_store_build_starts_with_the_usual_free_games
-    games = root(channel: B::WEBSITE, env: SETTINGS).free_games(DotPopper::Entitlement.free, metered: true, store: DotPopper::ScoreRecord::Memory.new)
+    games = root(channel: B::WEBSITE, env: SETTINGS).free_games(DotPopper::Entitlement.free, metered: true, file: DotPopper::ScoreRecord::Memory.new)
 
     assert_equal DotPopper::FreeGames::FIRST_GAMES + DotPopper::FreeGames::DAILY, games.left
-    test_build = root(env: SETTINGS).free_games(DotPopper::Entitlement.free, metered: true, store: DotPopper::ScoreRecord::Memory.new)
+    test_build = root(env: SETTINGS).free_games(DotPopper::Entitlement.free, metered: true, file: DotPopper::ScoreRecord::Memory.new)
 
     assert_equal 999 * 2, test_build.left
   end
