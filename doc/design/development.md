@@ -115,6 +115,10 @@ The shell talks to Lota, so most of it runs only in a window, and a call to a me
 
 It catches a missing method, not a wrong argument to Lota or a callback never wired up. The GUI scenarios catch those.
 
+## What the painters draw
+
+Every painter of a screen, and the parts they share (`Header`, the buttons, `Glyphs`), draws only through the `Shell::DrawingContext` it is given: text, shapes, lines, the clip and moves are the context's methods, which hand them to Lota. So a painter can be tested with no window and no Lota: `test/painters/` hands it a `RecordingContext`, which draws nothing and keeps each text with its face, size, place and color, and each shape with its color, line width, clip and offset, and Shell::DotPainter's dots as a `FakeDots` keeps them. Fonts are measured as `RoughMeasure` measures, and no shader is offered, so a painter takes its plain path. `test/painters/no_lota_test.rb` fails if one of those files names Lota, or if a screen's painter is left out of them.
+
 ## The GUI scenarios
 
 `bundle exec rake test:gui` plays the real game in real windows, on a driven clock. The unit suite never runs the shell, and the defined-calls check catches only a missing method: a resize once called a method that was never defined, reached `trunk`, and was caught only when someone ran the game by hand. Only a running game catches a wrong argument to Lota, a callback never wired up, or a screen that fails to draw. A scenario reaches `main.rb`'s callbacks by the path a player's press does, so wiring, drawing and resizing are tested end to end, and its driven clock and fixed settings play the same on a busy machine as on an idle one, so the suite stays fast and reliable, as the maintainer asked of every test. It checks behavior, which stays the same when the art changes, rather than comparing stills with recorded ones; the stills are kept as [galleries](#galleries), outside the suite.

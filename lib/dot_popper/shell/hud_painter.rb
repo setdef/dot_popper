@@ -6,8 +6,6 @@ module DotPopper
     # safe area, over every dot, outlined so they stay crisp over one. A number that changes bumps by drawing in
     # a bigger font for a moment; glyphs are never stretched.
     class HudPainter < Data.define(:context, :dots)
-      G = ::Lota::Graphics
-
       # Draws +drawing+ (Presentation::HudDrawing) and answers the pill.
       def draw(drawing)
         plan = drawing.plan
@@ -83,11 +81,11 @@ module DotPopper
         pixels = context.pixels
         corner = rect.height / 2.0
         context.color(context.palette.pill, context.style::HUD.backing)
-        G.rectangle(:fill, rect.x, rect.y, rect.width, rect.height, corner, corner, 48)
+        context.rectangle(:fill, rect.x, rect.y, rect.width, rect.height, corner, corner, 48)
         context.color(context.palette.pill_edge)
-        G.line_width = pixels.line_width(1)
+        context.line_width = pixels.line_width(1)
         inset = pixels.line_at(rect.x) - rect.x
-        G.rectangle(:line, rect.x + inset, rect.y + inset, rect.width - (2 * inset), rect.height - (2 * inset),
+        context.rectangle(:line, rect.x + inset, rect.y + inset, rect.width - (2 * inset), rect.height - (2 * inset),
                     corner, corner, 48)
         rect
       end
@@ -95,9 +93,9 @@ module DotPopper
       def divider(x, top, bottom)
         pixels = context.pixels
         context.color(context.palette.pill_edge)
-        G.line_width = pixels.line_width(1)
+        context.line_width = pixels.line_width(1)
         at = pixels.line_at(x)
-        G.line(at, pixels.snap(top), at, pixels.snap(bottom))
+        context.line(at, pixels.snap(top), at, pixels.snap(bottom))
       end
 
       def readout(readout, size, x, top, number, label)

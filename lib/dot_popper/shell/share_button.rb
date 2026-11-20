@@ -10,7 +10,6 @@ module DotPopper
     # with a ring spreading from its edge. +hover+, from 0 to 1, is how lit the mouse
     # over it has made it (Presentation::Hover).
     class ShareButton < Data.define(:context)
-      G = ::Lota::Graphics
       Plan = Presentation::GameOverLayout
 
       def draw(rect, text, entrance:, ui:, alpha: 1.0, hover: 0.0)
@@ -34,11 +33,11 @@ module DotPopper
         corner = height / 2.0
         fill = palette.pill.mix(lit.fill, hover)
         context.color(fill, fill.a * alpha)
-        G.rectangle(:fill, x, y, width, height, corner, corner, 48)
+        context.rectangle(:fill, x, y, width, height, corner, corner, 48)
         context.color(palette.bright_body.mix(lit.edge, hover), (0.8 + (0.2 * hover)) * alpha)
-        G.line_width = pixels.line_width(2)
+        context.line_width = pixels.line_width(2)
         inset = pixels.line_at(x, 2) - x
-        G.rectangle(:line, x + inset, y + inset, width - (2 * inset), height - (2 * inset), corner, corner, 48)
+        context.rectangle(:line, x + inset, y + inset, width - (2 * inset), height - (2 * inset), corner, corner, 48)
       end
 
       # The glyph and the words after it, centered together.
@@ -60,12 +59,12 @@ module DotPopper
         left = [x + dot, y]
         ends = [[x + size - dot, y - (size * 0.38)], [x + size - dot, y + (size * 0.38)]]
         context.color(palette.soft, alpha)
-        G.line_width = pixels.whole(size * 0.1)
-        ends.each { G.line(*left, *it) }
+        context.line_width = pixels.whole(size * 0.1)
+        ends.each { context.line(*left, *it) }
         context.color(palette.cream, alpha)
-        ends.each { G.circle(:fill, *it, dot, 24) }
+        ends.each { context.circle(:fill, *it, dot, 24) }
         context.color(palette.bright_body, alpha)
-        G.circle(:fill, *left, dot * 1.15, 24)
+        context.circle(:fill, *left, dot * 1.15, 24)
       end
 
       # A ring +reach+ units out from the pill, fading as it spreads.
@@ -75,8 +74,8 @@ module DotPopper
         x, y, width, height = [box.x, box.y, box.width, box.height].map { pixels.snap(it) }
         corner = height / 2.0
         context.color(context.palette.bright_body, alpha)
-        G.line_width = pixels.line_width(2)
-        G.rectangle(:line, x, y, width, height, corner, corner, 48)
+        context.line_width = pixels.line_width(2)
+        context.rectangle(:line, x, y, width, height, corner, corner, 48)
       end
 
       # The words in semibold, as big as the plan measured them, shrunk by

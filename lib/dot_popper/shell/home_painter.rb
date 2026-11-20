@@ -7,8 +7,6 @@ module DotPopper
     # goal and the days in a row on their card, the four large buttons,
     # and the bottom row. Each large button shows one value.
     class HomePainter < Data.define(:context, :dots)
-      G = ::Lota::Graphics
-
       def draw(show, layout)
         now = show.now
         intro = show.home_entrance.intro(now)
@@ -67,8 +65,8 @@ module DotPopper
           context.text(line, text, rect.x + pad + (text.width(line) / 2.0), card.top + (text.height * (i + 0.5)), done ? palette.gain : palette.cream, alpha)
         end
         context.color(palette.soft, 0.25 * alpha)
-        G.line_width = context.pixels.line_width(1)
-        G.line(context.pixels.snap(divider), rect.y + pad, context.pixels.snap(divider), rect.bottom - pad)
+        context.line_width = context.pixels.line_width(1)
+        context.line(context.pixels.snap(divider), rect.y + pad, context.pixels.snap(divider), rect.bottom - pad)
         streak(show, rect, divider, label, alpha)
       end
 
@@ -115,9 +113,9 @@ module DotPopper
         x = rect.right - width - 8
         y = rect.y - (height / 2.0)
         context.color(context.palette.ink_top, alpha)
-        G.rectangle(:fill, x, y, width, height, height / 2.0, height / 2.0, 12)
+        context.rectangle(:fill, x, y, width, height, height / 2.0, height / 2.0, 12)
         context.color(context.palette.soft, 0.5 * alpha)
-        G.rectangle(:line, x, y, width, height, height / 2.0, height / 2.0, 12)
+        context.rectangle(:line, x, y, width, height, height / 2.0, height / 2.0, 12)
         context.text(text, font, x + (width / 2.0), y + (height / 2.0), context.palette.soft, alpha)
       end
 

@@ -11,7 +11,6 @@ module DotPopper
     # press rings where it lands. Its letter and its tip sit on whole
     # device pixels.
     class GuidePainter < Data.define(:context)
-      G = ::Lota::Graphics
       ALPHA = 0.85 # how much of the pointer and the reticle show at most
       RING = 0.4 # seconds a press's ring lasts
       RIPPLE = 0.45 # seconds a tap's ripple lasts, before the hand lifts away
@@ -25,7 +24,7 @@ module DotPopper
 
       # The hand for +input+ at +pose+, sized for a dot of +radius+, kept
       # on a screen +width+ by +height+ (the window's, unless given).
-      def draw(pose, input, radius, screen: G.dimensions)
+      def draw(pose, input, radius, screen: context.dimensions)
         return unless pose && pose.alpha.positive?
 
         case input.name
@@ -61,8 +60,8 @@ module DotPopper
         sprite = context.hands.for(side * pixels.scale)
         scale = side / sprite.height
         (tip_x, tip_y), (wrist_x, wrist_y) = art::TIP_AT, art::WRIST_AT
-        G.color = [1, 1, 1, pose.alpha]
-        G.draw(sprite, x + (across * (wrist_x - tip_x) * side), y + ((wrist_y - tip_y) * side), pose.turn,
+        context.white(pose.alpha)
+        context.image(sprite, x + (across * (wrist_x - tip_x) * side), y + ((wrist_y - tip_y) * side), pose.turn,
                across * scale, scale, wrist_x * sprite.width, wrist_y * sprite.height)
       end
 
@@ -70,13 +69,13 @@ module DotPopper
       # lands, past the dot's edge, gone before the hand lifts away.
       def ripple(x, y, pose, radius)
         since = pose.since_press or return
-        G.line_width = context.pixels.line_width([radius * context.pixels.scale * 0.06, 2].max)
+        context.line_width = context.pixels.line_width([radius * context.pixels.scale * 0.06, 2].max)
         [[0.0, 1.0], [0.06, 0.6]].each do |delay, strength|
           share = (since - delay) / (RIPPLE - delay)
           next unless share.between?(0.0, 1.0)
 
           context.color(palette.cream, pose.alpha * strength * (1 - share))
-          G.circle(:line, x, y, radius * (0.4 + (1.2 * Presentation::Ease.out_cubic(share))), 48)
+          context.circle(:line, x, y, radius * (0.4 + (1.2 * Presentation::Ease.out_cubic(share))), 48)
         end
       end
 
@@ -89,10 +88,10 @@ module DotPopper
         unit = radius * 1.1 / 20.0 * (1 - (0.12 * pose.press))
         points = ARROW.map { |x, y| [pose.x + (x * unit), pose.y + (y * unit)] }
         context.color(palette.cream, alpha)
-        PIECES.each { |piece| G.polygon(:fill, *piece.flat_map { points[it] }) }
+        PIECES.each { |piece| context.polygon(:fill, *piece.flat_map { points[it] }) }
         context.color(palette.shadow, alpha)
-        G.line_width = context.pixels.line_width(2)
-        G.polygon(:line, *points.flatten)
+        context.line_width = context.pixels.line_width(2)
+        context.polygon(:line, *points.flatten)
       end
 
       def rays(pose, radius, alpha)
@@ -101,11 +100,11 @@ module DotPopper
         return unless fade.positive?
 
         context.color(palette.cream, alpha * fade)
-        G.line_width = context.pixels.line_width(3)
+        context.line_width = context.pixels.line_width(3)
         [Math::PI, Math::PI * 1.25, Math::PI * 1.5].each do |angle|
           from = radius * (0.25 + (0.15 * (1 - fade)))
           to = from + (radius * 0.3)
-          G.line(pose.x + (Math.cos(angle) * from), pose.y + (Math.sin(angle) * from),
+          context.line(pose.x + (Math.cos(angle) * from), pose.y + (Math.sin(angle) * from),
                  pose.x + (Math.cos(angle) * to), pose.y + (Math.sin(angle) * to))
         end
       end
@@ -119,10 +118,10 @@ module DotPopper
         ring(pose.x, pose.y, pose, radius * 0.3, radius * 0.9)
         [[palette.shadow, 0.6, 4], [palette.cream, 1.0, 2]].each do |color, strength, width|
           context.color(color, alpha * strength)
-          G.line_width = pixels.line_width(width)
-          G.circle(:line, pose.x, pose.y, style.ring * radius, 48)
+          context.line_width = pixels.line_width(width)
+          context.circle(:line, pose.x, pose.y, style.ring * radius, 48)
           [[1, 0], [-1, 0], [0, 1], [0, -1]].each do |dx, dy|
-            G.line(pose.x + (dx * style.ticks.begin * radius), pose.y + (dy * style.ticks.begin * radius),
+            context.line(pose.x + (dx * style.ticks.begin * radius), pose.y + (dy * style.ticks.begin * radius),
                    pose.x + (dx * style.ticks.end * radius), pose.y + (dy * style.ticks.end * radius))
           end
         end
@@ -132,9 +131,9 @@ module DotPopper
       def a_button(x, y, pose, radius, alpha)
         size = radius * 0.34 * (1 - (0.12 * pose.press))
         context.color(palette.shadow, alpha * 0.7)
-        G.circle(:fill, x, y + context.pixels.line_width(2), size, 32)
+        context.circle(:fill, x, y + context.pixels.line_width(2), size, 32)
         context.color(palette.gain.mix(palette.cream, 0.35 * pose.press), alpha)
-        G.circle(:fill, x, y, size, 32)
+        context.circle(:fill, x, y, size, 32)
         font = context.fonts.bold(Presentation::Pixels.font_size(radius * 0.42))
         context.text("A", font, x, y, palette.ink_bottom, alpha)
         ring(x, y, pose, size, size * 2.0)
@@ -147,8 +146,8 @@ module DotPopper
         return unless fade.positive?
 
         context.color(palette.cream, pose.alpha * 0.6 * fade)
-        G.line_width = context.pixels.line_width(2)
-        G.circle(:line, x, y, from + ((to - from) * Presentation::Ease.out_cubic(since / RING)), 48)
+        context.line_width = context.pixels.line_width(2)
+        context.circle(:line, x, y, from + ((to - from) * Presentation::Ease.out_cubic(since / RING)), 48)
       end
     end
   end

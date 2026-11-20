@@ -11,12 +11,12 @@ module DotPopper
         Header.new(context:).draw(drawing.header)
         clip = drawing.clip
         pixels = context.pixels
-        ::Lota::Graphics.scissor = pixels.snap(clip.x), pixels.snap(clip.y), pixels.snap(clip.width), pixels.snap(clip.height)
+        context.scissor = pixels.snap(clip.x), pixels.snap(clip.y), pixels.snap(clip.width), pixels.snap(clip.height)
         plan.rows.zip(drawing.choices).each { |row, choices| row(drawing, row, choices) }
         pill(drawing, :credits, plan.credits, :document, drawing.credits)
         pill(drawing, :privacy, plan.privacy, :shield, drawing.privacy)
         pill(drawing, :change_server, plan.change_server, :crown, drawing.change_server) if plan.change_server
-        ::Lota::Graphics.scissor = nil
+        context.scissor = nil
       end
 
       private

@@ -10,16 +10,14 @@ module DotPopper
     # and Close beside Copy, the card's one
     # filled gold button. It lifts into place as it fades in.
     class SharePreviewPainter < Data.define(:context, :dots)
-      G = ::Lota::Graphics
-
       # Draws what the screen hands it (Presentation::ShareDrawing), over a
       # veil +width+ by +height+.
       def draw(drawing, width, height)
         shown = drawing.shown
         veil(width, height, drawing.veil)
         plan = drawing.plan
-        G.push do
-          G.translate(0, context.pixels.snap(drawing.lift))
+        context.push do
+          context.translate(0, context.pixels.snap(drawing.lift))
           card(plan.card, drawing.corner, shown)
           heading(drawing, plan, shown)
           message(drawing, plan, shown)
@@ -34,7 +32,7 @@ module DotPopper
 
       def veil(width, height, alpha)
         context.color(context.palette.ink_bottom, alpha)
-        G.rectangle(:fill, 0, 0, width, height)
+        context.rectangle(:fill, 0, 0, width, height)
       end
 
       def card(rect, corner, alpha)
@@ -42,11 +40,11 @@ module DotPopper
         pixels = context.pixels
         x, y, width, height = [rect.x, rect.y, rect.width, rect.height].map { pixels.snap(it) }
         context.color(palette.ink_top, 0.97 * alpha)
-        G.rectangle(:fill, x, y, width, height, corner, corner, 48)
+        context.rectangle(:fill, x, y, width, height, corner, corner, 48)
         context.color(palette.soft, 0.35 * alpha)
-        G.line_width = pixels.line_width(1)
+        context.line_width = pixels.line_width(1)
         inset = pixels.line_at(x) - x
-        G.rectangle(:line, x + inset, y + inset, width - (2 * inset), height - (2 * inset), corner, corner, 48)
+        context.rectangle(:line, x + inset, y + inset, width - (2 * inset), height - (2 * inset), corner, corner, 48)
       end
 
       def heading(drawing, plan, alpha)
@@ -63,7 +61,7 @@ module DotPopper
         x, y, width, height = [rect.x, rect.y, rect.width, rect.height].map { pixels.snap(it) }
         bubble = plan.bubble
         context.color(context.palette.ink_bottom, 0.9 * alpha)
-        G.rectangle(:fill, x, y, width, height, bubble, bubble, 32)
+        context.rectangle(:fill, x, y, width, height, bubble, bubble, 32)
         font = context.fonts.semibold(plan.size(:message))
         step = font.height * Presentation::ShareLayout::LINE
         drawing.runs.each_with_index do |runs, i|
@@ -97,10 +95,10 @@ module DotPopper
       def stopwatch(x, y, radius, alpha)
         pixels = context.pixels
         context.color(context.palette.soft, alpha)
-        G.line_width = pixels.whole(radius * 0.22)
-        G.circle(:line, x, y + (radius * 0.1), radius * 0.85, 32)
-        G.line(x, y + (radius * 0.1), x + (radius * 0.4), y - (radius * 0.3))
-        G.rectangle(:fill, x - (radius * 0.25), y - (radius * 1.1), radius * 0.5, radius * 0.25)
+        context.line_width = pixels.whole(radius * 0.22)
+        context.circle(:line, x, y + (radius * 0.1), radius * 0.85, 32)
+        context.line(x, y + (radius * 0.1), x + (radius * 0.4), y - (radius * 0.3))
+        context.rectangle(:fill, x - (radius * 0.25), y - (radius * 1.1), radius * 0.5, radius * 0.25)
       end
 
       # Once Copy has copied: "Copied! Paste it anywhere.", with a check,

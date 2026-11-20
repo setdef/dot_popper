@@ -7,8 +7,6 @@ module DotPopper
     # middle and its edges feather out. Its outline is on whole device
     # pixels.
     class ScrimPainter < Data.define(:context)
-      G = ::Lota::Graphics
-
       def draw(rect, style, layout, alpha: 1.0)
         return if alpha <= 0.0
 
@@ -21,7 +19,7 @@ module DotPopper
           box = outer.inset(inset)
           x, y, width, height = [box.x, box.y, box.width, box.height].map { pixels.snap(it) }
           corner = [pad + feather - inset, height / 2.0].min
-          G.rectangle(:fill, x, y, width, height, corner, corner, 32)
+          context.rectangle(:fill, x, y, width, height, corner, corner, 32)
         end
       end
     end

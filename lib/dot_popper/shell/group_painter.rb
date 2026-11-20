@@ -7,8 +7,6 @@ module DotPopper
     # Back, and the short announcement a title change shows on Home or at
     # Game Over.
     class GroupPainter < Data.define(:context, :icons)
-      G = ::Lota::Graphics
-
       def initialize(context:, icons: MemberIconPainter.new(context:)) = super
 
       def draw(show, layout)
@@ -36,13 +34,13 @@ module DotPopper
         palette = context.palette
         safe = layout.safe
         context.color(palette.ink_edge, 0.72)
-        G.rectangle(:fill, safe.x - 400, safe.y - 400, safe.width + 800, safe.height + 800)
+        context.rectangle(:fill, safe.x - 400, safe.y - 400, safe.width + 800, safe.height + 800)
         card = plan.card
         context.color(palette.ink_top)
-        G.rectangle(:fill, card.x, card.y, card.width, card.height, 22, 22, 32)
+        context.rectangle(:fill, card.x, card.y, card.width, card.height, 22, 22, 32)
         context.color(palette.pill_edge)
-        G.line_width = context.pixels.line_width(1.5)
-        G.rectangle(:line, card.x, card.y, card.width, card.height, 22, 22, 32)
+        context.line_width = context.pixels.line_width(1.5)
+        context.rectangle(:line, card.x, card.y, card.width, card.height, 22, 22, 32)
         font = context.fonts.bold(plan.size)
         plan.lines.each_with_index { |line, i| context.text(line, font, plan.card.center_x, plan.text_y + (plan.line_height * i), palette.cream) }
         link(show, plan)
@@ -55,9 +53,9 @@ module DotPopper
       def rows(show, plan)
         window = plan.window
         pixels = context.pixels
-        G.scissor = pixels.snap(window.x - 4), pixels.snap(window.y), pixels.snap(window.width + 8), pixels.snap(window.height) if window
+        context.scissor = pixels.snap(window.x - 4), pixels.snap(window.y), pixels.snap(window.width + 8), pixels.snap(window.height) if window
         plan.rows.each { row(show, plan, it) }
-        G.scissor = nil
+        context.scissor = nil
       end
 
       # The announcement at +y+, on a dark pill so it reads over anything,
@@ -75,7 +73,7 @@ module DotPopper
         top = pixels.snap(y)
         middle = top + (height / 2.0)
         context.color(context.palette.ink_bottom, 0.94 * alpha)
-        G.rectangle(:fill, x, top, width, height, height / 2.0, height / 2.0, 32)
+        context.rectangle(:fill, x, top, width, height, height / 2.0, height / 2.0, 32)
         icons.crest(x + (height * 0.55), middle, height * 0.34, announcement.group_id, alpha)
         icons.draw(x + (height * 1.2), middle, height * 0.34, announcement.group_id, announcement.number, alpha)
         context.text(announcement.text, font, x + (height * 1.7) + (font.width(announcement.text) / 2.0), middle, context.palette.cream, alpha)
@@ -183,8 +181,8 @@ module DotPopper
         context.text(text, font, left + (font.width(text) / 2.0), rect.center_y, color)
         Glyphs.new(context:).draw(:external, left + font.width(text) + 14, rect.center_y - 1, font.height * 0.8, color:)
         under = context.pixels.snap(rect.center_y + (font.height * 0.5))
-        G.line_width = context.pixels.line_width(1.5)
-        G.line(left, under, left + font.width(text) + 26, under)
+        context.line_width = context.pixels.line_width(1.5)
+        context.line(left, under, left + font.width(text) + 26, under)
       end
 
       def quiet?(name) = name == :group_leave
@@ -302,7 +300,7 @@ module DotPopper
         pixels = context.pixels
         x, y, width, height = [rect.x, rect.y, rect.width, rect.height].map { pixels.snap(it) }
         context.color(context.palette.ink_bottom, 0.5 + (0.3 * lit))
-        G.rectangle(:fill, x, y, width, height, height / 2.0, height / 2.0, 32)
+        context.rectangle(:fill, x, y, width, height, height / 2.0, height / 2.0, 32)
       end
 
       # While a long press is held, what it will do.

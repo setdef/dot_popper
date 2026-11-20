@@ -8,7 +8,6 @@ module DotPopper
     # cleared, Undo) is in the other, and while it is held the prompt says
     # what will go.
     class StatsPainter < Data.define(:context)
-      G = ::Lota::Graphics
       DIM = 0.3 # how much of a bar shows when its game counts elsewhere
 
       def draw(show, layout)
@@ -32,13 +31,13 @@ module DotPopper
         placed, height = plan.cards
         scroll = show.list_fit(height, window.height)
         pixels = context.pixels
-        G.scissor = pixels.snap(window.x), pixels.snap(window.y), pixels.snap(window.width), pixels.snap(window.height)
+        context.scissor = pixels.snap(window.x), pixels.snap(window.y), pixels.snap(window.width), pixels.snap(window.height)
         placed.each do |card|
           rect = card.rect.with(y: window.y + card.rect.y - scroll.offset)
           Card.new(context:).draw(rect)
           send(card.kind, show, sheet, rect)
         end
-        G.scissor = nil
+        context.scissor = nil
       end
 
       def chart(show, sheet, rect)
@@ -61,7 +60,7 @@ module DotPopper
         Presentation::ScoreBars.new(scores: sheet.scores, mine: sheet.mine).bars(box, context.pixels).each do |bar|
           context.color(bar.score_record ? palette.bright_light : palette.bright_body.mix(palette.bright_deep, 0.45), bar.dim ? DIM : 1.0)
           corner = [bar.width / 3.0, 2.0].min
-          G.rectangle(:fill, bar.x, bar.y, bar.width, bar.height, corner, corner, 8)
+          context.rectangle(:fill, bar.x, bar.y, bar.width, bar.height, corner, corner, 8)
         end
       end
 
@@ -89,7 +88,7 @@ module DotPopper
           next if i.zero?
 
           context.color(palette.soft, 0.18)
-          G.rectangle(:fill, rect.x + pad, context.pixels.snap(y - (height / 2.0)), rect.width - (2 * pad), context.pixels.line_width(1))
+          context.rectangle(:fill, rect.x + pad, context.pixels.snap(y - (height / 2.0)), rect.width - (2 * pad), context.pixels.line_width(1))
         end
       end
 
@@ -145,7 +144,7 @@ module DotPopper
         outline = Presentation::PillFill.new(rect:, amount: show.clearing.progress(show.now)).outline
         if outline.size >= 6
           context.color(context.palette.alarm, 0.55)
-          G.polygon(:fill, *outline)
+          context.polygon(:fill, *outline)
         end
         PillButton.new(context:).label(rect, show.words.clear)
       end
@@ -160,7 +159,7 @@ module DotPopper
         return unless amount.positive?
 
         context.color(context.palette.soft, 0.5)
-        G.rectangle(:fill, rect.x + (rect.height / 2.0), rect.bottom + 4, [(rect.width - rect.height) * amount, 1.0].max, context.pixels.line_width(3))
+        context.rectangle(:fill, rect.x + (rect.height / 2.0), rect.bottom + 4, [(rect.width - rect.height) * amount, 1.0].max, context.pixels.line_width(3))
       end
 
       def nothing_yet(words, layout)

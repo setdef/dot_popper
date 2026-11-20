@@ -9,7 +9,6 @@ module DotPopper
     # mouse over it (+hover+, from 0 to 1) lightens it toward the bright
     # dot's light, and outlines it in cream.
     class PrimaryButton < Data.define(:context)
-      G = ::Lota::Graphics
       LABEL = 0.36 # the word's size, in the button's height
 
       def draw(rect, text, alpha: 1.0, hover: 0.0, ratio: LABEL, note: nil)
@@ -20,9 +19,9 @@ module DotPopper
         x, y, width, height = [rect.x, rect.y, rect.width, rect.height].map { pixels.snap(it) }
         corner = height / 2.0
         context.color(palette.shadow, 0.35 * alpha)
-        G.rectangle(:fill, x, y + pixels.snap(height * 0.06), width, height, corner, corner, 48)
+        context.rectangle(:fill, x, y + pixels.snap(height * 0.06), width, height, corner, corner, 48)
         context.color(palette.bright_body.mix(palette.bright_light, 0.15 + (0.45 * hover)), alpha)
-        G.rectangle(:fill, x, y, width, height, corner, corner, 48)
+        context.rectangle(:fill, x, y, width, height, corner, corner, 48)
         edge(x, y, width, height, corner, alpha, hover)
         font = fit(text, width - height, height, ratio)
         return context.text(text, font, x + (width / 2.0), y + (height / 2.0), palette.ink_bottom, alpha) unless note
@@ -39,9 +38,9 @@ module DotPopper
       def edge(x, y, width, height, corner, alpha, hover)
         pixels = context.pixels
         context.color(context.palette.bright_rim, (0.5 + (0.5 * hover)) * alpha)
-        G.line_width = pixels.line_width(hover.positive? ? 2 : 1)
+        context.line_width = pixels.line_width(hover.positive? ? 2 : 1)
         inset = pixels.line_at(x) - x
-        G.rectangle(:line, x + inset, y + inset, width - (2 * inset), height - (2 * inset), corner, corner, 48)
+        context.rectangle(:line, x + inset, y + inset, width - (2 * inset), height - (2 * inset), corner, corner, 48)
       end
 
       # The word in bold, as big as a third of the button's height allows,

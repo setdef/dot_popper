@@ -11,7 +11,6 @@ module DotPopper
     # Presentation::OfferLayout decides where each goes; this only draws,
     # on whole device pixels.
     class OfferPainter < Data.define(:context, :dots)
-      G = ::Lota::Graphics
       SIGNS = { "Unlimited games" => :infinity, "Achievements" => :ribbon, "Friend groups" => :crown }.freeze
 
       def draw(show, layout)
@@ -63,7 +62,7 @@ module DotPopper
         list.each_with_index do |theme, i|
           box = Presentation::Rect.new(x: left + (i * (width + gap)), y: rect.y, width:, height: rect.height)
           context.color(theme.palette.ink_top)
-          G.rectangle(:fill, box.x, box.y, box.width, box.height, 12, 12, 24)
+          context.rectangle(:fill, box.x, box.y, box.width, box.height, 12, 12, 24)
           radius = [box.height * 0.24, box.width * 0.17].min
           context.using(theme) do
             dots.icon(box.center_x - (radius * 0.6), box.y + (box.height * 0.4), radius, bright: true)

@@ -11,7 +11,6 @@ module DotPopper
     # stand together in the pill's middle; with an icon and no word, the
     # icon stands alone in its middle.
     class PillButton < Data.define(:context)
-      G = ::Lota::Graphics
       LABEL = Presentation::PillLabel::RATIO # the word's size, in the button's height
       GLYPH = Presentation::PillLabel::GLYPH
       GAP = Presentation::PillLabel::GAP
@@ -25,11 +24,11 @@ module DotPopper
         corner = height / 2.0
         fill = context.palette.pill.mix(lit.fill, hover)
         context.color(fill, fill.a * alpha)
-        G.rectangle(:fill, x, y, width, height, corner, corner, 48)
+        context.rectangle(:fill, x, y, width, height, corner, corner, 48)
         context.color(edge || context.palette.soft.mix(lit.edge, hover), (edge ? 1.0 : 0.55 + (0.45 * hover)) * alpha)
-        G.line_width = pixels.line_width(1)
+        context.line_width = pixels.line_width(1)
         inset = pixels.line_at(x) - x
-        G.rectangle(:line, x + inset, y + inset, width - (2 * inset), height - (2 * inset), corner, corner, 48)
+        context.rectangle(:line, x + inset, y + inset, width - (2 * inset), height - (2 * inset), corner, corner, 48)
         return word(text, x, y, width, height, color, alpha) unless icon
         return icon.call(x + (width / 2.0), y + (height / 2.0), height) unless text
 

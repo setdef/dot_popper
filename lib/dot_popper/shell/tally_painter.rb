@@ -7,8 +7,6 @@ module DotPopper
     # it, in the same color. The Tutorial flies these into the HUD, and
     # Home's legend shows the same ones, so they read as one language.
     class TallyPainter < Data.define(:context)
-      G = ::Lota::Graphics
-
       # +tally+ in +font+, its middle at +x+, +y+.
       def centered(tally, font, x, y, color, alpha)
         left(tally, font, x - (tally.width(font.height) { font.width(it) } / 2.0), y, color, alpha)
@@ -32,9 +30,9 @@ module DotPopper
         x = pixels.snap(x)
         y = pixels.snap(y)
         context.color(context.palette.shadow, alpha * 0.7)
-        G.circle(:fill, x, y, (size * 0.42) + pixels.line_width(2), 32)
+        context.circle(:fill, x, y, (size * 0.42) + pixels.line_width(2), 32)
         context.color(color, alpha)
-        G.circle(:fill, x, y, size * 0.42, 32)
+        context.circle(:fill, x, y, size * 0.42, 32)
       end
 
       # A small stopwatch, +size+ across, centered on +x+, +y+: its face, a
@@ -48,11 +46,11 @@ module DotPopper
         line = pixels.whole(size * 0.12)
         [[context.palette.shadow, alpha * 0.7, line + pixels.line_width(2)], [color, alpha, line]].each do |ink, strength, width|
           context.color(ink, strength)
-          G.line_width = width
-          G.circle(:line, x, middle, face, 32)
-          G.line(x, middle, x + (face * 0.45), middle - (face * 0.55))
-          G.line(x, middle - face, x, middle - face - (size * 0.12))
-          G.line(x - (size * 0.14), middle - face - (size * 0.14), x + (size * 0.14), middle - face - (size * 0.14))
+          context.line_width = width
+          context.circle(:line, x, middle, face, 32)
+          context.line(x, middle, x + (face * 0.45), middle - (face * 0.55))
+          context.line(x, middle - face, x, middle - face - (size * 0.12))
+          context.line(x - (size * 0.14), middle - face - (size * 0.14), x + (size * 0.14), middle - face - (size * 0.14))
         end
       end
     end

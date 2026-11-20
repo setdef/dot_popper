@@ -10,8 +10,6 @@ module DotPopper
     # Presentation::CreditsLayout decides where each goes, and the screen
     # hands it all (Presentation::CreditsDrawing).
     class CreditsPainter < Data.define(:context)
-      G = ::Lota::Graphics
-
       def draw(drawing)
         Header.new(context:).draw(drawing.header)
         text(drawing)
@@ -24,7 +22,7 @@ module DotPopper
         window = drawing.window
         offset = drawing.offset
         pixels = context.pixels
-        G.scissor = pixels.snap(window.x), pixels.snap(window.y), pixels.snap(window.width), pixels.snap(window.height)
+        context.scissor = pixels.snap(window.x), pixels.snap(window.y), pixels.snap(window.width), pixels.snap(window.height)
         fonts = { heading: context.fonts.bold(drawing.heading_size),
                   subheading: context.fonts.bold(drawing.size),
                   note: context.fonts.semibold(drawing.size), legal: context.fonts.mono(drawing.size) }
@@ -33,7 +31,7 @@ module DotPopper
           font = fonts.fetch(row.kind)
           context.text(row.text, font, window.x + (font.width(row.text) / 2.0), window.y + row.y - offset, colors.fetch(row.kind))
         end
-        G.scissor = nil
+        context.scissor = nil
       end
 
       # The page's place in the window, a thin bar at the window's right
@@ -46,7 +44,7 @@ module DotPopper
         width = pixels.line_width(3)
         x = [pixels.snap(drawing.bar_x), drawing.bar_limit - width].min
         context.color(context.palette.soft, 0.5)
-        G.rectangle(:fill, x, pixels.snap(window.y + (window.height * start)), width,
+        context.rectangle(:fill, x, pixels.snap(window.y + (window.height * start)), width,
                     [pixels.snap(window.height * length), width].max, width / 2.0, width / 2.0, 8)
       end
     end

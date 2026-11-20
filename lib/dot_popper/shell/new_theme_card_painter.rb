@@ -8,8 +8,6 @@ module DotPopper
     # Presentation::NewThemeCardPlan decides where each part goes, and the
     # screen hands it all (Presentation::NewThemeCardDrawing).
     class NewThemeCardPainter < Data.define(:context, :dots)
-      G = ::Lota::Graphics
-
       def draw(drawing)
         plan = drawing.plan
         veil(drawing.veil)
@@ -26,17 +24,17 @@ module DotPopper
 
       def veil(rect)
         context.color(context.palette.ink_edge, 0.72)
-        G.rectangle(:fill, rect.x, rect.y, rect.width, rect.height)
+        context.rectangle(:fill, rect.x, rect.y, rect.width, rect.height)
       end
 
       def card(plan)
         rect = plan.card
         corner = context.pixels.snap(rect.height * 0.06)
         context.color(context.palette.ink_top)
-        G.rectangle(:fill, rect.x, rect.y, rect.width, rect.height, corner, corner, 32)
+        context.rectangle(:fill, rect.x, rect.y, rect.width, rect.height, corner, corner, 32)
         context.color(context.palette.pill_edge)
-        G.line_width = context.pixels.line_width(1.5)
-        G.rectangle(:line, rect.x, rect.y, rect.width, rect.height, corner, corner, 32)
+        context.line_width = context.pixels.line_width(1.5)
+        context.rectangle(:line, rect.x, rect.y, rect.width, rect.height, corner, corner, 32)
       end
 
       def preview(plan, theme)

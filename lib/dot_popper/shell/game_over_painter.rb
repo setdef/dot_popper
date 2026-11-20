@@ -12,8 +12,6 @@ module DotPopper
     # as the mocks draw it, with no backing of their own. The stacking
     # rule is taught on the pile itself, with no word (Show#replay_mistake).
     class GameOverPainter < Data.define(:context, :dots)
-      G = ::Lota::Graphics
-
       def draw(show, layout)
         game_over = show.game_over or return
         plan = show.game_over_plan

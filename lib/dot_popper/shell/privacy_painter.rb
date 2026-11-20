@@ -6,8 +6,6 @@ module DotPopper
     # the policy, and a held button that deletes the online data, as the
     # screen hands it (Presentation::PrivacyDrawing).
     class PrivacyPainter < Data.define(:context)
-      G = ::Lota::Graphics
-
       def draw(drawing)
         plan = drawing.plan
         Header.new(context:).draw(drawing.header)
@@ -62,7 +60,7 @@ module DotPopper
         return if outline.size < 6
 
         context.color(context.palette.alarm, 0.45)
-        G.polygon(:fill, *outline)
+        context.polygon(:fill, *outline)
       end
 
       def note(drawing, plan)

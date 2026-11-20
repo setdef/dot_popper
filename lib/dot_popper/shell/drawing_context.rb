@@ -94,6 +94,38 @@ module DotPopper
 
       def color(color, alpha = color.a) = G.color = [color.r, color.g, color.b, alpha]
 
+      # A picture drawn in its own colors at +alpha+, for #image.
+      def white(alpha) = G.color = [1, 1, 1, alpha]
+
+      # The shapes, lines, clips and moves the painters draw with, as
+      # Lota::Graphics takes them. A painter draws only through its
+      # context, never Lota itself, so a test can hand it one that keeps
+      # what it was asked to draw (test/painters/recording_context.rb).
+      def rectangle(...) = G.rectangle(...)
+      def circle(...) = G.circle(...)
+      def line(...) = G.line(...)
+      def polygon(...) = G.polygon(...)
+      def arc(...) = G.arc(...)
+      def image(...) = G.draw(...)
+      def translate(...) = G.translate(...)
+      def push(&) = G.push(&)
+      def dimensions = G.dimensions
+
+      def line_width=(width)
+        G.line_width = width
+      end
+
+      # Where Lota can join lines, how; where it can't, nothing.
+      def line_join=(join)
+        G.line_join = join if G.respond_to?(:line_join=)
+      end
+
+      # Draws only inside the rectangle +rect+ ([x, y, width, height] in
+      # device pixels), or everywhere again for nil.
+      def scissor=(rect)
+        G.scissor = rect
+      end
+
       # A square of half sides +half_width+ and +half_height+ centered on
       # (+x+, +y+), for a shader to draw in.
       def square(x, y, half_width, half_height) = G.draw(@square, x, y, 0, half_width, half_height, 1, 1)

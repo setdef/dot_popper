@@ -9,7 +9,6 @@ module DotPopper
     # circle, [:arc, x, y, r, from, to] an open arc in degrees, and
     # [:fill, x, y, ...] a filled polygon.
     class Glyphs < Data.define(:context)
-      G = ::Lota::Graphics
       TABLE = {
         bars: [[:line, 4, 21, 4, 11], [:line, 10, 21, 10, 5], [:line, 16, 21, 16, 9], [:line, 22, 21, 22, 13]],
         ribbon: [[:circle, 12, 8, 6], [:line, 8.5, 13, 7, 21, 12, 18.5, 17, 21, 15.5, 13]],
@@ -58,8 +57,8 @@ module DotPopper
       def draw(name, x, y, size, color: context.palette.cream, alpha: 1.0, weight: 1.6)
         unit = size / 24.0
         context.color(color, alpha)
-        G.line_width = context.pixels.whole([weight * unit, 1.0].max)
-        G.line_join = :bevel if G.respond_to?(:line_join=)
+        context.line_width = context.pixels.whole([weight * unit, 1.0].max)
+        context.line_join = :bevel
         place = ->(px, py) { [x + ((px - 12) * unit), y + ((py - 12) * unit)] }
         TABLE.fetch(name).each { |part| stroke(part, unit, place) }
       end
@@ -68,11 +67,11 @@ module DotPopper
 
       def stroke(part, unit, place)
         case part
-        in [:line, *points] then G.line(*points.each_slice(2).flat_map { place.call(*it) })
-        in [:circle, cx, cy, r] then G.circle(:line, *place.call(cx, cy), r * unit, 40)
-        in [:disc, cx, cy, r] then G.circle(:fill, *place.call(cx, cy), r * unit, 20)
-        in [:fill, *points] then G.polygon(:fill, *points.each_slice(2).flat_map { place.call(*it) })
-        in [:arc, cx, cy, r, from, to] then G.arc(:line, :open, *place.call(cx, cy), r * unit, from * Math::PI / 180.0, to * Math::PI / 180.0, 32)
+        in [:line, *points] then context.line(*points.each_slice(2).flat_map { place.call(*it) })
+        in [:circle, cx, cy, r] then context.circle(:line, *place.call(cx, cy), r * unit, 40)
+        in [:disc, cx, cy, r] then context.circle(:fill, *place.call(cx, cy), r * unit, 20)
+        in [:fill, *points] then context.polygon(:fill, *points.each_slice(2).flat_map { place.call(*it) })
+        in [:arc, cx, cy, r, from, to] then context.arc(:line, :open, *place.call(cx, cy), r * unit, from * Math::PI / 180.0, to * Math::PI / 180.0, 32)
         end
       end
     end
@@ -80,8 +79,6 @@ module DotPopper
     # The dark rounded card the screens set their parts on, and the tiles
     # and choices built from it, on whole device pixels.
     class Card < Data.define(:context)
-      G = ::Lota::Graphics
-
       def draw(rect, corner: nil, alpha: 1.0, lit: 0.0, edge: nil)
         pixels = context.pixels
         x, y, width, height = [rect.x, rect.y, rect.width, rect.height].map { pixels.snap(it) }
@@ -89,11 +86,11 @@ module DotPopper
         palette = context.palette
         fill = palette.pill.mix(context.lit.fill, lit)
         context.color(fill, [fill.a, 0.7].max * alpha)
-        G.rectangle(:fill, x, y, width, height, corner, corner, 16)
+        context.rectangle(:fill, x, y, width, height, corner, corner, 16)
         context.color(edge || palette.soft.mix(context.lit.edge, lit), (edge ? 1.0 : 0.3 + (0.7 * lit)) * alpha)
-        G.line_width = pixels.line_width(1)
+        context.line_width = pixels.line_width(1)
         inset = pixels.line_at(x) - x
-        G.rectangle(:line, x + inset, y + inset, width - (2 * inset), height - (2 * inset), corner, corner, 16)
+        context.rectangle(:line, x + inset, y + inset, width - (2 * inset), height - (2 * inset), corner, corner, 16)
       end
     end
 
@@ -101,8 +98,6 @@ module DotPopper
     # +choices+ are [text, chosen?, hover, icon], where +icon+ draws at
     # x, y in a square of the given size, or is nil.
     class ChoiceRow < Data.define(:context)
-      G = ::Lota::Graphics
-
       def draw(frame, rects, choices)
         pixels = context.pixels
         palette = context.palette
@@ -112,10 +107,10 @@ module DotPopper
           x, y, width, height = [inner.x, inner.y, inner.width, inner.height].map { pixels.snap(it) }
           if chosen
             context.color(palette.cream, 0.92 + (0.08 * hover))
-            G.rectangle(:fill, x, y, width, height, height / 2.0, height / 2.0, 32)
+            context.rectangle(:fill, x, y, width, height, height / 2.0, height / 2.0, 32)
           elsif hover.positive?
             context.color(context.lit.fill, context.lit.fill.a * hover)
-            G.rectangle(:fill, x, y, width, height, height / 2.0, height / 2.0, 32)
+            context.rectangle(:fill, x, y, width, height, height / 2.0, height / 2.0, 32)
           end
           label(text, x + (width / 2.0), y + (height / 2.0), height, chosen, icon, width)
         end

@@ -6,17 +6,15 @@ module DotPopper
     # dialog over it: name, how it is earned, and for Pro the day or the
     # progress.
     class AchievementsPainter < Data.define(:context)
-      G = ::Lota::Graphics
-
       def draw(show, layout)
         words = show.words
         Header.new(context:).draw(show, layout, words.button(:achievements_heading))
         context.text(Presentation::AchievementWords.count(show.achievement_count), context.fonts.semibold(16), layout.center_x, layout.heading_y + (layout.heading_size * 0.72), context.palette.soft) if show.achievement_count
         window = show.achievements_layout.window
         pixels = context.pixels
-        G.scissor = pixels.snap(window.x), pixels.snap(window.y), pixels.snap(window.width), pixels.snap(window.height)
+        context.scissor = pixels.snap(window.x), pixels.snap(window.y), pixels.snap(window.width), pixels.snap(window.height)
         show.achievement_cells.each { cell(show, it) }
-        G.scissor = nil
+        context.scissor = nil
         how_to_earn(show, layout) if words.input == Presentation::InputKind::GAMEPAD
       end
 
@@ -42,19 +40,19 @@ module DotPopper
         palette = context.palette
         if earned
           context.color(palette.bright_body.mix(palette.bright_light, 0.2))
-          G.circle(:fill, x, y, radius, 64)
+          context.circle(:fill, x, y, radius, 64)
           context.color(palette.cream)
-          G.line_width = context.pixels.line_width(1)
-          G.circle(:line, x, y, radius, 64)
+          context.line_width = context.pixels.line_width(1)
+          context.circle(:line, x, y, radius, 64)
         else
           context.color(palette.ink_bottom, 0.7)
-          G.circle(:fill, x, y, radius, 64)
+          context.circle(:fill, x, y, radius, 64)
           context.color(palette.soft, 0.45)
-          G.line_width = context.pixels.line_width(1.2)
+          context.line_width = context.pixels.line_width(1.2)
           dashes(x, y, radius)
         end
         context.color(palette.cream, 0.2 * lit)
-        G.circle(:fill, x, y, radius, 64) if lit.positive?
+        context.circle(:fill, x, y, radius, 64) if lit.positive?
         glyph = Presentation::AchievementWords.glyph(id)
         Glyphs.new(context:).draw(glyph, x, y, radius * 1.15, color: earned ? palette.ink_bottom : palette.soft, weight: 2.0)
       end
@@ -77,7 +75,7 @@ module DotPopper
 
           a = i * 2 * Math::PI / segments
           b = (i + 1) * 2 * Math::PI / segments
-          G.line(x + (radius * Math.cos(a)), y + (radius * Math.sin(a)), x + (radius * Math.cos(b)), y + (radius * Math.sin(b)))
+          context.line(x + (radius * Math.cos(a)), y + (radius * Math.sin(a)), x + (radius * Math.cos(b)), y + (radius * Math.sin(b)))
         end
       end
 
@@ -102,10 +100,10 @@ module DotPopper
         count = "#{have} of #{goal}"
         context.text(count, small, rect.right - (small.width(count) / 2.0), rect.y - 16, context.palette.cream)
         context.color(context.palette.ink_bottom, 0.8)
-        G.rectangle(:fill, rect.x, rect.y, rect.width, rect.height, rect.height / 2.0, rect.height / 2.0, 12)
+        context.rectangle(:fill, rect.x, rect.y, rect.width, rect.height, rect.height / 2.0, rect.height / 2.0, 12)
         share = [have.to_f / goal, 1.0].min
         context.color(context.palette.bright_body)
-        G.rectangle(:fill, rect.x, rect.y, [rect.width * share, rect.height].max, rect.height, rect.height / 2.0, rect.height / 2.0, 12) if share.positive?
+        context.rectangle(:fill, rect.x, rect.y, [rect.width * share, rect.height].max, rect.height, rect.height / 2.0, rect.height / 2.0, 12) if share.positive?
       end
 
       def buttons(show, plan)
@@ -135,16 +133,16 @@ module DotPopper
 
       def shade(layout)
         context.color(context.palette.ink_edge, 0.85)
-        G.rectangle(:fill, -1, -1, layout.width + 2, layout.height + 2)
+        context.rectangle(:fill, -1, -1, layout.width + 2, layout.height + 2)
       end
 
       def card(rect)
         corner = 24.0
         context.color(context.palette.ink_top)
-        G.rectangle(:fill, rect.x, rect.y, rect.width, rect.height, corner, corner, 32)
+        context.rectangle(:fill, rect.x, rect.y, rect.width, rect.height, corner, corner, 32)
         context.color(context.palette.soft, 0.3)
-        G.line_width = context.pixels.line_width(1)
-        G.rectangle(:line, rect.x, rect.y, rect.width, rect.height, corner, corner, 32)
+        context.line_width = context.pixels.line_width(1)
+        context.rectangle(:line, rect.x, rect.y, rect.width, rect.height, corner, corner, 32)
       end
     end
   end

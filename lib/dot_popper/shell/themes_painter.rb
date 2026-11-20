@@ -11,8 +11,6 @@ module DotPopper
     # LooksLayout decides where each card goes; this only draws, on whole
     # device pixels.
     class ThemesPainter < Data.define(:context, :dots)
-      G = ::Lota::Graphics
-
       def draw(show, layout)
         plan = show.themes_layout
         Header.new(context:).draw(show, layout, show.words.themes.fetch(:heading))
@@ -40,7 +38,7 @@ module DotPopper
         chosen = theme == show.in_use
         hover = show.hover.level(theme)
         context.color(palette.ink_top)
-        G.rectangle(:fill, rect.x, rect.y, rect.width, rect.height, corner, corner, 32)
+        context.rectangle(:fill, rect.x, rect.y, rect.width, rect.height, corner, corner, 32)
         pair(rect, theme)
         name(show.words.themes.fetch(theme.key), rect, theme)
         shade(rect, corner, palette) unless show.theme_open?(theme)
@@ -51,7 +49,7 @@ module DotPopper
       # A theme neither earned nor in season is dimmed, so what is open is plain.
       def shade(rect, corner, palette)
         context.color(palette.ink_bottom, 0.6)
-        G.rectangle(:fill, rect.x, rect.y, rect.width, rect.height, corner, corner, 32)
+        context.rectangle(:fill, rect.x, rect.y, rect.width, rect.height, corner, corner, 32)
       end
 
       # A mark in a card's top right corner, as the Stats screen's
@@ -84,9 +82,9 @@ module DotPopper
         count = chosen ? 3 : 1
         width = pixels.line_width(count)
         context.color(chosen ? context.palette.cream : context.palette.soft.mix(context.lit.edge, hover), chosen ? 1.0 : 0.55 + (0.45 * hover))
-        G.line_width = width
+        context.line_width = width
         inset = pixels.line_at(rect.x, count) - rect.x
-        G.rectangle(:line, rect.x + inset, rect.y + inset, rect.width - (2 * inset), rect.height - (2 * inset), corner,
+        context.rectangle(:line, rect.x + inset, rect.y + inset, rect.width - (2 * inset), rect.height - (2 * inset), corner,
                     corner, 32)
       end
 
@@ -96,10 +94,10 @@ module DotPopper
         x = context.pixels.snap(rect.right - (size * 0.9))
         y = context.pixels.snap(rect.y + (size * 0.9))
         context.color(context.palette.cream)
-        G.circle(:fill, x, y, size / 2.0, 32)
+        context.circle(:fill, x, y, size / 2.0, 32)
         context.color(palette.ink_bottom)
-        G.line_width = context.pixels.whole(size * 0.12)
-        G.line(x - (size * 0.2), y, x - (size * 0.05), y + (size * 0.16), x + (size * 0.22), y - (size * 0.16))
+        context.line_width = context.pixels.whole(size * 0.12)
+        context.line(x - (size * 0.2), y, x - (size * 0.05), y + (size * 0.16), x + (size * 0.22), y - (size * 0.16))
       end
 
       def snapped(rect)

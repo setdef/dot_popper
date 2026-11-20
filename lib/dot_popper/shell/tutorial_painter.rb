@@ -13,7 +13,6 @@ module DotPopper
     # quads from the light's edge out past the screen's corners, a few one
     # inside the next, so its edge feathers out.
     class TutorialPainter < Data.define(:context)
-      G = ::Lota::Graphics
       SEGMENTS = 64
       LAYERS = 8 # rings in the dim's soft edge
       HUD_LIGHT = 0.8 # the light's reach around a HUD number, in the HUD's height
@@ -73,8 +72,8 @@ module DotPopper
         height = pixels.snap(pill.height + (2 * grow))
         corner = height / 2.0
         context.color(context.palette.gain, alpha * (0.55 + (0.4 * pulse)))
-        G.line_width = pixels.line_width(2)
-        G.rectangle(:line, left, top, width, height, corner, corner, 32)
+        context.line_width = pixels.line_width(2)
+        context.rectangle(:line, left, top, width, height, corner, corner, 32)
       end
 
       # A ring around the row of dots in a row of +size+, hung at +spot+ as
@@ -91,8 +90,8 @@ module DotPopper
         half = (radius * Presentation::Hud::PIP_STEP * (size - 1) / 2.0) + reach
         pulse = (Math.cos((now - notice.at) * 2 * Math::PI * 2.0) + 1) / 2
         context.color(notice.tone == :alarm ? palette.alarm : palette.gain, strength * (0.55 + (0.4 * pulse)))
-        G.line_width = pixels.line_width(2)
-        G.rectangle(:line, pixels.line_at(spot[0] - half, 2), pixels.line_at(spot[1] - reach, 2),
+        context.line_width = pixels.line_width(2)
+        context.rectangle(:line, pixels.line_at(spot[0] - half, 2), pixels.line_at(spot[1] - reach, 2),
                     pixels.snap(2 * half), pixels.snap(2 * reach), reach, reach, 32)
       end
 
@@ -130,7 +129,7 @@ module DotPopper
       # The night's ink over everything but a circle of +light+ around +x+,
       # +y+, darkening over +feather+ to +alpha+.
       def dim_around(x, y, light, feather, alpha)
-        width, height = G.dimensions
+        width, height = context.dimensions
         far = (Math.hypot(width, height) * 1.1) + light + feather
         layer = 1 - ((1 - alpha)**(1.0 / LAYERS))
         context.color(context.palette.ink_bottom, layer)
@@ -142,7 +141,7 @@ module DotPopper
         SEGMENTS.times do |i|
           a = i * step
           b = (i + 1) * step
-          G.polygon(:fill, x + (inner * Math.cos(a)), y + (inner * Math.sin(a)), x + (outer * Math.cos(a)),
+          context.polygon(:fill, x + (inner * Math.cos(a)), y + (inner * Math.sin(a)), x + (outer * Math.cos(a)),
                     y + (outer * Math.sin(a)), x + (outer * Math.cos(b)), y + (outer * Math.sin(b)),
                     x + (inner * Math.cos(b)), y + (inner * Math.sin(b)))
         end
