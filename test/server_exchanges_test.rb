@@ -16,6 +16,7 @@ require "dot_popper/presentation"
 # fails it when the server has changed what it answers.
 class ServerExchangesTest < Minitest::Test
   C = DotPopper::Monetization::Continuity
+  L = DotPopper::Monetization::LicenseKeys
   Groups = DotPopper::Gameplay::Groups
   Network = DotPopper::Network
   COPY = File.expand_path("fixtures/server/exchanges.json", __dir__)
@@ -61,10 +62,10 @@ class ServerExchangesTest < Minitest::Test
   def test_the_values_both_sides_hold_are_the_servers
     values = RECORD.fetch("values")
 
-    assert_equal [C::Certificate::PROOF, C::Certificate::SIGNING_LABEL, C::LicenseKey::LABEL, C::SignedAnswers::LICENSE],
+    assert_equal [C::Certificate::PROOF, C::Certificate::SIGNING_LABEL, L::LicenseKey::LABEL, C::SignedAnswers::LICENSE],
                  values.fetch("labels").values_at("proof", "certificate", "license_key", "license_check").map { C.label(it) }
     assert_equal [C::Certificate::SIZE, C::Certificate::MAGIC, C::Certificate::VERSION], values.fetch("certificate").values_at("size", "magic", "version")
-    assert_equal [C::LicenseKey::SIZE, C::LicenseKey::VERSION, C::LicenseKey::PREFIX, C::LicenseKey::ALPHABET, C::LicenseKey::LETTERS],
+    assert_equal [L::LicenseKey::SIZE, L::LicenseKey::VERSION, L::LicenseKey::PREFIX, L::LicenseKey::ALPHABET, L::LicenseKey::LETTERS],
                  values.fetch("license_key").values_at("size", "version", "prefix", "alphabet", "letters")
     assert_equal C::SignedAnswers::VERDICTS, values.fetch("verdicts")
     assert_equal Groups::Unsent::HIGHEST_SCORE, values.fetch("highest_score")
@@ -119,8 +120,8 @@ class ServerExchangesTest < Minitest::Test
       exchange("the device asks again after losing the answer"), exchange("another device enters the same key"), exchange("the first device learns the key has moved")
     text = entering.dig("request", "body", "key")
     secrets = [entering, checking, moving].map { H[body(it).fetch(it.equal?(entering) ? "secret" : "next")] }
-    first = C::License.new(DotPopper::MemoryFile.new, pins:, fresh: -> { secrets.shift })
-    second = C::License.new(DotPopper::MemoryFile.new, pins:, fresh: -> { H[body(elsewhere).fetch("secret")] })
+    first = L::License.new(DotPopper::MemoryFile.new, pins:, fresh: -> { secrets.shift })
+    second = L::License.new(DotPopper::MemoryFile.new, pins:, fresh: -> { H[body(elsewhere).fetch("secret")] })
 
     assert_equal :entered, first.enter(text)
     assert_equal :current, ask(server, first, entering)
@@ -135,7 +136,7 @@ class ServerExchangesTest < Minitest::Test
     assert_predicate second, :pro?
     [entering, checking, again, elsewhere, moving].each do |answered|
       verdict = answered.dig("reply", "body", "verdict")
-      assert_equal answered["signed"], C.hex(C::SignedAnswers.verdict_message(verdict, C::LicenseKey.parse(text).id, nonce_of(answered)))
+      assert_equal answered["signed"], C.hex(C::SignedAnswers.verdict_message(verdict, L::LicenseKey.parse(text).id, nonce_of(answered)))
     end
   end
 

@@ -88,7 +88,7 @@ class BuyProTest < Minitest::Test
   end
 
   def test_a_license_key_entered_is_pro_arriving_too
-    license = DotPopper::Monetization::Continuity::License.new(DotPopper::MemoryFile.new, pins: DotPopper::Monetization::Continuity::TEST_PINS)
+    license = DotPopper::Monetization::LicenseKeys::License.new(DotPopper::MemoryFile.new, pins: DotPopper::Monetization::Continuity::TEST_PINS)
     entitlement = DotPopper::Monetization::Entitlement.new(license:)
     entitlement.subscribe(DotPopper::UseCases::BuyPro.new(store: @store, entitlement:, game_flow: @game_flow, achievements: @achievements,
                                                           friend_groups: @groups))

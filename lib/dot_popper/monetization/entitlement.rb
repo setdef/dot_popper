@@ -7,7 +7,7 @@ module DotPopper
     # (ADR-0010): a store copy's
     # receipt, which the store hands over at each launch and #verify_receipt verifies
     # (Receipt), or a website copy's license key (+license+,
-    # Continuity::License), whose signature is checked against the pinned
+    # LicenseKeys::License), whose signature is checked against the pinned
     # keys. Pro features ask +pro?+ and nothing else.
     #
     # Pro arriving during a run, by a receipt that verifies or a license key
@@ -32,7 +32,7 @@ module DotPopper
       # (+platform+, a Platform), by DESKTOP_PRO.
       def self.forced?(platform: nil) = DESKTOP_PRO && !platform.nil? && !platform.phone_host?
 
-      # +license+ (Continuity::License, or anything that answers pro?) is a
+      # +license+ (LicenseKeys::License, or anything that answers pro?) is a
       # website copy's. +trust+ (Receipt::Trust) is whose receipts this build
       # accepts, as the composition root chooses it: its own store's, and
       # none by default.
@@ -68,7 +68,7 @@ module DotPopper
         @proven
       end
 
-      # Enters +text+ as a website copy's license key (Continuity::License#enter),
+      # Enters +text+ as a website copy's license key (LicenseKeys::License#enter),
       # and answers what that answered: :entered (Pro from now on), :same, or
       # :invalid, as with no license to enter it in.
       def enter(text)

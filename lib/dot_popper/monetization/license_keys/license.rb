@@ -2,7 +2,7 @@
 
 module DotPopper
   module Monetization
-    module Continuity
+    module LicenseKeys
       # This device's license key, if a player entered one, and its place in
       # "one key, one device at a time". The key gives Pro the moment it
       # verifies, offline (LicenseKey#valid?), and nothing but a signed
@@ -30,7 +30,7 @@ module DotPopper
         # is never sent.
         def self.kept_in(taken) = taken ? yield : MemoryFile.new
 
-        def initialize(file, pins: PINNED, fresh: -> { SignedAnswers.fresh })
+        def initialize(file, pins: Continuity::PINNED, fresh: -> { Continuity::SignedAnswers.fresh })
           @file = file
           @pins = pins
           @fresh = fresh
@@ -83,7 +83,7 @@ module DotPopper
           current = key or return nil
           return nil unless reply.ok? && due.body[:secret] == @lines["secret"]
 
-          verdict = SignedAnswers.verdict(reply.body, current.id, nonce, @pins)
+          verdict = Continuity::SignedAnswers.verdict(reply.body, current.id, nonce, @pins)
           case verdict
           when :current then accepted(due)
           when :moved then moved

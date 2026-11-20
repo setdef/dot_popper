@@ -36,7 +36,7 @@ module DotPopper
         }.freeze
 
         # The +index+th key signed by +signer+ (:license, :root or :online).
-        def self.license_key(signer = :license, index = 0) = LicenseKey.parse(LICENSE_KEYS.fetch(signer).fetch(index))
+        def self.license_key(signer = :license, index = 0) = LicenseKeys::LicenseKey.parse(LICENSE_KEYS.fetch(signer).fetch(index))
 
         # The online key's certificate, by the test root.
         def self.online_certificate

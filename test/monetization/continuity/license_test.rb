@@ -7,6 +7,7 @@ require "uri"
 # gone, played against the test build's fake server and fakes of the ports.
 class LicenseTest < Minitest::Test
   C = DotPopper::Monetization::Continuity
+  L = DotPopper::Monetization::LicenseKeys
   Memory = DotPopper::MemoryFile
   Reply = DotPopper::Network::Reply
   TODAY = Date.new(2026, 11, 9)
@@ -18,7 +19,7 @@ class LicenseTest < Minitest::Test
 
   # A device: its saved license, gone-ness and a watch over +server+.
   def device(server = C::FakeSetdef.new(@ledger), connectivity: server, today: TODAY)
-    license = C::License.new(Memory.new, pins: C::TEST_PINS)
+    license = L::License.new(Memory.new, pins: C::TEST_PINS)
     C::Watch.new(server:, connectivity:, gone: C::Gone.new(Memory.new), license:, today: -> { today }, pins: C::TEST_PINS)
   end
 
@@ -43,15 +44,15 @@ class LicenseTest < Minitest::Test
   # choice, test/composition/root_test.rb).
   def test_only_a_build_that_takes_license_keys_keeps_one_in_license_txt
     file = Memory.new
-    kept = C::License.kept_in(false) { flunk("opened license.txt") }
+    kept = L::License.kept_in(false) { flunk("opened license.txt") }
 
     refute_nil kept
     refute_same file, kept
-    assert_same file, C::License.kept_in(true) { file }
+    assert_same file, L::License.kept_in(true) { file }
   end
 
   def test_a_valid_key_is_pro_at_once_offline_and_a_bad_one_is_refused
-    license = C::License.new(Memory.new, pins: C::TEST_PINS)
+    license = L::License.new(Memory.new, pins: C::TEST_PINS)
 
     assert_equal :invalid, license.enter("DP-NOT-A-KEY")
     assert_equal :invalid, license.enter(C::TestKeys.license_key(:online).text)
@@ -65,12 +66,12 @@ class LicenseTest < Minitest::Test
   # saved key is verified again at each launch, offline.
   def test_license_txt_is_pro_only_while_it_holds_a_key_that_verifies
     saved = Memory.new
-    C::License.new(saved, pins: C::TEST_PINS).enter(@key.text)
+    L::License.new(saved, pins: C::TEST_PINS).enter(@key.text)
 
-    assert_predicate C::License.new(Memory.new(saved.read), pins: C::TEST_PINS), :pro?, "a relaunch, offline"
-    refute_predicate C::License.new(Memory.new(saved.read), pins: C::PINNED), :pro?, "a file build"
+    assert_predicate L::License.new(Memory.new(saved.read), pins: C::TEST_PINS), :pro?, "a relaunch, offline"
+    refute_predicate L::License.new(Memory.new(saved.read), pins: C::PINNED), :pro?, "a file build"
     ["key: pro\n", "pro: yes\nregistered: yes\n", "key: #{@key.text.sub(/.\z/) { it == "0" ? "1" : "0" }}\n", "4"].each do |text|
-      refute_predicate C::License.new(Memory.new(text), pins: C::TEST_PINS), :pro?, text
+      refute_predicate L::License.new(Memory.new(text), pins: C::TEST_PINS), :pro?, text
     end
   end
 

@@ -285,7 +285,7 @@ class RootTest < Minitest::Test
 
   # A license file on disk is never read in an app store's build, so it
   # grants nothing and the watch owes the server no request about it
-  # (Root.license_keys?, Continuity::License.kept_in): an app store's copy
+  # (Root.license_keys?, LicenseKeys::License.kept_in): an app store's copy
   # never accepts, keeps, verifies or sends a website license key (Apple
   # 3.1.1; Google's billing rules).
   def test_an_app_stores_build_never_reads_a_license_key

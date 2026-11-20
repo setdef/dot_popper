@@ -16,4 +16,4 @@ module DotPopper
   end
 end
 
-%w[receipt entitlement store website_store free_games continuity].each { require_relative "monetization/#{it}" }
+%w[receipt entitlement store website_store free_games continuity license_keys].each { require_relative "monetization/#{it}" }

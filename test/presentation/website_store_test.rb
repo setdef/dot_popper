@@ -19,13 +19,14 @@ class WebsiteStoreTest < Minitest::Test
   FakeCheckout = DotPopper::Monetization::FakeCheckout
 
   C = DotPopper::Monetization::Continuity
+  L = DotPopper::Monetization::LicenseKeys
   Memory = DotPopper::MemoryFile
 
   def setup
     @clipboard = MemoryClipboard.new
     @gone_store = Memory.new
     @gone = C::Gone.new(@gone_store)
-    @license = C::License.new(Memory.new, pins: C::TEST_PINS)
+    @license = L::License.new(Memory.new, pins: C::TEST_PINS)
     @entitlement = DotPopper::Monetization::Entitlement.new(license: @license)
     @entered = 0
     @store = WebsiteStore.new(checkout: FakeCheckout.new(clipboard: @clipboard), entitlement: @entitlement, gone: @gone, clipboard: @clipboard,

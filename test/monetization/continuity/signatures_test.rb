@@ -7,6 +7,7 @@ require "test_helper"
 # test keys.
 class SignaturesTest < Minitest::Test
   C = DotPopper::Monetization::Continuity
+  L = DotPopper::Monetization::LicenseKeys
   H = ->(hex) { [hex].pack("H*") }
 
   # The server's published test vector, public values only.
@@ -65,9 +66,9 @@ class SignaturesTest < Minitest::Test
     text = key.text
 
     assert_match(/\ADP-(?:[0-9A-Z]{5}-){25}[0-9A-Z]{5}\z/, text)
-    assert_equal key, C::LicenseKey.parse(text)
-    assert_equal key, C::LicenseKey.parse("  #{text.downcase.delete("-").scan(/.{1,40}/).join("\r\n")}\n")
-    assert_equal key, C::LicenseKey.parse(text.delete_prefix("DP-").tr("0", "O"))
+    assert_equal key, L::LicenseKey.parse(text)
+    assert_equal key, L::LicenseKey.parse("  #{text.downcase.delete("-").scan(/.{1,40}/).join("\r\n")}\n")
+    assert_equal key, L::LicenseKey.parse(text.delete_prefix("DP-").tr("0", "O"))
     assert key.valid?(C::TEST_PINS)
   end
 
@@ -84,7 +85,7 @@ class SignaturesTest < Minitest::Test
   def test_text_that_is_no_key_parses_to_nothing
     key = C::TestKeys.license_key
 
-    ["", "hello", "A" * 130, "U" * 130, nil, key.text.sub(/.\z/, "Z"), key.text[0..-2]].each { assert_nil C::LicenseKey.parse(it) }
+    ["", "hello", "A" * 130, "U" * 130, nil, key.text.sub(/.\z/, "Z"), key.text[0..-2]].each { assert_nil L::LicenseKey.parse(it) }
   end
 
   def test_a_verdict_is_read_only_for_its_key_and_nonce
@@ -121,7 +122,7 @@ class SignaturesTest < Minitest::Test
   # The server's license-key test vector signs with RFC 8032's first test
   # key, which is public and pinned by no build.
   def test_the_server_license_key_test_vector_is_not_valid_against_the_real_pins
-    vector = C::LicenseKey.parse("DP-04002-0G30G-2GC1R-81450-P30D1-R7SFX-0HGSD-6SGPK-K2W19-V4W1S-HG83P-HYKNB-CE1KN-Q1F61-356YC-HEY9G-RB61G-ZG7MQ-0YPZS-A2015-PT5GT-M3X50-KSA5M-FC841-KPZC6-WXQ0W")
+    vector = L::LicenseKey.parse("DP-04002-0G30G-2GC1R-81450-P30D1-R7SFX-0HGSD-6SGPK-K2W19-V4W1S-HG83P-HYKNB-CE1KN-Q1F61-356YC-HEY9G-RB61G-ZG7MQ-0YPZS-A2015-PT5GT-M3X50-KSA5M-FC841-KPZC6-WXQ0W")
 
     assert_equal H["000102030405060708090a0b0c0d0e0f"], vector.id
     assert vector.valid?(C::Pins.new(roots: [], license_keys: [H["d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a"]]))

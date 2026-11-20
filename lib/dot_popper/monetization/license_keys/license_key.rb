@@ -2,7 +2,7 @@
 
 module DotPopper
   module Monetization
-    module Continuity
+    module LicenseKeys
       # A license key: what a website purchase of Pro sends by email. Version
       # 1 is 81 bytes: the version, a random 16-byte +id+, and a license-
       # signing key's Ed25519 +signature+ over LABEL and those first 17
@@ -44,7 +44,7 @@ module DotPopper
         end
 
         # Whether a license-signing key that +pins+ trust signed it.
-        def valid?(pins = PINNED) = pins.license_keys.any? { Ed25519.verify(it, signature, LABEL + bytes[0, 17].to_s) }
+        def valid?(pins = Continuity::PINNED) = pins.license_keys.any? { Continuity::Ed25519.verify(it, signature, LABEL + bytes[0, 17].to_s) }
       end
     end
   end

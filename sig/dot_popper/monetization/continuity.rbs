@@ -29,12 +29,6 @@ module DotPopper
       module TestKeys
         LICENSE: String
       end
-
-      class LicenseKey
-        def self.issue: (String seed) -> LicenseKey
-
-        def text: () -> String
-      end
     end
   end
 end

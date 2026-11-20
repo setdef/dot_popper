@@ -148,7 +148,7 @@ class GroupPanelTest < Minitest::Test
   end
 
   # A license key that holds Pro until it is gone, as when it moves to
-  # another device (Continuity::License).
+  # another device (LicenseKeys::License).
   License = Struct.new(:pro?)
 
   # Pro gone while the code pad is open: Join sends nothing, and the

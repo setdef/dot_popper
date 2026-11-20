@@ -6,7 +6,8 @@
 # pattern matching (case/in) entirely, so that is an error here too,
 # rather than a part of the rules nobody checks. The presentation, the
 # shell and the composition root are not typed yet; the shell would also
-# need Lota's signatures. Nor are Monetization's continuity/ and receipt/,
+# need Lota's signatures. Nor are Monetization's continuity/, license_keys/
+# and receipt/,
 # the network client's network/, or the test build's part.
 #
 # Each area is a target of its own, which sees only its own signatures

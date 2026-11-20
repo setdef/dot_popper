@@ -6,7 +6,7 @@ module DotPopper
     # itch.io, Homebrew, winget, a Linux package or an APK. Buy opens a
     # checkout in a web browser, which sells a license key by email, and
     # Paste license key enters it (+entitlement+, Entitlement#enter, into
-    # its Continuity::License), so it answers the
+    # its LicenseKeys::License), so it answers the
     # Store's methods and two of its own: #keys?, that a key is how
     # Pro arrives here, and #paste. It has no Restore: the key is the
     # purchase, and it works on any device. While setdef is gone (+gone+,

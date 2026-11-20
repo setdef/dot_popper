@@ -50,7 +50,7 @@ MAKE_PROOFS = <<~RUBY
   receipt = DotPopper::Monetization::Receipt.issue
   controls = {
     "this Ruby verifies Ed25519" => c::Ed25519.available?,
-    "a key signed by the test key unlocks a test build" => c::LicenseKey.parse(keys[1])&.valid?(c::TEST_PINS) == true,
+    "a key signed by the test key unlocks a test build" => DotPopper::Monetization::LicenseKeys::LicenseKey.parse(keys[1])&.valid?(c::TEST_PINS) == true,
     "a test build takes a proof certified by the test root" =>
       !c::Certificate.verified(certificate, roots: c::TEST_PINS.roots, purpose: c::Certificate::PROOF).nil?,
     "the fake store's receipt proves Pro in a test build" => DotPopper::Monetization::Entitlement.new(trust: DotPopper::Monetization::Receipt::TEST).verify_receipt(receipt) == true
@@ -117,7 +117,7 @@ end
 # the repository's code: the same proof does grant in a test build.
 proofs.fetch("controls").each { |what, held| check.call(what) { held } }
 check.call("no license key signed by a test key unlocks it") do
-  !defined?(c::LicenseKey) || proofs.fetch("keys").none? { c::LicenseKey.parse(it)&.valid?(pins) }
+  !defined?(DotPopper::Monetization::LicenseKeys::LicenseKey) || proofs.fetch("keys").none? { DotPopper::Monetization::LicenseKeys::LicenseKey.parse(it)&.valid?(pins) }
 end
 check.call("it takes no proof certified by the test root") do
   c::Certificate.verified([proofs.fetch("certificate")].pack("H*"), roots: pins.roots, purpose: c::Certificate::PROOF).nil?

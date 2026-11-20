@@ -95,7 +95,7 @@ module DotPopper
       # Whether a build takes website license keys: the website's does; an
       # app store's copy never accepts, keeps, verifies or sends one (Apple
       # 3.1.1; Google's billing rules), so it never reads license.txt
-      # (Continuity::License.kept_in).
+      # (LicenseKeys::License.kept_in).
       def self.license_keys?(settings) = settings.channel == ReleaseEngineering::Build::WEBSITE
 
       # Starts what reaches past this process: the first request for theme
@@ -185,7 +185,7 @@ module DotPopper
         # What this build trusts, and where it keeps a license key, by the
         # channel alone (ADR-0010).
         pins = self.class.pins(settings)
-        license = Monetization::Continuity::License.new(Monetization::Continuity::License.kept_in(self.class.license_keys?(settings)) { file("license.txt") }, pins:)
+        license = Monetization::LicenseKeys::License.new(Monetization::LicenseKeys::License.kept_in(self.class.license_keys?(settings)) { file("license.txt") }, pins:)
         @watch = watch_for(license, pins)
         @entitlement = Monetization::Entitlement.new(forced: self.class.forced_pro?(settings, platform), license:,
                                                      trust: self.class.receipt_trust(settings))
