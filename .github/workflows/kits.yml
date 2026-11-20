@@ -20,8 +20,10 @@
 #   project for the Simulator and, unsigned, for devices, and runs the
 #   autoplay check of doc/ios.md.
 #
-# The Android kit has a workflow of its own (android.yml). A v* tag
-# attaches the kits to the tag's GitHub Release.
+# Every kit's app carries the version the tag names (before 1.0.0;
+# script/release_version.rb), stamped into this run's fledge.yml, which its
+# header names too. The Android kit has a workflow of its own
+# (android.yml). A v* tag attaches the kits to the tag's GitHub Release.
 
 name: Kits
 
@@ -66,12 +68,6 @@ jobs:
           windows-toolchain: default
           bundler: none
       - uses: ./.github/actions/windows-ruby
-
-      # The fuse action takes the app's version from fledge.yml; a tag's
-      # build takes the tag's (playtest/kit.rb's BuildVersion), so the
-      # header and lota fuse --app-version name it.
-      - name: Take the version from the tag
-        run: ruby script/playtest_kit.rb tag-version "$GITHUB_REF_NAME" fledge.yml
 
       - uses: ./.github/actions/fuse
         with:
@@ -189,12 +185,6 @@ jobs:
         with:
           ruby-version: .ruby-version
 
-      # The fuse action takes the app's version from fledge.yml; a tag's
-      # build takes the tag's (playtest/kit.rb's BuildVersion), so the
-      # header and lota fuse --app-version name it.
-      - name: Take the version from the tag
-        run: ruby script/playtest_kit.rb tag-version "$GITHUB_REF_NAME" fledge.yml
-
       - uses: ./.github/actions/fuse
         with:
           platform: arm64-darwin
@@ -265,12 +255,6 @@ jobs:
       - uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
         with:
           ruby-version: .ruby-version
-
-      # The fuse action takes the app's version from fledge.yml; a tag's
-      # build takes the tag's (playtest/kit.rb's BuildVersion), so the
-      # header and lota fuse --app-version name it.
-      - name: Take the version from the tag
-        run: ruby script/playtest_kit.rb tag-version "$GITHUB_REF_NAME" fledge.yml
 
       - uses: ./.github/actions/fuse
         with:
@@ -416,7 +400,9 @@ jobs:
           gem "lota", path: "$LOTA_GEM"
           gem "fledge", git: "https://github.com/setdef/Fledge", tag: "$FLEDGE_TAG", group: :development
           EOF
-          ruby script/playtest_kit.rb tag-version "$GITHUB_REF_NAME" fledge.yml
+          # The tag's version, as the fuse action stamps it for the desktop
+          # kits (script/release_version.rb).
+          ruby script/release_version.rb stamp "$GITHUB_REF_NAME"
           ruby -ryaml -e '
             source = YAML.load_file("fledge.yml")
             program = source.fetch("programs").first

@@ -3,7 +3,9 @@
 # vendor/cache and checked against the SHA256SUMS of Lota's release, is
 # installed, and lota fuse builds the app into $RUNNER_TEMP/fuse. It also
 # writes $RUNNER_TEMP/build.txt, the lines a kit names its build by, and
-# sets APP_VERSION from fledge.yml.
+# sets APP_VERSION: before 1.0.0 a playtest tag's own, stamped into this
+# working tree's fledge.yml and doc/privacy.json first; otherwise
+# fledge.yml's, which a website tag must match (script/release_version.rb).
 name: lota fuse
 description: Fuse Dot Popper for this runner's platform with Lota's release gem
 inputs:
@@ -18,7 +20,7 @@ runs:
       env:
         PLATFORM: ${{ inputs.platform }}
       run: |
-        version=$(ruby -ryaml -e 'print YAML.load_file("fledge.yml").fetch("version")')
+        version=$(ruby script/release_version.rb stamp "$GITHUB_REF_NAME" | tr -d '\r')
         echo "APP_VERSION=$version" >> "$GITHUB_ENV"
         {
           echo "Dot Popper $GITHUB_REF_NAME, commit $GITHUB_SHA, version $version"
