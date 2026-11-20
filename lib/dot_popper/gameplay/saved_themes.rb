@@ -67,10 +67,10 @@ module DotPopper
         true
       end
 
-      # Hears Continuity::Gone: each check that leaves setdef gone opens the
+      # Hears whether setdef is there (SetdefGone, SetdefHere): each check that leaves setdef gone opens the
       # themes whose dates have passed, once it has been gone long enough.
       def call(event)
-        open_by_date(event.today, event.days) if event.is_a?(Monetization::Continuity::SetdefGone)
+        open_by_date(event.today, event.days) if event.is_a?(SetdefGone)
       end
 
       # Opens every theme whose date has come by +today+, once setdef has

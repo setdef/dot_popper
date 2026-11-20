@@ -33,7 +33,7 @@ module DotPopper
 
       def release: (Array[String | Symbol] keys) -> bool
 
-      def call: (Monetization::Continuity::SetdefGone | Monetization::Continuity::SetdefHere event) -> void
+      def call: (setdef_event event) -> void
 
       def open_by_date: (Date today, Integer gone_days) -> bool
 

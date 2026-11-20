@@ -3,7 +3,8 @@
 module DotPopper
   module Gameplay
     # The server friend groups and themes use, which a player may change
-    # only while setdef is gone (+gone+, Continuity::Gone), to one someone
+    # only while setdef is gone (+gone+ as the game starts, and then as it
+    # hears SetdefGone and SetdefHere), to one someone
     # else runs from the game's published API. The address comes from the
     # clipboard, so nothing is typed, and must be HTTPS. It is kept in the
     # +file+ (server.txt) and used from the next start, since a group
@@ -23,7 +24,7 @@ module DotPopper
       attr_reader :status
 
       # Whether Settings offers Change Server.
-      def offered? = @gone.gone?
+      def offered? = @gone
 
       # The replacement's address, or nil for setdef's own.
       def address
@@ -59,10 +60,15 @@ module DotPopper
         reset if !offered? && address
       end
 
-      # Hears Continuity::Gone: once setdef answers again, a chosen server
-      # is forgotten, and the game returns to setdef's.
+      # Hears whether setdef is there: once setdef answers again, a chosen
+      # server is forgotten, and the game returns to setdef's.
       def call(event)
-        forget if event.is_a?(Monetization::Continuity::SetdefHere)
+        case event
+        when SetdefGone then @gone = true
+        when SetdefHere
+          @gone = false
+          forget
+        end
       end
 
       # Whether +text+ is one HTTPS address with a host, and nothing else.

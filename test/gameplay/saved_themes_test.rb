@@ -8,7 +8,8 @@ require "test_helper"
 class SavedThemesTest < Minitest::Test
   Memory = DotPopper::Gameplay::ScoreRecord::Memory
   Theme = DotPopper::Gameplay::Theme
-  Continuity = DotPopper::Monetization::Continuity
+  Gone = DotPopper::Gameplay::SetdefGone
+  Here = DotPopper::Gameplay::SetdefHere
 
   def setup
     @file = Memory.new
@@ -128,17 +129,16 @@ class SavedThemesTest < Minitest::Test
 
   def test_a_check_that_leaves_setdef_gone_long_enough_opens_themes_by_their_dates
     t = saved_themes
-    gone = Continuity::Gone.new(Memory.new).subscribe(t)
-    gone.heard(:gone, Date.new(2027, 1, 1))
+    t.call(Gone.new(since: Date.new(2027, 1, 1), today: Date.new(2027, 1, 1)))
     assert_equal [:classic], t.choices
 
-    gone.heard(:unknown, Date.new(2027, 7, 1))
+    t.call(Gone.new(since: Date.new(2027, 1, 1), today: Date.new(2027, 7, 1)))
     assert_includes t.choices, :ghost
   end
 
   def test_setdef_answering_opens_nothing
     t = saved_themes
-    t.call(Continuity::SetdefHere.new)
+    t.call(Here.new)
     assert_equal [:classic], t.choices
   end
 end

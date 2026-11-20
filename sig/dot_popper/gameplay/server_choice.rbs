@@ -9,7 +9,7 @@ module DotPopper
 
       @file: ScoreRecord::_SaveFile
 
-      @gone: Monetization::Continuity::Gone
+      @gone: bool
 
       @clipboard: _Clipboard
 
@@ -17,7 +17,7 @@ module DotPopper
 
       attr_reader status: (:chosen | :not_https | :empty)?
 
-      def initialize: (ScoreRecord::_SaveFile file, gone: Monetization::Continuity::Gone, clipboard: _Clipboard) -> void
+      def initialize: (ScoreRecord::_SaveFile file, gone: bool, clipboard: _Clipboard) -> void
 
       def offered?: () -> bool
 
@@ -31,7 +31,7 @@ module DotPopper
 
       def forget: () -> void
 
-      def call: (Monetization::Continuity::SetdefGone | Monetization::Continuity::SetdefHere event) -> void
+      def call: (setdef_event event) -> void
 
       def self.https?: (String text) -> bool
     end

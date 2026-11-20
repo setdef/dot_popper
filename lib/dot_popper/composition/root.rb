@@ -3,6 +3,7 @@
 require "uri"
 require_relative "../presentation"
 require_relative "developer_settings"
+require_relative "setdef_adapter"
 require_relative "use_cases"
 
 module DotPopper
@@ -150,12 +151,12 @@ module DotPopper
         @watch = watch_for(license, pins)
         @entitlement = Monetization::Entitlement.new(forced: Monetization::Entitlement.forced?(settings.env, platform:), license:, trust: Monetization::Receipt.trusted(channel))
         clipboard = @engine.clipboard
-        @server_choice = Gameplay::ServerChoice.new(file("server.txt"), gone: @gone, clipboard:)
+        @server_choice = Gameplay::ServerChoice.new(file("server.txt"), gone: @gone.gone?, clipboard:)
         saved_themes = Gameplay::SavedThemes.new(file("themes.txt"))
         use_theme = UseCases::UseTheme.new(saved_themes:, entitlement:)
         use_fixture(saved_themes, use_theme)
         saved_themes.open_by_date(today.call, @gone.days(today.call))
-        @gone.subscribe(@server_choice).subscribe(saved_themes)
+        @gone.subscribe(SetdefAdapter.new(@server_choice, saved_themes))
         @theme_releases = theme_releases_for(saved_themes)
         @context = @engine.context(shaders: !flag?("DOT_POPPER_NO_SHADERS"))
         current = Style::THEMES.find { it.key == use_theme.current }

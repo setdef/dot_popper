@@ -50,10 +50,6 @@ class AreasTest < Minitest::Test
   # [file, the constant it names] => [times named, the step of the
   # refactoring list that removes it].
   BREACHES = {
-    # "setdef is gone" is Monetization's event, which Gameplay is to hear
-    # through a port of its own (step 3.8).
-    ["lib/dot_popper/gameplay/saved_themes.rb", "DotPopper::Monetization::Continuity::SetdefGone"] => [1, "3.8"],
-    ["lib/dot_popper/gameplay/server_choice.rb", "DotPopper::Monetization::Continuity::SetdefHere"] => [1, "3.8"],
     # The save file kept in memory is the score record's (step 2.3).
     ["lib/dot_popper/monetization/free_games.rb", "DotPopper::Gameplay::ScoreRecord::Memory"] => [1, "2.3"],
     ["lib/dot_popper/monetization/continuity/license.rb", "DotPopper::Gameplay::ScoreRecord::Memory"] => [1, "2.3"],

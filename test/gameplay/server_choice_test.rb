@@ -7,6 +7,8 @@ require "test_helper"
 class ServerChoiceTest < Minitest::Test
   Memory = DotPopper::Gameplay::ScoreRecord::Memory
   OWN = "https://server.dot-popper.setdef.com"
+  Gone = DotPopper::Gameplay::SetdefGone
+  JAN1 = Date.new(2027, 1, 1)
 
   class Clipboard
     attr_accessor :text
@@ -16,9 +18,8 @@ class ServerChoiceTest < Minitest::Test
 
   def setup
     @file = Memory.new
-    @gone = DotPopper::Monetization::Continuity::Gone.new(Memory.new)
     @clipboard = Clipboard.new
-    @choice = DotPopper::Gameplay::ServerChoice.new(@file, gone: @gone, clipboard: @clipboard)
+    @choice = DotPopper::Gameplay::ServerChoice.new(@file, gone: false, clipboard: @clipboard)
   end
 
   def test_while_setdef_answers_nothing_is_offered_and_setdefs_server_is_used
@@ -28,8 +29,18 @@ class ServerChoiceTest < Minitest::Test
     assert_equal OWN, @choice.server_url(OWN)
   end
 
+  # setdef found gone before this launch: offered from the start, until
+  # setdef answers.
+  def test_setdef_gone_as_the_game_starts_offers_change_server_until_setdef_answers
+    choice = DotPopper::Gameplay::ServerChoice.new(@file, gone: true, clipboard: @clipboard)
+    assert_predicate choice, :offered?
+
+    choice.call(DotPopper::Gameplay::SetdefHere.new)
+    refute_predicate choice, :offered?
+  end
+
   def test_while_setdef_is_gone_a_pasted_https_address_is_kept_and_used
-    @gone.heard(:gone, Date.new(2027, 1, 1))
+    @choice.call(Gone.new(since: JAN1, today: JAN1))
     assert_predicate @choice, :offered?
     assert_equal OWN, @choice.server_url(OWN)
 
@@ -46,21 +57,20 @@ class ServerChoiceTest < Minitest::Test
   end
 
   def test_when_setdef_answers_again_a_chosen_server_is_forgotten
-    @gone.heard(:gone, Date.new(2027, 1, 1))
+    @choice.call(Gone.new(since: JAN1, today: JAN1))
     @clipboard.text = "https://groups.example.org"
     @choice.paste
-    @gone.subscribe(@choice)
 
-    @gone.heard(:unknown, Date.new(2027, 1, 2))
+    @choice.call(Gone.new(since: JAN1, today: JAN1 + 1))
     assert_equal "https://groups.example.org", @choice.address, "kept while setdef is still gone"
-    @gone.heard(:here, Date.new(2027, 1, 3))
+    @choice.call(DotPopper::Gameplay::SetdefHere.new)
     assert_nil @choice.address
     assert_equal "", @file.read
     assert_equal OWN, @choice.server_url(OWN)
   end
 
   def test_a_chosen_server_is_forgotten_only_once_setdef_is_back
-    @gone.heard(:gone, Date.new(2027, 1, 1))
+    @choice.call(Gone.new(since: JAN1, today: JAN1))
     @clipboard.text = "https://groups.example.org"
     @choice.paste
 
@@ -69,7 +79,7 @@ class ServerChoiceTest < Minitest::Test
   end
 
   def test_reset_goes_back_to_setdefs_server
-    @gone.heard(:gone, Date.new(2027, 1, 1))
+    @choice.call(Gone.new(since: JAN1, today: JAN1))
     @clipboard.text = "https://groups.example.org"
     @choice.paste
     @choice.reset

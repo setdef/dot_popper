@@ -25,10 +25,7 @@ end
 # Gameplay and Metagame names nothing of Monetization or Release
 # Engineering.
 target :gameplay do
-  signature(*SHARED, "sig/dot_popper/gameplay",
-            # Gameplay hears "setdef is gone" as Monetization's own events
-            # until it has a port of its own (step 3.8).
-            "sig/dot_popper/monetization/continuity.rbs")
+  signature(*SHARED, "sig/dot_popper/gameplay")
   LIBRARIES.each { library it }
   check "lib/dot_popper/gameplay/**/*.rb"
   configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)

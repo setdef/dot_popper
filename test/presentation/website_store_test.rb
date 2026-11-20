@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "presentation_helper"
+require "dot_popper/composition/setdef_adapter"
 require "platforms_helper"
 
 # Selling Pro to copies no store controls: Buy reaches a checkout, Paste
@@ -29,7 +30,8 @@ class WebsiteStoreTest < Minitest::Test
     @entered = 0
     @store = WebsiteStore.new(checkout: FakeCheckout.new(clipboard: @clipboard), entitlement: @entitlement, gone: @gone, clipboard: @clipboard,
                               entered: -> { @entered += 1 })
-    @choice = DotPopper::Gameplay::ServerChoice.new(Memory.new, gone: @gone, clipboard: @clipboard)
+    @choice = DotPopper::Gameplay::ServerChoice.new(Memory.new, gone: false, clipboard: @clipboard)
+    @gone.subscribe(DotPopper::Composition::SetdefAdapter.new(@choice))
   end
 
   def show
@@ -289,7 +291,6 @@ class WebsiteStoreTest < Minitest::Test
     @gone.heard(:gone, Date.new(2027, 1, 1))
     @clipboard.copy("https://groups.example.org")
     @choice.paste
-    @gone.subscribe(@choice)
     @gone.heard(:here, Date.new(2027, 2, 1))
     own = "https://server.dot-popper.setdef.com"
 
