@@ -16,6 +16,14 @@ module DotPopper
     # the next clearing removes them, so the folder only ever keeps one.
     # Lota's save folder cannot rename a file, so nothing is moved: the
     # copies are written, then the save files are emptied.
+    #
+    # Each of the three is its own aggregate, so clearing is a sequence,
+    # one save file after another, which finishes within a moment. The
+    # game may be stopped between its steps (a crash, the system ending
+    # it): then the next launch finishes it (#finish_stopped_clear), so the
+    # player finds their Stats cleared as they asked, never half of them,
+    # and the backup holds every file as it was. Undo lasts only as long as
+    # the game runs, after a clear stopped or not.
     class StatsBackup
       NOTE = "cleared.txt"
       BACKUP = /\A(?:score_record|stats|achievements)-\d{8}-\d{6}\.txt\z/
@@ -25,6 +33,7 @@ module DotPopper
         @folder = folder
         @now = now
         @cleared = !folder.call(NOTE).read.to_s.empty?
+        finish_stopped_clear if @cleared
       end
 
       # Whether this device's Stats have ever been cleared, so the player
@@ -56,6 +65,29 @@ module DotPopper
       end
 
       private
+
+      # Finishes the last clear if the game was stopped before it emptied
+      # every save file: when each save file the note names is either empty
+      # or still exactly its backup, and some are each. A game played since
+      # a clear finished changes Stats, so their file is neither, and Undo
+      # leaves none empty.
+      def finish_stopped_clear
+        now = backups.to_h { |name, backup| [name, [@kept.fetch(name).saved.to_s, @folder.call(backup).read.to_s]] }
+        emptied, left = now.partition { |_, (text, _)| text.empty? }
+        return if emptied.empty? || left.empty? || left.any? { |_, (text, backup)| text != backup }
+
+        left.each { |name, _| @kept.fetch(name).clear }
+      end
+
+      # The backups the note names, by the name of the save file each
+      # copies, for the save files this keeps.
+      def backups
+        @folder.call(NOTE).read.to_s.lines.filter_map do |line|
+          file, backup = line.strip.split("=", 2)
+          name = file.to_s.delete_suffix(".txt")
+          [name, backup] if @kept.key?(name) && BACKUP.match?(backup.to_s)
+        end.to_h
+      end
 
       def back_up(texts)
         note = @folder.call(NOTE)

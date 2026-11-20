@@ -192,6 +192,10 @@ Forgiveness, from Lidwell's *Universal Principles of Design*: an Undo serves the
 
 **Undo** restores each store's exact text, kept in memory (`StatsBackup#restore` with the `Cleared` value). The backup stays on disk for support.
 
+**One act, in steps.** For the player, clearing is one act that takes their records, totals, chart, achievements and streak together, as the prompt says. In the model, the score record, Stats and the achievements are each an aggregate of their own, so the clear is a short sequence, one save file after another, finished well within half a second. If the game is stopped between those steps (a crash, the system ending it), the next launch finishes the clear (`StatsBackup#finish_stopped_clear`): when every save file `cleared.txt` names is either empty or still exactly its backup, and some are each, the rest are emptied. A game played since a finished clear changes `stats.txt`, and Undo leaves no file empty, so neither is mistaken for a clear stopped halfway. The player never finds half their Stats gone, and the backup holds every file as it was. Undo, kept in memory, lasts as long as the game runs, after a clear stopped or not.
+
+Why one act and not a choice, decided by the books in `INSIPIRATION.md`: the prompt says what will go before anything does (Podmajersky, *Strategic Writing for UX*; Yifrah, *Microcopy*); the hold makes the wrong act hard to make by accident (Lee, Wickens, Liu and Boyle, *Designing for People*); Undo and the backup make it reversible (Nystrom, *Game Programming Patterns*, the command pattern; Engelstein, *Achievement Relocked*, on loss aversion); and one fresh start, rather than a choice of what to clear, keeps the decision to one (Lidwell, Holden and Butler, *Universal Principles of Design*, Hick's law).
+
 Tests: `test/gameplay/stats_backup_test.rb`, `test/presentation/clearing_stats_test.rb`, `test/presentation/hold_to_confirm_test.rb`.
 
 ## Home after clearing

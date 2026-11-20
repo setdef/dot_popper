@@ -107,6 +107,73 @@ class StatsBackupTest < Minitest::Test
     assert @stats_backup.cleared?, "after the game starts again too"
   end
 
+  ACHIEVEMENTS = "sharpshooter=2026-11-01\nblink=2026-11-05\n"
+
+  # The process stops (a crash, the system ending it, a battery) as this
+  # save file is emptied, so nothing after it happens.
+  class Stopped < StandardError; end
+
+  class StopsWhenEmptied < Memory
+    def write(text) = text.empty? ? raise(Stopped) : super
+  end
+
+  def keep_all
+    keep
+    @achievements = DotPopper::Gameplay::Achievements.new(@folder.call("achievements.txt"))
+    @stats_backup = DotPopper::Gameplay::StatsBackup.new(score_record: @score_record, saved_stats: @saved_stats, achievements: @achievements,
+                                                         folder: @folder, now: -> { @time })
+  end
+
+  # Clearing is a sequence, one save file after another; stopped between
+  # its steps, it is finished as the game next starts, so the player finds
+  # their Stats cleared as they asked, never half of them, and the backup
+  # still holds every file as it was.
+  def test_a_clear_stopped_between_its_steps_is_finished_at_the_next_launch
+    @folder.call("achievements.txt").write(ACHIEVEMENTS)
+    @folder.files["stats.txt"] = StopsWhenEmptied.new(STATS)
+    keep_all
+    assert_raises(Stopped) { @stats_backup.clear }
+    assert_equal "", @folder["score_record.txt"], "stopped after the score record was emptied"
+    assert_equal ACHIEVEMENTS, @folder["achievements.txt"], "and before the achievements were"
+
+    @folder.files["stats.txt"] = Memory.new(STATS)
+    keep_all
+
+    assert_equal ["", "", ""], [@folder["score_record.txt"], @folder["stats.txt"], @folder["achievements.txt"]]
+    assert_equal 0, @saved_stats.stats.games
+    assert_equal 0, @achievements.count
+    assert_predicate @stats_backup, :cleared?
+    assert_equal [SCORE_RECORD, STATS, ACHIEVEMENTS],
+                 %w[score_record stats achievements].map { @folder["#{it}-20261105-093000.txt"] }, "the backup is whole"
+  end
+
+  # A launch after a clear that finished touches nothing: not after a game
+  # played since, one that earned no achievement or one that earned an
+  # achievement on the day it was first earned, nor after Undo.
+  def test_a_launch_after_a_finished_clear_changes_nothing
+    @folder.call("achievements.txt").write(ACHIEVEMENTS)
+    keep_all
+    @stats_backup.clear
+    @saved_stats.record(DotPopper::Gameplay::GameStats.start, MEDIUM)
+    @score_record.record(5, MEDIUM)
+    played = %w[score_record.txt stats.txt achievements.txt].map { @folder[it] }
+    keep_all
+    assert_equal played, %w[score_record.txt stats.txt achievements.txt].map { @folder[it] }, "no achievement since"
+
+    @stats_backup.clear
+    @saved_stats.record(DotPopper::Gameplay::GameStats.start, MEDIUM)
+    @score_record.record(5, MEDIUM)
+    @achievements.award(%i[sharpshooter blink], day: "2026-11-01")
+    @folder.call("achievements.txt").write(ACHIEVEMENTS)
+    played = %w[score_record.txt stats.txt achievements.txt].map { @folder[it] }
+    keep_all
+    assert_equal played, %w[score_record.txt stats.txt achievements.txt].map { @folder[it] }
+
+    @stats_backup.restore(@stats_backup.clear)
+    keep_all
+    assert_equal played, %w[score_record.txt stats.txt achievements.txt].map { @folder[it] }, "after Undo"
+  end
+
   private
 
   def keep
