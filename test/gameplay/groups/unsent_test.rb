@@ -4,7 +4,7 @@ require "test_helper"
 
 # What the game owes the server, and the rules for sending it.
 class UnsentTest < Minitest::Test
-  Unsent = DotPopper::Groups::Unsent
+  Unsent = DotPopper::Gameplay::Groups::Unsent
 
   def setup = @unsent = Unsent.new
 

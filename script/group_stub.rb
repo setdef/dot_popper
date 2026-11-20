@@ -3,8 +3,8 @@
 # A stand-in for the friend groups' server, in memory, for trying the
 # game's screens without one: `ruby script/group_stub.rb [port]`, then run
 # the game with DOT_POPPER_SERVER=http://127.0.0.1:9293. It answers every
-# request friend groups declare (test/groups/group_stub_test.rb holds it
-# to DotPopper::Groups::REQUESTS), and starts with groups to look at: one
+# request friend groups declare (test/gameplay/groups/group_stub_test.rb holds it
+# to DotPopper::Gameplay::Groups::REQUESTS), and starts with groups to look at: one
 # full of members with a history of its title, joined by code 1234567.
 
 require "json"

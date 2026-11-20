@@ -5,7 +5,7 @@ require "test_helper"
 # Each kind of request friend groups make: what it sends, from its
 # declaration, and what each answer means.
 class JobsTest < Minitest::Test
-  Groups = DotPopper::Groups
+  Groups = DotPopper::Gameplay::Groups
   Jobs = Groups::Jobs
   Reply = DotPopper::Network::Reply
 

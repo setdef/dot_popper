@@ -1,0 +1,27 @@
+module DotPopper
+  module Gameplay
+    class Refresh
+      FLOOR: Float
+
+      HAPPENS: String
+
+      @askers: Array[^() -> void]
+
+      @game_flow: GameFlow
+
+      @now: ^() -> Float
+
+      @asked_at: Float
+
+      def initialize: (Array[^() -> void] askers, game_flow: GameFlow, ?now: ^() -> Float) -> void
+
+      def came_back: () -> void
+
+      def call: (event event) -> void
+
+      private
+
+      def ask_if_due: () -> void
+    end
+  end
+end

@@ -5,8 +5,8 @@ require "test_helper"
 # group.txt's format, which players' builds have written since v0.9.10:
 # it must read and write byte for byte as they do.
 class GroupFileTest < Minitest::Test
-  GroupFile = DotPopper::Groups::GroupFile
-  Seen = DotPopper::Groups::Seen
+  GroupFile = DotPopper::Gameplay::Groups::GroupFile
+  Seen = DotPopper::Gameplay::Groups::Seen
 
   FULL = "t\n60\n1\n1|4|1~50 a-b|0|~7\nsteady,blink"
 

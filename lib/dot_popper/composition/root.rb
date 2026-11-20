@@ -150,7 +150,7 @@ module DotPopper
         @watch = watch_for(license, pins)
         @entitlement = Entitlement.new(forced: Entitlement.forced?(settings.env, platform:), license:, trust: Receipt.trusted(channel))
         clipboard = @engine.clipboard
-        @server_choice = ServerChoice.new(file("server.txt"), gone: @gone, clipboard:)
+        @server_choice = Gameplay::ServerChoice.new(file("server.txt"), gone: @gone, clipboard:)
         saved_themes = Gameplay::SavedThemes.new(file("themes.txt"))
         use_theme = UseCases::UseTheme.new(saved_themes:, entitlement:)
         use_fixture(saved_themes, use_theme)
@@ -189,7 +189,7 @@ module DotPopper
         @game_flow.subscribe(@show)
         use_cases[:finish_game].subscribe(@show)
         entitlement.subscribe(@show.offer)
-        @refresh = Refresh.new([-> { @theme_releases&.ask }, -> { groups.refresh }], game_flow: @game_flow, now: @now)
+        @refresh = Gameplay::Refresh.new([-> { @theme_releases&.ask }, -> { groups.refresh }], game_flow: @game_flow, now: @now)
         @game_flow.subscribe(@refresh)
         @game_flow.subscribe(Gameplay::GamesLog.new(file(GAMES_LOG), today:, archive: ->(name) { file(name) }))
         @engine.say("each game is logged in #{@engine.path(GAMES_LOG)}")
@@ -223,7 +223,7 @@ module DotPopper
       def groups_session
         url = server_url
         own = url.nil? || url == Network::Server.url(settings.env)
-        Groups::Session.at(url, file: own ? file("group.txt") : file("group-#{URI(url).host.to_s.downcase}.txt"))
+        Gameplay::Groups::Session.at(url, file: own ? file("group.txt") : file("group-#{URI(url).host.to_s.downcase}.txt"))
       end
 
       # What asks whether setdef is gone, and where a license key is: a test

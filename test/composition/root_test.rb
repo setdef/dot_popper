@@ -361,12 +361,12 @@ class RootTest < Minitest::Test
     game = root
     listeners = game.game_flow.instance_variable_get(:@listeners).map(&:class)
 
-    assert_equal [DotPopper::UseCases::FinishGame, Show, DotPopper::Refresh, DotPopper::Gameplay::GamesLog], listeners
+    assert_equal [DotPopper::UseCases::FinishGame, Show, DotPopper::Gameplay::Refresh, DotPopper::Gameplay::GamesLog], listeners
     game_flow = DotPopper::Gameplay::GameFlow.new(field)
     entitlement = DotPopper::Entitlement.free
     saved_stats = DotPopper::Gameplay::SavedStats.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     achievements = DotPopper::Gameplay::Achievements.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
-    groups = DotPopper::Groups::Session.off
+    groups = DotPopper::Gameplay::Groups::Session.off
     saved_themes = DotPopper::Gameplay::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: DotPopper::FreeGames.unlimited, entitlement:, store: NoStore.new,
                                                  achievements:, saved_stats:, friend_groups: groups)
@@ -466,11 +466,11 @@ class RootTest < Minitest::Test
 
     assert_equal %i[themes store watch], asked, "each asked once as the game starts"
     asked.clear
-    now += DotPopper::Refresh::FLOOR
+    now += DotPopper::Gameplay::Refresh::FLOOR
     game.refresh.came_back
 
     assert_equal %i[themes groups], asked
-    now += DotPopper::Refresh::FLOOR
+    now += DotPopper::Gameplay::Refresh::FLOOR
     game.game_flow.send(:announce, DotPopper::Gameplay::Events::HomeShown.new(score_record: 0)) # as the game_flow does, back on Home
 
     assert_equal %i[themes groups themes groups], asked

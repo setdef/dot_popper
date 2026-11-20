@@ -199,7 +199,7 @@ module DotPopper
 
       # How long the new theme card takes no press after
       # it appears: one can come while Home is up, under a finger already
-      # on its way to Play (DotPopper::Refresh).
+      # on its way to Play (DotPopper::Gameplay::Refresh).
       NEW_THEME_CARD_GRACE = 0.5
 
       # The stacking rule, taught on the first two Game Overs after a

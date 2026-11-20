@@ -5,7 +5,7 @@ require "test_helper"
 # What the game last heard from the server, and the rules for telling the
 # player of a title change.
 class KnownGroupsTest < Minitest::Test
-  Groups = DotPopper::Groups
+  Groups = DotPopper::Gameplay::Groups
 
   def setup = @known = Groups::KnownGroups.new
 

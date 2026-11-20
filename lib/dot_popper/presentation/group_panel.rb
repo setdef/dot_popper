@@ -64,7 +64,7 @@ module DotPopper
       def entry(group_id, change)
         name = ->(number) { [Names.member(group_id, number), true] }
         case change
-        in Groups::MemberAchievement
+        in Gameplay::Groups::MemberAchievement
           [name.(change.member_number), [" earned ", false], [AchievementWords.name(change.key), true], [".", false]]
         in { passed_on: true }
           [["The title passed to ", false], name.(change.champion_number), [" with ", false], [change.score.to_s, true], [".", false]]
@@ -368,7 +368,7 @@ module DotPopper
       # does not know.
       def history_entries
         list = groups.history(@group_id) || groups.title_changes(@group_id) || []
-        list.reject { it.is_a?(Groups::MemberAchievement) && !Gameplay::Achievement::IDS.include?(it.key) }
+        list.reject { it.is_a?(Gameplay::Groups::MemberAchievement) && !Gameplay::Achievement::IDS.include?(it.key) }
       end
 
       # Show, then Copy: the code shows, then goes to the clipboard.

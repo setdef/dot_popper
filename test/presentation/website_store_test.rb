@@ -29,7 +29,7 @@ class WebsiteStoreTest < Minitest::Test
     @entered = 0
     @store = WebsiteStore.new(checkout: FakeCheckout.new(clipboard: @clipboard), entitlement: @entitlement, gone: @gone, clipboard: @clipboard,
                               entered: -> { @entered += 1 })
-    @choice = DotPopper::ServerChoice.new(Memory.new, gone: @gone, clipboard: @clipboard)
+    @choice = DotPopper::Gameplay::ServerChoice.new(Memory.new, gone: @gone, clipboard: @clipboard)
   end
 
   def show
@@ -149,7 +149,7 @@ class WebsiteStoreTest < Minitest::Test
   # counts in the player's friend groups, as after a store's purchase.
   def test_a_key_entered_on_the_offer_reports_what_was_earned_while_free
     reported = []
-    groups = DotPopper::Groups::Session.off
+    groups = DotPopper::Gameplay::Groups::Session.off
     groups.define_singleton_method(:report_achievements) { |keys| reported << keys }
     achievements = DotPopper::Gameplay::Achievements.new(Memory.new)
     achievements.award(%i[blink], day: "2026-11-01")

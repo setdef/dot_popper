@@ -55,7 +55,7 @@ class ScreenHooksTest < Minitest::Test
   # A game started: the friend groups forget the last game's result, so
   # the next Game Over never shows it while its own is on the way.
   def test_a_game_started_forgets_the_last_games_result_for_the_friend_groups
-    session = DotPopper::Groups::Session.off
+    session = DotPopper::Gameplay::Groups::Session.off
     session.instance_variable_set(:@result_due, true) # as a game that counts finishes
     show = new_show(game_flow: DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2)), layout:, sounds: FakeSounds.new, radius: R, groups: session)
     assert_equal " ", show.group_panel.game_line, "a result on its way holds the line's place"

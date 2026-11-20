@@ -62,7 +62,7 @@ fi
 
 # Leaving for the launcher and coming back reaches the game as the
 # window's focus, lost and then gained, which Refresh hears as the game
-# coming back (DotPopper::Refresh), so a theme released meanwhile is
+# coming back (DotPopper::Gameplay::Refresh), so a theme released meanwhile is
 # asked for. DOT_POPPER_AUTOMATED keeps it off the internet, so nothing
 # is asked of a server; the check is that the game hears it. Back on
 # Home then leaves the app, as after a launch.

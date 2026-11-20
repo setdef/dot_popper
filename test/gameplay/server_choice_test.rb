@@ -18,7 +18,7 @@ class ServerChoiceTest < Minitest::Test
     @file = Memory.new
     @gone = DotPopper::Continuity::Gone.new(Memory.new)
     @clipboard = Clipboard.new
-    @choice = DotPopper::ServerChoice.new(@file, gone: @gone, clipboard: @clipboard)
+    @choice = DotPopper::Gameplay::ServerChoice.new(@file, gone: @gone, clipboard: @clipboard)
   end
 
   def test_while_setdef_answers_nothing_is_offered_and_setdefs_server_is_used
@@ -79,9 +79,9 @@ class ServerChoiceTest < Minitest::Test
   end
 
   def test_a_server_address_must_be_one_https_address
-    ["https://a.example", "https://a.example:8443/api"].each { assert DotPopper::ServerChoice.https?(it), it }
+    ["https://a.example", "https://a.example:8443/api"].each { assert DotPopper::Gameplay::ServerChoice.https?(it), it }
     ["http://a.example", "https://", "https://u:p@a.example", "https://a.example b", "ftp://a.example", "a.example", "https://[bad"].each do
-      refute DotPopper::ServerChoice.https?(it), it
+      refute DotPopper::Gameplay::ServerChoice.https?(it), it
     end
   end
 end

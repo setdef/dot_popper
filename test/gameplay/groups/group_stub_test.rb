@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
-require_relative "../../script/group_stub"
+require_relative "../../../script/group_stub"
 
 # script/group_stub.rb, the stand-in server for trying the screens by
 # hand, answers every request friend groups declare, so a new one cannot
@@ -12,7 +12,7 @@ class GroupStubTest < Minitest::Test
   SAMPLES = { join_code: "1234567", key: "steady", score: 10 }.freeze
 
   def test_every_declared_request_is_answered
-    DotPopper::Groups::REQUESTS.each_value do |request|
+    DotPopper::Gameplay::Groups::REQUESTS.each_value do |request|
       stub = GroupStub.new
       token = "Bearer #{stub.call('POST', '/player', {}, nil).body[:token]}" if request.token
       # Group 2 is one the stub's player is in.
@@ -29,6 +29,6 @@ class GroupStubTest < Minitest::Test
     stub.call("POST", "/achievements", { "key" => "steady" }, token)
     history = JSON.parse(JSON.generate(stub.call("GET", "/groups/2/history", {}, token).body))
 
-    assert_equal 1, history.filter_map { DotPopper::Groups::MemberAchievement.parse(it) }.size
+    assert_equal 1, history.filter_map { DotPopper::Gameplay::Groups::MemberAchievement.parse(it) }.size
   end
 end

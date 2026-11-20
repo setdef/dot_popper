@@ -10,7 +10,7 @@ require "dot_popper/privacy/requests"
 # Plays every request the game can make, through a real Session and a real
 # Link, against a local server, and reads what actually arrived.
 class PrivacyRequestsTest < Minitest::Test
-  Groups = DotPopper::Groups
+  Groups = DotPopper::Gameplay::Groups
   Network = DotPopper::Network
   Privacy = DotPopper::Privacy
   ROOT = File.expand_path("../..", __dir__)

@@ -2,14 +2,14 @@
 
 require_relative "presentation_helper"
 
-# What arrives when the game asks again (DotPopper::Refresh) takes the
+# What arrives when the game asks again (DotPopper::Gameplay::Refresh) takes the
 # road it takes at launch: a new theme's card on Home, and a title
 # change's announcement. Nothing is handed to the network during a game.
 class AskingAgainTest < Minitest::Test
   include PresentationTest
 
   Reply = DotPopper::Network::Reply
-  Refresh = DotPopper::Refresh
+  Refresh = DotPopper::Gameplay::Refresh
 
   # A worker answered by hand: what was started, and the replies given.
   class ManualWorker
@@ -32,7 +32,7 @@ class AskingAgainTest < Minitest::Test
     @groups_worker = ManualWorker.new
     file = DotPopper::Gameplay::ScoreRecord::Memory.new
     file.write("t\n")
-    @session = DotPopper::Groups::Session.new(file:, worker: @groups_worker)
+    @session = DotPopper::Gameplay::Groups::Session.new(file:, worker: @groups_worker)
     @saved_themes = DotPopper::Gameplay::SavedThemes.new(DotPopper::Gameplay::ScoreRecord::Memory.new)
     @theme_releases = DotPopper::Gameplay::ThemeReleases.new(worker: @themes_worker, saved_themes: @saved_themes, file: DotPopper::Gameplay::ScoreRecord::Memory.new)
     @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2))

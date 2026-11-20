@@ -16,7 +16,7 @@ require "dot_popper/presentation"
 # fails it when the server has changed what it answers.
 class ServerExchangesTest < Minitest::Test
   C = DotPopper::Continuity
-  Groups = DotPopper::Groups
+  Groups = DotPopper::Gameplay::Groups
   Network = DotPopper::Network
   COPY = File.expand_path("fixtures/server/exchanges.json", __dir__)
   RECORD = JSON.parse(File.read(COPY))

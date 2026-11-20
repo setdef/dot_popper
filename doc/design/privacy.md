@@ -34,7 +34,7 @@ Each part of the game that makes requests declares its own, as `REQUESTS`, where
 
 | Part | Declares |
 | --- | --- |
-| `Groups::REQUESTS` (`lib/dot_popper/groups/requests.rb`) | `POST /player`, `GET /groups`, `POST /groups`, `POST /memberships`, `GET /groups/:id`, `GET /groups/:id/history`, `POST /achievements`, `DELETE /groups/:id/membership`, `DELETE /player` and `POST /games`, for friend groups ([friend-groups.md](friend-groups.md)) |
+| `Groups::REQUESTS` (`lib/dot_popper/gameplay/groups/requests.rb`) | `POST /player`, `GET /groups`, `POST /groups`, `POST /memberships`, `GET /groups/:id`, `GET /groups/:id/history`, `POST /achievements`, `DELETE /groups/:id/membership`, `DELETE /player` and `POST /games`, for friend groups ([friend-groups.md](friend-groups.md)) |
 | `ThemeReleases::REQUESTS` (`lib/dot_popper/gameplay/theme_releases.rb`) | `GET /themes` with `started_on`, for every player, with no token ([look-and-sound.md](look-and-sound.md)) |
 | `Continuity::SetdefServer::REQUESTS` (`lib/dot_popper/continuity/setdef_server.rb`) | `GET /proof`, `POST /licenses` and `POST /license_checks`, for setdef being there and license keys ([store-and-pro.md](store-and-pro.md)) |
 | `Continuity::Connectivity::REQUESTS` (the same file) | the three connectivity checks, to `captive.apple.com`, `connectivitycheck.gstatic.com` and `www.msftconnecttest.com` |

@@ -121,8 +121,8 @@ module Inputs
       (new_theme ? saved_themes.choices[0...-1] : saved_themes.choices).each { saved_themes.told(it) }
       book = DotPopper::Gameplay::SavedStats.new(Memory.new, today: -> { @day })
       book.record(DotPopper::Gameplay::GameStats.start, @game_flow.size_class) if played
-      session = DotPopper::Groups::Session.new(file: Memory.new, worker: Server.new(groups:))
-      @server_choice = DotPopper::ServerChoice.new(Memory.new, gone: @gone, clipboard:)
+      session = DotPopper::Gameplay::Groups::Session.new(file: Memory.new, worker: Server.new(groups:))
+      @server_choice = DotPopper::Gameplay::ServerChoice.new(Memory.new, gone: @gone, clipboard:)
       @show = new_show(game_flow:, layout: layout(width, height), sounds:, radius: R, random: Random.new(5), clipboard:, window:, saved_stats: book,
                        sharing: P::SheetSharing.for(platform, opener:), links: opener, entitlement:, store:, games:,
                        saved_themes:, groups: session, group_notice: P::GroupNotice.new(Memory.new),

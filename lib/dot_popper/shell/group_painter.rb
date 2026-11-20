@@ -251,7 +251,7 @@ module DotPopper
         rect = row.rect
         Card.new(context:).draw(rect)
         change = row.change
-        number = change.is_a?(Groups::MemberAchievement) ? change.member_number : change.champion_number
+        number = change.is_a?(Gameplay::Groups::MemberAchievement) ? change.member_number : change.champion_number
         radius = rect.height * 0.3
         icons.draw(rect.x + 14 + radius, rect.center_y, radius, row.group_id, number)
         left = rect.x + 28 + (radius * 2)

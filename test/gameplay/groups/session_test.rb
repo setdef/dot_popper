@@ -3,7 +3,7 @@
 require "test_helper"
 
 class SessionTest < Minitest::Test
-  Groups = DotPopper::Groups
+  Groups = DotPopper::Gameplay::Groups
   Reply = DotPopper::Network::Reply
 
   # A worker that holds each job until the test answers it.

@@ -5,7 +5,7 @@ require_relative "presentation_helper"
 class GroupPanelTest < Minitest::Test
   include PresentationTest
 
-  Groups = DotPopper::Groups
+  Groups = DotPopper::Gameplay::Groups
   Reply = DotPopper::Network::Reply
   Screen = DotPopper::Presentation::GroupLayout
   Words = DotPopper::Presentation::GroupWords

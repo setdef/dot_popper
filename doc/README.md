@@ -28,7 +28,7 @@ If you know LÖVE, [Why Ruby](why_ruby.md) sets Dot Popper's code beside the Lua
 | `conf.rb` | Lota's window settings: the title, the 1200 × 800 window, the save folder's name, and which graphics renderers to allow |
 | `lib/dot_popper/` | The rules. `rules.rb` holds every number that sets how the game plays, in dot radii; `game.rb` and `stack.rb` hold a game and its dots |
 | `lib/dot_popper/presentation/` | How the game looks and sounds, as values. `look.rb` holds every setting, and `words.rb` writes every sentence the player reads |
-| `lib/dot_popper/groups/` | The friend groups' client, which makes every network call on a thread of its own |
+| `lib/dot_popper/gameplay/groups/` | The friend groups' client, which makes every network call on a thread of its own |
 | `lib/dot_popper/composition/` | Puts the game together for one system and one kind of build, without Lota, from what the shell hands it |
 | `lib/dot_popper/shell/` | Carries out the presentation with Lota: painters, the sound player, input, and save files. Only it calls Lota, and only it reads Lota's names for things |
 | `bin/dot_popper` | The program in the packaged app. It starts the game as a fused Lota game, which saves in a folder named after the game, as a fused LÖVE game does |
@@ -42,7 +42,7 @@ If you know LÖVE, [Why Ruby](why_ruby.md) sets Dot Popper's code beside the Lua
 
 ## The friend-group server
 
-The server is a separate Rails app, `~/Developer/dot_popper-server`; its API is `docs/api.md` there, and `doc/server.md` here says what it must do. The game speaks to it with `lib/dot_popper/groups/` (no `/v1` prefix; JSON; a bearer token). It holds no names or text: within a group a member is a number, which the game draws as an icon (`presentation/member_icon.rb`), and a group's code is seven digits.
+The server is a separate Rails app, `~/Developer/dot_popper-server`; its API is `docs/api.md` there, and `doc/server.md` here says what it must do. The game speaks to it with `lib/dot_popper/gameplay/groups/` (no `/v1` prefix; JSON; a bearer token). It holds no names or text: within a group a member is a number, which the game draws as an icon (`presentation/member_icon.rb`), and a group's code is seven digits.
 
 The game finds the server through `Network::Server`: every build uses `SERVER_URL`; `DOT_POPPER_SERVER` overrides it, and empty means no server (no Groups button appears and the game connects to nothing). Run the game with `DOT_POPPER_SERVER=http://127.0.0.1:9293` and `ruby script/group_stub.rb` to try the screens against an in-memory stand-in, seeded with a full group whose code is 1234567.
 
