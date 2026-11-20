@@ -29,7 +29,7 @@ class StatsBackupTest < Minitest::Test
   end
 
   def test_clearing_forgets_every_record_as_on_a_new_device
-    @keeper.clear
+    @stats_backup.clear
 
     assert @score_record.first?(MEDIUM)
     assert_equal 0, @score_record.of(MEDIUM)
@@ -45,14 +45,14 @@ class StatsBackupTest < Minitest::Test
 
   def test_clearing_keeps_the_games_log_settings_and_lessons
     before = %w[games.csv sound.txt dot_size.txt taught.txt tilt_hint.txt].to_h { [it, @folder[it]] }
-    @keeper.clear
-    @keeper.restore(@keeper.clear)
+    @stats_backup.clear
+    @stats_backup.restore(@stats_backup.clear)
 
     assert_equal before, before.keys.to_h { [it, @folder[it]] }
   end
 
   def test_the_stats_are_copied_exactly_to_backups_named_for_when
-    @keeper.clear
+    @stats_backup.clear
 
     assert_equal SCORE_RECORD, @folder["score_record-20261105-093000.txt"]
     assert_equal STATS, @folder["stats-20261105-093000.txt"]
@@ -61,8 +61,8 @@ class StatsBackupTest < Minitest::Test
   end
 
   def test_undo_restores_the_stats_exactly_and_keeps_the_backup
-    cleared = @keeper.clear
-    @keeper.restore(cleared)
+    cleared = @stats_backup.clear
+    @stats_backup.restore(cleared)
 
     assert_equal [SCORE_RECORD, STATS], [@folder["score_record.txt"], @folder["stats.txt"]]
     assert_equal 24, @score_record.of(MEDIUM)
@@ -71,10 +71,10 @@ class StatsBackupTest < Minitest::Test
   end
 
   def test_only_the_latest_backup_is_kept
-    @keeper.clear
+    @stats_backup.clear
     @saved_stats.record(DotPopper::GameStats.start.with(score: 2, duration: 11.0), MEDIUM)
     @time += 60
-    @keeper.clear
+    @stats_backup.clear
 
     backups = @folder.names.grep(/-2026/)
     assert_equal %w[score_record-20261105-093100.txt stats-20261105-093100.txt], backups
@@ -83,7 +83,7 @@ class StatsBackupTest < Minitest::Test
 
   def test_the_note_never_removes_a_file_that_is_not_a_backup
     @folder.call("cleared.txt").write("cleared=x\nscore_record.txt=games.csv\nstats.txt=../stats.txt\n")
-    @keeper.clear
+    @stats_backup.clear
 
     assert_equal "time,seed\n1,2\n", @folder["games.csv"]
   end
@@ -91,7 +91,7 @@ class StatsBackupTest < Minitest::Test
   def test_a_store_never_written_is_restored_empty
     @folder = FakeFolder.new("stats.txt" => STATS)
     keep
-    @keeper.restore(@keeper.clear)
+    @stats_backup.restore(@stats_backup.clear)
 
     assert_equal 3, @saved_stats.stats.games
     assert_equal 0, @score_record.of(MEDIUM)
@@ -99,12 +99,12 @@ class StatsBackupTest < Minitest::Test
   end
 
   def test_it_remembers_that_stats_were_cleared
-    refute @keeper.cleared?
-    @keeper.clear
-    assert @keeper.cleared?
+    refute @stats_backup.cleared?
+    @stats_backup.clear
+    assert @stats_backup.cleared?
 
     keep
-    assert @keeper.cleared?, "after the game starts again too"
+    assert @stats_backup.cleared?, "after the game starts again too"
   end
 
   private
@@ -112,6 +112,6 @@ class StatsBackupTest < Minitest::Test
   def keep
     @score_record = DotPopper::ScoreRecord.new(@folder.call("score_record.txt"))
     @saved_stats = DotPopper::SavedStats.new(@folder.call("stats.txt"), today: -> { @today })
-    @keeper = DotPopper::StatsBackup.new(score_record: @score_record, saved_stats: @saved_stats, folder: @folder, now: -> { @time })
+    @stats_backup = DotPopper::StatsBackup.new(score_record: @score_record, saved_stats: @saved_stats, folder: @folder, now: -> { @time })
   end
 end

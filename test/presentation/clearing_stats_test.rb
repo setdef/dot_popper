@@ -15,8 +15,8 @@ class ClearingStatsTest < Minitest::Test
     @folder = DotPopper::StatsBackup::Folder.new
     @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(@folder.call("score_record")))
     @saved_stats = DotPopper::SavedStats.new(@folder.call("stats"), today: -> { Date.new(2026, 11, 5) })
-    @keeper = DotPopper::StatsBackup.new(score_record: @game_flow.score_record, saved_stats: @saved_stats, folder: @folder)
-    @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, saved_stats: @saved_stats, keeper: @keeper)
+    @stats_backup = DotPopper::StatsBackup.new(score_record: @game_flow.score_record, saved_stats: @saved_stats, folder: @folder)
+    @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, saved_stats: @saved_stats, stats_backup: @stats_backup)
     finish_game
     @show.open_stats
   end

@@ -217,9 +217,9 @@ class ShowTutorialTest < Minitest::Test
   def test_it_never_opens_again_not_even_after_the_stats_are_cleared
     play_through
     finish_game
-    keeper = DotPopper::StatsBackup.new(score_record: @score_record, saved_stats: @saved_stats)
-    keeper.clear
-    @show = show(keeper:)
+    stats_backup = DotPopper::StatsBackup.new(score_record: @score_record, saved_stats: @saved_stats)
+    stats_backup.clear
+    @show = show(stats_backup:)
     press_main
 
     refute @show.tutorial?
@@ -289,9 +289,9 @@ class ShowTutorialTest < Minitest::Test
 
   private
 
-  def show(keeper: DotPopper::StatsBackup.new(score_record: @score_record, saved_stats: @saved_stats))
+  def show(stats_backup: DotPopper::StatsBackup.new(score_record: @score_record, saved_stats: @saved_stats))
     new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, random: Random.new(3), saved_stats: @saved_stats,
-             keeper:, tutorial_flag: TutorialFlag.new(@file))
+             stats_backup:, tutorial_flag: TutorialFlag.new(@file))
   end
 
   def update_for(seconds)

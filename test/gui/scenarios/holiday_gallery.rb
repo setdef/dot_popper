@@ -16,9 +16,9 @@ module DotPopperGui
 
     def play
       @theme = ENV.fetch("DOT_POPPER_THEME", "classic")
-      keeper = show.instance_variable_get(:@themes)
+      themes = show.instance_variable_get(:@themes)
       wait(0.5)
-      keeper.told(keeper.new_theme) until keeper.new_theme.nil?
+      themes.told(themes.new_theme) until themes.new_theme.nil?
       fit(1200, 800, false)
       wait(1.5)
       keep_screenshot("#{@theme}-home-desktop")

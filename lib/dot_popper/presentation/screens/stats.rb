@@ -5,14 +5,14 @@ module DotPopper
     module Screens
       # Stats, over Home (StatsLayout): the sheet of every game's numbers
       # from +saved_stats+ and the +achievements+, Back, and "Clear my
-      # stats…", held to clear them through +keeper+ (StatsBackup), or
+      # stats…", held to clear them through +stats_backup+ (StatsBackup), or
       # Undo for a while after.
       class Stats < Page
         include Scrolling
 
-        def initialize(show, keeper:, saved_stats:, achievements:, haptics:)
+        def initialize(show, stats_backup:, saved_stats:, achievements:, haptics:)
           super(show)
-          @keeper = keeper
+          @stats_backup = stats_backup
           @saved_stats = saved_stats
           @achievements = achievements
           @haptics = haptics
@@ -77,7 +77,7 @@ module DotPopper
         def game_started = @undo = nil
 
         def undo
-          @keeper.restore(@undo.cleared)
+          @stats_backup.restore(@undo.cleared)
           @undo = nil
           changed
           sounds.play(:tick, pitch: 1.2)
@@ -94,7 +94,7 @@ module DotPopper
         # offered.
         def clear
           @clearing = clearing.cancel
-          @undo = UndoableClear.new(cleared: @keeper.clear, at: show.now, seconds: style::STATS_CLEAR.undo)
+          @undo = UndoableClear.new(cleared: @stats_backup.clear, at: show.now, seconds: style::STATS_CLEAR.undo)
           changed
           sounds.play(:bonk, pitch: 0.7)
           @haptics.buzz(style::HAPTICS.penalty)

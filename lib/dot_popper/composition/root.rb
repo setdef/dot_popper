@@ -140,7 +140,7 @@ module DotPopper
         @engine.say("dots are standard, worked out from the screen as each game starts") if @game_flow.sizing.standard?
         saved_stats = SavedStats.new(file("stats.txt"), today:, legacy:)
         achievements = Achievements.new(file("achievements.txt"))
-        keeper = StatsBackup.new(score_record: @game_flow.score_record, saved_stats:, achievements:, folder: ->(name) { file(name) })
+        stats_backup = StatsBackup.new(score_record: @game_flow.score_record, saved_stats:, achievements:, folder: ->(name) { file(name) })
         @gone = Continuity::Gone.new(file("setdef.txt"))
         # What this build trusts, and where it keeps a license key, as
         # Monetization decides by the channel alone (ADR-0010).
@@ -176,7 +176,7 @@ module DotPopper
           groups:, game_flow: @game_flow, layout: @engine.layout, sounds: @sound_player, radius: dot_size.radius,
           random:, calm: settings.calm?, tutor: Presentation::Tutor.new(file("taught.txt"), times: Style::LESSON.times),
           haptics:, clipboard:, notices: @engine.notices, sharing:,
-          saved_stats:, achievements:, keeper:, sizing_file:, input: starting_input, measure: @engine.measure(@context),
+          saved_stats:, achievements:, stats_backup:, sizing_file:, input: starting_input, measure: @engine.measure(@context),
           window: @window,
           tutorial_flag: Presentation::TutorialFlag.new(file("tutorial.txt"), mode: Presentation::TutorialFlag.mode(settings.env)),
           group_notice: Presentation::GroupNotice.new(file("group_notice.txt")),

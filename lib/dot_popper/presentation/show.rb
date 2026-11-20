@@ -15,7 +15,7 @@ module DotPopper
     # DotSizing, chosen on Home. +radius+ is the usual dot's, which
     # sizes the buttons' reach; a game's effects follow its own dots.
     # +input+ (InputKind) is what the player last pressed with, and the
-    # words follow it. +keeper+ (StatsBackup) clears Stats, from
+    # words follow it. +stats_backup+ (StatsBackup) clears Stats, from
     # the Stats screen, and puts them back. +measure+ sizes the screens' words (RoughMeasure's
     # methods). +sharing+ (InGameSharing's methods) offers Game
     # Over's result to share, in a preview or a phone's own sheet, and
@@ -43,7 +43,7 @@ module DotPopper
                      view_achievements:, saved_stats:, achievements:, themes:, groups:, style: Style, random: Random.new, calm: false,
                      tutor: Tutor.new(ScoreRecord::Memory.new, times: style::LESSON.times), haptics: NoHaptics.new, clipboard: MemoryClipboard.new,
                      sizing_file: ScoreRecord::Memory.new, input: InputKind::MOUSE, measure: RoughMeasure.new,
-                     keeper: StatsBackup.new(score_record: game_flow.score_record, saved_stats:, achievements:), notices: Notices.none,
+                     stats_backup: StatsBackup.new(score_record: game_flow.score_record, saved_stats:, achievements:), notices: Notices.none,
                      sharing: InGameSharing.new, tutorial_flag: TutorialFlag.never, window: NoWindowControl.new,
                      links: NoLinks.new, group_notice: GroupNotice.read, server_choice: nil)
         @game_flow = game_flow
@@ -84,10 +84,10 @@ module DotPopper
         @mistake = nil
         @penalized_at = -Float::INFINITY
         @beckoned_at = nil
-        @keeper = keeper
+        @stats_backup = stats_backup
         @pointer = nil
         @hover = Hover.none
-        @screens = Screens.made_for(self, clipboard:, buy_pro:, start_game:, sharing:, view_achievements:, keeper:, saved_stats:,
+        @screens = Screens.made_for(self, clipboard:, buy_pro:, start_game:, sharing:, view_achievements:, stats_backup:, saved_stats:,
                                           achievements:, haptics:, notices:, sizing_file:, server_choice:, themes:, use_theme:,
                                           tutorial_flag:)
       end
@@ -231,7 +231,7 @@ module DotPopper
       # only how to play. A player who cleared their Stats has played, so
       # it still offers them, though it shows no score record or goal until their
       # next game (#played?).
-      def stats_offered? = played? || @keeper.cleared?
+      def stats_offered? = played? || @stats_backup.cleared?
 
       # Whether a game has finished since Stats were last cleared:
       # Home shows today's goal only then.

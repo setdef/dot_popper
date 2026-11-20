@@ -18,9 +18,9 @@ class AchievementsOnStatsTest < Minitest::Test
   def show(pro:)
     @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(@folder.call("score_record")))
     saved_stats = DotPopper::SavedStats.new(@folder.call("stats"), today: -> { Date.new(2026, 11, 8) })
-    keeper = DotPopper::StatsBackup.new(score_record: @game_flow.score_record, saved_stats:, achievements: @achievements, folder: @folder)
+    stats_backup = DotPopper::StatsBackup.new(score_record: @game_flow.score_record, saved_stats:, achievements: @achievements, folder: @folder)
     entitlement = DotPopper::Entitlement.new(forced: pro)
-    @show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, saved_stats:, keeper:,
+    @show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, saved_stats:, stats_backup:,
                      achievements: @achievements, entitlement:)
   end
 
