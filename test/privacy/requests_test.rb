@@ -185,7 +185,7 @@ class PrivacyRequestsTest < Minitest::Test
     local = "http://127.0.0.1:#{@server.addr[1]}"
     server = c::SetdefServer.new(Network::Link.new(local))
     license = c::License.new(DotPopper::MemoryFile.new, pins: c::TEST_PINS)
-    license.enter(c::LicenseKey.issue(c::TestKeys::LICENSE).text)
+    license.enter(c::TestKeys.license_key.text)
     server.proof(c::SignedAnswers.fresh)
     server.ask(license.due(c::SignedAnswers.fresh))
     license.instance_variable_get(:@lines)["registered"] = "yes"

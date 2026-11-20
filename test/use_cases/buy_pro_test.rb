@@ -93,7 +93,7 @@ class BuyProTest < Minitest::Test
     entitlement.subscribe(DotPopper::UseCases::BuyPro.new(store: @store, entitlement:, game_flow: @game_flow, achievements: @achievements,
                                                           friend_groups: @groups))
     @achievements.award(%i[steady], day: "2026-11-01")
-    entitlement.enter(DotPopper::Monetization::Continuity::LicenseKey.issue(DotPopper::Monetization::Continuity::TestKeys::LICENSE).text)
+    entitlement.enter(DotPopper::Monetization::Continuity::TestKeys.license_key.text)
 
     assert_equal [%i[steady]], @groups.reported
   end

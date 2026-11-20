@@ -61,7 +61,7 @@ class SignaturesTest < Minitest::Test
   end
 
   def test_a_license_key_reads_back_from_its_text_however_it_was_pasted
-    key = C::LicenseKey.issue(C::TestKeys::LICENSE)
+    key = C::TestKeys.license_key
     text = key.text
 
     assert_match(/\ADP-(?:[0-9A-Z]{5}-){25}[0-9A-Z]{5}\z/, text)
@@ -72,8 +72,8 @@ class SignaturesTest < Minitest::Test
   end
 
   def test_a_key_not_signed_by_a_pinned_license_key_or_changed_is_not_valid
-    stranger = C::LicenseKey.issue(C::TestKeys::ONLINE)
-    key = C::LicenseKey.issue(C::TestKeys::LICENSE)
+    stranger = C::TestKeys.license_key(:online)
+    key = C::TestKeys.license_key
     changed = key.with(id: key.id.dup.tap { it.setbyte(0, key.id.getbyte(0) ^ 1) })
 
     refute stranger.valid?(C::TEST_PINS)
@@ -82,7 +82,7 @@ class SignaturesTest < Minitest::Test
   end
 
   def test_text_that_is_no_key_parses_to_nothing
-    key = C::LicenseKey.issue(C::TestKeys::LICENSE)
+    key = C::TestKeys.license_key
 
     ["", "hello", "A" * 130, "U" * 130, nil, key.text.sub(/.\z/, "Z"), key.text[0..-2]].each { assert_nil C::LicenseKey.parse(it) }
   end
@@ -111,8 +111,8 @@ class SignaturesTest < Minitest::Test
   end
 
   def test_nothing_the_test_build_signs_passes_against_the_real_pins
-    assert C::LicenseKey.issue(C::TestKeys::LICENSE).valid?(C::TEST_PINS)
-    refute C::LicenseKey.issue(C::TestKeys::LICENSE).valid?(C::PINNED)
+    assert C::TestKeys.license_key.valid?(C::TEST_PINS)
+    refute C::TestKeys.license_key.valid?(C::PINNED)
     nonce = C::SignedAnswers.fresh
     assert C::SignedAnswers.proof?(C::SignedAnswers.signed_proof(nonce), nonce, C::TEST_PINS)
     refute C::SignedAnswers.proof?(C::SignedAnswers.signed_proof(nonce), nonce, C::PINNED)
@@ -126,5 +126,21 @@ class SignaturesTest < Minitest::Test
     assert_equal H["000102030405060708090a0b0c0d0e0f"], vector.id
     assert vector.valid?(C::Pins.new(roots: [], license_keys: [H["d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a"]]))
     refute vector.valid?(C::PINNED)
+  end
+
+  # No code in the repository makes a license key: setdef's server alone
+  # issues them, and the test build hands out a fixed list its test key
+  # signed once (TestKeys::LICENSE_KEYS). Nothing here builds a key or signs
+  # with a key's label. (test/channel_contents_test.rb writes such a line
+  # into a copy of a package, as a plant, and is not scanned.)
+  KEY_MAKING = /LicenseKey\.(?:issue|new)\(|\bsign\(\w+, LABEL\b/
+
+  def test_no_code_in_the_repository_makes_a_license_key
+    root = File.expand_path("../../..", __dir__)
+    plant = File.join(root, "test/channel_contents_test.rb")
+    makers = Dir["#{root}/{lib,script,test}/**/*.rb"].reject { it == File.expand_path(__FILE__) || it == plant }
+                                                  .select { File.read(it).match?(KEY_MAKING) }
+
+    assert_empty makers.map { it.delete_prefix("#{root}/") }
   end
 end

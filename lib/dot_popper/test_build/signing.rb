@@ -33,14 +33,6 @@ module DotPopper
           body + Ed25519.sign(root_seed, SIGNING_LABEL + body)
         end
       end
-
-      class LicenseKey
-        # A key for a fresh random id, signed by +seed+, as the test build's
-        # fake checkout issues one.
-        def self.issue(seed, id: Random.bytes(16))
-          new(id:, signature: Ed25519.sign(seed, LABEL + [VERSION].pack("C") + id))
-        end
-      end
     end
   end
 end

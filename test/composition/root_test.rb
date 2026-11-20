@@ -185,7 +185,7 @@ class RootTest < Minitest::Test
   # The root gives what it trusts to the license and the Entitlement,
   # whatever the environment says.
   def test_a_test_signed_license_key_unlocks_only_a_test_build
-    key = C::LicenseKey.issue(C::TestKeys::LICENSE).text
+    key = C::TestKeys.license_key.text
 
     assert_equal :invalid, root(channel: B::WEBSITE, env: SETTINGS).entitlement.enter(key)
     assert_equal :entered, root(env: SETTINGS).entitlement.enter(key)

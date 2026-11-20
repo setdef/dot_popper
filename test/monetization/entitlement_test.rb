@@ -69,7 +69,7 @@ class EntitlementTest < Minitest::Test
     entitlement = Entitlement.new(license:)
     heard = []
     entitlement.subscribe(->(event) { heard << event })
-    key = DotPopper::Monetization::Continuity::LicenseKey.issue(DotPopper::Monetization::Continuity::TestKeys::LICENSE).text
+    key = DotPopper::Monetization::Continuity::TestKeys.license_key.text
 
     assert_equal :invalid, entitlement.enter("DP-NOTAKEY")
     assert_equal :entered, entitlement.enter(key)

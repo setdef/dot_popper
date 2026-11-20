@@ -309,7 +309,7 @@ class InputsTest < Minitest::Test
     assert_equal fixture.show.words.offer[:empty], fixture.show.offer_status, "Copy your license key first."
     refute_predicate fixture.entitlement, :pro?
 
-    fixture.clipboard.copy(DotPopper::Monetization::Continuity::LicenseKey.issue(DotPopper::Monetization::Continuity::TestKeys::LICENSE).text) # copied from the email
+    fixture.clipboard.copy(DotPopper::Monetization::Continuity::TestKeys.license_key.text) # copied from the email
     assert_equal :pressed, player.press(:paste)
     fixture.tick(1.0)
     assert_predicate fixture.entitlement, :pro?

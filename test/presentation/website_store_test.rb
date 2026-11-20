@@ -168,7 +168,7 @@ class WebsiteStoreTest < Minitest::Test
 
   def test_the_keyboards_paste_takes_the_key_too
     s = show
-    @clipboard.copy(C::LicenseKey.issue(C::TestKeys::LICENSE).text)
+    @clipboard.copy(C::TestKeys.license_key.text)
 
     press_key(:v, :ctrl, show: s)
 
@@ -182,7 +182,7 @@ class WebsiteStoreTest < Minitest::Test
   def test_a_keyboard_types_the_key_ignoring_case_spaces_and_hyphens
     s = show
     open_offer(s)
-    text = C::LicenseKey.issue(C::TestKeys::LICENSE).text
+    text = C::TestKeys.license_key.text
     press_key(:enter, show: s)
 
     refute s.offer?, "Enter with nothing typed is the main button's, Back"
@@ -219,7 +219,7 @@ class WebsiteStoreTest < Minitest::Test
     click(s, :paste)
 
     assert_equal s.words.offer[:invalid], s.offer_status
-    @clipboard.copy(C::LicenseKey.issue(C::TestKeys::ONLINE).text)
+    @clipboard.copy(C::TestKeys.license_key(:online).text)
     click(s, :paste)
 
     assert_equal s.words.offer[:invalid], s.offer_status
@@ -234,7 +234,7 @@ class WebsiteStoreTest < Minitest::Test
     assert_equal %i[back paste], names(s).sort
     assert_equal s.words.offer[:not_sold], s.offer_status
     assert_nil s.offer_price
-    @clipboard.copy(C::LicenseKey.issue(C::TestKeys::LICENSE).text)
+    @clipboard.copy(C::TestKeys.license_key.text)
     click(s, :paste)
 
     assert @entitlement.pro?, "a key bought before still works"

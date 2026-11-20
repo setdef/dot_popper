@@ -45,7 +45,7 @@ MAKE_PROOFS = <<~RUBY
   require "dot_popper/test_build/core"
   c = DotPopper::Monetization::Continuity
   hex = ->(bytes) { bytes.unpack1("H*") }
-  keys = [c::TestKeys::ROOT, c::TestKeys::LICENSE, c::TestKeys::ONLINE].map { c::LicenseKey.issue(it).text }
+  keys = %i[root license online].map { c::TestKeys.license_key(it).text }
   certificate = c::TestKeys.online_certificate
   receipt = DotPopper::Monetization::Receipt.issue
   controls = {

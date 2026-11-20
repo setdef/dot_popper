@@ -64,7 +64,7 @@ class BuildForSaleTest < Minitest::Test
   RUBY
 
   def self.proofs
-    @proofs ||= [DotPopper::Monetization::Receipt.issue, C::LicenseKey.issue(C::TestKeys::LICENSE).text]
+    @proofs ||= [DotPopper::Monetization::Receipt.issue, C::TestKeys.license_key.text]
   end
 
   # How each build is made: as the release makes it, or with the test

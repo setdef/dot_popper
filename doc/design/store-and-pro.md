@@ -127,7 +127,7 @@ Both ask for owned purchases first (StoreKit's `Transaction.currentEntitlements`
 **`WebsiteStore`** (`lib/dot_popper/monetization/website_store.rb`, with its checkouts) is the store for copies no store controls: setdef's website, itch.io, Homebrew, winget, a Linux package or an APK. It answers the Store's methods, plus `#keys?` (true: a license key is how Pro arrives) and `#paste`. Its price is `WebsiteStore::PRICE` (`$1.99`), which must match the checkout page. It has no Restore: the key is the purchase, on any device. Its checkout is a port, `#buy` answering the state to show:
 
 - `BrowserCheckout` opens `BrowserCheckout::URL` (`https://dot-popper.setdef.com/buy`) in the player's browser and answers `:browser` ("Finish in your browser. Your key comes by email."), or `:unavailable`. The URL is the one constant to set once a payment company is chosen.
-- `FakeCheckout`, a test build's on a computer, puts a real license key signed by the test key on the clipboard and answers `:copied` ("Your license key is copied. Paste it here."). Paste license key then takes the road a bought key takes.
+- `FakeCheckout`, a test build's on a computer, puts a real license key on the clipboard, one of a fixed list the test key signed once (`Continuity::TestKeys::LICENSE_KEYS`, in the test build's part: no code in the repository makes a license key, which setdef's server alone issues) and answers `:copied` ("Your license key is copied. Paste it here."). Paste license key then takes the road a bought key takes.
 
 **`NoStore`** offers nothing: `offered?` is false, its status is `:unavailable`, and every request does nothing.
 

@@ -13,7 +13,7 @@ class LicenseTest < Minitest::Test
 
   def setup
     @ledger = Memory.new
-    @key = C::LicenseKey.issue(C::TestKeys::LICENSE)
+    @key = C::TestKeys.license_key
   end
 
   # A device: its saved license, gone-ness and a watch over +server+.
@@ -54,7 +54,7 @@ class LicenseTest < Minitest::Test
     license = C::License.new(Memory.new, pins: C::TEST_PINS)
 
     assert_equal :invalid, license.enter("DP-NOT-A-KEY")
-    assert_equal :invalid, license.enter(C::LicenseKey.issue(C::TestKeys::ONLINE).text)
+    assert_equal :invalid, license.enter(C::TestKeys.license_key(:online).text)
     refute license.pro?
     assert_equal :entered, license.enter(@key.text)
     assert license.pro?
