@@ -40,14 +40,42 @@ module DotPopper
       end
       prepend TestBuildParts
 
-      # What a test build trusts in place of a build for sale's (Root.pins,
-      # Root.receipt_trust): the test keys, and only the fake store's
-      # receipts; with a channel, the shared answer.
-      module TestBuildTrust
+      # What a test build trusts and obeys in place of a build for sale's,
+      # each giving the shared answer for a build with a channel:
+      # - the test keys, and only the fake store's receipts (Root.pins,
+      #   Root.receipt_trust);
+      # - DOT_POPPER_PRO=1 stands in for a purchase, to try Pro out, and
+      #   DOT_POPPER_PRO=0 is a free player; unset, as the shared code
+      #   answers (Root.forced_pro?);
+      # - who plays (Root.player?): not the autoplay bot, and not a GUI
+      #   scenario unless it sets DOT_POPPER_FREE_GAMES to try the limit;
+      # - DOT_POPPER_FREE_GAMES starts a new save with that many first
+      #   games and that many a day (Root.starting_free_games).
+      module TestBuildChoices
+        STARTING = "DOT_POPPER_FREE_GAMES"
+
         def pins(settings) = settings.store_build? ? super : Monetization::Continuity::TEST_PINS
         def receipt_trust(settings) = settings.store_build? ? super : Monetization::Receipt::TEST
+
+        def forced_pro?(settings, platform)
+          value = settings.fetch("DOT_POPPER_PRO")
+          settings.store_build? || value.empty? ? super : value == "1"
+        end
+
+        def player?(settings)
+          return super if settings.store_build?
+          return false if settings.flag?("DOT_POPPER_AUTOPLAY")
+
+          settings.fetch("DOT_POPPER_SCENARIO").empty? || !settings[STARTING].nil?
+        end
+
+        def starting_free_games(settings)
+          return super if settings.store_build?
+
+          Integer(settings.fetch(STARTING), exception: false)
+        end
       end
-      singleton_class.prepend(TestBuildTrust)
+      singleton_class.prepend(TestBuildChoices)
     end
   end
 end

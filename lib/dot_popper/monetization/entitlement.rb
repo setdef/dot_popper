@@ -29,10 +29,8 @@ module DotPopper
       def self.free = new
 
       # Whether this copy is pro without a purchase: on a computer
-      # (+platform+, a Platform), by DESKTOP_PRO. +env+ is the developer
-      # settings this build obeys (Build.settings), which a build for sale
-      # never lets decide it.
-      def self.forced?(_env, platform: nil) = DESKTOP_PRO && !platform.nil? && !platform.phone_host?
+      # (+platform+, a Platform), by DESKTOP_PRO.
+      def self.forced?(platform: nil) = DESKTOP_PRO && !platform.nil? && !platform.phone_host?
 
       # +license+ (Continuity::License, or anything that answers pro?) is a
       # website copy's. +trust+ (Receipt::Trust) is whose receipts this build

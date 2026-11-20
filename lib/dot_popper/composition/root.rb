@@ -73,6 +73,19 @@ module DotPopper
         settings.channel == ReleaseEngineering::Build::MICROSOFT_STORE ? Monetization::Receipt::MICROSOFT_STORE : Monetization::Receipt::STORES
       end
 
+      # Whether this build's copy on +platform+ is Pro without a purchase
+      # (Entitlement.forced?), which no setting decides in a build for sale.
+      def self.forced_pro?(_settings, platform) = Monetization::Entitlement.forced?(platform:)
+
+      # Whether someone is playing, not a machine, so that free games are
+      # counted where Pro is offered (FreeGames.metered?): in a build for
+      # sale everyone is, whatever its settings say (ADR-0010).
+      def self.player?(_settings) = true
+
+      # The free games a developer setting asks a new save to start with,
+      # or nil: never in a build for sale.
+      def self.starting_free_games(_settings) = nil
+
       # Starts what reaches past this process: the first request for theme
       # releases, the store's first question, and the watch for setdef.
       # Only the first and the friend groups' are asked again (Refresh);
@@ -99,9 +112,9 @@ module DotPopper
 
       # The games a free player has left, counted as +metered+ says
       # (FreeGames.metered?), starting as a developer may ask
-      # (FreeGames.starting).
+      # (Root.starting_free_games).
       def free_games(entitlement, metered:, file: file("games.txt"))
-        start = Monetization::FreeGames.starting(settings.env, channel: settings.channel)
+        start = self.class.starting_free_games(settings)
         Monetization::FreeGames.new(file, today: settings.today, entitlement:, metered:,
                              **(start ? { first_games: start, daily: start } : {}))
       end
@@ -163,7 +176,7 @@ module DotPopper
         pins = self.class.pins(settings)
         license = Monetization::Continuity::License.new(Monetization::Continuity::License.kept_in(channel) { file("license.txt") }, pins:)
         @watch = watch_for(license, pins)
-        @entitlement = Monetization::Entitlement.new(forced: Monetization::Entitlement.forced?(settings.env, platform:), license:,
+        @entitlement = Monetization::Entitlement.new(forced: self.class.forced_pro?(settings, platform), license:,
                                                      trust: self.class.receipt_trust(settings))
         clipboard = @engine.clipboard
         @server_choice = Gameplay::ServerChoice.new(file("server.txt"), gone: @gone.gone?, clipboard:)
@@ -182,7 +195,7 @@ module DotPopper
           @splash = Presentation::Splash.start(calm: settings.calm?, sounding: !@sound_player.muted?)
         end
         @store = store_for(clipboard)
-        games = free_games(entitlement, metered: Monetization::FreeGames.metered?(settings.env, channel:, offered: store.offered?))
+        games = free_games(entitlement, metered: Monetization::FreeGames.metered?(offered: store.offered?, player: self.class.player?(settings)))
         @haptics = platform.buzzes? ? @engine.buzzer : Presentation::NoHaptics.new
         @sharing = Presentation::SheetSharing.for(platform, opener: @engine.opener)
         groups = groups_session

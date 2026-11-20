@@ -58,7 +58,6 @@ class BuildTest < Minitest::Test
   def test_pro_and_the_server_stay_as_they_were_in_a_store_build
     env = DotPopper::ReleaseEngineering::Build.settings(SETTINGS, channel: STORE)
 
-    refute DotPopper::Monetization::Entitlement.forced?(env)
     assert_equal DotPopper::Network::Server::SERVER_URL, DotPopper::Network::Server.url(env)
     refute DotPopper::Automation.on?(env), "a store build is not made automated by the environment"
   end
@@ -66,7 +65,6 @@ class BuildTest < Minitest::Test
   def test_the_settings_do_work_in_a_test_build
     env = DotPopper::ReleaseEngineering::Build.settings(SETTINGS, channel: nil)
 
-    assert DotPopper::Monetization::Entitlement.forced?(env)
     assert_equal "http://localhost:9292", DotPopper::Network::Server.url(env)
   end
 end

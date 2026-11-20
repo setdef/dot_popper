@@ -169,36 +169,12 @@ class FreeGamesTest < Minitest::Test
     refute_predicate FreeGames.unlimited, :metered?
   end
 
-  # Who is counted (doc/design/store-and-pro.md): a player, not the autoplay bot nor a GUI
-  # scenario unless it sets DOT_POPPER_FREE_GAMES to try the limit; and in
-  # a store build everyone, whatever its settings say.
-  def test_a_store_build_counts_free_games_even_for_a_bot_or_a_scenario
-    bot = { "DOT_POPPER_AUTOPLAY" => "1", "DOT_POPPER_SCENARIO" => "game" }
-
-    assert FreeGames.player?(bot, channel: DotPopper::ReleaseEngineering::Build::WEBSITE)
-    refute FreeGames.player?(bot, channel: nil)
-    refute FreeGames.player?({ "DOT_POPPER_AUTOPLAY" => "1" }, channel: nil)
-    refute FreeGames.player?({ "DOT_POPPER_SCENARIO" => "game" }, channel: nil)
-    assert FreeGames.player?({ "DOT_POPPER_SCENARIO" => "game", "DOT_POPPER_FREE_GAMES" => "2" }, channel: nil)
-    assert FreeGames.player?({}, channel: nil)
-  end
-
   # Counted only where Pro can be bought, since a limit with no way past it
-  # is a dead end.
-  def test_free_games_are_counted_only_where_pro_is_offered
-    assert FreeGames.metered?({}, channel: DotPopper::ReleaseEngineering::Build::WEBSITE, offered: true)
-    refute FreeGames.metered?({}, channel: DotPopper::ReleaseEngineering::Build::WEBSITE, offered: false)
-    refute FreeGames.metered?({ "DOT_POPPER_AUTOPLAY" => "1" }, channel: nil, offered: true)
-  end
-
-  def test_a_new_save_can_start_with_the_games_a_developer_asks_for
-    assert_equal 2, FreeGames.starting({ "DOT_POPPER_FREE_GAMES" => "2" }, channel: nil)
-    assert_nil FreeGames.starting({ "DOT_POPPER_FREE_GAMES" => "lots" }, channel: nil)
-    assert_nil FreeGames.starting({}, channel: nil)
-  end
-
-  # Even with the test build's part loaded and the setting let through.
-  def test_no_setting_changes_the_first_games_of_a_build_for_sale
-    DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES.each { assert_nil FreeGames.starting({ "DOT_POPPER_FREE_GAMES" => "2" }, channel: it), it }
+  # is a dead end, and only for a player (who plays is the composition
+  # root's to decide, test/composition/root_test.rb).
+  def test_free_games_are_counted_only_where_pro_is_offered_to_a_player
+    assert FreeGames.metered?(offered: true, player: true)
+    refute FreeGames.metered?(offered: false, player: true)
+    refute FreeGames.metered?(offered: true, player: false)
   end
 end

@@ -116,7 +116,7 @@ Code that only some builds carry lives in a part, a folder of its own: today `li
 
 What every build for sale still carries, because the game's loaders and the composition root use it in every build: the website store and license keys (with the offer's words about them), every store's receipt code (`receipt/play.rb`, `apple.rb`, `microsoft.rb`), and the computers' store helper (`shell/store_helper.rb`): the receipts because every channel but the Microsoft Store's trusts Apple's and Google's (`Receipt::STORES`), the rest because the loaders require them. `script/channel_contents.rb list` shows them. Each waits on a part of its own, and the receipts on a decision about which receipts a build trusts.
 
-What parts cost: a reader of the shared code doesn't see the test build's answer there (`Composition::Root.pins` and `.receipt_trust`, `Entitlement.forced?` and the composition root's test-only choices answer for a build for sale, and the part's prepended modules for a test build); a build for sale must be stamped, or it loads the test build's part; and phone builds don't go through `lota fuse`, so each phone workflow keeps its own list of what to leave out.
+What parts cost: a reader of the shared code doesn't see the test build's answer there (`Composition::Root.pins`, `.receipt_trust`, `.forced_pro?`, `.player?`, `.starting_free_games` and the composition root's test-only choices answer for a build for sale, and the part's prepended modules for a test build); a build for sale must be stamped, or it loads the test build's part; and phone builds don't go through `lota fuse`, so each phone workflow keeps its own list of what to leave out.
 
 ## Building on your own computer
 

@@ -215,8 +215,35 @@ class RootTest < Minitest::Test
     end
   end
 
-  # Who is metered is Monetization's to decide (FreeGames.metered?); Home
-  # says how many games are left wherever they are counted.
+  # Pro without a purchase (Root.forced_pro?): never on a computer or a
+  # phone by default; in a test build DOT_POPPER_PRO stands in for a
+  # purchase, and in a build for sale no setting does.
+  def test_a_computer_is_free_by_default_and_the_setting_still_stands_in
+    forced = ->(env, system) { Root.forced_pro?(DotPopper::Composition::DeveloperSettings.new(env, channel: nil), system && DotPopperTest.platform(system)) }
+
+    ["Linux", "Windows", "OS X", "iOS", "Android"].each { refute forced.({}, it), it }
+    refute forced.({ "DOT_POPPER_PRO" => "0" }, "Windows")
+    B::CHANNEL_NAMES.each { refute Root.forced_pro?(DotPopper::Composition::DeveloperSettings.new({ "DOT_POPPER_PRO" => "1" }, channel: it), nil), it }
+    ["Linux", "iOS", nil].each { assert forced.({ "DOT_POPPER_PRO" => "1" }, it), it.inspect }
+  end
+
+  # A new save starts with the games a developer asks for in a test build
+  # (Root.starting_free_games), and with no setting's in a build for sale.
+  def test_a_new_save_starts_with_the_games_a_developer_asks_for_only_in_a_test_build
+    games = ->(channel, env) { Root.starting_free_games(DotPopper::Composition::DeveloperSettings.new(env, channel:)) }
+
+    assert_equal 2, games.(nil, { "DOT_POPPER_FREE_GAMES" => "2" })
+    assert_nil games.(nil, { "DOT_POPPER_FREE_GAMES" => "lots" })
+    assert_nil games.(nil, {})
+    B::CHANNEL_NAMES.each { assert_nil games.(it, { "DOT_POPPER_FREE_GAMES" => "2" }), it }
+  end
+
+  # Who plays is the root's to decide (Root.player?), and that free games
+  # are counted for a player where Pro is offered Monetization's
+  # (FreeGames.metered?): in a test build not the autoplay bot nor a GUI
+  # scenario unless it sets DOT_POPPER_FREE_GAMES to try the limit, and in
+  # a store build everyone. Home says how many games are left wherever
+  # they are counted.
   def test_the_free_game_limit_counts_in_a_store_build_even_for_a_bot_or_a_scenario
     bot = { "DOT_POPPER_AUTOPLAY" => "1", "DOT_POPPER_SCENARIO" => "game" }
     counted = ->(channel, env) { !root(channel:, env:).show.screens[:home].games_line.nil? }

@@ -25,19 +25,11 @@ module DotPopper
       FIRST_GAMES = 20
       DAILY = 3
 
-      # Whether the free games of a run with the developer settings +env+
-      # (Build.settings) in a build for +channel+ are counted: where Pro can
-      # be bought (+offered+), as a limit with no way past it is a dead end,
-      # and someone is playing (.player?).
-      def self.metered?(env, channel:, offered:) = offered && player?(env, channel:)
-
-      # Whether someone is playing, not a machine. In a build for sale
-      # everyone is, whatever its settings say (ADR-0010).
-      def self.player?(_env, channel:) = true
-
-      # The games a developer setting asks a new save to start with, or nil:
-      # never in a build for sale.
-      def self.starting(_env, channel:) = nil
+      # Whether the free games of a run are counted: where Pro can be bought
+      # (+offered+), as a limit with no way past it is a dead end, and
+      # someone is playing, not a machine (+player+, which the composition
+      # root decides by the build).
+      def self.metered?(offered:, player:) = offered && player
 
       # Games that never count and never show: for a Show made without any.
       def self.unlimited = new(MemoryFile.new, today: -> { Date.today }, entitlement: Entitlement.free, metered: false)

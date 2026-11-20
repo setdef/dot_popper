@@ -29,7 +29,7 @@ module DotPopper
 
       def self.free: () -> Entitlement
       def self.test: () -> Entitlement
-      def self.forced?: (untyped env, ?platform: Platform?) -> bool
+      def self.forced?: (?platform: Platform?) -> bool
       def initialize: (?forced: bool, ?license: _License?, ?trust: Receipt::Trust) -> void
       def pro?: () -> bool
       def subscribe: (_Listener listener) -> self

@@ -49,9 +49,7 @@ class EntitlementTest < Minitest::Test
     refute_predicate Entitlement.new(license: Struct.new(:pro?).new(false)), :pro?
   end
 
-  def test_the_setting_stands_in_for_a_purchase
-    assert Entitlement.forced?({ "DOT_POPPER_PRO" => "1" })
-    refute Entitlement.forced?({})
+  def test_being_forced_stands_in_for_a_purchase
     assert_predicate Entitlement.new(forced: true), :pro?
   end
 
