@@ -4,14 +4,13 @@ module DotPopper
   module Gameplay
     # The Achievements this device has earned, and the day each was first earned
     # (an ISO date), kept in a save file that answers +read+ and +write(text)+,
-    # as ScoreRecord's does. They are earned and kept whether or not the
-    # player has bought Pro; only showing them waits for that.
-    # Text it cannot read is left out, and a achievement a newer version knows and
-    # this one does not is dropped.
+    # as ScoreRecord's does, which it reads and writes as an AchievementsFile.
+    # They are earned and kept whether or not the player has bought Pro; only
+    # showing them waits for that.
     class Achievements
       def initialize(file)
         @file = file
-        @days = parse(file.read)
+        @days = AchievementsFile.parse(file.read).days
       end
 
       def earned?(id) = @days.key?(id)
@@ -31,7 +30,7 @@ module DotPopper
         return fresh if fresh.empty?
 
         @days = @days.merge(fresh.to_h { [it, day.to_s] })
-        @file.write(text)
+        @file.write(AchievementsFile.new(days: @days).to_s)
         fresh
       end
 
@@ -47,19 +46,7 @@ module DotPopper
       # Puts back +text+, the save file's whole text as #saved gave it.
       def restore(text)
         @file.write(text.to_s)
-        @days = parse(text)
-      end
-
-      private
-
-      def text = Achievement::IDS.filter_map { |id| "#{id}=#{@days[id]}\n" if earned?(id) }.join
-
-      def parse(text)
-        text.to_s.lines.filter_map do |line|
-          name, day = line.strip.split("=", 2)
-          id = name&.to_sym
-          [id, day.to_s] if id && Achievement.known?(id)
-        end.to_h
+        @days = AchievementsFile.parse(text).days
       end
     end
   end

@@ -22,12 +22,17 @@ module DotPopper
       def clear: () -> void
 
       def restore: (String? text) -> void
+    end
 
-      private
+    # What achievements.txt holds (achievements_file.rb).
+    class AchievementsFile < ::Data
+      attr_reader days: Hash[Achievement::id, String]
 
-      def text: () -> String
+      def self.new: (days: Hash[Achievement::id, String]) -> instance
 
-      def parse: (String? text) -> Hash[Achievement::id, String]
+      def self.parse: (String? text) -> AchievementsFile
+
+      def to_s: () -> String
     end
   end
 end
