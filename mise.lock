@@ -2,10 +2,19 @@
 
 lockfile_version = 3
 
+[[tools."http:msys2_ucrt64"]]
+version = "20261115.002214"
+backend = "http:msys2_ucrt64"
+specifiers = ["20261115.002214"]
+
+[tools."http:msys2_ucrt64"."platforms.windows-x64"]
+checksum = "sha256:e9ca55648fe65bf701222a9fadf197103e5433d418a16b0962db430b61adbe6c"
+url = "https://github.com/ruby/setup-msys2-gcc/releases/download/v20261115.002214/msys2-ucrt64.7z"
+
 [[tools."http:rubyinstaller-head"]]
-version = "4.1.0-6-20261110"
+version = "20261110"
 backend = "http:rubyinstaller-head"
-specifiers = ["4.1.0-6-20261110"]
+specifiers = ["20261110"]
 
 [tools."http:rubyinstaller-head".options]
 strip_components = "1"
