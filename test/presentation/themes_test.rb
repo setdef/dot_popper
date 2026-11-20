@@ -12,11 +12,11 @@ class ThemesTest < Minitest::Test
     @day = Date.new(2026, 11, 8)
   end
 
-  def show(pro:, unlocked: [])
+  def show(pro:, released: [])
     @pro = true if pro
     entitlement = DotPopper::Entitlement.new(forced: @pro)
     @saved_themes = DotPopper::SavedThemes.new(DotPopper::ScoreRecord::Memory.new)
-    @saved_themes.release(unlocked)
+    @saved_themes.release(released)
     @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new))
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, entitlement:, saved_themes: @saved_themes,
                      saved_stats: DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new, today: -> { @day }))
@@ -52,14 +52,14 @@ class ThemesTest < Minitest::Test
     assert_nil @show.new_theme
   end
 
-  def test_nothing_of_a_theme_shows_until_the_server_unlocks_it
+  def test_nothing_of_a_theme_shows_until_the_server_releases_it
     show(pro: true)
     assert_nil @show.new_theme
     refute_predicate @saved_themes, :offered?
   end
 
   def test_a_new_theme_is_told_with_an_immediate_switch
-    show(pro: true, unlocked: ["ghost"])
+    show(pro: true, released: ["ghost"])
     assert_equal :ghost, @show.new_theme.key
     use_key = @show.screens.fetch(:new_theme).plan.use_button
     @show.tap(use_key.center_x, use_key.center_y)
@@ -96,7 +96,7 @@ class ThemesTest < Minitest::Test
   end
 
   def test_not_now_keeps_the_ordinary_theme_and_does_not_ask_again
-    show(pro: true, unlocked: ["ghost"])
+    show(pro: true, released: ["ghost"])
     later = @show.screens.fetch(:new_theme).plan.later_button
     @show.tap(later.center_x, later.center_y)
     assert_predicate @show.in_use, :ordinary?
@@ -104,7 +104,7 @@ class ThemesTest < Minitest::Test
   end
 
   def test_escape_declines
-    show(pro: true, unlocked: ["ghost"])
+    show(pro: true, released: ["ghost"])
     assert @show.back
     assert_nil @show.new_theme
   end
@@ -113,7 +113,7 @@ class ThemesTest < Minitest::Test
   # buttons, which would open Home's screens or How to play, do nothing
   # under it, as a tap on Home's buttons under it does.
   def test_under_the_card_a_controllers_own_buttons_do_nothing
-    show(pro: true, unlocked: ["ghost"])
+    show(pro: true, released: ["ghost"])
     %i[x y lb rb lt select].each { @show.pad(it) }
 
     assert_equal :ghost, @show.new_theme&.key
@@ -123,7 +123,7 @@ class ThemesTest < Minitest::Test
 
   # H, How to play's key on Home, waits for the card's answer too.
   def test_under_the_card_h_does_nothing
-    show(pro: true, unlocked: ["ghost"])
+    show(pro: true, released: ["ghost"])
 
     press_key(:h)
 
@@ -133,7 +133,7 @@ class ThemesTest < Minitest::Test
 
   # Home's dots under the card are not Home's toy while it waits.
   def test_under_the_card_a_tap_on_homes_dots_does_nothing
-    show(pro: true, unlocked: ["ghost"])
+    show(pro: true, released: ["ghost"])
     dots = @show.attract.dots
     bright = dots.find { it.bright? && dots.top_at(it.x, it.y) == it && @show.control_at(it.x, it.y).nil? }
     @show.tap(bright.x, bright.y, by: :mouse)
@@ -143,20 +143,20 @@ class ThemesTest < Minitest::Test
   end
 
   def test_the_card_comes_only_on_home
-    show(pro: true, unlocked: ["ghost"])
+    show(pro: true, released: ["ghost"])
     @show.open_stats rescue nil
     assert_nil @show.new_theme
   end
 
   def test_a_free_player_can_be_told_and_is_led_to_pro
-    show(pro: false, unlocked: ["ghost"])
+    show(pro: false, released: ["ghost"])
     assert_equal :ghost, @show.new_theme.key
     assert_equal "Get Pro", @show.screens.fetch(:new_theme).use_word
     assert_predicate @show.in_use, :ordinary?
   end
 
   def test_the_switch_names_the_theme_it_uses
-    show(pro: true, unlocked: ["ghost"])
+    show(pro: true, released: ["ghost"])
     assert_equal "Use Ghost", @show.screens.fetch(:new_theme).use_word
   end
 

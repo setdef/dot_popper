@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DotPopperGui
-  # A theme the server has unlocked: the Stats screen offers Themes, whose
+  # A theme the server has released: the Stats screen offers Themes, whose
   # cards choose a theme at once. Needs DOT_POPPER_PRO=1 and
   # DOT_POPPER_THEME_UNLOCKS=ghost.
   class ThemesScenario < Scenario

@@ -387,7 +387,7 @@ class RootTest < Minitest::Test
   end
 
   # A device that saved Jingle bell, a theme since removed, as its choice
-  # or among its unlocks starts with the ordinary theme in its place and
+  # or among its released themes starts with the ordinary theme in its place and
   # keeps every other theme it saved.
   def test_a_device_that_saved_a_removed_theme_starts_and_keeps_the_rest
     pro = AUTOMATED.merge("DOT_POPPER_PRO" => "1")

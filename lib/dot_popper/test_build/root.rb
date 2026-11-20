@@ -20,7 +20,7 @@ module DotPopper
           Store.of_test_build(platform, entitlement:, fake:, website: -> { website_store(clipboard, FakeCheckout.new(clipboard:)) })
         end
 
-        # A scenario's unlocks and theme, in place of the server's.
+        # A scenario's released themes and theme, in place of the server's.
         def use_fixture(saved_themes, use_theme)
           return super if settings.store_build?
 

@@ -49,7 +49,7 @@ class ThemeReleasesTest < Minitest::Test
     assert_nil @saved_themes.new_theme
   end
 
-  def test_an_unlock_arrives_and_unknown_keys_are_ignored
+  def test_a_release_arrives_and_unknown_keys_are_ignored
     @worker.finished_list = [[nil, Reply.new(status: 200, body: [{ "key" => "ghost" }, { "key" => "zombie" }])]]
     assert @feed.update
     assert_equal [:ghost], @saved_themes.choices.drop(1)
