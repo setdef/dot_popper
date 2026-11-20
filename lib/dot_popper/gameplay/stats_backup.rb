@@ -72,11 +72,12 @@ module DotPopper
       # a clear finished changes Stats, so their file is neither, and Undo
       # leaves none empty.
       def finish_stopped_clear
-        now = backups.to_h { |name, backup| [name, [@kept.fetch(name).saved.to_s, @folder.call(backup).read.to_s]] }
-        emptied, left = now.partition { |_, (text, _)| text.empty? }
-        return if emptied.empty? || left.empty? || left.any? { |_, (text, backup)| text != backup }
+        named = backups
+        left = named.reject { |name, _| @kept.fetch(name).saved.to_s.empty? }
+        return if left.empty? || left.size == named.size
+        return unless left.all? { |name, backup| @kept.fetch(name).saved.to_s == @folder.call(backup).read.to_s }
 
-        left.each { |name, _| @kept.fetch(name).clear }
+        left.each_key { @kept.fetch(it).clear }
       end
 
       # The backups the note names, by the name of the save file each
