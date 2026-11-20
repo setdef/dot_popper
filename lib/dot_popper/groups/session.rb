@@ -11,7 +11,7 @@ module DotPopper
     # read and write, as a SaveFile does, and +now+ gives the time.
     #
     # It is made of parts, each with its own rules: what the game owes the
-    # server (Outbox), what it last heard from it (ReadModel), each kind of
+    # server (Unsent), what it last heard from it (ReadModel), each kind of
     # request and what its answers mean (Jobs), and group.txt (GroupFile).
     # Session holds the player's token, the queue of jobs and a 429's wait,
     # and ties the parts together.
@@ -98,7 +98,7 @@ module DotPopper
       # the groups they are in (retries are harmless, and a key that
       # could not be sent waits for the next contact).
       def report_achievements(keys)
-        return unless @outbox.owe_achievements(keys)
+        return unless @unsent.owe_achievements(keys)
 
         save
         send_achievements
@@ -109,18 +109,18 @@ module DotPopper
       # A game just ended. The server cannot tell how a score was won, so
       # only a game that counts is sent: one played by a member, not the
       # tutorial's (+counts+ is false for that one), with a score above 0,
-      # whatever its dot size (Outbox#owe_game). If it cannot be sent now,
+      # whatever its dot size (Unsent#owe_game). If it cannot be sent now,
       # the highest-scoring such game waits and is sent with the next
       # contact.
       def game_finished(score:, counts:)
         @game_result = nil
         @result_due = false
         # Without a token nothing owed is sent, so nothing is owed.
-        score = @outbox.owe_game(score:, counts:, member: member? && known?)
+        score = @unsent.owe_game(score:, counts:, member: member? && known?)
         return unless score
 
         @last_score = score
-        @result_due = @outbox.score == score
+        @result_due = @unsent.score == score
         save
         send_owed
       end
@@ -193,24 +193,24 @@ module DotPopper
         save
       end
 
-      def achievement_settled(key) = @outbox.achievement_settled(key)
+      def achievement_settled(key) = @unsent.achievement_settled(key)
 
       def achievement_taken(key, body)
-        @outbox.drop_achievement(key)
+        @unsent.drop_achievement(key)
         listed_groups(body).filter_map { Group.parse(it) }.each { upsert(it) }
         save
       end
 
       def drop_achievement(key)
-        @outbox.drop_achievement(key)
+        @unsent.drop_achievement(key)
         save
       end
 
-      def score_settled = @outbox.score_settled
+      def score_settled = @unsent.score_settled
 
       # The server took +score+, and says what it did in each group.
       def game_taken(score, body)
-        @outbox.score_taken(score)
+        @unsent.score_taken(score)
         outcomes = listed_groups(body).filter_map { outcome(it) }
         save
         @game_result = GameResult.of(outcomes, score) if score == @last_score && @result_due
@@ -219,7 +219,7 @@ module DotPopper
       end
 
       def give_up_score
-        @outbox.drop_score
+        @unsent.drop_score
         @result_due = false
         save
       end
@@ -228,7 +228,7 @@ module DotPopper
       # no longer knows their token.
       def forget_identity
         @token = nil
-        @outbox.forget
+        @unsent.forget
         @read.forget
         @wait_until = nil
         @result_due = false
@@ -256,7 +256,7 @@ module DotPopper
       def send_achievements
         return unless known? && !waiting_out?
 
-        @outbox.take_achievements(member: member?).each { ask(Jobs::SendAchievement.new(it)) }
+        @unsent.take_achievements(member: member?).each { ask(Jobs::SendAchievement.new(it)) }
       end
 
       # Sends what is owed: achievements, then the score. Nothing goes
@@ -265,7 +265,7 @@ module DotPopper
         send_achievements
         return unless known? && !waiting_out?
 
-        score = @outbox.take_score(member: member?)
+        score = @unsent.take_score(member: member?)
         ask(Jobs::SendGame.new(score)) if score
       end
 
@@ -341,9 +341,9 @@ module DotPopper
       # Leaving the last group drops the score waiting, as it has no group
       # to go to.
       def remember_membership
-        return unless @read.remember_membership || (!member? && @outbox.score)
+        return unless @read.remember_membership || (!member? && @unsent.score)
 
-        @outbox.drop_score unless member?
+        @unsent.drop_score unless member?
         save
       end
 
@@ -351,13 +351,13 @@ module DotPopper
       def load_saved
         saved = GroupFile.parse(@store.read)
         @token = saved.token
-        @outbox = Outbox.new(score: saved.unsent_score, achievements: saved.unsent_achievements)
+        @unsent = Unsent.new(score: saved.unsent_score, achievements: saved.unsent_achievements)
         @read = ReadModel.new(last_known_member: saved.member, seen: saved.seen)
       end
 
       def save
-        @store.write(GroupFile.new(token: @token, unsent_score: @outbox.score, member: @read.last_known_member, seen: @read.seen,
-                                   unsent_achievements: @outbox.achievements).to_s)
+        @store.write(GroupFile.new(token: @token, unsent_score: @unsent.score, member: @read.last_known_member, seen: @read.seen,
+                                   unsent_achievements: @unsent.achievements).to_s)
       end
     end
   end

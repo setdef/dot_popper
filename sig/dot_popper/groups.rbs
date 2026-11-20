@@ -30,7 +30,7 @@ module DotPopper
       def to_s: () -> String
     end
 
-    class Outbox
+    class Unsent
       HIGHEST_SCORE: Integer
 
       @score: Integer?
@@ -409,7 +409,7 @@ module DotPopper
 
       @token: String?
 
-      @outbox: Outbox
+      @unsent: Unsent
 
       @read: ReadModel
 

@@ -67,7 +67,7 @@ class ServerExchangesTest < Minitest::Test
     assert_equal [C::LicenseKey::SIZE, C::LicenseKey::VERSION, C::LicenseKey::PREFIX, C::LicenseKey::ALPHABET, C::LicenseKey::LETTERS],
                  values.fetch("license_key").values_at("size", "version", "prefix", "alphabet", "letters")
     assert_equal C::SignedAnswers::VERDICTS, values.fetch("verdicts")
-    assert_equal Groups::Outbox::HIGHEST_SCORE, values.fetch("highest_score")
+    assert_equal Groups::Unsent::HIGHEST_SCORE, values.fetch("highest_score")
     assert_equal DotPopper::Presentation::GroupWords::CODE_LENGTH, values.fetch("join_code_digits")
     assert_equal Groups::Session::LONGEST_RETRY_WAIT, values.fetch("retry_after")
     assert_includes File.read(File.expand_path("../doc/server.md", __dir__)),

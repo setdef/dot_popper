@@ -13,7 +13,7 @@ module DotPopper
     # very score, so a higher one that arrives meanwhile still waits. A
     # score or a key the server will never take is dropped, and so is the
     # score once the player is in no group.
-    class Outbox
+    class Unsent
       # The highest score the server takes.
       HIGHEST_SCORE = 100_000
 
