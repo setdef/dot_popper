@@ -1,0 +1,8 @@
+module DotPopper
+  module Monetization
+    # License keys, the website's way to Pro (license_keys.rb; what is in
+    # license_keys/ is not typed yet).
+    module LicenseKeys
+    end
+  end
+end
