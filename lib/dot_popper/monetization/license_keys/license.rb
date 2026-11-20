@@ -30,9 +30,10 @@ module DotPopper
         # is never sent.
         def self.kept_in(taken) = taken ? yield : MemoryFile.new
 
-        def initialize(file, pins: Continuity::PINNED, fresh: -> { Continuity::SignedAnswers.fresh })
+        def initialize(file, pins: Continuity::PINNED, signing_keys: SIGNING_KEYS, fresh: -> { Continuity::SignedAnswers.fresh })
           @file = file
           @pins = pins
+          @signing_keys = signing_keys
           @fresh = fresh
           @lines = read
         end
@@ -45,7 +46,7 @@ module DotPopper
 
           @checked = text
           parsed = LicenseKey.parse(text)
-          @key = (parsed if parsed&.valid?(@pins))
+          @key = (parsed if parsed&.valid?(@signing_keys))
         end
 
         def pro? = !key.nil?
@@ -55,7 +56,7 @@ module DotPopper
         # entry.
         def enter(text)
           entered = LicenseKey.parse(text)
-          return :invalid unless entered&.valid?(@pins)
+          return :invalid unless entered&.valid?(@signing_keys)
           return :same if entered == key
 
           @lines = { "key" => entered.text, "secret" => Continuity.hex(@fresh.call) }

@@ -107,7 +107,7 @@ module Inputs
       @game_flow = DotPopper::Gameplay::GameFlow.new(field(width, height), random: Random.new(5), sizing: DotPopper::Gameplay::DotSizing.parse(nil))
       @gone = DotPopper::Monetization::Continuity::Gone.new(Memory.new)
       @gone.heard(:gone, @day - 200) if gone
-      license = DotPopper::Monetization::LicenseKeys::License.new(Memory.new, pins: DotPopper::Monetization::Continuity::TEST_PINS)
+      license = DotPopper::Monetization::LicenseKeys::License.new(Memory.new, pins: DotPopper::Monetization::Continuity::TEST_PINS, signing_keys: DotPopper::Monetization::LicenseKeys::TEST_SIGNING_KEYS)
       @entitlement = DotPopper::Monetization::Entitlement.new(forced: pro, license:, trust: DotPopper::Monetization::Receipt::TEST)
       @store = if channel
                       DotPopper::Monetization::Store.for(platform, entitlement:, native: DotPopper::Monetization::FakeStore.new(Memory.new), website: (-> { website(fake: false) } if channel == DotPopper::ReleaseEngineering::Build::WEBSITE), channel:)

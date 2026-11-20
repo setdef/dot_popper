@@ -39,9 +39,12 @@ class BuildForSaleTest < Minitest::Test
     require "composition/fake_engine"
     receipt, key, every = ARGV
     c = DotPopper::Monetization::Continuity
+    l = DotPopper::Monetization::LicenseKeys
     answers = { "channel" => DotPopper::ReleaseEngineering::Build::CHANNEL, "parts" => DotPopper::ReleaseEngineering::Build::PARTS,
                 "part loaded" => $LOADED_FEATURES.grep(%r{/test_build/}),
-                "pins are setdef's" => DotPopper::Composition::Root.pins(DotPopper::Composition::DeveloperSettings.new).equal?(c::PINNED) && c::PINNED == c::SETDEF_PINS,
+                "pins are setdef's" => DotPopper::Composition::Root.pins(DotPopper::Composition::DeveloperSettings.new).equal?(c::PINNED) && c::PINNED == c::SETDEF_PINS &&
+                  DotPopper::Composition::Root.license_signing_keys(DotPopper::Composition::DeveloperSettings.new).equal?(l::SIGNING_KEYS) &&
+                  l::SIGNING_KEYS == l::SETDEF_SIGNING_KEYS,
                 "builds" => [] }
     #{SYSTEMS.inspect}.product({ "no setting" => {}, "every setting" => JSON.parse(every) }.to_a).each do |system, (label, env)|
       engine = FakeEngine.new(system)

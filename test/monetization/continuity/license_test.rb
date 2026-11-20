@@ -19,7 +19,7 @@ class LicenseTest < Minitest::Test
 
   # A device: its saved license, gone-ness and a watch over +server+.
   def device(server = C::FakeSetdef.new(@ledger), connectivity: server, today: TODAY)
-    license = L::License.new(Memory.new, pins: C::TEST_PINS)
+    license = L::License.new(Memory.new, pins: C::TEST_PINS, signing_keys: L::TEST_SIGNING_KEYS)
     C::Watch.new(server:, connectivity:, gone: C::Gone.new(Memory.new), license:, license_server: server, today: -> { today }, pins: C::TEST_PINS)
   end
 
@@ -34,8 +34,8 @@ class LicenseTest < Minitest::Test
   # against setdef's (which pins a build trusts is the composition root's
   # choice, test/composition/root_test.rb).
   def test_a_test_signed_key_verifies_only_against_the_test_keys
-    refute @key.valid?(C::PINNED)
-    assert @key.valid?(C::TEST_PINS)
+    refute @key.valid?(L::SIGNING_KEYS)
+    assert @key.valid?(L::TEST_SIGNING_KEYS)
   end
 
   # A build that takes no license keys never reads license.txt, so a key
@@ -52,7 +52,7 @@ class LicenseTest < Minitest::Test
   end
 
   def test_a_valid_key_is_pro_at_once_offline_and_a_bad_one_is_refused
-    license = L::License.new(Memory.new, pins: C::TEST_PINS)
+    license = L::License.new(Memory.new, pins: C::TEST_PINS, signing_keys: L::TEST_SIGNING_KEYS)
 
     assert_equal :invalid, license.enter("DP-NOT-A-KEY")
     assert_equal :invalid, license.enter(C::TestKeys.license_key(:online).text)
@@ -66,12 +66,12 @@ class LicenseTest < Minitest::Test
   # saved key is verified again at each launch, offline.
   def test_license_txt_is_pro_only_while_it_holds_a_key_that_verifies
     saved = Memory.new
-    L::License.new(saved, pins: C::TEST_PINS).enter(@key.text)
+    L::License.new(saved, pins: C::TEST_PINS, signing_keys: L::TEST_SIGNING_KEYS).enter(@key.text)
 
-    assert_predicate L::License.new(Memory.new(saved.read), pins: C::TEST_PINS), :pro?, "a relaunch, offline"
+    assert_predicate L::License.new(Memory.new(saved.read), pins: C::TEST_PINS, signing_keys: L::TEST_SIGNING_KEYS), :pro?, "a relaunch, offline"
     refute_predicate L::License.new(Memory.new(saved.read), pins: C::PINNED), :pro?, "a file build"
     ["key: pro\n", "pro: yes\nregistered: yes\n", "key: #{@key.text.sub(/.\z/) { it == "0" ? "1" : "0" }}\n", "4"].each do |text|
-      refute_predicate L::License.new(Memory.new(text), pins: C::TEST_PINS), :pro?, text
+      refute_predicate L::License.new(Memory.new(text), pins: C::TEST_PINS, signing_keys: L::TEST_SIGNING_KEYS), :pro?, text
     end
   end
 
@@ -90,7 +90,7 @@ class LicenseTest < Minitest::Test
   def test_the_watch_asks_the_license_server_and_setdef_only_for_its_proof
     proving = C::FakeSetdef.new(@ledger)
     def proving.ask(_due) = raise("setdef's proof server was asked about a license key")
-    watch = C::Watch.new(server: proving, connectivity: proving, gone: C::Gone.new(Memory.new), license: L::License.new(Memory.new, pins: C::TEST_PINS),
+    watch = C::Watch.new(server: proving, connectivity: proving, gone: C::Gone.new(Memory.new), license: L::License.new(Memory.new, pins: C::TEST_PINS, signing_keys: L::TEST_SIGNING_KEYS),
                          license_server: C::FakeSetdef.new(@ledger), today: -> { TODAY }, pins: C::TEST_PINS)
     watch.license.enter(@key.text)
 

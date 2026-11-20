@@ -59,11 +59,17 @@ module DotPopper
         build
       end
 
-      # The keys a build with +settings+ (DeveloperSettings) trusts, by its
-      # channel alone and never by anything set at run time (ADR-0010):
+      # The proof roots a build with +settings+ (DeveloperSettings) trusts, by
+      # its channel alone and never by anything set at run time (ADR-0010):
       # setdef's own. script/check_build.rb asks this of each build for
       # sale. A part (Build::PARTS) answers for its own builds.
       def self.pins(_settings) = Monetization::Continuity::PINNED
+
+      # The keys whose signature on a license key a build with +settings+
+      # trusts, by its channel alone (ADR-0010): setdef's own.
+      # script/check_build.rb asks this too. A part answers for its own
+      # builds.
+      def self.license_signing_keys(_settings) = Monetization::LicenseKeys::SIGNING_KEYS
 
       # Whose receipts it trusts, by its channel alone (ADR-0010): only its
       # own store's. The App Store's and the Mac App Store's build Apple's,
@@ -185,7 +191,8 @@ module DotPopper
         # What this build trusts, and where it keeps a license key, by the
         # channel alone (ADR-0010).
         pins = self.class.pins(settings)
-        license = Monetization::LicenseKeys::License.new(Monetization::LicenseKeys::License.kept_in(self.class.license_keys?(settings)) { file("license.txt") }, pins:)
+        kept = Monetization::LicenseKeys::License.kept_in(self.class.license_keys?(settings)) { file("license.txt") }
+        license = Monetization::LicenseKeys::License.new(kept, pins:, signing_keys: self.class.license_signing_keys(settings))
         @watch = watch_for(license, pins)
         @entitlement = Monetization::Entitlement.new(forced: self.class.forced_pro?(settings, platform), license:,
                                                      trust: self.class.receipt_trust(settings))

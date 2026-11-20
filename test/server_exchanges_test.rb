@@ -108,7 +108,8 @@ class ServerExchangesTest < Minitest::Test
   private
 
   def play_continuity
-    pins = C::Pins.of(roots: RECORD.dig("keys", "roots"), license_keys: RECORD.dig("keys", "license_keys"))
+    pins = C::Pins.of(roots: RECORD.dig("keys", "roots"))
+    signing_keys = RECORD.dig("keys", "license_keys").map { [it].pack("H*") }
     server = C::SetdefServer.new(Network::Link.new(@url))
     license_server = L::Server.new(Network::Link.new(@url))
 
@@ -121,8 +122,8 @@ class ServerExchangesTest < Minitest::Test
       exchange("the device asks again after losing the answer"), exchange("another device enters the same key"), exchange("the first device learns the key has moved")
     text = entering.dig("request", "body", "key")
     secrets = [entering, checking, moving].map { H[body(it).fetch(it.equal?(entering) ? "secret" : "next")] }
-    first = L::License.new(DotPopper::MemoryFile.new, pins:, fresh: -> { secrets.shift })
-    second = L::License.new(DotPopper::MemoryFile.new, pins:, fresh: -> { H[body(elsewhere).fetch("secret")] })
+    first = L::License.new(DotPopper::MemoryFile.new, pins:, signing_keys:, fresh: -> { secrets.shift })
+    second = L::License.new(DotPopper::MemoryFile.new, pins:, signing_keys:, fresh: -> { H[body(elsewhere).fetch("secret")] })
 
     assert_equal :entered, first.enter(text)
     assert_equal :current, ask(license_server, first, entering)

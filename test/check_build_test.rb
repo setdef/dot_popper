@@ -75,8 +75,9 @@ class CheckBuildTest < Minitest::Test
     stamp("website")
     test_pins = DotPopper::Monetization::Continuity::TEST_PINS
     hexes = ->(keys) { "%w[#{keys.map { it.unpack1("H*") }.join(" ")}]" }
-    edit("lib/dot_popper/monetization/continuity/pins.rb", "PINNED = SETDEF_PINS",
-         "PINNED = Pins.of(roots: #{hexes.(test_pins.roots)}, license_keys: #{hexes.(test_pins.license_keys)})")
+    edit("lib/dot_popper/monetization/continuity/pins.rb", "PINNED = SETDEF_PINS", "PINNED = Pins.of(roots: #{hexes.(test_pins.roots)})")
+    edit("lib/dot_popper/monetization/license_keys/signing_keys.rb", "SIGNING_KEYS = SETDEF_SIGNING_KEYS",
+         "SIGNING_KEYS = #{hexes.(DotPopper::Monetization::LicenseKeys::TEST_SIGNING_KEYS)}.map { [it].pack(\"H*\") }")
     ok, out = check("website", "0.0.1")
 
     refute ok, out

@@ -43,8 +43,8 @@ module DotPopper
           "#{PREFIX}-#{bits.scan(/.{5}/).map { ALPHABET[it.to_i(2)] }.join.scan(/.{1,#{GROUP}}/o).join("-")}"
         end
 
-        # Whether a license-signing key that +pins+ trust signed it.
-        def valid?(pins = Continuity::PINNED) = pins.license_keys.any? { Continuity::Ed25519.verify(it, signature, LABEL + bytes[0, 17].to_s) }
+        # Whether one of the license-signing +keys+ signed it.
+        def valid?(keys = SIGNING_KEYS) = keys.any? { Continuity::Ed25519.verify(it, signature, LABEL + bytes[0, 17].to_s) }
       end
     end
   end

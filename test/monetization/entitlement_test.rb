@@ -65,7 +65,7 @@ class EntitlementTest < Minitest::Test
   end
 
   def test_pro_arriving_by_a_license_key_is_announced_once
-    license = DotPopper::Monetization::LicenseKeys::License.new(DotPopper::MemoryFile.new, pins: DotPopper::Monetization::Continuity::TEST_PINS)
+    license = DotPopper::Monetization::LicenseKeys::License.new(DotPopper::MemoryFile.new, pins: DotPopper::Monetization::Continuity::TEST_PINS, signing_keys: DotPopper::Monetization::LicenseKeys::TEST_SIGNING_KEYS)
     entitlement = Entitlement.new(license:)
     heard = []
     entitlement.subscribe(->(event) { heard << event })

@@ -43,6 +43,7 @@ module DotPopper
       # What a test build trusts and obeys in place of a build for sale's,
       # each giving the shared answer for a build with a channel:
       # - the test keys, and only the fake store's receipts (Root.pins,
+      #   Root.license_signing_keys,
       #   Root.receipt_trust), and license keys (Root.license_keys?);
       # - DOT_POPPER_PRO=1 stands in for a purchase, to try Pro out, and
       #   DOT_POPPER_PRO=0 is a free player; unset, as the shared code
@@ -55,6 +56,7 @@ module DotPopper
         STARTING = "DOT_POPPER_FREE_GAMES"
 
         def pins(settings) = settings.store_build? ? super : Monetization::Continuity::TEST_PINS
+        def license_signing_keys(settings) = settings.store_build? ? super : Monetization::LicenseKeys::TEST_SIGNING_KEYS
         def license_keys?(settings) = settings.store_build? ? super : true
         def receipt_trust(settings) = settings.store_build? ? super : Monetization::Receipt::TEST
 

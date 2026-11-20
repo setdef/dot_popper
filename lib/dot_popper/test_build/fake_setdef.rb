@@ -58,7 +58,7 @@ module DotPopper
 
         def enter(body)
           key = LicenseKeys::LicenseKey.parse(body[:key])
-          return Network::Reply.new(status: 422, body: {}) unless key&.valid?(TEST_PINS)
+          return Network::Reply.new(status: 422, body: {}) unless key&.valid?(LicenseKeys::TEST_SIGNING_KEYS)
 
           remember(key.id, body[:secret])
           verdict("current", key.id, body[:nonce])

@@ -173,9 +173,11 @@ class RootTest < Minitest::Test
     trust = ->(channel) { DotPopper::Composition::DeveloperSettings.new(SETTINGS, channel:) }
 
     assert_same C::TEST_PINS, Root.pins(trust.(nil))
+    assert_same DotPopper::Monetization::LicenseKeys::TEST_SIGNING_KEYS, Root.license_signing_keys(trust.(nil))
     assert_same DotPopper::Monetization::Receipt::TEST, Root.receipt_trust(trust.(nil))
     B::CHANNEL_NAMES.each do |channel|
       assert_same C::PINNED, Root.pins(trust.(channel)), channel
+      assert_same DotPopper::Monetization::LicenseKeys::SIGNING_KEYS, Root.license_signing_keys(trust.(channel)), channel
       wanted = { B::APP_STORE => :APPLE, B::MAC_APP_STORE => :APPLE, B::GOOGLE_PLAY => :PLAY, B::MICROSOFT_STORE => :MICROSOFT_STORE,
                  B::WEBSITE => :NONE }.fetch(channel)
       assert_same DotPopper::Monetization::Receipt.const_get(wanted), Root.receipt_trust(trust.(channel)), channel
@@ -307,12 +309,14 @@ class RootTest < Minitest::Test
   # license key is checked with: the test keys in a test build, setdef's
   # in a build for sale that asks the real server.
   def test_the_setdef_watch_trusts_the_same_pins_as_the_license
-    { nil => C::TEST_PINS, B::WEBSITE => C::PINNED }.each do |channel, pins|
+    l = DotPopper::Monetization::LicenseKeys
+    { nil => [C::TEST_PINS, l::TEST_SIGNING_KEYS], B::WEBSITE => [C::PINNED, l::SIGNING_KEYS] }.each do |channel, (pins, signing_keys)|
       watch = root(channel:, env: {}).watch
 
       assert_instance_of C::Watch, watch, channel.inspect
       assert_same pins, watch.instance_variable_get(:@pins), channel.inspect
       assert_same pins, watch.license.instance_variable_get(:@pins), channel.inspect
+      assert_same signing_keys, watch.license.instance_variable_get(:@signing_keys), channel.inspect
     end
   end
 

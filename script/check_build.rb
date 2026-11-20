@@ -44,18 +44,19 @@ MAKE_PROOFS = <<~RUBY
   require "dot_popper"
   require "dot_popper/test_build/core"
   c = DotPopper::Monetization::Continuity
+  l = DotPopper::Monetization::LicenseKeys
   hex = ->(bytes) { bytes.unpack1("H*") }
   keys = %i[root license online].map { c::TestKeys.license_key(it).text }
   certificate = c::TestKeys.online_certificate
   receipt = DotPopper::Monetization::Receipt.issue
   controls = {
     "this Ruby verifies Ed25519" => c::Ed25519.available?,
-    "a key signed by the test key unlocks a test build" => DotPopper::Monetization::LicenseKeys::LicenseKey.parse(keys[1])&.valid?(c::TEST_PINS) == true,
+    "a key signed by the test key unlocks a test build" => l::LicenseKey.parse(keys[1])&.valid?(l::TEST_SIGNING_KEYS) == true,
     "a test build takes a proof certified by the test root" =>
       !c::Certificate.verified(certificate, roots: c::TEST_PINS.roots, purpose: c::Certificate::PROOF).nil?,
     "the fake store's receipt proves Pro in a test build" => DotPopper::Monetization::Entitlement.new(trust: DotPopper::Monetization::Receipt::TEST).verify_receipt(receipt) == true
   }
-  puts JSON.generate("roots" => c::TEST_PINS.roots.map(&hex), "license_keys" => c::TEST_PINS.license_keys.map(&hex),
+  puts JSON.generate("roots" => c::TEST_PINS.roots.map(&hex), "license_keys" => l::TEST_SIGNING_KEYS.map(&hex),
                      "keys" => keys, "certificate" => hex.(certificate), "receipt" => receipt, "controls" => controls)
 RUBY
 made, status = Open3.capture2e(RbConfig.ruby, "-I", File.expand_path("../lib", __dir__), "-e", MAKE_PROOFS)
@@ -101,23 +102,29 @@ check.call("it holds nothing a #{channel} build leaves out, and is stamped for i
 end
 check.call("it loads none of the test build's part") do
   $LOADED_FEATURES.none? { it.include?("/dot_popper/test_build/") } && !defined?(c::TestKeys) && !defined?(c::TEST_PINS) &&
+    !defined?(DotPopper::Monetization::LicenseKeys::TEST_SIGNING_KEYS) &&
     !defined?(DotPopper::Monetization::FakeStore) && !DotPopper::Monetization::Receipt.const_defined?(:TEST, false)
 end
 check.call("#{channel.inspect} is a channel the game names (#{build::CHANNEL_NAMES.join(", ")})") { build::CHANNEL_NAMES.include?(channel) }
 check.call("the app was built for #{channel.inspect} (Build::CHANNEL is #{build::CHANNEL.inspect})") { build::CHANNEL == channel }
 
 pins = root.pins(settings)
+signing_keys = root.license_signing_keys(settings)
+license_keys = DotPopper::Monetization::LicenseKeys
 hex = ->(bytes) { bytes.unpack1("H*") }
-check.call("it trusts setdef's own keys (Continuity::SETDEF_PINS)") { pins.equal?(c::PINNED) && c::PINNED == c::SETDEF_PINS && c.live?(pins) }
+check.call("it trusts setdef's own keys (Continuity::SETDEF_PINS, LicenseKeys::SETDEF_SIGNING_KEYS)") do
+  pins.equal?(c::PINNED) && c::PINNED == c::SETDEF_PINS && c.live?(pins) &&
+    signing_keys.equal?(license_keys::SIGNING_KEYS) && license_keys::SIGNING_KEYS == license_keys::SETDEF_SIGNING_KEYS
+end
 check.call("it trusts no test key") do
-  (pins.roots.map(&hex) & proofs.fetch("roots")).empty? && (pins.license_keys.map(&hex) & proofs.fetch("license_keys")).empty?
+  (pins.roots.map(&hex) & proofs.fetch("roots")).empty? && (signing_keys.map(&hex) & proofs.fetch("license_keys")).empty?
 end
 
 # Each "grants nothing" below is shown against its control, checked by
 # the repository's code: the same proof does grant in a test build.
 proofs.fetch("controls").each { |what, held| check.call(what) { held } }
 check.call("no license key signed by a test key unlocks it") do
-  !defined?(DotPopper::Monetization::LicenseKeys::LicenseKey) || proofs.fetch("keys").none? { DotPopper::Monetization::LicenseKeys::LicenseKey.parse(it)&.valid?(pins) }
+  !defined?(DotPopper::Monetization::LicenseKeys::LicenseKey) || proofs.fetch("keys").none? { DotPopper::Monetization::LicenseKeys::LicenseKey.parse(it)&.valid?(signing_keys) }
 end
 check.call("it takes no proof certified by the test root") do
   c::Certificate.verified([proofs.fetch("certificate")].pack("H*"), roots: pins.roots, purpose: c::Certificate::PROOF).nil?

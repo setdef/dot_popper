@@ -18,7 +18,7 @@ class SignaturesTest < Minitest::Test
     "signature" => "4523c24b7b106e8207bea434ddb355d0898f0c60a0edf8bc8593fd4f17ac9373f548ce3f7f5e96fd9f90ce455cdb93c196c4f1f96b82d7374ef7698dd2942004",
     "certificate" => "445043540169caa7e3cee69c41646f742d706f707065722f7365727665722d70726f6f662f76310000000000004b27a311e0ca69f749672766d988b3e673d347bfcd7f67aeff856ff743fe036d0f2371e812744e936b2ebfc4839dfba788620768c7f59020d77caee2d5c5dde9500c2f2769d3117d37e4e129268ddaae9cd8a9f4b89e1b54d3942af4ba58de01"
   }.freeze
-  VECTOR_PINS = C::Pins.new(roots: [VECTOR_ROOT], license_keys: [])
+  VECTOR_PINS = C::Pins.new(roots: [VECTOR_ROOT])
 
   def test_openssl_verifies_ed25519_in_this_ruby
     assert C::Ed25519.verify(H["4b27a311e0ca69f749672766d988b3e673d347bfcd7f67aeff856ff743fe036d"],
@@ -69,7 +69,7 @@ class SignaturesTest < Minitest::Test
     assert_equal key, L::LicenseKey.parse(text)
     assert_equal key, L::LicenseKey.parse("  #{text.downcase.delete("-").scan(/.{1,40}/).join("\r\n")}\n")
     assert_equal key, L::LicenseKey.parse(text.delete_prefix("DP-").tr("0", "O"))
-    assert key.valid?(C::TEST_PINS)
+    assert key.valid?(L::TEST_SIGNING_KEYS)
   end
 
   def test_a_key_not_signed_by_a_pinned_license_key_or_changed_is_not_valid
@@ -77,9 +77,9 @@ class SignaturesTest < Minitest::Test
     key = C::TestKeys.license_key
     changed = key.with(id: key.id.dup.tap { it.setbyte(0, key.id.getbyte(0) ^ 1) })
 
-    refute stranger.valid?(C::TEST_PINS)
-    refute changed.valid?(C::TEST_PINS)
-    refute key.valid?(VECTOR_PINS)
+    refute stranger.valid?(L::TEST_SIGNING_KEYS)
+    refute changed.valid?(L::TEST_SIGNING_KEYS)
+    refute key.valid?([]), "no key is valid where no signing key is trusted"
   end
 
   def test_text_that_is_no_key_parses_to_nothing
@@ -106,14 +106,15 @@ class SignaturesTest < Minitest::Test
     assert C.live?
     refute C.live?(C::TEST_PINS)
     assert_equal %w[8336ad85d326749b ad88ca8070d052b7], C::PINNED.roots.map { C.hex(C::Certificate.id_of(it)) }
-    assert_equal [2, 2], [C::PINNED.roots.size, C::PINNED.license_keys.size]
-    assert(([*C::PINNED.roots, *C::PINNED.license_keys] & [*C::TEST_PINS.roots, *C::TEST_PINS.license_keys]).empty?)
-    assert(([*C::PINNED.roots, *C::PINNED.license_keys]).all? { it.bytesize == 32 })
+    assert_same L::SETDEF_SIGNING_KEYS, L::SIGNING_KEYS
+    assert_equal [2, 2], [C::PINNED.roots.size, L::SIGNING_KEYS.size]
+    assert(([*C::PINNED.roots, *L::SIGNING_KEYS] & [*C::TEST_PINS.roots, *L::TEST_SIGNING_KEYS]).empty?)
+    assert([*C::PINNED.roots, *L::SIGNING_KEYS].all? { it.bytesize == 32 })
   end
 
   def test_nothing_the_test_build_signs_passes_against_the_real_pins
-    assert C::TestKeys.license_key.valid?(C::TEST_PINS)
-    refute C::TestKeys.license_key.valid?(C::PINNED)
+    assert C::TestKeys.license_key.valid?(L::TEST_SIGNING_KEYS)
+    refute C::TestKeys.license_key.valid?(L::SIGNING_KEYS)
     nonce = C::SignedAnswers.fresh
     assert C::SignedAnswers.proof?(C::SignedAnswers.signed_proof(nonce), nonce, C::TEST_PINS)
     refute C::SignedAnswers.proof?(C::SignedAnswers.signed_proof(nonce), nonce, C::PINNED)
@@ -125,8 +126,8 @@ class SignaturesTest < Minitest::Test
     vector = L::LicenseKey.parse("DP-04002-0G30G-2GC1R-81450-P30D1-R7SFX-0HGSD-6SGPK-K2W19-V4W1S-HG83P-HYKNB-CE1KN-Q1F61-356YC-HEY9G-RB61G-ZG7MQ-0YPZS-A2015-PT5GT-M3X50-KSA5M-FC841-KPZC6-WXQ0W")
 
     assert_equal H["000102030405060708090a0b0c0d0e0f"], vector.id
-    assert vector.valid?(C::Pins.new(roots: [], license_keys: [H["d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a"]]))
-    refute vector.valid?(C::PINNED)
+    assert vector.valid?([H["d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a"]])
+    refute vector.valid?(L::SIGNING_KEYS)
   end
 
   # No code in the repository makes a license key: setdef's server alone

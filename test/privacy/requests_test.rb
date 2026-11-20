@@ -185,7 +185,7 @@ class PrivacyRequestsTest < Minitest::Test
     local = "http://127.0.0.1:#{@server.addr[1]}"
     server = c::SetdefServer.new(Network::Link.new(local))
     license_server = DotPopper::Monetization::LicenseKeys::Server.new(Network::Link.new(local))
-    license = DotPopper::Monetization::LicenseKeys::License.new(DotPopper::MemoryFile.new, pins: c::TEST_PINS)
+    license = DotPopper::Monetization::LicenseKeys::License.new(DotPopper::MemoryFile.new, pins: c::TEST_PINS, signing_keys: DotPopper::Monetization::LicenseKeys::TEST_SIGNING_KEYS)
     license.enter(c::TestKeys.license_key.text)
     server.proof(c::SignedAnswers.fresh)
     license_server.ask(license.due(c::SignedAnswers.fresh))
