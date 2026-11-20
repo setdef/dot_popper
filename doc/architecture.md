@@ -84,7 +84,7 @@ What only the engine can make or do, the root asks of an engine it is given, who
 
 ## Saving
 
-Everything the game keeps is a text file in Lota's save folder, read and written whole through `Shell::SaveFile`, which refuses any name not declared in `Privacy::SAVE_FILES`. Lota's save folder can't rename or append, so a file is rewritten whole, and a backup is a copy written before the original changes. The core's objects that keep what is saved (`ScoreRecord`, `SavedStats`, `FreeGames`, `License` and the rest) each take a save file that answers `read` and `write(text)`, so they work on one in memory in tests. Saves read leniently: a line that can't be read keeps its starting value. `doc/privacy.json` lists every file, what it holds, and what leaves the device.
+Everything the game keeps is a text file in Lota's save folder, read and written whole through `Shell::SaveFile`, which refuses any name not declared in `Privacy::SAVE_FILES`. Lota's save folder can't rename or append, so a file is rewritten whole, and a backup is a copy written before the original changes. The core's objects that keep what is saved (`ScoreRecord`, `SavedStats`, `FreeGames`, `License` and the rest) each take a save file that answers `read` and `write(text)`, so they work on one in memory in tests. Gameplay keeps each save file's format apart from the rules of what it holds, in a value of its own that parses the text and writes it back (`ScoreRecordFile`, `StatsFile`, `AchievementsFile`, `ThemesFile`, `Groups::GroupFile`), so the rules never parse and the formats hold no rule. Saves read leniently: a line that can't be read keeps its starting value. `doc/privacy.json` lists every file, what it holds, and what leaves the device.
 
 ## Threads
 
