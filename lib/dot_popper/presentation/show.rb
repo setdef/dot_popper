@@ -250,7 +250,7 @@ module DotPopper
       def clear_offered? = @screens[:stats].clear_offered?
 
       # Undo, while it is offered on the Stats screen (UndoableClear), or nil.
-      def undo_offer = @screens[:stats].undo_offer
+      def undoable_clear = @screens[:stats].undoable_clear
 
       # What the choice of dot size would do on this screen, worked out
       # afresh each time, so a resized window is always seen as it is now.

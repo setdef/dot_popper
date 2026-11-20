@@ -130,7 +130,7 @@ module DotPopper
       end
 
       def corner(show, layout)
-        if (offer = show.undo_offer) then undo(show, offer, layout)
+        if (undoable = show.undoable_clear) then undo(show, undoable, layout)
         elsif show.clear_offered? then clear(show, layout)
         end
       end
@@ -150,13 +150,13 @@ module DotPopper
         PillButton.new(context:).label(rect, show.words.clear)
       end
 
-      def undo(show, offer, layout)
+      def undo(show, undoable, layout)
         rect = layout.undo_button
         PillButton.new(context:).draw(rect, show.words.undo, hover: show.hover.level(:undo))
         font = context.fonts.semibold(15)
         text = show.words.cleared
         context.text(text, font, rect.x - 12 - (font.width(text) / 2.0), rect.center_y, context.palette.soft)
-        amount = offer.left(show.now)
+        amount = undoable.left(show.now)
         return unless amount.positive?
 
         context.color(context.palette.soft, 0.5)

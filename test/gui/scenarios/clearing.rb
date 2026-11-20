@@ -29,7 +29,7 @@ module DotPopperGui
       pad_down(:y)
       wait(HOLD + 0.1)
       pad_up(:y)
-      check(show.stats.empty && show.undo_offer, "holding a gamepad's Y clears the records too")
+      check(show.stats.empty && show.undoable_clear, "holding a gamepad's Y clears the records too")
       pad(:y)
       check(!show.stats.empty, "a press of Y undoes")
       back = show.back_reach
@@ -55,7 +55,7 @@ module DotPopperGui
       keep_screenshot("clearing-held")
       release(reach.center_x, reach.center_y)
       wait(HOLD)
-      check(!show.stats.empty && !show.undo_offer, "letting go too soon clears nothing")
+      check(!show.stats.empty && !show.undoable_clear, "letting go too soon clears nothing")
       check(before == files, "letting go too soon leaves every file as it was")
     end
 
@@ -68,7 +68,7 @@ module DotPopperGui
       check(show.clearing.held?, "a finger on Clear my stats starts a hold")
       touch_up(reach.center_x, reach.center_y)
       wait(HOLD)
-      check(!show.stats.empty && !show.undo_offer, "a finger let go too soon clears nothing")
+      check(!show.stats.empty && !show.undoable_clear, "a finger let go too soon clears nothing")
       check(before == files, "a finger let go too soon leaves every file as it was")
     end
 
@@ -81,7 +81,7 @@ module DotPopperGui
 
     def check_cleared(before)
       check(show.stats? && show.stats.empty, "held two seconds, the records clear, to the empty Stats screen")
-      check(show.undo_offer, "Undo is offered")
+      check(show.undoable_clear, "Undo is offered")
       wait(0.3)
       keep_screenshot("clearing-cleared")
       check_equal("", File.read(saved("stats.txt")), "stats.txt is emptied")

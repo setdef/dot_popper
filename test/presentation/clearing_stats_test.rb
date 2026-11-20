@@ -35,7 +35,7 @@ class ClearingStatsTest < Minitest::Test
 
     @show.update(0.1)
     assert @show.stats.empty, "the screen says there are no games yet"
-    assert @show.undo_offer
+    assert @show.undoable_clear
     refute @show.clear_offered?
     assert_equal 0, @show.home_entrance.score_record
     assert_equal 0, @saved_stats.stats.games
@@ -79,7 +79,7 @@ class ClearingStatsTest < Minitest::Test
     clear_by(:mouse)
     @show.update(UNDO)
 
-    assert_nil @show.undo_offer
+    assert_nil @show.undoable_clear
     assert @show.stats.empty
     assert_nil @show.undo_reach
     @show.tap(*middle(@show.layout.undo_button))
@@ -99,7 +99,7 @@ class ClearingStatsTest < Minitest::Test
     @show.open_stats
     assert @show.stats?
 
-    assert_nil @show.undo_offer
+    assert_nil @show.undoable_clear
   end
 
   def test_a_gamepads_y_holds_clear_and_then_undoes

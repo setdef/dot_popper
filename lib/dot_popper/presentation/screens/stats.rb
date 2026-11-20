@@ -47,16 +47,16 @@ module DotPopper
         def plan = StatsLayout.measured(layout:, sheet:, style: style::STATS, measure:)
 
         # Undo, while it is offered here (UndoableClear), or nil.
-        def undo_offer = (@undo if show.stats?)
+        def undoable_clear = (@undo if show.stats?)
 
         # Whether it offers "Clear my stats…": while it has Stats to clear,
         # and no Undo is offered.
-        def clear_offered? = show.stats? && !sheet.empty && !undo_offer
+        def clear_offered? = show.stats? && !sheet.empty && !undoable_clear
 
         # A gamepad's Y, held by +by+: Undo while it is offered, or else the
         # start of holding "Clear my stats…".
         def clear_or_undo(by)
-          return undo if undo_offer
+          return undo if undoable_clear
 
           hold_clear(by) if clear_offered?
         end
@@ -101,7 +101,7 @@ module DotPopper
         end
 
         def controls
-          [(button(:undo, layout.undo_button) if undo_offer),
+          [(button(:undo, layout.undo_button) if undoable_clear),
            (button(:clear, layout.clear_stats_button) if clear_offered?),
            back_button].compact
         end
