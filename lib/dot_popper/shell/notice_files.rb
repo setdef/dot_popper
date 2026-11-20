@@ -29,16 +29,16 @@ module DotPopper
       FLEDGE = "notices"
       REACH = 4
 
-      def initialize(game_flow:, starts: [], reach: REACH)
-        @game_flow = game_flow
-        @roots = [game_flow, *starts].compact.flat_map { climb(it, reach) }.uniq
+      def initialize(game_folder:, starts: [], reach: REACH)
+        @game_folder = game_folder
+        @roots = [game_folder, *starts].compact.flat_map { climb(it, reach) }.uniq
       end
 
       def notices
-        Presentation::Notices.new(ofl: read(@game_flow, "assets", "fonts", "OFL.txt"),
-                                  iosevka: read(@game_flow, "assets", "fonts", "Iosevka-LICENSE.md"),
-                                  emoji: read(@game_flow, "assets", "emoji", "LICENSE.txt"),
-                                  wordlists: read(@game_flow, "assets", "wordlists-LICENSE.txt"),
+        Presentation::Notices.new(ofl: read(@game_folder, "assets", "fonts", "OFL.txt"),
+                                  iosevka: read(@game_folder, "assets", "fonts", "Iosevka-LICENSE.md"),
+                                  emoji: read(@game_folder, "assets", "emoji", "LICENSE.txt"),
+                                  wordlists: read(@game_folder, "assets", "wordlists-LICENSE.txt"),
                                   lota: lota, fledge: fledge)
       end
 
