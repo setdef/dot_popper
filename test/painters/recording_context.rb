@@ -10,7 +10,7 @@
 # Fonts are measured as RoughMeasure measures, so a painter given a
 # plan laid out with RoughMeasure draws text where the plan placed it.
 # No shader is offered, so a painter takes the paths it draws without
-# them, and no theme has art.
+# them, and no theme has art; a theme's colors are used as in the game.
 class RecordingContext
   P = DotPopper::Presentation
 
@@ -60,7 +60,15 @@ class RecordingContext
   def art = nil
   def shader?(_name) = false
   def dot_shader = nil
-  def using(_theme) = yield
+  # Draws the block in +theme+'s colors, as DrawingContext#using does.
+  def using(theme)
+    was = @palette
+    @palette = theme.palette if theme
+    yield
+  ensure
+    @palette = was
+  end
+
   def adding = yield
   def themed(color) = (job = style::PALETTE.to_h.key(color)) ? palette.public_send(job) : color
   def lit = style::HOVER.with(fill: palette.ink_glow.with_alpha(style::HOVER.fill.a), edge: palette.cream)

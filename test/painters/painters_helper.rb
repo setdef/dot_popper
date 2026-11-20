@@ -22,9 +22,9 @@ module PaintersTest
   Shell = DotPopper::Shell
 
   # Shell::DotPainter's dots, kept as marks of the kind :dot in the
-  # context: where, how big, and how drawn.
+  # context: where, how big, how drawn, and in which theme's colors.
   class FakeDots < Data.define(:context)
-    def icon(x, y, radius, bright:, opacity: 1.0, bonus: false) = context.record(:dot, x, y, radius, { bright:, opacity:, bonus: })
+    def icon(x, y, radius, bright:, opacity: 1.0, bonus: false) = context.record(:dot, x, y, radius, { bright:, opacity:, bonus:, palette: context.palette })
   end
 
   def context = @context ||= RecordingContext.new
@@ -90,7 +90,7 @@ module PaintersTest
   def change(value)
     case value
     when Integer then value + 5
-    when Float then value.between?(0.0, 1.0) ? (value + 0.37) % 1.0 : value + 5.37
+    when Float then value.between?(0.0, 1.0) ? (value + 0.63) % 1.0 : value + 5.37
     when String then "#{value}Z"
     when true, false then !value
     when P::Color then value.mix(P::Color.new(r: 0.5, g: 0.1, b: 0.9, a: 1.0), 0.5)
