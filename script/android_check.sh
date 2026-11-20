@@ -32,9 +32,11 @@
 #   snapshot, so it writes nothing there, and its own changes go to its
 #   own folder, which is deleted when it ends.
 #
-# The emulator and its adb server run on ports of the run's own, so
-# several runs can share a computer, and both end with the script, as
-# does everything else it starts. The cache is
+# The emulator and its adb server run on ports each run picks at random,
+# so several runs can share a computer, and both end with the script, as
+# does everything else it starts, however it ends: a watcher in a session
+# of its own ends them, and removes the run's folder, once the script is
+# gone, killed outright included. The cache is
 # ${XDG_CACHE_HOME:-~/.cache}/dot_popper.
 set -euo pipefail
 
@@ -45,6 +47,26 @@ cache=${XDG_CACHE_HOME:-$HOME/.cache}/dot_popper
 keep=$cache/android-check
 mkdir -p "$keep" "$repo/tmp/android"
 run=$(mktemp -d "$repo/tmp/android/check-run.XXXXXX")
+# What ends with the script even when it is killed outright, which no
+# trap sees: once the script's process is gone, a watcher in a session of
+# its own ends the emulator's process group and the adb server the run
+# has (named in the run's folder as they start), then removes the folder.
+# After a normal end it finds the folder gone, and leaves at once.
+# shellcheck disable=SC2016 # expanded by the watcher's own shell
+setsid bash -c '
+  while kill -0 "$1" 2> /dev/null; do sleep 1; done
+  run=$2
+  [ -d "$run" ] || exit 0
+  if [ -s "$run/emulator.pid" ]; then
+    emulator=$(cat "$run/emulator.pid")
+    kill -- -"$emulator" 2> /dev/null; sleep 2; kill -9 -- -"$emulator" 2> /dev/null
+  fi
+  if [ -s "$run/adb" ]; then
+    read -r adb port < "$run/adb"
+    ANDROID_ADB_SERVER_PORT=$port "$adb" kill-server 2> /dev/null
+  fi
+  rm -rf "$run"
+' watcher "$$" "$run" < /dev/null > /dev/null 2>&1 &
 started=$(date +%s.%N)
 say() { awk -v t="$started" -v now="$(date +%s.%N)" -v m="$*" 'BEGIN { printf "android check: %s (%.0f s)\n", m, now - t }'; }
 
@@ -135,11 +157,13 @@ pick_ports() {
   export ANDROID_ADB_SERVER_PORT=$((7100 + RANDOM % 800))
   port=$((5600 + 2 * (RANDOM % 150)))
   export ANDROID_SERIAL=emulator-$port
+  echo "$ANDROID_HOME/platform-tools/adb $ANDROID_ADB_SERVER_PORT" > "$run/adb"
 }
 start_emulator() { # LOG FLAGS...
   local log=$1; shift
   ANDROID_AVD_HOME=$avd_home setsid emulator -avd checks -port "$port" "${EMULATOR_FLAGS[@]}" "$@" > "$log" 2>&1 &
   emulator_pid=$!
+  echo "$emulator_pid" > "$run/emulator.pid"
   timeout 300 adb wait-for-device || { tail -30 "$log"; exit 1; }
   local waited=0
   until [ "$(adb shell getprop sys.boot_completed 2> /dev/null | tr -d '\r')" = 1 ]; do
@@ -151,6 +175,7 @@ stop_emulator() {
   adb emu kill > /dev/null 2>&1 || true
   wait "$emulator_pid" 2> /dev/null || true
   emulator_pid=
+  rm -f "$run/emulator.pid"
   adb kill-server > /dev/null 2>&1 || true
 }
 export ANDROID_USER_HOME=$run/android-user ANDROID_EMULATOR_HOME=$run/android-user TMPDIR=$run
