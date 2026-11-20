@@ -57,7 +57,7 @@ class KitTest < Minitest::Test
   end
 
   def test_the_checks_script_runs_the_three_checks
-    assert_equal %w[autoplay back-on-title foreground], self.class.runs.map(&:name)
+    assert_equal %w[autoplay back-on-home foreground], self.class.runs.map(&:name)
   end
 
   runs.each do |run|

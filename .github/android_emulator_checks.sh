@@ -4,7 +4,7 @@
 # under OUT. All of them run; the script fails if any did. Every run
 # passes ALSOFT_DRIVERS=null, so OpenAL Soft opens no sound device.
 # ANDROID_CHECKS, when set, names the only checks to run, such as
-# "back-on-title foreground".
+# "back-on-home foreground".
 #
 #   android_emulator_checks.sh APK OUT
 set -uo pipefail
@@ -49,8 +49,8 @@ fi
 # Back waits for the setdef splash to be over, since a key during it only
 # skips it: the splash lasts 3.5 s of the game's time, and on a slow
 # runner that was more than the 4 s of the clock this once waited.
-if wanted back-on-title; then
-  ruby "$here/android_emulator.rb" "$apk" "$package" "$out/back-on-title" \
+if wanted back-on-home; then
+  ruby "$here/android_emulator.rb" "$apk" "$package" "$out/back-on-home" \
   --env ALSOFT_DRIVERS=null --env DOT_POPPER_SAVE_AS=ci_back --env DOT_POPPER_KIT_PROBE=1 --env DOT_POPPER_AUTOMATED=1 \
   --ready "kit probe: subscribed to the game flow" --shot 2 --timeout 90 \
   --key-after "1:KEYCODE_BACK:kit probe: splash over" \

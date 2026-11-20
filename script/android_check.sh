@@ -8,7 +8,7 @@
 # It checks the commit at HEAD, as script/android_build.sh builds it, and
 # keeps each run's logs, game lines and screenshots in OUT (default
 # tmp/android/check). It exits 0 only if every check passed.
-# ANDROID_CHECKS names the only checks to run, such as "back-on-title",
+# ANDROID_CHECKS names the only checks to run, such as "back-on-home",
 # and ANDROID_CHECK_TIMES runs them that many times on one emulator.
 #
 # It is fast after its first run on a computer, because it rebuilds and
