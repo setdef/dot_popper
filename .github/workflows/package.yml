@@ -43,7 +43,9 @@ env:
 
 jobs:
   # What this run releases, if anything, and the version its apps must
-  # have: a website tag's own number, else fledge.yml's.
+  # have (script/release_version.rb): before 1.0.0 a playtest tag's own,
+  # which every job that builds stamps into its working tree; from 1.0.0
+  # on the committed one, and this fails first if the tag disagrees.
   plan:
     name: What this run releases
     runs-on: ubuntu-24.04
@@ -55,12 +57,15 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
+        with:
+          ruby-version: .ruby-version
+          bundler: none
       - id: plan
         run: |
           kind=none
           if [ "$GITHUB_REF_TYPE" = tag ]; then kind=$(ruby script/release_kind.rb "$GITHUB_REF_NAME"); fi
-          version=$(ruby -ryaml -e 'print YAML.load_file("fledge.yml").fetch("version")')
-          if [ "$kind" = website ]; then version=${GITHUB_REF_NAME#v}; version=${version%%-*}; fi
+          version=$(ruby script/release_version.rb stamp "$GITHUB_REF_NAME")
           echo "kind=$kind" | tee -a "$GITHUB_OUTPUT"
           echo "version=$version" | tee -a "$GITHUB_OUTPUT"
 
@@ -75,6 +80,8 @@ jobs:
       - uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
         with:
           ruby-version: .ruby-version
+      # The tests take the version the tag's apps are built with.
+      - run: ruby script/release_version.rb stamp "$GITHUB_REF_NAME"
       - run: bundle install
       - run: bundle exec rake
 
@@ -259,10 +266,8 @@ jobs:
             Get-ChildItem -LiteralPath 'C:\msys64\ucrt64\bin' -Filter $pattern | Copy-Item -Destination $mesa
           }
 
-          # A tag names the version; otherwise fledge.yml does. Always X.Y.Z.0.
-          $name = if ($env:GITHUB_REF -like 'refs/tags/v*') { $env:GITHUB_REF_NAME.TrimStart('v') } else { (Select-String -Path fledge.yml -Pattern '^version:\s*"?([0-9.]+)').Matches[0].Groups[1].Value }
-          $parts = @($name.Split('.')[0..2])
-          $version = ($parts -join '.') + '.0'
+          # The app's version (the fuse action's APP_VERSION, X.Y.Z), as X.Y.Z.0.
+          $version = "$env:APP_VERSION.0"
           Write-Host "version $version"
 
           # Logos from the repo's icon, at the sizes the manifest names.
