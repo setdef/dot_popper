@@ -47,7 +47,7 @@ class BuildForSaleTest < Minitest::Test
       engine = FakeEngine.new(system)
       root = DotPopper::Composition::Root.new(engine:, settings: DotPopper::Composition::DeveloperSettings.new(env))
       settings = root.settings
-      built = { "system" => system, "settings" => label, "offered" => root.storefront.offered?,
+      built = { "system" => system, "settings" => label, "offered" => root.store.offered?,
                 "games" => root.show.games_line, "pro" => root.entitlement.pro?,
                 "themes.txt" => engine.file("themes.txt").read.to_s, "theme" => root.pen.theme&.key.to_s,
                 "today" => settings.today.call.to_s, "date" => Date.today.to_s,

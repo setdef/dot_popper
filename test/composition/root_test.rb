@@ -37,7 +37,7 @@ class RootTest < Minitest::Test
     Root.new(engine:, settings: DotPopper::Composition::DeveloperSettings.new(env, channel:))
   end
 
-  def port(storefront) = storefront.instance_variable_get(:@port)
+  def port(store) = store.instance_variable_get(:@port)
 
   def test_every_system_and_every_build_builds_a_game_at_home
     SYSTEMS.product(BUILDS).each do |system, channel|
@@ -137,7 +137,7 @@ class RootTest < Minitest::Test
       row = expected.fetch(channel)
       want = row.fetch(system) { row.fetch(PHONES.include?(system) ? :phone : :computer) }
 
-      assert_equal want, store_kind(root(system, channel:).storefront), "#{system}, #{channel.inspect}"
+      assert_equal want, store_kind(root(system, channel:).store), "#{system}, #{channel.inspect}"
     end
   end
 
@@ -156,10 +156,10 @@ class RootTest < Minitest::Test
 
   def test_a_computers_own_store_starts_no_helper_in_an_automated_run
     [B::MAC_APP_STORE, "OS X", B::MICROSOFT_STORE, "Windows"].each_slice(2) do |channel, system|
-      helper = port(root(system, channel:).storefront)
+      helper = port(root(system, channel:).store)
 
       assert helper.automated, system
-      refute port(root(system, channel:, env: {}).storefront).automated, system
+      refute port(root(system, channel:, env: {}).store).automated, system
     end
   end
 
@@ -461,7 +461,7 @@ class RootTest < Minitest::Test
     game.theme_releases.define_singleton_method(:ask) { asked << :themes }
     game.show.group_panel.groups.define_singleton_method(:refresh) { asked << :groups }
     game.watch.define_singleton_method(:start) { asked << :watch }
-    game.storefront.define_singleton_method(:connect) { asked << :store }
+    game.store.define_singleton_method(:connect) { asked << :store }
     game.start
 
     assert_equal %i[themes store watch], asked, "each asked once as the game starts"

@@ -72,7 +72,7 @@ class KeyboardTest < Minitest::Test
       press(:v, held)
 
       assert fixture.entitlement.pro?, "#{held}+V pastes the license key"
-      assert_empty fixture.storefront.typed
+      assert_empty fixture.store.typed
 
       given(at: :change_server, gone: true, copied: SERVER)
       press(:v, held)
@@ -91,7 +91,7 @@ class KeyboardTest < Minitest::Test
     press(:v)
     press(:v, :alt)
 
-    assert_equal "VV", fixture.storefront.typed
+    assert_equal "VV", fixture.store.typed
     refute fixture.entitlement.pro?
   end
 
@@ -101,12 +101,12 @@ class KeyboardTest < Minitest::Test
       press(:b, held)
 
       assert_match(/\ADP-/, fixture.clipboard.text, "#{held}+B buys, and the test build's checkout copies a key")
-      assert_empty fixture.storefront.typed
+      assert_empty fixture.store.typed
     end
     given(at: :offer)
     press(:b)
 
-    assert_equal "B", fixture.storefront.typed, "B alone is typed"
+    assert_equal "B", fixture.store.typed, "B alone is typed"
     assert_nil fixture.clipboard.text
   end
 
@@ -117,7 +117,7 @@ class KeyboardTest < Minitest::Test
     %i[m h c 7 minus x y].each { press(it) }
     press(:backspace)
 
-    assert_equal "MHC7-X", fixture.storefront.typed
+    assert_equal "MHC7-X", fixture.store.typed
     refute show.sounds.muted?
     assert show.offer?
     assert_equal 0, @shell.quits
@@ -134,7 +134,7 @@ class KeyboardTest < Minitest::Test
     press(:enter)
 
     assert show.offer?
-    refute_equal :ready, fixture.storefront.status, "entered, and found to be no key"
+    refute_equal :ready, fixture.store.status, "entered, and found to be no key"
   end
 
   # A license key's text ignores spaces, so one typed as it is printed,
@@ -145,7 +145,7 @@ class KeyboardTest < Minitest::Test
     %i[a b space c].each { press(it) }
 
     assert show.offer?, "Space between a key's groups"
-    assert_equal "ABC", fixture.storefront.typed
+    assert_equal "ABC", fixture.store.typed
     press(:escape)
 
     refute show.offer?, "Escape closes it"
@@ -306,13 +306,13 @@ class KeyboardTest < Minitest::Test
       keys.each { press(it, held) }
     end
 
-    assert_equal "A", fixture.storefront.typed
+    assert_equal "A", fixture.store.typed
     assert show.offer?
     refute show.sounds.muted?
     assert_equal 0, @shell.quits
     press(:m, :alt)
 
-    assert_equal "AM", fixture.storefront.typed, "Alt+M types M"
+    assert_equal "AM", fixture.store.typed, "Alt+M types M"
   end
 
   def test_f11_switches_fullscreen_on_a_computer_only

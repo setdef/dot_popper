@@ -269,7 +269,7 @@ class StoreTest < Minitest::Test
   end
 
   def test_a_build_with_no_store_offers_nothing
-    show = build_show(storefront: NoStore.new)
+    show = build_show(store: NoStore.new)
     show.open_stats
 
     refute_includes show.controls.map(&:name), :offer
@@ -289,7 +289,7 @@ class StoreTest < Minitest::Test
   def offer_show
     opener = FakeOpener.new
     store = Store.new(port: DotPopper::NativeStore.new(opener:, answers: @answers), entitlement: @entitlement)
-    show = build_show(storefront: store, entitlement: @entitlement)
+    show = build_show(store:, entitlement: @entitlement)
     [show, opener]
   end
 

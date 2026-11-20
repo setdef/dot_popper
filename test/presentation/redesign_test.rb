@@ -137,7 +137,7 @@ class RedesignTest < Minitest::Test
     store = Store.new
     entitlement = DotPopper::Entitlement.test
     game_flow = DotPopper::GameFlow.new(field(1200, 800), random: Random.new(2))
-    s = new_show(game_flow:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, entitlement:, storefront: store,
+    s = new_show(game_flow:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, entitlement:, store:,
                  themes: DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new))
     s.open_themes
     s.use(s.themes.last)

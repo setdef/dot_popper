@@ -144,7 +144,7 @@ class ScreenAnswersTest < Minitest::Test
         game_quits: fixture.shell.quits,
         display: fixture.window.display, muted: sounds.muted?, dot_size: show.words.sizing(show.game_flow.sizing, show.sizing_preview).downcase,
         holding: [show.clearing, show.group_panel.hold].find(&:held?)&.then { :held }, asked_to_quit: show.quit_prompt.positive?,
-        store: fixture.storefront.status, status: show.offer_status, server: fixture.server_choice.address,
+        store: fixture.store.status, status: show.offer_status, server: fixture.server_choice.address,
         undo: show.undo_offer && :offered, games: show.saved_stats.stats.games, code: (show.group_panel.code unless show.group_panel.code.empty?),
         code_shown: show.group_panel.code_shown?, group: show.group_panel.group_id, score: show.game_flow.game&.score,
         sounds: sounds.played.size, last_sound: sounds.played.last&.then { |name, pitch| "#{name} #{pitch.round(2)}" } }

@@ -214,7 +214,7 @@ class InputsTest < Minitest::Test
         # license key; a computer's test build sells as a website copy does.
         assert_includes show.controls.map(&:name), fixture.phone? ? :restore : :paste
         assert_equal :pressed, player.press(:buy)
-        assert_equal :pressed, player.press(:paste) if fixture.storefront.keys?
+        assert_equal :pressed, player.press(:paste) if fixture.store.keys?
         fixture.tick(1.0)
 
         assert_predicate fixture.entitlement, :pro?

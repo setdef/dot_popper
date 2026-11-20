@@ -40,7 +40,7 @@ module DotPopper
       GAMES_LOG = "games.csv"
       SMALLEST_WINDOW = [400, 320].freeze
 
-      attr_reader :settings, :platform, :dot_size, :window, :game_flow, :show, :pen, :sound_player, :splash, :storefront,
+      attr_reader :settings, :platform, :dot_size, :window, :game_flow, :show, :pen, :sound_player, :splash, :store,
                   :entitlement, :theme_releases, :watch, :cursor, :bot, :haptics, :sharing, :refresh
 
       def initialize(engine:, settings: DeveloperSettings.new, now: -> { Time.now.to_f })
@@ -64,7 +64,7 @@ module DotPopper
       # the rest are once each time the game starts.
       def start
         theme_releases&.ask
-        storefront.connect
+        store.connect
         watch.start
       end
 
@@ -165,12 +165,12 @@ module DotPopper
         unless Presentation::Splash.skipped?(settings.env)
           @splash = Presentation::Splash.start(calm: settings.calm?, sounding: !@sound_player.muted?)
         end
-        @storefront = store_for(clipboard)
-        games = free_games(entitlement, metered: FreeGames.metered?(settings.env, channel:, offered: storefront.offered?))
+        @store = store_for(clipboard)
+        games = free_games(entitlement, metered: FreeGames.metered?(settings.env, channel:, offered: store.offered?))
         @haptics = platform.buzzes? ? @engine.buzzer : Presentation::NoHaptics.new
         @sharing = Presentation::SheetSharing.for(platform, opener: @engine.opener)
         groups = groups_session
-        use_cases = Composition.use_cases(game_flow: @game_flow, free_games: games, entitlement:, store: storefront, achievements:,
+        use_cases = Composition.use_cases(game_flow: @game_flow, free_games: games, entitlement:, store:, achievements:,
                                           saved_stats:, friend_groups: groups)
         @show = Presentation::Show.new(
           groups:, game_flow: @game_flow, layout: @engine.layout, sounds: @sound_player, radius: dot_size.radius,

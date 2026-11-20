@@ -42,16 +42,16 @@ class BuildTest < Minitest::Test
     assert DotPopper::Build.license_keys?(nil)
   end
 
-  def test_every_channel_is_named_once_and_the_storefront_uses_those_names
+  def test_every_channel_is_named_once_and_the_store_uses_those_names
     assert_equal %w[app-store mac-app-store google-play microsoft-store website], DotPopper::Build::CHANNEL_NAMES
-    storefront = DotPopper::Store
+    store = DotPopper::Store
 
-    assert_equal [storefront::MAC_APP_STORE, storefront::MICROSOFT_STORE, storefront::WEBSITE],
+    assert_equal [store::MAC_APP_STORE, store::MICROSOFT_STORE, store::WEBSITE],
                  [DotPopper::Build::MAC_APP_STORE, DotPopper::Build::MICROSOFT_STORE, DotPopper::Build::WEBSITE]
-    assert_empty storefront::HELPER_CHANNELS - DotPopper::Build::CHANNEL_NAMES
+    assert_empty store::HELPER_CHANNELS - DotPopper::Build::CHANNEL_NAMES
   end
 
-  def test_the_storefront_takes_its_channel_from_the_build
+  def test_the_store_takes_its_channel_from_the_build
     assert_same DotPopper::Build::CHANNEL,DotPopper::Store::BUILD_CHANNEL
   end
 

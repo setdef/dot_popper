@@ -161,7 +161,7 @@ module StoreContract
 
   # The port as the game drives it, through the Store above it.
 
-  def test_through_the_storefront_buying_unlocks_and_restoring_finds_it
+  def test_through_the_store_buying_unlocks_and_restoring_finds_it
     store = new_store
     entitlement = DotPopper::Entitlement.test
     front = Store.new(port: store, entitlement:)
@@ -187,7 +187,7 @@ module StoreContract
     assert_predicate again, :pro?, "a relaunch sees what was bought"
   end
 
-  def test_through_the_storefront_a_failure_is_said_and_unlocks_nothing
+  def test_through_the_store_a_failure_is_said_and_unlocks_nothing
     store = new_store(fails: "failed")
     entitlement = DotPopper::Entitlement.test
     front = Store.new(port: store, entitlement:)
@@ -230,6 +230,6 @@ module StoreContract
 
       front.update(Store::EVERY)
     end
-    flunk "the storefront never heard"
+    flunk "the store never heard"
   end
 end

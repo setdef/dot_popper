@@ -63,7 +63,7 @@ module Inputs
 
     THEMES = %i[ghost jack_o_lantern].freeze
 
-    attr_reader :os, :show, :game_flow, :sounds, :window, :clipboard, :opener, :entitlement, :games, :storefront, :server_choice, :to_pop,
+    attr_reader :os, :show, :game_flow, :sounds, :window, :clipboard, :opener, :entitlement, :games, :store, :server_choice, :to_pop,
                 :shell
 
     # Game Over's pile as Shell::Dragging takes a press on it that drags
@@ -109,12 +109,12 @@ module Inputs
       @gone.heard(:gone, @day - 200) if gone
       license = DotPopper::Continuity::License.new(Memory.new, pins: DotPopper::Continuity::TEST_PINS)
       @entitlement = DotPopper::Entitlement.new(forced: pro, license:, trust: DotPopper::Receipt::TEST)
-      @storefront = if channel
+      @store = if channel
                       DotPopper::Store.for(platform, entitlement:, native: DotPopper::FakeStore.new(Memory.new), website: -> { website(fake: false) }, channel:)
                     else
                       DotPopper::Store.of_test_build(platform, entitlement:, fake: DotPopper::FakeStore.new(Memory.new), website: -> { website(fake: true) })
                     end
-      @games = DotPopper::FreeGames.new(Memory.new, today: -> { @day }, entitlement:, metered: storefront.offered?, first_games: [games_left - 3, 0].max)
+      @games = DotPopper::FreeGames.new(Memory.new, today: -> { @day }, entitlement:, metered: store.offered?, first_games: [games_left - 3, 0].max)
       (3 - games_left.clamp(0, 3)).times { games.spend! }
       themes = DotPopper::Themes.new(Memory.new)
       themes.release(THEMES.map(&:to_s))
@@ -124,11 +124,11 @@ module Inputs
       session = DotPopper::Groups::Session.new(file: Memory.new, worker: Server.new(groups:))
       @server_choice = DotPopper::ServerChoice.new(Memory.new, gone: @gone, clipboard:)
       @show = new_show(game_flow:, layout: layout(width, height), sounds:, radius: R, random: Random.new(5), clipboard:, window:, saved_stats: book,
-                       sharing: P::SheetSharing.for(platform, opener:), links: opener, entitlement:, storefront:, games:,
+                       sharing: P::SheetSharing.for(platform, opener:), links: opener, entitlement:, store:, games:,
                        themes:, groups: session, group_notice: P::GroupNotice.new(Memory.new),
                        tutorial_flag: P::TutorialFlag.new(Memory.new((P::TutorialFlag::SEEN if played))), input: P::InputKind.starting(touch: phone?),
                        server_choice: @server_choice)
-      storefront.connect
+      store.connect
       @shell = Shell.new
       @handler = P::InputHandler.new(show:, platform:, shell:, pile: Pile.new(show),
                                      cursor: P::GamepadCursor.centered(show.layout.whole, style: P::Style::GAMEPAD, radius: R))
@@ -661,7 +661,7 @@ module Inputs
     def trace(fixture)
       show = fixture.show
       [Inputs.screen(show), fixture.sounds.played.size, fixture.window.display, (fixture.window.quits if fixture.window.respond_to?(:quits)),
-       fixture.opener.urls.size, fixture.clipboard.paste, fixture.storefront.status, show.offer_status, show.scroll&.offset]
+       fixture.opener.urls.size, fixture.clipboard.paste, fixture.store.status, show.offer_status, show.scroll&.offset]
     end
   end
 end

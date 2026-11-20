@@ -28,7 +28,7 @@ class GamesTest < Minitest::Test
     @games = DotPopper::FreeGames.new(Memory.new, today: -> { @day }, entitlement: @entitlement, first_games: 0)
     @game_flow = DotPopper::GameFlow.new(field, random: Random.new(3))
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, games: @games, entitlement: @entitlement,
-                     storefront: Store.new)
+                     store: Store.new)
   end
 
   def test_each_started_game_costs_one_play_and_home_says_how_many_are_left
@@ -120,7 +120,7 @@ class GamesTest < Minitest::Test
   def test_over_game_over_a_controllers_y_buys_as_its_words_say
     store = Buying.new
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, games: @games, entitlement: @entitlement,
-                     storefront: store, input: InputKind::GAMEPAD)
+                     store:, input: InputKind::GAMEPAD)
     2.times { @games.spend! }
     press_main
     @game_flow.update(20)
@@ -269,7 +269,7 @@ class GamesTest < Minitest::Test
     3.times { @games.spend! }
     flag = TutorialFlag.new(Memory.new)
     show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, games: @games,
-                    entitlement: @entitlement, storefront: Store.new, tutorial_flag: flag)
+                    entitlement: @entitlement, store: Store.new, tutorial_flag: flag)
     press_main(show)
 
     refute_predicate show, :tutorial?
@@ -288,7 +288,7 @@ class GamesTest < Minitest::Test
 
   # A Show with its Tutorial still due, or, +seen+, only How to Play's.
   def tutorial_show(seen: false, **) = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, games: @games,
-                                                    entitlement: @entitlement, storefront: Store.new,
+                                                    entitlement: @entitlement, store: Store.new,
                                                     tutorial_flag: TutorialFlag.new(Memory.new).tap { it.seen! if seen }, **)
 
   def started_games = [].tap { |seen| @game_flow.subscribe { |event| seen << event if event.is_a?(DotPopper::Events::GameStarted) } }
