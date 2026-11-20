@@ -10,8 +10,8 @@ class RactorTest < Minitest::Test
 
   def test_the_rules_values_can_be_shared_between_ractors
     stack = DotPopper::Stack.new(dots: [dot(100, 100), dot(200, 200, popped: true)])
-    stands = { dots: stack, score: 1, countdown: DotPopper::Countdown.new(remaining: 3), elapsed: 1.0 }
-    values = [field, stack, stack.dots.first, DotPopper::Countdown.new(remaining: 3),
+    stands = { dots: stack, score: 1, clock: DotPopper::Clock.new(remaining: 3), elapsed: 1.0 }
+    values = [field, stack, stack.dots.first, DotPopper::Clock.new(remaining: 3),
               DotPopper::DotSize.for(DotPopper::Platform::PHONE, unit: "points"), DotPopper::DotSize.standard(395, 850), DotPopper::DotSizing::STANDARD,
               DotPopper::SizeClass::STANDARD, DotPopper::Events::Missed.new(x: 1, y: 2),
               DotPopper::Events::Popped.new(dot: stack.dots.first.pop, x: 1, y: 2, points: 1, seconds: 1.0,

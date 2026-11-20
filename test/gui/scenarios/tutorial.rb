@@ -162,7 +162,7 @@ module DotPopperGui
       x = popped.x + ((popped.x - peeking.x).positive? ? 0.5 : -0.5) * popped.radius
       how.call(x, popped.y)
       check_equal([0, 9], shown, "a tap on the popped dot does nothing")
-      check(game.score.zero? && game.countdown.remaining == 9.0 && story.none?(:Penalized),
+      check(game.score.zero? && game.clock.remaining == 9.0 && story.none?(:Penalized),
             "the game hears nothing of it, and its clock stands still")
       check_equal(:aim_next, tutorial.beat, "the turn goes on")
     end
@@ -183,15 +183,15 @@ module DotPopperGui
       check_equal([true, true, false], game.dots.map(&:popped?), "popped and bright as they were")
       check_equal(1, game.score, "and its point")
       check_equal(1, game.dots_in_a_row, "and its row")
-      check(game.countdown.remaining <= 10.0 && game.countdown.remaining > 9.8,
-            "and its 10 seconds, the clock only now starting (#{game.countdown.remaining})")
+      check(game.clock.remaining <= 10.0 && game.clock.remaining > 9.8,
+            "and its 10 seconds, the clock only now starting (#{game.clock.remaining})")
       check_equal([1, 10], [show.hud.score, show.hud.seconds], "the HUD shows the same numbers")
       check(show.clock_highlight, "the clock is lit as it starts to run")
       wait(0.3)
       keep_screenshot(name("4-runs"))
       check_equal(%i[GameStarted], story.uniq - %i[HomeShown], "no one heard of the game until play began")
       wait(1.2)
-      check(game.countdown.remaining < 9.0, "the clock runs")
+      check(game.clock.remaining < 9.0, "the clock runs")
     end
   end
 end

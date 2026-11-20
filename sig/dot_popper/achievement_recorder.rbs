@@ -48,7 +48,7 @@ module DotPopper
 
     def early: (Events::Popped popped) -> void
 
-    def clock: (Events::Popped | Events::Penalized tapped) -> void
+    def note_low_clock: (Events::Popped | Events::Penalized tapped) -> void
 
     def appeared: (Dot dot, Array[Dot] above, Events::Popped popped) -> void
 

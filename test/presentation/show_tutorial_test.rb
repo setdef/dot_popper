@@ -44,8 +44,8 @@ class ShowTutorialTest < Minitest::Test
     assert_equal scene.dots.map(&:id), game.dots.map(&:id), "the same dots, in the same order"
     assert_equal [true, true, false], game.dots.map(&:popped?)
     assert_equal 1, game.score, "two dots popped, less what the guide's mistake cost"
-    assert_operator game.countdown.remaining, :<=, 10.0
-    assert_operator game.countdown.remaining, :>, 9.9, "the clock has only just started"
+    assert_operator game.clock.remaining, :<=, 10.0
+    assert_operator game.clock.remaining, :>, 9.9, "the clock has only just started"
     assert_equal [1, 10], [@show.hud.score, @show.hud.seconds], "the HUD shows the same numbers"
     assert_equal [1, 1], [game.dots_in_a_row, @show.hud.dots_in_a_row], "and the row goes on as the player left it"
     assert_same scene.animations, @show.animations, "and the dots are drawn as they were"
@@ -91,7 +91,7 @@ class ShowTutorialTest < Minitest::Test
     assert_nil @show.clock_highlight
     assert_same paused, @game_flow.game
     assert_equal [1, 2], [@game_flow.game.score, @game_flow.game.dots.size], "the pop the player made is the game's"
-    assert_in_delta 11.0, @game_flow.game.countdown.remaining
+    assert_in_delta 11.0, @game_flow.game.clock.remaining
     assert_equal [true, false], @game_flow.game.dots.map(&:popped?)
     assert_equal [DotPopper::Events::GameStarted], @events.uniq - [DotPopper::Events::HomeShown], "nothing else starts"
     @show.update(0.0)
@@ -119,7 +119,7 @@ class ShowTutorialTest < Minitest::Test
 
     assert @show.playing?
     assert_equal [first], @game_flow.game.dots.to_a, "the dot where it was"
-    assert_equal [0, 10.0], [@game_flow.game.score, @game_flow.game.countdown.remaining]
+    assert_equal [0, 10.0], [@game_flow.game.score, @game_flow.game.clock.remaining]
   end
 
   # Skipped after the guide's mistake, the game plays on with what it
@@ -131,7 +131,7 @@ class ShowTutorialTest < Minitest::Test
     update_for(0.05) until @show.tutorial.traveling_numbers.any? { it.to.name == :score && it.text.start_with?("−") }
     @show.back
 
-    assert_equal [0, 9.0, 0], [@game_flow.game.score, @game_flow.game.countdown.remaining, @game_flow.game.dots_in_a_row]
+    assert_equal [0, 9.0, 0], [@game_flow.game.score, @game_flow.game.clock.remaining, @game_flow.game.dots_in_a_row]
     assert_equal [1, 0], [@show.game_stats.dots_popped, @show.game_stats.mistakes]
   end
 
@@ -182,13 +182,13 @@ class ShowTutorialTest < Minitest::Test
     update_for(0.05) until @show.tutorial.beat == :aim_next
     popped = @show.tutorial.dots.find { it.id == TutorialScene::BRIGHT }
     kept = @show.tutorial.hud.then { [it.score, it.seconds] }
-    game = @game_flow.game.then { [it.score, it.countdown.remaining, it.dots_in_a_row] }
+    game = @game_flow.game.then { [it.score, it.clock.remaining, it.dots_in_a_row] }
     @sounds.played.clear
 
     %i[mouse tap gamepad].each { @show.tap(popped.x, popped.y, by: it) }
 
     assert_equal kept, @show.tutorial.hud.then { [it.score, it.seconds] }
-    assert_equal game, @game_flow.game.then { [it.score, it.countdown.remaining, it.dots_in_a_row] }, "no press reaches the game"
+    assert_equal game, @game_flow.game.then { [it.score, it.clock.remaining, it.dots_in_a_row] }, "no press reaches the game"
     assert_equal :aim_next, @show.tutorial.beat
     assert_empty @sounds.names
   end
@@ -250,7 +250,7 @@ class ShowTutorialTest < Minitest::Test
     assert @show.playing?
     assert_equal [true, true, false], @game_flow.game.dots.map(&:popped?)
     assert_equal 1, @game_flow.game.score
-    assert_operator @game_flow.game.countdown.remaining, :>, 9.8, "from what it left, the clock only now running"
+    assert_operator @game_flow.game.clock.remaining, :>, 9.8, "from what it left, the clock only now running"
     assert @show.clock_highlight
   end
 

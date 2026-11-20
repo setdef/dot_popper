@@ -7,7 +7,7 @@ module DotPopper
   # Only GameFlow holds a game; everything else reads it through its #view,
   # which cannot change it.
   class Game
-    attr_reader :field, :dots, :score, :countdown, :elapsed, :spawns, :dots_in_a_row, :bonus
+    attr_reader :field, :dots, :score, :clock, :elapsed, :spawns, :dots_in_a_row, :bonus
 
     # The game as it stands, read-only (View), made once with the game, so
     # reading it each frame makes nothing.
@@ -23,7 +23,7 @@ module DotPopper
       def field = @game.field
       def dots = @game.dots
       def score = @game.score
-      def countdown = @game.countdown
+      def clock = @game.clock
       def elapsed = @game.elapsed
       def dots_in_a_row = @game.dots_in_a_row
       def bonus = @game.bonus
@@ -47,20 +47,20 @@ module DotPopper
       @next_id = 0
       @score = Rules::LOWEST_SCORE
       @elapsed = 0.0
-      @countdown = Countdown.new(remaining: Rules::STARTING_SECONDS)
+      @clock = Clock.new(remaining: Rules::STARTING_SECONDS)
       @dots = dots || Stack.new.slide_under(spawn(Stack.new))
       @next_id = @dots.map(&:id).max.to_i + 1
       @view = View.new(self)
     end
 
-    def over? = countdown.expired?
+    def over? = clock.expired?
 
     def update(seconds)
       return if over?
 
       move_dots(seconds)
-      @elapsed += [seconds, countdown.remaining].min # a game plays no longer than its clock
-      @countdown = countdown.tick(seconds)
+      @elapsed += [seconds, clock.remaining].min # a game plays no longer than its clock
+      @clock = clock.tick(seconds)
     end
 
     # Taps the point (+x+, +y+), which reaches only the topmost dot there.
@@ -121,8 +121,8 @@ module DotPopper
       spawned = spawn(above, bonus: earned)
       @dots = above.slide_under(spawned)
       @score += points
-      @countdown = countdown.adjust(seconds)
-      Events::Popped.new(dot: popped, x:, y:, points:, seconds:, spawned:, dots:, score:, countdown:, elapsed:)
+      @clock = clock.adjust(seconds)
+      Events::Popped.new(dot: popped, x:, y:, points:, seconds:, spawned:, dots:, score:, clock:, elapsed:)
     end
 
     # What a pop of +dot+ pays: a pop's own, and a bonus dot's besides.
@@ -149,8 +149,8 @@ module DotPopper
       @dots_in_a_row = 0
       lost = [Rules::PENALTY_POINTS, score - Rules::LOWEST_SCORE].min
       @score -= lost
-      @countdown = countdown.adjust(-Rules::PENALTY_SECONDS)
-      Events::Penalized.new(dot:, x:, y:, points: -lost, seconds: -Rules::PENALTY_SECONDS, dots:, score:, countdown:, elapsed:)
+      @clock = clock.adjust(-Rules::PENALTY_SECONDS)
+      Events::Penalized.new(dot:, x:, y:, points: -lost, seconds: -Rules::PENALTY_SECONDS, dots:, score:, clock:, elapsed:)
     end
   end
 end

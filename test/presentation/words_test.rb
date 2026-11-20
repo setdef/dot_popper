@@ -19,8 +19,8 @@ class WordsTest < Minitest::Test
   end
 
   def test_the_clock_shows_whole_seconds_and_never_less_than_zero
-    assert_equal "9", Words.clock(DotPopper::Countdown.new(remaining: 9.7))
-    assert_equal "0", Words.clock(DotPopper::Countdown.new(remaining: -3))
+    assert_equal "9", Words.clock(DotPopper::Clock.new(remaining: 9.7))
+    assert_equal "0", Words.clock(DotPopper::Clock.new(remaining: -3))
   end
 
   def test_the_score_record_is_named

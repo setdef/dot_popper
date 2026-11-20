@@ -7,7 +7,7 @@ module DotPopper
     # the achievement and how to earn it, or the feature's sign), its name,
     # the rest of what Pro adds, each after its sign, the price from the
     # store on Buy, and Restore Purchases; or, once it is the player's,
-    # thanks. Calm: no motion, no countdown, and Back always there.
+    # thanks. Calm: no motion, no clock, and Back always there.
     # Presentation::OfferLayout decides where each goes; this only draws,
     # on whole device pixels.
     class OfferPainter < Data.define(:pen, :dots)

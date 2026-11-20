@@ -12,7 +12,7 @@ class GameTest < Minitest::Test
     assert_equal 1, game.dots.size
     assert game.dots.first.bright?
     assert_equal 0, game.score
-    assert_equal 10.0, game.countdown.remaining
+    assert_equal 10.0, game.clock.remaining
     refute game.over?
   end
 
@@ -24,7 +24,7 @@ class GameTest < Minitest::Test
 
     assert_instance_of Events::Popped, event
     assert_equal 1, game.score
-    assert_in_delta 11.0, game.countdown.remaining
+    assert_in_delta 11.0, game.clock.remaining
     assert_equal 2, game.dots.size
     top, bottom = game.dots.to_a
     assert_equal target.id, top.id, "the popped dot stays on top"
@@ -43,7 +43,7 @@ class GameTest < Minitest::Test
 
     assert_instance_of Events::Penalized, event
     assert_equal 3, game.score
-    assert_in_delta 8.0, game.countdown.remaining
+    assert_in_delta 8.0, game.clock.remaining
     assert_equal [-2, -2.0], [event.points, event.seconds]
     refute event.softened?
   end
@@ -59,7 +59,7 @@ class GameTest < Minitest::Test
     assert_equal(-1, first.points)
     assert_equal 0, second.points
     assert first.softened?
-    assert_in_delta 6.0, game.countdown.remaining, 1e-9, "time is still lost"
+    assert_in_delta 6.0, game.clock.remaining, 1e-9, "time is still lost"
   end
 
   def test_tapping_empty_space_does_nothing
@@ -69,7 +69,7 @@ class GameTest < Minitest::Test
 
     assert_instance_of Events::Missed, event
     assert_equal 0, game.score
-    assert_equal 10.0, game.countdown.remaining
+    assert_equal 10.0, game.clock.remaining
     assert game.dots.first.bright?
   end
 
@@ -110,7 +110,7 @@ class GameTest < Minitest::Test
 
     game.update(0.5)
 
-    assert_in_delta 9.5, game.countdown.remaining
+    assert_in_delta 9.5, game.clock.remaining
     assert_in_delta 430, game.dots.first.x
   end
 
@@ -120,7 +120,7 @@ class GameTest < Minitest::Test
     game.update(10.4)
 
     assert game.over?
-    assert_equal 0, game.countdown.whole_seconds
+    assert_equal 0, game.clock.whole_seconds
   end
 
   def test_a_penalty_can_end_the_game
@@ -130,7 +130,7 @@ class GameTest < Minitest::Test
     game.tap_at(400, 300)
 
     assert game.over?
-    assert_equal 0.0, game.countdown.remaining
+    assert_equal 0.0, game.clock.remaining
   end
 
   def test_nothing_happens_once_the_game_is_over
@@ -149,7 +149,7 @@ class GameTest < Minitest::Test
     game.move_dots(0.5)
 
     assert_in_delta 430.0, game.dots.first.x
-    assert_equal [10.0, 0.0], [game.countdown.remaining, game.elapsed]
+    assert_equal [10.0, 0.0], [game.clock.remaining, game.elapsed]
   end
 
   def test_arranging_puts_dots_in_place_of_their_ids_at_the_same_depth
@@ -159,7 +159,7 @@ class GameTest < Minitest::Test
     game.arrange(under.with(x: 600.0, velocity_y: 60.0), top.with(velocity_y: -60.0))
 
     assert_equal [[0, 400.0, -60.0], [1, 600.0, 60.0]], game.dots.map { [it.id, it.x, it.velocity_y] }
-    assert_equal [0, 10.0], [game.score, game.countdown.remaining]
+    assert_equal [0, 10.0], [game.score, game.clock.remaining]
   end
 
   def test_resizing_keeps_every_dot_on_screen

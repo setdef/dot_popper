@@ -32,7 +32,7 @@ class GameFlowTest < Minitest::Test
     assert_instance_of GameFlow::Playing, @game_flow.state
     assert_predicate @game_flow, :playing?
     assert_equal 0, @game_flow.game.score
-    assert_equal 10.0, @game_flow.game.countdown.remaining
+    assert_equal 10.0, @game_flow.game.clock.remaining
     assert_equal 1, @game_flow.game.dots.size
     assert_instance_of Events::GameStarted, @heard.last
   end
@@ -56,10 +56,10 @@ class GameFlowTest < Minitest::Test
     @game_flow.update(1.25)
     bright = game.dots.first
     @game_flow.press(bright.x, bright.y)
-    assert_stood game, @heard.last, :dots, :score, :countdown, :elapsed
+    assert_stood game, @heard.last, :dots, :score, :clock, :elapsed
     popped = game.dots.first
     @game_flow.press(popped.x, popped.y)
-    assert_stood game, @heard.last, :dots, :score, :countdown, :elapsed
+    assert_stood game, @heard.last, :dots, :score, :clock, :elapsed
     @game_flow.update(20)
     assert_stood game, @heard.last, :field, :dots, :score, :elapsed
 
@@ -111,7 +111,7 @@ class GameFlowTest < Minitest::Test
     @game_flow.press(400, 300)
 
     assert_equal 1, game.score
-    assert_equal 0.0, game.countdown.remaining
+    assert_equal 0.0, game.clock.remaining
   end
 
   def test_a_new_game_starts_fresh
@@ -123,7 +123,7 @@ class GameFlowTest < Minitest::Test
 
     assert_equal 0, @game_flow.game.score
     assert_equal 1, @game_flow.game.dots.size
-    assert_equal 10.0, @game_flow.game.countdown.remaining
+    assert_equal 10.0, @game_flow.game.clock.remaining
   end
 
   # 800 by 600 is 16 by 12 radii, a phone-sized field, and 1200 by 800 a
@@ -212,7 +212,7 @@ class GameFlowTest < Minitest::Test
     assert_instance_of GameFlow::Paused, @game_flow.state
     assert_predicate @game_flow, :paused?
     assert_equal first, @game_flow.game.dots
-    assert_equal [0, 10.0], [@game_flow.game.score, @game_flow.game.countdown.remaining]
+    assert_equal [0, 10.0], [@game_flow.game.score, @game_flow.game.clock.remaining]
     assert_empty @heard.grep(Events::GameStarted)
   end
 
@@ -221,11 +221,11 @@ class GameFlowTest < Minitest::Test
     @game_flow.update(3.0)
     @game_flow.press(300, 300)
 
-    assert_equal [300.0, 10.0, 0.0], [@game_flow.game.dots.first.x, @game_flow.game.countdown.remaining, @game_flow.game.elapsed]
+    assert_equal [300.0, 10.0, 0.0], [@game_flow.game.dots.first.x, @game_flow.game.clock.remaining, @game_flow.game.elapsed]
     assert_equal [false], @game_flow.game.dots.map(&:popped?)
     @game_flow.move_paused(1.0)
     assert_in_delta 350.0, @game_flow.game.dots.first.x, 1e-9, "its dots move only as the tutorial moves them"
-    assert_in_delta 10.0, @game_flow.game.countdown.remaining
+    assert_in_delta 10.0, @game_flow.game.clock.remaining
   end
 
   def test_the_tutorials_presses_reach_a_paused_game_by_the_usual_rules_and_tell_no_one
@@ -239,7 +239,7 @@ class GameFlowTest < Minitest::Test
     assert_equal 1, popped.spawned.id
     assert_equal bright.id, popped.spawned.id
     assert_instance_of Events::Penalized, penalized
-    assert_equal [0, 9.0, 0], [@game_flow.game.score, @game_flow.game.countdown.remaining, @game_flow.game.dots_in_a_row]
+    assert_equal [0, 9.0, 0], [@game_flow.game.score, @game_flow.game.clock.remaining, @game_flow.game.dots_in_a_row]
     assert_empty @heard.grep(Events::Popped)
     assert_empty @heard.grep(Events::Penalized)
   end
@@ -262,9 +262,9 @@ class GameFlowTest < Minitest::Test
     started = @heard.last
     assert_instance_of Events::GameStarted, started
     assert_equal [game.dots, 1], [started.dots, started.score]
-    assert_equal [1, 11.0], [game.score, game.countdown.remaining]
+    assert_equal [1, 11.0], [game.score, game.clock.remaining]
     @game_flow.update(0.5)
-    assert_in_delta 10.5, game.countdown.remaining, 1e-9, "its clock runs from there"
+    assert_in_delta 10.5, game.clock.remaining, 1e-9, "its clock runs from there"
   end
 
   def test_a_paused_games_seed_replays_the_dots_it_spawns

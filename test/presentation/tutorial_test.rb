@@ -314,7 +314,7 @@ class TutorialTest < Minitest::Test
     assert @tutorial.over?
     assert_in_delta 1.0, @tutorial.rate, 1e-9, "and time flows as the game's does"
     assert_equal [1, 10], shown
-    assert_equal [1, 10.0], [@game_flow.game.score, @game_flow.game.countdown.remaining], "the game's own numbers"
+    assert_equal [1, 10.0], [@game_flow.game.score, @game_flow.game.clock.remaining], "the game's own numbers"
     assert_equal @game_flow.game.dots.to_a, @tutorial.dots.to_a, "it draws the game's dots, every one as it is"
     assert_equal 3, @tutorial.dots.size, "no dot fades or is added"
   end
@@ -420,7 +420,7 @@ class TutorialTest < Minitest::Test
     game = @game_flow.game
 
     assert_equal [true, false], game.dots.map(&:popped?)
-    assert_equal [1, 11.0, 1], [game.score, game.countdown.remaining, game.dots_in_a_row]
+    assert_equal [1, 11.0, 1], [game.score, game.clock.remaining, game.dots_in_a_row]
     assert_equal [[TutorialScene::BRIGHT, false]], @tutorial.dots.map { [it.id, it.popped?] }
     assert_equal [0, 10], shown
     play_until { @tutorial.beat == :peek }
@@ -435,17 +435,17 @@ class TutorialTest < Minitest::Test
     to_the_peek
     play_until { @tutorial.traveling_numbers.any? }
 
-    assert_equal [0, 9.0, 0], [@game_flow.game.score, @game_flow.game.countdown.remaining, @game_flow.game.dots_in_a_row]
+    assert_equal [0, 9.0, 0], [@game_flow.game.score, @game_flow.game.clock.remaining, @game_flow.game.dots_in_a_row]
     assert_empty heard
   end
 
   def test_a_tap_on_the_popped_dot_never_reaches_the_game
     to_the_peek
     play_until { @tutorial.beat == :aim_next }
-    before = @game_flow.game.then { [it.score, it.countdown.remaining, it.dots_in_a_row] }
+    before = @game_flow.game.then { [it.score, it.clock.remaining, it.dots_in_a_row] }
     2.times { tap_on(bright) }
 
-    assert_equal before, @game_flow.game.then { [it.score, it.countdown.remaining, it.dots_in_a_row] }
+    assert_equal before, @game_flow.game.then { [it.score, it.clock.remaining, it.dots_in_a_row] }
   end
 
   def test_its_clock_never_runs
@@ -453,7 +453,7 @@ class TutorialTest < Minitest::Test
     play_until(within: 900) { @tutorial.beat == :aim_next }
     play_for(2.0)
 
-    assert_in_delta 9.0, @game_flow.game.countdown.remaining
+    assert_in_delta 9.0, @game_flow.game.clock.remaining
     assert_in_delta 0.0, @game_flow.game.elapsed
   end
 

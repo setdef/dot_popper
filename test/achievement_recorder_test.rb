@@ -20,7 +20,7 @@ class AchievementRecorderTest < Minitest::Test
   end
 
   # What an event of the rules says of +game+ as it stands.
-  def as_it_stands(game) = { dots: game.dots, score: game.score, countdown: game.countdown, elapsed: game.elapsed }
+  def as_it_stands(game) = { dots: game.dots, score: game.score, clock: game.clock, elapsed: game.elapsed }
 
   # Taps (x, y) in the game and tells the recorder what the rules reported.
   def tap_at(x, y)

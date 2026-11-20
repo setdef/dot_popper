@@ -57,8 +57,8 @@ module DotPopper
       time_to_pop(event.elapsed - last) if last
       dots_in_a_row
       early(event)
-      clock(event)
-      find(:comeback) if @low && event.countdown.remaining >= Achievement::BACK
+      note_low_clock(event)
+      find(:comeback) if @low && event.clock.remaining >= Achievement::BACK
       appeared(event.spawned, dots.take_while { it.id != event.spawned.id }, event)
     end
 
@@ -66,7 +66,7 @@ module DotPopper
       @dots_in_a_row = 0
       @mistaken = true
       @tapped = true
-      clock(event)
+      note_low_clock(event)
     end
 
     def ended(event)
@@ -99,7 +99,7 @@ module DotPopper
       find(:fast_start) if @early >= Achievement::FAST_START
     end
 
-    def clock(tapped) = (@low ||= tapped.countdown.remaining <= Achievement::BRINK)
+    def note_low_clock(tapped) = (@low ||= tapped.clock.remaining <= Achievement::BRINK)
 
     # A bright dot has slid under the others: whether it spawned with no
     # room for a fingertip yet, so the wait to pop it is waiting for it to

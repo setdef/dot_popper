@@ -44,7 +44,7 @@ module DotPopperGui
     def expect(dots_popped:, mistakes:)
       check_equal(expected_score(dots_popped, mistakes), game.score, "the score after #{dots_popped} dots popped and #{mistakes} mistakes")
       granted = R::STARTING_SECONDS + (dots_popped * R::POP_SECONDS) - (mistakes * R::PENALTY_SECONDS)
-      check_close(granted, game.countdown.remaining + game.elapsed, "the clock's time left and time played add up")
+      check_close(granted, game.clock.remaining + game.elapsed, "the clock's time left and time played add up")
     end
 
     def expected_score(dots_popped, mistakes)

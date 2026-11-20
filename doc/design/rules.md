@@ -123,7 +123,7 @@ Tests: `test/spawner_test.rb`, `test/touch_target_test.rb`.
 
 ## Score and clock
 
-`Game` (`lib/dot_popper/game.rb`) holds the dots, the score and the clock, and changes them in place by swapping in new values. Each tap returns an event (`Events::Popped`, `Events::Penalized`, `Events::Missed`); a pop's and a mistake's carry the dots, the score, the countdown and the time played as the tap left them, so no listener reads the game itself.
+`Game` (`lib/dot_popper/game.rb`) holds the dots, the score and the clock, and changes them in place by swapping in new values. Each tap returns an event (`Events::Popped`, `Events::Penalized`, `Events::Missed`); a pop's and a mistake's carry the dots, the score, the clock and the time played as the tap left them, so no listener reads the game itself.
 
 | | Points | Seconds | Constants |
 | --- | ---: | ---: | --- |
@@ -135,7 +135,7 @@ Tests: `test/spawner_test.rb`, `test/touch_target_test.rb`.
 
 - **Pop.** The dot becomes a popped dot where it is, and a new bright dot spawns under every dot on the field.
 - **Mistake.** The penalty takes at most what the score has, so the score never falls below 0. `Events::Penalized#points` is what was really lost, and `#softened?` says the floor kept part of it from landing. The clock takes the full 2 seconds.
-- **The clock** (`Countdown`) counts down in real time and never reads less than zero. The game ends the moment it reaches zero, whether time ran out or a penalty took the last of it (`GameFlow::Playing#settle`).
+- **The clock** (`Clock`) counts down in real time and never reads less than zero. The game ends the moment it reaches zero, whether time ran out or a penalty took the last of it (`GameFlow::Playing#settle`).
 - **`Game#elapsed`** counts only time the clock was running, and never more than was left on it, so a game plays no longer than its clock. Stats and achievements time a game by it.
 
 ## The bonus dot
@@ -237,7 +237,7 @@ On every device but one, fewer than 1 spawn in 70 is redrawn, and a new place is
 | What | Where |
 | --- | --- |
 | Every rule, over thousands of random games with random resizes | `test/rules_fuzz_test.rb` |
-| A game: popping, mistakes, the floor, the clock, resuming from the tutorial | `test/game_test.rb`, `test/game_flow_test.rb`, `test/countdown_test.rb` |
+| A game: popping, mistakes, the floor, the clock, resuming from the tutorial | `test/game_test.rb`, `test/game_flow_test.rb`, `test/clock_test.rb` |
 | Dots, bounces, refitting | `test/dot_test.rb`, `test/field_test.rb`, `test/stack_test.rb` |
 | Dot size and the choice | `test/dot_size_test.rb`, `test/dot_sizing_test.rb`, `test/presentation/sizing_preview_test.rb` |
 | The spawn check | `test/spawner_test.rb`, `test/touch_target_test.rb` |

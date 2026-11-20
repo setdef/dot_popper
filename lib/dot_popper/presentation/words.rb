@@ -31,7 +31,7 @@ module DotPopper
       def self.seconds(seconds) = "#{signed(seconds)}s"
 
       # The whole seconds left on a clock, never below zero.
-      def self.clock(countdown) = [countdown.whole_seconds, 0].max.to_s
+      def self.clock(clock) = [clock.whole_seconds, 0].max.to_s
 
       def self.signed(number)
         whole = number.round(1)

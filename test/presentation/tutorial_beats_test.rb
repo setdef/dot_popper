@@ -184,7 +184,7 @@ class TutorialBeatsTest < Minitest::Test
       assert_equal [0, 1, 2], game.dots.map(&:id), name
       assert_equal [true, true, false], game.dots.map(&:popped?), name
       assert_equal [1, 1], [game.score, game.dots_in_a_row], name
-      assert_in_delta 10.0, game.countdown.remaining, STEP, name
+      assert_in_delta 10.0, game.clock.remaining, STEP, name
     end
   end
 

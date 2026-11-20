@@ -5,17 +5,17 @@ module DotPopper
   # Each is a frozen value, decided before anyone hears of it: by the time
   # a listener runs, the score, the clock, and the dots have already
   # changed, and the event carries them as they then are, under the
-  # names Game gives them (+dots+, +score+, +countdown+, +elapsed+). A
+  # names Game gives them (+dots+, +score+, +clock+, +elapsed+). A
   # listener reads the game from its events alone, so one that keeps an
   # event sees the game as it was then, never as it is now.
   module Events
     # A bright dot was tapped and popped; +spawned+ is the dot that took
     # its place underneath.
-    class Popped < Data.define(:dot, :x, :y, :points, :seconds, :spawned, :dots, :score, :countdown, :elapsed); end
+    class Popped < Data.define(:dot, :x, :y, :points, :seconds, :spawned, :dots, :score, :clock, :elapsed); end
 
     # A popped dot was tapped. +points+ is what the score actually lost,
     # which is less than the penalty when the score was near zero.
-    class Penalized < Data.define(:dot, :x, :y, :points, :seconds, :dots, :score, :countdown, :elapsed)
+    class Penalized < Data.define(:dot, :x, :y, :points, :seconds, :dots, :score, :clock, :elapsed)
       # Whether the score floor kept part of the penalty from landing.
       def softened? = points > -Rules::PENALTY_POINTS
     end

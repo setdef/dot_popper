@@ -493,11 +493,11 @@ class ShowTest < Minitest::Test
   def test_start_does_nothing_in_a_game
     @show.start
     score = @game_flow.game.score
-    clock = @game_flow.game.countdown
+    clock = @game_flow.game.clock
     @show.start
 
     assert @show.playing?
-    assert_equal [score, clock], [@game_flow.game.score, @game_flow.game.countdown]
+    assert_equal [score, clock], [@game_flow.game.score, @game_flow.game.clock]
   end
 
   def test_start_plays_again_from_game_over_after_the_grace

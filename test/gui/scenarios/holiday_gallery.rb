@@ -57,14 +57,14 @@ module DotPopperGui
               still(3, x + (r * 5.2), y, r, bonus: true), still(4, x + (r * 7.2), y, r)]
       start_game
       live_game.instance_variable_set(:@dots, D::Stack.new(dots:))
-      live_game.instance_variable_set(:@countdown, D::Countdown.new(remaining: 999))
+      live_game.instance_variable_set(:@clock, D::Clock.new(remaining: 999))
       wait(1.5)
       keep_screenshot("#{@theme}-closeup")
       finish
     end
 
     def finish
-      live_game.instance_variable_set(:@countdown, D::Countdown.new(remaining: 0.01))
+      live_game.instance_variable_set(:@clock, D::Clock.new(remaining: 0.01))
       run_out_the_clock
       wait(2.5)
       keep_screenshot("#{@theme}-over-#{@size_tag}") if @size_tag
@@ -74,7 +74,7 @@ module DotPopperGui
     def crowd(tag, count)
       @size_tag = tag
       start_game
-      live_game.instance_variable_set(:@countdown, D::Countdown.new(remaining: 999))
+      live_game.instance_variable_set(:@clock, D::Clock.new(remaining: 999))
       pop_bright while game.dots.size < count
       shown = nil
       2400.times do

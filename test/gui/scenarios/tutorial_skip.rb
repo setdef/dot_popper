@@ -30,7 +30,7 @@ module DotPopperGui
       check(game.equal?(paused), "the same game")
       check_equal([1, [true, false]], [game.score, game.dots.map(&:popped?)], "with the pop the player made")
       frames(1)
-      check_equal([game.score, game.countdown.whole_seconds], [show.hud.score, show.hud.seconds], "which the HUD shows")
+      check_equal([game.score, game.clock.whole_seconds], [show.hud.score, show.hud.seconds], "which the HUD shows")
       check_equal(2, story.count(:GameStarted), "each tutorial's game begins play once")
     end
 

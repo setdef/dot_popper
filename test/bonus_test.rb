@@ -46,7 +46,7 @@ class BonusTest < Minitest::Test
     game = calm_game
     Rules::BONUS.dots_in_a_row.times { pop_next(game) }
     score = game.score
-    left = game.countdown.remaining
+    left = game.clock.remaining
 
     event = pop_next(game)
 
@@ -54,7 +54,7 @@ class BonusTest < Minitest::Test
     assert_equal Rules::POP_POINTS + Rules::BONUS.points, event.points
     assert_equal Rules::POP_SECONDS + Rules::BONUS.seconds, event.seconds
     assert_equal score + event.points, game.score
-    assert_in_delta left + event.seconds, game.countdown.remaining
+    assert_in_delta left + event.seconds, game.clock.remaining
     refute event.spawned.bonus?, "the next bright dot is an ordinary one"
   end
 

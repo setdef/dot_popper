@@ -142,7 +142,7 @@ module DotPopper
         @animations = DotAnimations.new(style::MOTION)
         @shown = [] # the ids of the game's dots it has shown born
         @bright = [] # the ids of dots the rules popped that it still draws bright
-        @hud = Hud.blank(style::HUD, style::WORDS).showing(game.score, game.countdown.whole_seconds, now)
+        @hud = Hud.blank(style::HUD, style::WORDS).showing(game.score, game.clock.whole_seconds, now)
                   .counting(game.dots_in_a_row, game.bonus.dots_in_a_row, now)
         spawned(game.dots.first)
       end

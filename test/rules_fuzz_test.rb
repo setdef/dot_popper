@@ -30,14 +30,14 @@ class RulesFuzzTest < Minitest::Test
     3_000.times do |step|
       before = game_flow.state
       seen << before.class
-      kept = [game_flow.game&.score, game_flow.game&.countdown]
+      kept = [game_flow.game&.score, game_flow.game&.clock]
       if before.is_a?(DotPopper::GameFlow::Home) && random.rand < 0.1 then start!(game_flow)
       elsif random.rand < 0.5 then game_flow.press(*aim_anywhere(game_flow, random))
       else game_flow.update(random.rand(1.5))
       end
       next if before.is_a?(DotPopper::GameFlow::Playing)
 
-      assert_equal kept, [before.game&.score, before.game&.countdown], "seed #{seed}, step #{step}"
+      assert_equal kept, [before.game&.score, before.game&.clock], "seed #{seed}, step #{step}"
     end
     assert_equal 3, seen.size, "seed #{seed} never reached every state"
   end
@@ -71,11 +71,11 @@ class RulesFuzzTest < Minitest::Test
     x, y = aim(game, random)
     before = game.dots.to_a
     score = game.score
-    remaining = game.countdown.remaining
+    remaining = game.clock.remaining
     event = game.tap_at(x, y)
     check_tap(event, before, x, y, game, where)
     check_score_change(event, game.score - score, score, where)
-    check_clock_change(event, game.countdown.remaining - remaining, remaining, where)
+    check_clock_change(event, game.clock.remaining - remaining, remaining, where)
   end
 
   def aim(game, random)
@@ -91,12 +91,12 @@ class RulesFuzzTest < Minitest::Test
 
   def tick(game, random, where)
     ids = game.dots.map(&:id)
-    remaining = game.countdown.remaining
+    remaining = game.clock.remaining
     seconds = random.rand < 0.1 ? random.rand(20.0) : random.rand(0.2)
     game.update(seconds)
 
     assert_equal ids, game.dots.map(&:id), "#{where}: a tick changed the dots"
-    assert_in_delta [remaining - seconds, 0].max, game.countdown.remaining, EPSILON, "#{where}: the clock"
+    assert_in_delta [remaining - seconds, 0].max, game.clock.remaining, EPSILON, "#{where}: the clock"
   end
 
   # A resize, or half the time a phone's turn, keeps every dot, its order,
@@ -105,11 +105,11 @@ class RulesFuzzTest < Minitest::Test
   def resize(game, random, where)
     old = game.field
     before = game.dots.to_a
-    kept = [game.score, game.countdown]
+    kept = [game.score, game.clock]
     game.field = random.rand < 0.5 ? DotPopper::Field.new(old.height, old.width, old.radius) : random_field(random)
     after = game.dots.to_a
 
-    assert_equal kept, [game.score, game.countdown], "#{where}: a resize changed the score or clock"
+    assert_equal kept, [game.score, game.clock], "#{where}: a resize changed the score or clock"
     assert_equal before.map { [it.id, it.popped?, it.velocity_x, it.velocity_y] },
                  after.map { [it.id, it.popped?, it.velocity_x, it.velocity_y] }, "#{where}: a resize changed a dot"
     before.zip(after).each { |was, now| check_proportion(was, now, old, game.field, where) }
@@ -132,7 +132,7 @@ class RulesFuzzTest < Minitest::Test
       assert dot.y.between?(field.min_y - EPSILON, field.max_y + EPSILON), "#{where}: dot #{dot.id} left the field"
     end
     assert_operator game.score, :>=, DotPopper::Rules::LOWEST_SCORE, "#{where}: score below zero"
-    assert_operator game.countdown.remaining, :>=, 0, "#{where}: negative clock"
+    assert_operator game.clock.remaining, :>=, 0, "#{where}: negative clock"
     assert_equal 1, game.dots.count(&:bright?), "#{where}: not exactly one bright dot" unless game.over?
     ids = game.dots.map(&:id)
     assert_equal ids.sort, ids, "#{where}: a newer dot is above an older one"

@@ -22,11 +22,11 @@ module DotPopper
 
       attr_reader score: Integer
 
-      attr_reader countdown: Countdown
+      attr_reader clock: Clock
 
       attr_reader elapsed: Float
 
-      def self.new: (dot: Dot, x: number, y: number, points: Integer, seconds: Float, spawned: Dot, dots: Stack, score: Integer, countdown: Countdown, elapsed: Float) -> instance
+      def self.new: (dot: Dot, x: number, y: number, points: Integer, seconds: Float, spawned: Dot, dots: Stack, score: Integer, clock: Clock, elapsed: Float) -> instance
     end
 
     class Penalized < ::Data
@@ -44,11 +44,11 @@ module DotPopper
 
       attr_reader score: Integer
 
-      attr_reader countdown: Countdown
+      attr_reader clock: Clock
 
       attr_reader elapsed: Float
 
-      def self.new: (dot: Dot, x: number, y: number, points: Integer, seconds: Float, dots: Stack, score: Integer, countdown: Countdown, elapsed: Float) -> instance
+      def self.new: (dot: Dot, x: number, y: number, points: Integer, seconds: Float, dots: Stack, score: Integer, clock: Clock, elapsed: Float) -> instance
 
       def softened?: () -> bool
     end

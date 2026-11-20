@@ -98,7 +98,7 @@ module DotPopperGui
       wait(0.5)
       check(show.in_use.key == theme.key, "#{theme.key} is in use")
       start_game
-      live_game.instance_variable_set(:@countdown, D::Countdown.new(remaining: 999))
+      live_game.instance_variable_set(:@clock, D::Clock.new(remaining: 999))
       radius = game.field.radius # dots are drawn at the field's size
       x = layout.center_x
       y = layout.center_y
@@ -112,7 +112,7 @@ module DotPopperGui
       bright = IDS.map { shoot.([dot.(it, false)]) }
       still(theme, x, y, radius)
       popped = IDS.map { shoot.([dot.(it, true)]) }
-      live_game.instance_variable_set(:@countdown, D::Countdown.new(remaining: 0.01))
+      live_game.instance_variable_set(:@clock, D::Clock.new(remaining: 0.01))
       run_out_the_clock
       continue_to_home
       Drawn.new(key: theme.key, night:, bright:, popped:)

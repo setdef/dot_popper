@@ -6,7 +6,7 @@ module DotPopper
 
     attr_reader score: Integer
 
-    attr_reader countdown: Countdown
+    attr_reader clock: Clock
 
     # Seconds of play so far.
     attr_reader elapsed: Float
@@ -33,7 +33,7 @@ module DotPopper
 
       def score: () -> Integer
 
-      def countdown: () -> Countdown
+      def clock: () -> Clock
 
       def elapsed: () -> Float
 

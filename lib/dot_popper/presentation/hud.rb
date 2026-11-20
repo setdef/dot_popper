@@ -92,7 +92,7 @@ module DotPopper
       # seconds left when the clock runs down past a second while urgent.
       def read(game, now)
         score = game.score
-        seconds = [game.countdown.whole_seconds, 0].max
+        seconds = [game.clock.whole_seconds, 0].max
         if self.seconds && seconds < self.seconds && seconds.positive? && seconds <= style.urgent_below && block_given?
           yield seconds
         end
