@@ -116,16 +116,16 @@ module Inputs
                     end
       @games = DotPopper::FreeGames.new(Memory.new, today: -> { @day }, entitlement:, metered: store.offered?, first_games: [games_left - 3, 0].max)
       (3 - games_left.clamp(0, 3)).times { games.spend! }
-      themes = DotPopper::Themes.new(Memory.new)
-      themes.release(THEMES.map(&:to_s))
-      (new_theme ? themes.choices[0...-1] : themes.choices).each { themes.told(it) }
+      saved_themes = DotPopper::SavedThemes.new(Memory.new)
+      saved_themes.release(THEMES.map(&:to_s))
+      (new_theme ? saved_themes.choices[0...-1] : saved_themes.choices).each { saved_themes.told(it) }
       book = DotPopper::SavedStats.new(Memory.new, today: -> { @day })
       book.record(DotPopper::GameStats.start, @game_flow.size_class) if played
       session = DotPopper::Groups::Session.new(file: Memory.new, worker: Server.new(groups:))
       @server_choice = DotPopper::ServerChoice.new(Memory.new, gone: @gone, clipboard:)
       @show = new_show(game_flow:, layout: layout(width, height), sounds:, radius: R, random: Random.new(5), clipboard:, window:, saved_stats: book,
                        sharing: P::SheetSharing.for(platform, opener:), links: opener, entitlement:, store:, games:,
-                       themes:, groups: session, group_notice: P::GroupNotice.new(Memory.new),
+                       saved_themes:, groups: session, group_notice: P::GroupNotice.new(Memory.new),
                        tutorial_flag: P::TutorialFlag.new(Memory.new((P::TutorialFlag::SEEN if played))), input: P::InputKind.starting(touch: phone?),
                        server_choice: @server_choice)
       store.connect

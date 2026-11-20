@@ -15,7 +15,7 @@ module DotPopper
   #
   # The save file (themes.txt) keeps three lines: "unlocked: ghost eclipse",
   # "told: ghost", and "chosen: ghost".
-  class Themes
+  class SavedThemes
     # How long setdef must have been gone before a theme opens by its
     # date alone.
     GONE_DAYS = 180

@@ -7,12 +7,12 @@ module DotPopper
       # its switch, and Not now. It waits for its answer, so nothing of
       # Home's under it takes a press.
       class NewTheme < Screen
-        # +themes+ (DotPopper::Themes) remembers it was told; +use_theme+
+        # +saved_themes+ (DotPopper::SavedThemes) remembers it was told; +use_theme+
         # (UseCases::UseTheme) says what its switch leads to (#choice) and
         # uses it, or for a Free player leads to Pro.
-        def initialize(show, themes:, use_theme:)
+        def initialize(show, saved_themes:, use_theme:)
           super(show)
-          @themes = themes
+          @saved_themes = saved_themes
           @use_theme = use_theme
         end
 
@@ -63,7 +63,7 @@ module DotPopper
 
           theme = show.new_theme or return
 
-          @themes.told(theme.key)
+          @saved_themes.told(theme.key)
           return sounds.play(:tick, pitch: 0.8) unless use
           return show.offer.open_led_by(:themes) if @use_theme.call(theme.key) == :offer
 

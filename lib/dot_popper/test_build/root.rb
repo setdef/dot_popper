@@ -21,11 +21,11 @@ module DotPopper
         end
 
         # A scenario's unlocks and theme, in place of the server's.
-        def use_fixture(themes, use_theme)
+        def use_fixture(saved_themes, use_theme)
           return super if settings.store_build?
 
           keys = settings["DOT_POPPER_THEME_UNLOCKS"]
-          themes.release(keys.split(",")) if keys
+          saved_themes.release(keys.split(",")) if keys
           key = settings["DOT_POPPER_THEME"]&.to_sym or return
 
           use_theme.call(key)

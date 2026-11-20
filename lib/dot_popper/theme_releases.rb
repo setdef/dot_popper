@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DotPopper
-  # Asks the game's server which themes are released, and tells Themes:
+  # Asks the game's server which themes are released, and tells SavedThemes:
   # at launch, and again when Refresh says, each read on its own thread
   # (Network::Worker), so a frame never waits; offline, it simply does
   # nothing, and what was saved stays. The server asks only for the date
@@ -23,9 +23,9 @@ module DotPopper
       body.filter_map { it["key"] if it.is_a?(Hash) && it["key"].is_a?(String) }
     end
 
-    def initialize(worker:, themes:, file:, now: -> { Time.now })
+    def initialize(worker:, saved_themes:, file:, now: -> { Time.now })
       @worker = worker
-      @themes = themes
+      @saved_themes = saved_themes
       @file = file
       @now = now
     end
@@ -52,7 +52,7 @@ module DotPopper
       return false unless reply.ok?
 
       keys = self.class.keys(reply.body)
-      keys ? @themes.release(keys) : false
+      keys ? @saved_themes.release(keys) : false
     end
   end
 end

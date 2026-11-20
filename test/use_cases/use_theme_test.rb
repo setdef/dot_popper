@@ -8,7 +8,7 @@ require "dot_popper/use_cases"
 class UseThemeTest < Minitest::Test
   # The themes the game keeps, as a local fake: :plain is the ordinary
   # one, and only the open ones may be chosen.
-  class Themes
+  class SavedThemes
     attr_reader :chosen
 
     def initialize(open:) = (@open = open) && (@chosen = :plain)
@@ -18,17 +18,17 @@ class UseThemeTest < Minitest::Test
   end
 
   def setup
-    @themes = Themes.new(open: %i[plain ghost])
+    @saved_themes = SavedThemes.new(open: %i[plain ghost])
   end
 
-  def use_theme(pro:) = DotPopper::UseCases::UseTheme.new(themes: @themes, entitlement: DotPopper::Entitlement.new(forced: pro))
+  def use_theme(pro:) = DotPopper::UseCases::UseTheme.new(saved_themes: @saved_themes, entitlement: DotPopper::Entitlement.new(forced: pro))
 
   def test_pro_uses_an_open_theme_at_once
     pro = use_theme(pro: true)
 
     assert_equal :used, pro.call(:ghost)
     assert_equal :ghost, pro.current
-    assert_equal :ghost, @themes.chosen
+    assert_equal :ghost, @saved_themes.chosen
   end
 
   def test_the_current_theme_or_one_not_open_changes_nothing
@@ -36,7 +36,7 @@ class UseThemeTest < Minitest::Test
 
     assert_equal :same, pro.call(:plain)
     assert_equal :same, pro.call(:eclipse)
-    assert_equal :plain, @themes.chosen
+    assert_equal :plain, @saved_themes.chosen
   end
 
   # What the new theme card's switch leads to, as choosing the theme
@@ -58,7 +58,7 @@ class UseThemeTest < Minitest::Test
     assert_equal :offer, free.choice(:ghost)
     assert_equal :offer, free.call(:ghost)
     assert_equal :plain, free.current
-    assert_equal :plain, @themes.chosen
+    assert_equal :plain, @saved_themes.chosen
   end
 
   def test_a_choice_made_with_pro_is_current_only_while_pro_lasts
@@ -70,8 +70,8 @@ class UseThemeTest < Minitest::Test
 
   def test_pro_arriving_changes_the_current_theme_only_once_it_is_taken_up
     entitlement = DotPopper::Entitlement.test
-    @themes.use(:ghost)
-    theme = DotPopper::UseCases::UseTheme.new(themes: @themes, entitlement:)
+    @saved_themes.use(:ghost)
+    theme = DotPopper::UseCases::UseTheme.new(saved_themes: @saved_themes, entitlement:)
     entitlement.prove(DotPopper::Receipt.issue)
 
     assert_equal :plain, theme.current, "never mid-game"
@@ -83,12 +83,12 @@ class UseThemeTest < Minitest::Test
   # after a restart, and a saved choice of a theme since removed gives way
   # to the ordinary one.
   def test_with_the_games_themes_a_choice_lasts_and_a_removed_one_gives_way
-    store = DotPopper::ScoreRecord::Memory.new("unlocked: ghost jingle_bell\ntold: ghost\nchosen: jingle_bell\n")
+    file = DotPopper::ScoreRecord::Memory.new("unlocked: ghost jingle_bell\ntold: ghost\nchosen: jingle_bell\n")
     pro = DotPopper::Entitlement.new(forced: true)
-    theme = DotPopper::UseCases::UseTheme.new(themes: DotPopper::Themes.new(store), entitlement: pro)
+    theme = DotPopper::UseCases::UseTheme.new(saved_themes: DotPopper::SavedThemes.new(file), entitlement: pro)
 
     assert_equal :classic, theme.current
     assert_equal :used, theme.call(:ghost)
-    assert_equal :ghost, DotPopper::UseCases::UseTheme.new(themes: DotPopper::Themes.new(store), entitlement: pro).current
+    assert_equal :ghost, DotPopper::UseCases::UseTheme.new(saved_themes: DotPopper::SavedThemes.new(file), entitlement: pro).current
   end
 end

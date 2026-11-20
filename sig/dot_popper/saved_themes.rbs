@@ -1,5 +1,5 @@
 module DotPopper
-  class Themes
+  class SavedThemes
     GONE_DAYS: Integer
 
     RELEASED: String

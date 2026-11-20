@@ -33,11 +33,11 @@ class AskingAgainTest < Minitest::Test
     file = DotPopper::ScoreRecord::Memory.new
     file.write("t\n")
     @session = DotPopper::Groups::Session.new(file:, worker: @groups_worker)
-    @themes = DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new)
-    @feed = DotPopper::ThemeReleases.new(worker: @themes_worker, themes: @themes, file: DotPopper::ScoreRecord::Memory.new)
+    @saved_themes = DotPopper::SavedThemes.new(DotPopper::ScoreRecord::Memory.new)
+    @feed = DotPopper::ThemeReleases.new(worker: @themes_worker, saved_themes: @saved_themes, file: DotPopper::ScoreRecord::Memory.new)
     @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2))
     @show = new_show(game_flow: @game_flow, layout:, sounds: FakeSounds.new, radius: R, entitlement: DotPopper::Entitlement.new(forced: true),
-                     themes: @themes, groups: @session)
+                     saved_themes: @saved_themes, groups: @session)
     @feed.ask
     @refresh = Refresh.new([-> { @feed.ask }, -> { @session.refresh }], game_flow: @game_flow, now: -> { @now })
     @game_flow.subscribe(@refresh)

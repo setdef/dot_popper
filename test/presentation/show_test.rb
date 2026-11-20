@@ -752,14 +752,14 @@ class ShowTest < Minitest::Test
     entitlement = DotPopper::Entitlement.free
     saved_stats = DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new)
     achievements = DotPopper::Achievements.new(DotPopper::ScoreRecord::Memory.new)
-    themes = DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new)
+    saved_themes = DotPopper::SavedThemes.new(DotPopper::ScoreRecord::Memory.new)
     groups = DotPopper::Groups::Session.off
     use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: DotPopper::FreeGames.unlimited, entitlement:, store: DotPopper::NoStore.new,
                                                  achievements:, saved_stats:, friend_groups: groups, starter: DotPopperTest.starter_of(game_flow))
     told = []
     use_cases[:finish_game].subscribe(told.method(:<<))
-    show = Show.new(game_flow:, layout:, sounds: FakeSounds.new, radius: R, saved_stats:, achievements:, themes:, groups:,
-                    use_theme: DotPopper::UseCases::UseTheme.new(themes:, entitlement:), **use_cases)
+    show = Show.new(game_flow:, layout:, sounds: FakeSounds.new, radius: R, saved_stats:, achievements:, saved_themes:, groups:,
+                    use_theme: DotPopper::UseCases::UseTheme.new(saved_themes:, entitlement:), **use_cases)
     use_cases[:finish_game].subscribe(show)
     [0, 3].each do |taps|
       press_main(show)

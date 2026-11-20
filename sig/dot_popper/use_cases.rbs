@@ -113,12 +113,12 @@ module DotPopper
     end
 
     class UseTheme
-      @themes: Themes
+      @saved_themes: SavedThemes
       @entitlement: Entitlement
 
       attr_reader current: theme_key
 
-      def initialize: (themes: Themes, entitlement: Entitlement) -> void
+      def initialize: (saved_themes: SavedThemes, entitlement: Entitlement) -> void
 
       def choice: (theme_key? key) -> (:use | :same | :offer)
 

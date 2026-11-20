@@ -4,7 +4,7 @@ module DotPopper
   # A theme as Gameplay and Metagame knows it: its +key+, which is what is
   # saved of it and what the server names, and +opens_on+, the day from
   # which it opens to everyone once setdef has been gone for
-  # Themes::GONE_DAYS, or nil for the ordinary theme and for one that waits
+  # SavedThemes::GONE_DAYS, or nil for the ordinary theme and for one that waits
   # for a replacement server to release it. What it draws and plays is the
   # presentation's (Presentation::Theme), found by its key.
   class Theme < Data.define(:key, :opens_on)

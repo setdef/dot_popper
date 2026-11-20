@@ -151,12 +151,12 @@ module DotPopper
         @entitlement = Entitlement.new(forced: Entitlement.forced?(settings.env, platform:), license:, trust: Receipt.trusted(channel))
         clipboard = @engine.clipboard
         @server_choice = ServerChoice.new(file("server.txt"), gone: @gone, clipboard:)
-        themes = Themes.new(file("themes.txt"))
-        use_theme = UseCases::UseTheme.new(themes:, entitlement:)
-        use_fixture(themes, use_theme)
-        themes.open_by_date(today.call, @gone.days(today.call))
-        @gone.subscribe(@server_choice).subscribe(themes)
-        @theme_releases = theme_releases_for(themes)
+        saved_themes = SavedThemes.new(file("themes.txt"))
+        use_theme = UseCases::UseTheme.new(saved_themes:, entitlement:)
+        use_fixture(saved_themes, use_theme)
+        saved_themes.open_by_date(today.call, @gone.days(today.call))
+        @gone.subscribe(@server_choice).subscribe(saved_themes)
+        @theme_releases = theme_releases_for(saved_themes)
         @context = @engine.context(shaders: !flag?("DOT_POPPER_NO_SHADERS"))
         current = Style::THEMES.find { it.key == use_theme.current }
         @context.use(current)
@@ -180,7 +180,7 @@ module DotPopper
           window: @window,
           tutorial_flag: Presentation::TutorialFlag.new(file("tutorial.txt"), mode: Presentation::TutorialFlag.mode(settings.env)),
           group_notice: Presentation::GroupNotice.new(file("group_notice.txt")),
-          themes:, links: @engine.opener, server_choice: @server_choice, use_theme:, **use_cases
+          saved_themes:, links: @engine.opener, server_choice: @server_choice, use_theme:, **use_cases
         )
         # The Show hears the rules' events, and each game as FinishGame
         # finishes it, for Game Over; a store's purchase landing ticks on
@@ -208,7 +208,7 @@ module DotPopper
       # A build for sale releases no theme here and has no stand-in for
       # setdef; a part (Build::PARTS) may answer these, and #store_for,
       # for a build with no channel.
-      def use_fixture(_themes, _use_theme) = nil
+      def use_fixture(_saved_themes, _use_theme) = nil
       def test_watch(_license, _pins) = nil
 
       # What the player is assumed to hold before they press anything.
@@ -249,9 +249,9 @@ module DotPopper
 
       # What asks the server which themes are released, if the game has a
       # server.
-      def theme_releases_for(themes)
+      def theme_releases_for(saved_themes)
         url = server_url or return
-        ThemeReleases.new(worker: Network::Worker.new(Network::Link.new(url)), themes:,
+        ThemeReleases.new(worker: Network::Worker.new(Network::Link.new(url)), saved_themes:,
                           file: file("started_on.txt"), now: settings.utc_now)
       end
     end

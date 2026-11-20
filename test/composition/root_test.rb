@@ -367,13 +367,13 @@ class RootTest < Minitest::Test
     saved_stats = DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new)
     achievements = DotPopper::Achievements.new(DotPopper::ScoreRecord::Memory.new)
     groups = DotPopper::Groups::Session.off
-    themes = DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new)
+    saved_themes = DotPopper::SavedThemes.new(DotPopper::ScoreRecord::Memory.new)
     use_cases = DotPopper::Composition.use_cases(game_flow:, free_games: DotPopper::FreeGames.unlimited, entitlement:, store: NoStore.new,
                                                  achievements:, saved_stats:, friend_groups: groups)
     heard = -> { [game_flow, entitlement, use_cases[:finish_game]].map { it.instance_variable_get(:@listeners).size } }
     before = heard.call
-    Show.new(game_flow:, layout:, sounds: FakeSounds.new, radius: R, saved_stats:, achievements:, themes:, groups:,
-             use_theme: DotPopper::UseCases::UseTheme.new(themes:, entitlement:), **use_cases)
+    Show.new(game_flow:, layout:, sounds: FakeSounds.new, radius: R, saved_stats:, achievements:, saved_themes:, groups:,
+             use_theme: DotPopper::UseCases::UseTheme.new(saved_themes:, entitlement:), **use_cases)
 
     assert_equal before, heard.call
   end
@@ -402,7 +402,7 @@ class RootTest < Minitest::Test
       assert_instance_of DotPopper::GameFlow::Home, game.game_flow.state, saved
       assert_equal in_use, game.context.theme.key, saved
       assert_equal in_use, game.sound_player.theme.key, saved
-      assert_equal %i[classic ghost], DotPopper::Themes.new(engine.file("themes.txt")).choices, saved
+      assert_equal %i[classic ghost], DotPopper::SavedThemes.new(engine.file("themes.txt")).choices, saved
     end
   end
 

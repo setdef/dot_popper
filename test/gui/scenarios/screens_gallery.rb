@@ -22,9 +22,9 @@ module DotPopperGui
       @size = "first"
       shoot("over", settle: 2.5)
       continue_to_home
-      themes = show.instance_variable_get(:@themes)
-      themes.release(%w[ghost]) if ENV["DOT_POPPER_PRO"] == "1"
-      themes.told(themes.new_theme) until themes.new_theme.nil?
+      saved_themes = show.instance_variable_get(:@saved_themes)
+      saved_themes.release(%w[ghost]) if ENV["DOT_POPPER_PRO"] == "1"
+      saved_themes.told(saved_themes.new_theme) until saved_themes.new_theme.nil?
       SIZES.each { |width, height, phone| screens(width, height, phone) }
       join
       SIZES.each { |width, height, phone| member(width, height, phone) }

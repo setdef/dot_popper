@@ -40,7 +40,7 @@ module DotPopper
                   :saved_stats, :input, :words, :clock_highlight, :window
 
       def initialize(game_flow:, layout:, sounds:, radius:, start_game:, finish_game:, buy_pro:, use_theme:, join_or_create_friend_group:,
-                     view_achievements:, saved_stats:, achievements:, themes:, groups:, style: Style, random: Random.new, calm: false,
+                     view_achievements:, saved_stats:, achievements:, saved_themes:, groups:, style: Style, random: Random.new, calm: false,
                      tutor: Tutor.new(ScoreRecord::Memory.new, times: style::LESSON.times), haptics: NoHaptics.new, clipboard: MemoryClipboard.new,
                      sizing_file: ScoreRecord::Memory.new, input: InputKind::MOUSE, measure: RoughMeasure.new,
                      stats_backup: StatsBackup.new(score_record: game_flow.score_record, saved_stats:, achievements:), notices: Notices.none,
@@ -50,7 +50,7 @@ module DotPopper
         @window = window
         @links = links
         @tutorial_flag = tutorial_flag
-        @themes = themes
+        @saved_themes = saved_themes
         # Methods, not blocks, so that what the panel keeps holds the Show
         # and the clipboard alone, and none of what the Show was given.
         @groups = GroupPanel.new(groups:, joining: join_or_create_friend_group, sounds:, pro_offer: method(:open_offer_for), notice: group_notice,
@@ -88,7 +88,7 @@ module DotPopper
         @pointer = nil
         @hover = Hover.none
         @screens = Screens.made_for(self, clipboard:, buy_pro:, start_game:, sharing:, view_achievements:, stats_backup:, saved_stats:,
-                                          achievements:, haptics:, notices:, sizing_file:, server_choice:, themes:, use_theme:,
+                                          achievements:, haptics:, notices:, sizing_file:, server_choice:, saved_themes:, use_theme:,
                                           tutorial_flag:)
       end
 
@@ -132,16 +132,16 @@ module DotPopper
 
       # The new theme to tell the player of, once, at Home, when nothing
       # else is asked of them; nil the rest of the time.
-      def new_theme = (theme_of(@themes.new_theme) if on_home?)
+      def new_theme = (theme_of(@saved_themes.new_theme) if on_home?)
       def new_theme? = !new_theme.nil?
 
-      def themes = @themes.choices.map { theme_of(it) }
+      def themes = @saved_themes.choices.map { theme_of(it) }
       # The art of the theme in use (UseCases::UseTheme answers its key).
       def in_use = theme_of(@use_theme.current)
 
       # Whether +theme+ is open to use, earned or in season. It shows the
       # same to either player.
-      def theme_open?(theme) = @themes.open?(theme.key)
+      def theme_open?(theme) = @saved_themes.open?(theme.key)
 
       # Where the Themes screen's cards go (LooksLayout).
       def themes_layout = @screens[:themes].plan

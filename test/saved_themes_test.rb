@@ -5,7 +5,7 @@ require "test_helper"
 # Which themes a player has, by key: a theme other than the ordinary one
 # exists for them only once the server has released it, or, once setdef
 # has been gone long enough, once its date has passed.
-class ThemeRulesTest < Minitest::Test
+class SavedThemesTest < Minitest::Test
   Memory = DotPopper::ScoreRecord::Memory
   Theme = DotPopper::Theme
   Continuity = DotPopper::Continuity
@@ -14,7 +14,7 @@ class ThemeRulesTest < Minitest::Test
     @file = Memory.new
   end
 
-  def themes = DotPopper::Themes.new(@file)
+  def saved_themes = DotPopper::SavedThemes.new(@file)
 
   def test_the_ordinary_theme_comes_first_and_every_key_is_its_own
     assert_predicate Theme::ALL.first, :ordinary?
@@ -25,7 +25,7 @@ class ThemeRulesTest < Minitest::Test
   end
 
   def test_until_the_server_says_so_there_is_no_trace_of_a_theme
-    t = themes
+    t = saved_themes
     assert_equal [:classic], t.choices
     refute_predicate t, :offered?
     assert_nil t.new_theme
@@ -33,56 +33,56 @@ class ThemeRulesTest < Minitest::Test
   end
 
   def test_releases_are_kept_for_good_even_if_the_server_forgets
-    t = themes
+    t = saved_themes
     assert t.release(%w[ghost awake]), "the server sent new themes"
     assert_equal %i[classic ghost awake], t.choices
     refute t.release([])
-    assert_equal %i[classic ghost awake], themes.choices, "still there, after a restart, offline"
+    assert_equal %i[classic ghost awake], saved_themes.choices, "still there, after a restart, offline"
   end
 
   def test_a_release_that_leaves_out_one_already_saved_keeps_it
-    t = themes
+    t = saved_themes
     t.release(%w[ghost])
     assert t.release(%w[santa]), "Santa is new"
     assert_equal %i[classic ghost santa], t.choices
-    assert_equal %i[classic ghost santa], themes.choices, "both saved"
+    assert_equal %i[classic ghost santa], saved_themes.choices, "both saved"
   end
 
   def test_keys_the_game_does_not_know_and_the_ordinary_theme_are_ignored
-    refute themes.release(%w[zombie classic])
-    assert_equal [:classic], themes.choices
+    refute saved_themes.release(%w[zombie classic])
+    assert_equal [:classic], saved_themes.choices
   end
 
   # Jingle bell was a theme in playtest builds and is gone from the game,
   # but the server still lists it and devices still have it saved.
   def test_a_removed_theme_saved_on_a_device_gives_way_to_the_ordinary_one_and_the_rest_are_kept
     @file.write("unlocked: ghost jingle_bell turkey\ntold: ghost jingle_bell\nchosen: jingle_bell\n")
-    t = themes
+    t = saved_themes
     assert_equal %i[classic ghost turkey], t.choices
     assert_equal :classic, t.chosen
     assert_equal :turkey, t.new_theme, "only a theme the game has is told"
   end
 
   def test_a_removed_theme_the_server_still_sends_is_ignored
-    t = themes
+    t = saved_themes
     refute t.release(%w[jingle_bell]), "nothing new"
     assert t.release(%w[jingle_bell ghost])
-    assert_equal %i[classic ghost], themes.choices
+    assert_equal %i[classic ghost], saved_themes.choices
   end
 
   def test_each_new_theme_is_told_once
-    t = themes
+    t = saved_themes
     t.release(%w[ghost turkey])
     assert_equal :ghost, t.new_theme
     t.told(:ghost)
     assert_equal :turkey, t.new_theme
     t.told(:turkey)
     assert_nil t.new_theme, "told, however it was answered"
-    assert_nil themes.new_theme, "and still, after a restart"
+    assert_nil saved_themes.new_theme, "and still, after a restart"
   end
 
   def test_a_theme_is_chosen_only_once_it_is_released
-    t = themes
+    t = saved_themes
     t.use(:ghost)
     assert_equal :classic, t.chosen
     t.release(["ghost"])
@@ -90,11 +90,11 @@ class ThemeRulesTest < Minitest::Test
     assert t.open?(:ghost)
     refute t.open?(:turkey)
     t.use(:ghost)
-    assert_equal :ghost, themes.chosen, "still chosen after a restart"
+    assert_equal :ghost, saved_themes.chosen, "still chosen after a restart"
   end
 
   def test_what_is_saved_is_three_lines_in_the_order_they_came
-    t = themes
+    t = saved_themes
     t.release(%w[turkey ghost])
     t.told(:turkey)
     t.use(:ghost)
@@ -103,12 +103,12 @@ class ThemeRulesTest < Minitest::Test
 
   def test_a_saved_choice_no_longer_in_the_game_is_written_back_as_it_was
     @file.write("unlocked: ghost\ntold: \nchosen: jingle_bell\n")
-    themes.told(:ghost)
+    saved_themes.told(:ghost)
     assert_equal "unlocked: ghost\ntold: ghost\nchosen: jingle_bell\n", @file.read
   end
 
   def test_themes_open_by_their_dates_only_once_setdef_has_been_gone_180_days
-    t = themes
+    t = saved_themes
     today = Date.new(2027, 6, 1)
 
     refute t.open_by_date(today, 179)
@@ -121,13 +121,13 @@ class ThemeRulesTest < Minitest::Test
   end
 
   def test_a_theme_opens_on_its_date_and_not_the_day_before
-    refute themes.open_by_date(Date.new(2026, 9, 30), 400)
-    assert themes.open_by_date(Date.new(2026, 10, 1), 400)
-    assert_equal %i[classic ghost jack_o_lantern], themes.choices
+    refute saved_themes.open_by_date(Date.new(2026, 9, 30), 400)
+    assert saved_themes.open_by_date(Date.new(2026, 10, 1), 400)
+    assert_equal %i[classic ghost jack_o_lantern], saved_themes.choices
   end
 
   def test_a_check_that_leaves_setdef_gone_long_enough_opens_themes_by_their_dates
-    t = themes
+    t = saved_themes
     gone = Continuity::Gone.new(Memory.new).subscribe(t)
     gone.heard(:gone, Date.new(2027, 1, 1))
     assert_equal [:classic], t.choices
@@ -137,7 +137,7 @@ class ThemeRulesTest < Minitest::Test
   end
 
   def test_setdef_answering_opens_nothing
-    t = themes
+    t = saved_themes
     t.call(Continuity::SetdefHere.new)
     assert_equal [:classic], t.choices
   end

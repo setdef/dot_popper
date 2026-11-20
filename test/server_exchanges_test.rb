@@ -30,7 +30,7 @@ class ServerExchangesTest < Minitest::Test
   end
 
   # The theme keys the feed hands over.
-  class Themes
+  class SavedThemes
     attr_reader :keys
 
     def release(keys) = (@keys = keys) && true
@@ -206,14 +206,14 @@ class ServerExchangesTest < Minitest::Test
   def play_themes
     asking = exchange("the themes a player who started on a date has")
     started_on = asking.dig("request", "path")[/started_on=([\d-]+)/, 1]
-    themes = Themes.new
-    feed = DotPopper::ThemeReleases.new(worker: InlineWorker.new(Network::Link.new(@url)), themes:,
+    saved_themes = SavedThemes.new
+    feed = DotPopper::ThemeReleases.new(worker: InlineWorker.new(Network::Link.new(@url)), saved_themes:,
                                         file: DotPopper::ScoreRecord::Memory.new, now: -> { Time.utc(*started_on.split("-").map(&:to_i), 12) })
     feed.ask
     feed.update
 
-    assert_equal asking.dig("reply", "body").map { it["key"] }, themes.keys
-    refute_empty themes.keys
+    assert_equal asking.dig("reply", "body").map { it["key"] }, saved_themes.keys
+    refute_empty saved_themes.keys
   end
 
   def session = Groups::Session.new(file: DotPopper::ScoreRecord::Memory.new, worker: InlineWorker.new(Network::Link.new(@url)))

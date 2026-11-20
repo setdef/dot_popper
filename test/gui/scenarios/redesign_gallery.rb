@@ -13,9 +13,9 @@ module DotPopperGui
     P = DotPopper::Presentation
 
     def play
-      themes = show.instance_variable_get(:@themes)
+      saved_themes = show.instance_variable_get(:@saved_themes)
       wait(0.5)
-      themes.told(themes.new_theme) until themes.new_theme.nil?
+      saved_themes.told(saved_themes.new_theme) until saved_themes.new_theme.nil?
       @size = "1200x800"
       shoot("home-first", settle: 1.5)
       quick_game

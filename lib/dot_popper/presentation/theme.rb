@@ -21,7 +21,7 @@ module DotPopper
     # theme has no art and is always there. Every theme lives in its own
     # file in presentation/themes/ with its shader in
     # assets/shaders/themes/, so one can be swapped alone. Which themes a
-    # player has, and when one opens, is DotPopper::Themes'.
+    # player has, and when one opens, is DotPopper::SavedThemes'.
     class Theme < Data.define(:key, :palette, :art)
       def initialize(key:, palette:, art: nil) = super
 

@@ -83,7 +83,7 @@ class PrivacyRequestsTest < Minitest::Test
     @session.leave(1)
     pump
     DotPopper::ThemeReleases.new(worker: InlineWorker.new(Network::Link.new("http://127.0.0.1:#{@server.addr[1]}")),
-                                 themes: DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new), file: DotPopper::ScoreRecord::Memory.new,
+                                 saved_themes: DotPopper::SavedThemes.new(DotPopper::ScoreRecord::Memory.new), file: DotPopper::ScoreRecord::Memory.new,
                                  now: -> { Time.utc(2026, 11, 8, 12) }).ask
     @session.delete_everything
     pump

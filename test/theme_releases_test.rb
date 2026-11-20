@@ -21,45 +21,45 @@ class ThemeReleasesTest < Minitest::Test
     @file = Memory.new
     @dated = Memory.new
     @worker = FakeWorker.new
-    @themes = DotPopper::Themes.new(@file)
-    @feed = DotPopper::ThemeReleases.new(worker: @worker, themes: @themes, file: @dated, now: -> { Time.utc(2026, 11, 8, 12) })
+    @saved_themes = DotPopper::SavedThemes.new(@file)
+    @feed = DotPopper::ThemeReleases.new(worker: @worker, saved_themes: @saved_themes, file: @dated, now: -> { Time.utc(2026, 11, 8, 12) })
   end
 
   def test_sends_the_first_play_date_and_keeps_it_for_good
     @feed.ask
     assert_equal "/themes?started_on=2026-11-08", @worker.started.path
-    feed = DotPopper::ThemeReleases.new(worker: @worker, themes: @themes, file: @dated, now: -> { Time.utc(2027, 1, 1, 12) })
+    feed = DotPopper::ThemeReleases.new(worker: @worker, saved_themes: @saved_themes, file: @dated, now: -> { Time.utc(2027, 1, 1, 12) })
     feed.ask
     assert_equal "/themes?started_on=2026-11-08", @worker.started.path
   end
 
   def test_sends_the_utc_date_not_the_local_one
     late_in_los_angeles = Time.new(2026, 11, 8, 20, 0, 0, "-08:00")
-    DotPopper::ThemeReleases.new(worker: @worker, themes: @themes, file: Memory.new, now: -> { late_in_los_angeles }).ask
+    DotPopper::ThemeReleases.new(worker: @worker, saved_themes: @saved_themes, file: Memory.new, now: -> { late_in_los_angeles }).ask
     assert_equal "/themes?started_on=2026-11-09", @worker.started.path
     early_in_auckland = Time.new(2026, 11, 9, 5, 0, 0, "+13:00")
-    DotPopper::ThemeReleases.new(worker: @worker, themes: @themes, file: Memory.new, now: -> { early_in_auckland }).ask
+    DotPopper::ThemeReleases.new(worker: @worker, saved_themes: @saved_themes, file: Memory.new, now: -> { early_in_auckland }).ask
     assert_equal "/themes?started_on=2026-11-08", @worker.started.path
   end
 
   def test_an_empty_answer_shows_no_trace_of_any_theme
     @worker.finished_list = [[nil, Reply.new(status: 200, body: [])]]
     refute @feed.update
-    refute_predicate @themes, :offered?
-    assert_nil @themes.new_theme
+    refute_predicate @saved_themes, :offered?
+    assert_nil @saved_themes.new_theme
   end
 
   def test_an_unlock_arrives_and_unknown_keys_are_ignored
     @worker.finished_list = [[nil, Reply.new(status: 200, body: [{ "key" => "ghost" }, { "key" => "zombie" }])]]
     assert @feed.update
-    assert_equal [:ghost], @themes.choices.drop(1)
+    assert_equal [:ghost], @saved_themes.choices.drop(1)
   end
 
   def test_offline_keeps_what_was_saved
-    @themes.release(["ghost"])
+    @saved_themes.release(["ghost"])
     @worker.finished_list = [[nil, Reply.offline]]
     refute @feed.update
-    assert_equal [:ghost], @themes.choices.drop(1)
+    assert_equal [:ghost], @saved_themes.choices.drop(1)
   end
 
   # Only a successful answer releases anything, whatever an error's body
@@ -67,6 +67,6 @@ class ThemeReleasesTest < Minitest::Test
   def test_an_error_answer_releases_nothing
     @worker.finished_list = [[nil, Reply.new(status: 500, body: [{ "key" => "ghost" }])]]
     refute @feed.update
-    assert_equal [:classic], @themes.choices
+    assert_equal [:classic], @saved_themes.choices
   end
 end

@@ -15,10 +15,10 @@ class ThemesTest < Minitest::Test
   def show(pro:, unlocked: [])
     @pro = true if pro
     entitlement = DotPopper::Entitlement.new(forced: @pro)
-    @themes = DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new)
-    @themes.release(unlocked)
+    @saved_themes = DotPopper::SavedThemes.new(DotPopper::ScoreRecord::Memory.new)
+    @saved_themes.release(unlocked)
     @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new))
-    @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, entitlement:, themes: @themes,
+    @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, entitlement:, saved_themes: @saved_themes,
                      saved_stats: DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new, today: -> { @day }))
     settle
   end
@@ -36,7 +36,7 @@ class ThemesTest < Minitest::Test
   # miss what we did not expect).
   def test_a_card_that_appears_under_a_finger_waits_a_moment_before_it_takes_a_press
     show(pro: true)
-    @themes.release(["ghost"])
+    @saved_themes.release(["ghost"])
     @show.update(0.016)
     use_key = @show.screens.fetch(:new_theme).plan.use_button
     @show.tap(use_key.center_x, use_key.center_y)
@@ -55,7 +55,7 @@ class ThemesTest < Minitest::Test
   def test_nothing_of_a_theme_shows_until_the_server_unlocks_it
     show(pro: true)
     assert_nil @show.new_theme
-    refute_predicate @themes, :offered?
+    refute_predicate @saved_themes, :offered?
   end
 
   def test_a_new_theme_is_told_with_an_immediate_switch
@@ -74,13 +74,13 @@ class ThemesTest < Minitest::Test
     pro = false
     entitlement = DotPopper::Entitlement.free
     entitlement.define_singleton_method(:pro?) { pro }
-    @themes = DotPopper::Themes.new(DotPopper::ScoreRecord::Memory.new)
-    @themes.release(["ghost"])
-    @themes.told(:ghost)
-    @themes.use(:ghost)
+    @saved_themes = DotPopper::SavedThemes.new(DotPopper::ScoreRecord::Memory.new)
+    @saved_themes.release(["ghost"])
+    @saved_themes.told(:ghost)
+    @saved_themes.use(:ghost)
     @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new))
-    @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, entitlement:, themes: @themes,
-                     use_theme: DotPopper::UseCases::UseTheme.new(themes: @themes, entitlement:))
+    @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, entitlement:, saved_themes: @saved_themes,
+                     use_theme: DotPopper::UseCases::UseTheme.new(saved_themes: @saved_themes, entitlement:))
     settle
     press_main
     @show.back # Escape skips the Tutorial, if it opened

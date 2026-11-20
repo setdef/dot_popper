@@ -3,15 +3,15 @@
 module DotPopper
   module UseCases
     # Using a theme: which themes a player has is Gameplay and Metagame's
-    # (+themes+, Themes, which keeps which are released and which the
+    # (+saved_themes+, SavedThemes, which keeps which are released and which the
     # player chose), and using one other than the ordinary is Pro's
     # (+entitlement+, Entitlement). A Free player sees every theme, and is
     # told of a new one, but uses the ordinary theme, and choosing another
     # leads to the offer of Pro instead. Themes are named by their keys
     # (Theme#key); what each draws is the presentation's.
     class UseTheme
-      def initialize(themes:, entitlement:)
-        @themes = themes
+      def initialize(saved_themes:, entitlement:)
+        @saved_themes = saved_themes
         @entitlement = entitlement
         refresh
       end
@@ -37,7 +37,7 @@ module DotPopper
         return :offer if locked?
         return :same if same?(key)
 
-        @themes.use(key)
+        @saved_themes.use(key)
         refresh
         :used
       end
@@ -45,12 +45,12 @@ module DotPopper
       # Takes up which theme is current: the one a Pro player chose, and
       # for a Free player the ordinary one.
       def refresh
-        @current = locked? ? @themes.ordinary : @themes.chosen
+        @current = locked? ? @saved_themes.ordinary : @saved_themes.chosen
       end
 
       private
 
-      def same?(key) = key == current || !@themes.open?(key)
+      def same?(key) = key == current || !@saved_themes.open?(key)
 
       # Whether choosing a theme leads to Pro, as for a Free player.
       def locked? = !@entitlement.pro?

@@ -64,7 +64,7 @@ module DotPopperGui
     NEAREST = 45
 
     def play
-      player_themes = show.instance_variable_get(:@themes)
+      player_themes = show.instance_variable_get(:@saved_themes)
       wait(0.5)
       player_themes.release(P::Style::THEMES.map(&:key))
       player_themes.told(player_themes.new_theme) until player_themes.new_theme.nil?
