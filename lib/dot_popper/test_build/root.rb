@@ -35,7 +35,7 @@ module DotPopper
           return super if settings.store_build?
 
           fake = Monetization::Continuity::FakeSetdef.new(file("fake_setdef.txt"), mode: Monetization::Continuity::FakeSetdef.mode(settings.env))
-          Monetization::Continuity::Watch.new(server: fake, connectivity: fake, gone: @gone, license:, today: settings.today, pins:)
+          Monetization::Continuity::Watch.new(server: fake, connectivity: fake, gone: @gone, license:, license_server: fake, today: settings.today, pins:)
         end
       end
       prepend TestBuildParts

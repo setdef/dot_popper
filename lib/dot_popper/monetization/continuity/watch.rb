@@ -71,15 +71,19 @@ module DotPopper
       # Asks, on a thread of its own and at low priority, so no frame waits:
       # first setdef's +server+ for a proof, and, only if it gives none, the
       # +connectivity+ checks. While setdef answers, it also asks what the
-      # +license+ owes it. What it learns is taken up on the game's thread,
-      # by #update, so Gone and License change only there.
+      # +license+ owes it (due(nonce): a request with a +kind+ and a +body+,
+      # or nil) of the +license_server+ (ask(due): a Network::Reply), and
+      # tells the license what came back (heard(due, nonce, reply)). What it
+      # learns is taken up on the game's thread, by #update, so Gone and the
+      # license change only there.
       class Watch
         PRIORITY = -2
         Result = Data.define(:answer, :due, :nonce, :reply)
 
-        def initialize(server:, connectivity:, gone:, license:, today:, pins: PINNED)
+        def initialize(server:, connectivity:, gone:, license:, license_server:, today:, pins: PINNED)
           @pins = pins
           @server = server
+          @license_server = license_server
           @connectivity = connectivity
           @gone = gone
           @license = license
@@ -132,7 +136,7 @@ module DotPopper
             return Result.new(answer: gone ? :gone : :unknown, due:, nonce:, reply: nil)
           end
 
-          Result.new(answer: :here, due:, nonce:, reply: due && @server.ask(due))
+          Result.new(answer: :here, due:, nonce:, reply: due && @license_server.ask(due))
         end
       end
 

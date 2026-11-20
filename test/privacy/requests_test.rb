@@ -184,12 +184,13 @@ class PrivacyRequestsTest < Minitest::Test
     c = DotPopper::Monetization::Continuity
     local = "http://127.0.0.1:#{@server.addr[1]}"
     server = c::SetdefServer.new(Network::Link.new(local))
+    license_server = DotPopper::Monetization::LicenseKeys::Server.new(Network::Link.new(local))
     license = DotPopper::Monetization::LicenseKeys::License.new(DotPopper::MemoryFile.new, pins: c::TEST_PINS)
     license.enter(c::TestKeys.license_key.text)
     server.proof(c::SignedAnswers.fresh)
-    server.ask(license.due(c::SignedAnswers.fresh))
+    license_server.ask(license.due(c::SignedAnswers.fresh))
     license.instance_variable_get(:@lines)["registered"] = "yes"
-    server.ask(license.due(c::SignedAnswers.fresh))
+    license_server.ask(license.due(c::SignedAnswers.fresh))
 
     refute c::Connectivity.new(link: ->(_host) { Network::Link.new(local, raw: true) }).online?
   end

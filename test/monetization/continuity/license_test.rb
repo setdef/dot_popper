@@ -20,7 +20,7 @@ class LicenseTest < Minitest::Test
   # A device: its saved license, gone-ness and a watch over +server+.
   def device(server = C::FakeSetdef.new(@ledger), connectivity: server, today: TODAY)
     license = L::License.new(Memory.new, pins: C::TEST_PINS)
-    C::Watch.new(server:, connectivity:, gone: C::Gone.new(Memory.new), license:, today: -> { today }, pins: C::TEST_PINS)
+    C::Watch.new(server:, connectivity:, gone: C::Gone.new(Memory.new), license:, license_server: server, today: -> { today }, pins: C::TEST_PINS)
   end
 
   def run_check(watch)
@@ -85,6 +85,20 @@ class LicenseTest < Minitest::Test
     assert_predicate watch.license, :pro?
   end
 
+  # setdef's server is asked only for its proof, and the license's server
+  # only what the license owes it: Continuity declares no license request.
+  def test_the_watch_asks_the_license_server_and_setdef_only_for_its_proof
+    proving = C::FakeSetdef.new(@ledger)
+    def proving.ask(_due) = raise("setdef's proof server was asked about a license key")
+    watch = C::Watch.new(server: proving, connectivity: proving, gone: C::Gone.new(Memory.new), license: L::License.new(Memory.new, pins: C::TEST_PINS),
+                         license_server: C::FakeSetdef.new(@ledger), today: -> { TODAY }, pins: C::TEST_PINS)
+    watch.license.enter(@key.text)
+
+    assert_equal :current, run_check(watch)
+    assert_equal %i[proof], C::SetdefServer::REQUESTS.keys
+    assert_equal %i[license_entry license_check], L::Server::REQUESTS.keys
+  end
+
   def test_a_key_entered_on_another_device_returns_the_first_to_free_on_a_signed_answer
     first = device
     first.license.enter(@key.text)
@@ -111,7 +125,7 @@ class LicenseTest < Minitest::Test
 
     [forged, refusing, C::FakeSetdef.new(@ledger, mode: :offline), C::FakeSetdef.new(@ledger, mode: :gone)].each do |server|
       other = C::Watch.new(server:, connectivity: server.respond_to?(:online?) ? server : C::FakeSetdef.new(@ledger),
-                           gone: C::Gone.new(Memory.new), license: watch.license, today: -> { TODAY }, pins: C::TEST_PINS)
+                           gone: C::Gone.new(Memory.new), license: watch.license, license_server: server, today: -> { TODAY }, pins: C::TEST_PINS)
       run_check(other)
 
       assert_predicate watch.license, :pro?
@@ -177,7 +191,7 @@ class LicenseTest < Minitest::Test
     assert_predicate watch.license, :pro?
     refute_predicate watch.license, :registered?
     back = C::Watch.new(server: C::FakeSetdef.new(@ledger), connectivity: ledger_server, gone: watch.gone, license: watch.license,
-                        today: -> { TODAY }, pins: C::TEST_PINS)
+                        license_server: C::FakeSetdef.new(@ledger), today: -> { TODAY }, pins: C::TEST_PINS)
     run_check(back)
 
     assert_predicate watch.license, :registered?

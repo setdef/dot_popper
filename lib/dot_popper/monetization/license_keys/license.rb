@@ -20,7 +20,7 @@ module DotPopper
       # and "registered: yes" once the server has answered the entry.
       class License
         # What setdef's server is to be asked: +kind+ (:license_entry or
-        # :license_check, as SetdefServer::REQUESTS names them) and the +body+ to send.
+        # :license_check, as Server::REQUESTS names them) and the +body+ to send.
         Due = Data.define(:kind, :body)
 
         # Where a build keeps its license key: the save file the block makes

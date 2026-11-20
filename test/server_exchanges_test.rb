@@ -9,9 +9,9 @@ require "dot_popper/presentation"
 # Replays the server's own record of every exchange (its
 # docs/exchanges.json, made by its tests against its real app, copied to
 # test/fixtures/server/) with the game's own client: Groups::Session,
-# ThemeReleases, License and SetdefServer, through a real Network::Link, to a
-# local socket that answers only what the record holds, and refuses any
-# request it doesn't hold exactly. So the game can change nothing it
+# ThemeReleases, License, SetdefServer and LicenseKeys::Server, through a
+# real Network::Link, to a local socket that answers only what the record
+# holds, and refuses any request it doesn't hold exactly. So the game can change nothing it
 # sends or reads without this failing, and a new copy of the record
 # fails it when the server has changed what it answers.
 class ServerExchangesTest < Minitest::Test
@@ -110,6 +110,7 @@ class ServerExchangesTest < Minitest::Test
   def play_continuity
     pins = C::Pins.of(roots: RECORD.dig("keys", "roots"), license_keys: RECORD.dig("keys", "license_keys"))
     server = C::SetdefServer.new(Network::Link.new(@url))
+    license_server = L::Server.new(Network::Link.new(@url))
 
     proving = exchange("setdef's server proves itself")
     nonce = H[proving.dig("request", "path")[/nonce=(\h+)/, 1]]
@@ -124,14 +125,14 @@ class ServerExchangesTest < Minitest::Test
     second = L::License.new(DotPopper::MemoryFile.new, pins:, fresh: -> { H[body(elsewhere).fetch("secret")] })
 
     assert_equal :entered, first.enter(text)
-    assert_equal :current, ask(server, first, entering)
+    assert_equal :current, ask(license_server, first, entering)
     lost = first.due(nonce_of(checking))
-    server.ask(lost)
+    license_server.ask(lost)
     assert_nil first.heard(lost, nonce_of(checking), Network::Reply.offline), "an answer lost on the way"
-    assert_equal :current, ask(server, first, again)
+    assert_equal :current, ask(license_server, first, again)
     assert_equal :entered, second.enter(text)
-    assert_equal :current, ask(server, second, elsewhere)
-    assert_equal :moved, ask(server, first, moving)
+    assert_equal :current, ask(license_server, second, elsewhere)
+    assert_equal :moved, ask(license_server, first, moving)
     refute_predicate first, :pro?
     assert_predicate second, :pro?
     [entering, checking, again, elsewhere, moving].each do |answered|
@@ -140,8 +141,8 @@ class ServerExchangesTest < Minitest::Test
     end
   end
 
-  # +license+ asks setdef's server what is due, with +exchange+'s nonce,
-  # and hears the answer.
+  # +license+ asks setdef's license +server+ what is due, with +exchange+'s
+  # nonce, and hears the answer.
   def ask(server, license, exchange)
     nonce = nonce_of(exchange)
     due = license.due(nonce)

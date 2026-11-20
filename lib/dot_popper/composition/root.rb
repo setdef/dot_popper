@@ -276,8 +276,9 @@ module DotPopper
       def watch_for(license, pins)
         watch = test_watch(license, pins) and return watch
         if Monetization::Continuity.live? && !settings.automated?
-          return Monetization::Continuity::Watch.new(server: Monetization::Continuity::SetdefServer.new(Network::Link.new(Network::Server::SERVER_URL)),
-                                       connectivity: Monetization::Continuity::Connectivity.new, gone: @gone, license:, today: settings.today, pins:)
+          link = Network::Link.new(Network::Server::SERVER_URL)
+          return Monetization::Continuity::Watch.new(server: Monetization::Continuity::SetdefServer.new(link), connectivity: Monetization::Continuity::Connectivity.new,
+                                                     gone: @gone, license:, license_server: Monetization::LicenseKeys::Server.new(link), today: settings.today, pins:)
         end
 
         Monetization::Continuity::NoWatch.new(gone: @gone, license:)
