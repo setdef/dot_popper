@@ -13,9 +13,8 @@
 # Each area is a target of its own, which sees only its own signatures
 # and those of what it may name (test/areas_test.rb gives the rules, and
 # holds them for the Ruby Steep does not type): a name from another area
-# is then an unknown constant or type. A signature file of another area
-# that a target loads is a breach of the rules, listed with the step of
-# the refactoring list that removes it.
+# is then an unknown constant or type. No target loads a signature file
+# of another area: one would be a breach of the rules.
 SHARED = %w[sig/core sig/dot_popper.rbs sig/dot_popper/network.rbs sig/dot_popper/platform.rbs sig/dot_popper/automation.rbs sig/dot_popper/memory_file.rbs].freeze
 LIBRARIES = %w[date socket uri].freeze
 
@@ -36,10 +35,7 @@ end
 # code does yet), and names nothing of Release Engineering, which has no
 # interface at run time.
 target :monetization do
-  signature(*SHARED, "sig/dot_popper/monetization",
-            # The store and the receipts ask the build's channel (steps 5.1
-            # to 5.4), and the license whether it keeps keys (6.2).
-            "sig/dot_popper/release_engineering/build.rbs")
+  signature(*SHARED, "sig/dot_popper/monetization")
   LIBRARIES.each { library it }
   check "lib/dot_popper/monetization/*.rb"
   configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)
