@@ -67,11 +67,11 @@ class EntitlementTest < Minitest::Test
   end
 
   def test_pro_arriving_by_a_license_key_is_announced_once
-    license = DotPopper::Continuity::License.new(DotPopper::Gameplay::ScoreRecord::Memory.new, pins: DotPopper::Continuity::TEST_PINS)
+    license = DotPopper::Monetization::Continuity::License.new(DotPopper::Gameplay::ScoreRecord::Memory.new, pins: DotPopper::Monetization::Continuity::TEST_PINS)
     entitlement = Entitlement.new(license:)
     heard = []
     entitlement.subscribe(->(event) { heard << event })
-    key = DotPopper::Continuity::LicenseKey.issue(DotPopper::Continuity::TestKeys::LICENSE).text
+    key = DotPopper::Monetization::Continuity::LicenseKey.issue(DotPopper::Monetization::Continuity::TestKeys::LICENSE).text
 
     assert_equal :invalid, entitlement.enter("DP-NOTAKEY")
     assert_equal :entered, entitlement.enter(key)

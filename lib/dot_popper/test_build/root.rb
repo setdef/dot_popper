@@ -34,8 +34,8 @@ module DotPopper
         def test_watch(license, pins)
           return super if settings.store_build?
 
-          fake = Continuity::FakeSetdef.new(file("fake_setdef.txt"), mode: Continuity::FakeSetdef.mode(settings.env))
-          Continuity::Watch.new(server: fake, connectivity: fake, gone: @gone, license:, today: settings.today, pins:)
+          fake = Monetization::Continuity::FakeSetdef.new(file("fake_setdef.txt"), mode: Monetization::Continuity::FakeSetdef.mode(settings.env))
+          Monetization::Continuity::Watch.new(server: fake, connectivity: fake, gone: @gone, license:, today: settings.today, pins:)
         end
       end
       prepend TestBuildParts

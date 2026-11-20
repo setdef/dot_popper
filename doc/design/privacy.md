@@ -36,7 +36,7 @@ Each part of the game that makes requests declares its own, as `REQUESTS`, where
 | --- | --- |
 | `Groups::REQUESTS` (`lib/dot_popper/gameplay/groups/requests.rb`) | `POST /player`, `GET /groups`, `POST /groups`, `POST /memberships`, `GET /groups/:id`, `GET /groups/:id/history`, `POST /achievements`, `DELETE /groups/:id/membership`, `DELETE /player` and `POST /games`, for friend groups ([friend-groups.md](friend-groups.md)) |
 | `ThemeReleases::REQUESTS` (`lib/dot_popper/gameplay/theme_releases.rb`) | `GET /themes` with `started_on`, for every player, with no token ([look-and-sound.md](look-and-sound.md)) |
-| `Continuity::SetdefServer::REQUESTS` (`lib/dot_popper/continuity/setdef_server.rb`) | `GET /proof`, `POST /licenses` and `POST /license_checks`, for setdef being there and license keys ([store-and-pro.md](store-and-pro.md)) |
+| `Continuity::SetdefServer::REQUESTS` (`lib/dot_popper/monetization/continuity/setdef_server.rb`) | `GET /proof`, `POST /licenses` and `POST /license_checks`, for setdef being there and license keys ([store-and-pro.md](store-and-pro.md)) |
 | `Continuity::Connectivity::REQUESTS` (the same file) | the three connectivity checks, to `captive.apple.com`, `connectivitycheck.gstatic.com` and `www.msftconnecttest.com` |
 
 `Privacy::REQUESTS` (`lib/dot_popper/privacy/requests.rb`) merges them in the order of `Privacy::PARTS`, which is the document's, and refuses a kind declared twice.
@@ -51,7 +51,7 @@ Each part of the game that makes requests declares its own, as `REQUESTS`, where
 
 **Source scans.** Comments are stripped first (Prism).
 
-- No network primitive (`Net::`, sockets, `OpenSSL`, `open-uri`, HTTP gems) appears outside `network/link.rb`, except `automation.rb`, which only refuses connections, and the signature checks in `continuity/ed25519.rb` and `monetization/receipt/`, which may use OpenSSL's keys and certificates and nothing that connects. The native hosts use no `URLSession`, `NSURLConnection`, `HttpURLConnection`, OkHttp or Volley.
+- No network primitive (`Net::`, sockets, `OpenSSL`, `open-uri`, HTTP gems) appears outside `network/link.rb`, except `automation.rb`, which only refuses connections, and the signature checks in `monetization/continuity/ed25519.rb` and `monetization/receipt/`, which may use OpenSSL's keys and certificates and nothing that connects. The native hosts use no `URLSession`, `NSURLConnection`, `HttpURLConnection`, OkHttp or Volley.
 - No file write, delete or rename appears outside `shell/save_file.rb`, except `StoreAnswers`' `File.delete` and the screenshot capture in `shell/app.rb`.
 - Every `SaveFile.new` name in the code is declared and every declared fixed name is in the code; exactly three names are computed, and those match their patterns.
 - Only `accelerometer.rb` reads `Lota::Sensor`, and only `url_opener.rb` calls `open_url`, whose own schemes are `dotpopper-share` and `dotpopper-store`.

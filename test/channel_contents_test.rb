@@ -176,10 +176,10 @@ class ChannelContentsTest < Minitest::Test
     _, out = run_script("list", "website", @app)
 
     refute_match(/^signing/, out)
-    File.write(File.join(@game, "lib/dot_popper/continuity/license_key.rb"), "def self.issue(seed) = Ed25519.sign(seed, LABEL)\n", mode: "a")
+    File.write(File.join(@game, "lib/dot_popper/monetization/continuity/license_key.rb"), "def self.issue(seed) = Ed25519.sign(seed, LABEL)\n", mode: "a")
     _, out = run_script("check", "website", @app)
 
-    assert_match(%r{FAIL .* holds lib/dot_popper/continuity/license_key\.rb, which names signing}, out)
+    assert_match(%r{FAIL .* holds lib/dot_popper/monetization/continuity/license_key\.rb, which names signing}, out)
   end
 
   # Nor any prose about the test build, which has other ways to Pro.

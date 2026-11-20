@@ -43,7 +43,7 @@ MAKE_PROOFS = <<~RUBY
   require "json"
   require "dot_popper"
   require "dot_popper/test_build/core"
-  c = DotPopper::Continuity
+  c = DotPopper::Monetization::Continuity
   hex = ->(bytes) { bytes.unpack1("H*") }
   keys = [c::TestKeys::ROOT, c::TestKeys::LICENSE, c::TestKeys::ONLINE].map { c::LicenseKey.issue(it).text }
   certificate = c::TestKeys.online_certificate
@@ -90,7 +90,7 @@ ours = $LOADED_FEATURES.grep(%r{/lib/dot_popper(/|\.rb\z)})
 check.call("every file of the game's code loaded is the app's own") { ours.any? && ours.all? { it.start_with?(game) } }
 
 build = DotPopper::Build
-c = DotPopper::Continuity
+c = DotPopper::Monetization::Continuity
 check.call("it holds nothing a #{channel} build leaves out, and is stamped for it (script/channel_contents.rb check)") do
   contents.lines.grep(/^FAIL /).each { warn "  #{it.chomp}" }
   contents_held

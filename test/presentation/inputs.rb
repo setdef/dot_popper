@@ -105,9 +105,9 @@ module Inputs
       @clipboard.copy(copied) if copied
       @window = phone? ? NoWindowControl.new : FakeWindow.new
       @game_flow = DotPopper::Gameplay::GameFlow.new(field(width, height), random: Random.new(5), sizing: DotPopper::Gameplay::DotSizing.parse(nil))
-      @gone = DotPopper::Continuity::Gone.new(Memory.new)
+      @gone = DotPopper::Monetization::Continuity::Gone.new(Memory.new)
       @gone.heard(:gone, @day - 200) if gone
-      license = DotPopper::Continuity::License.new(Memory.new, pins: DotPopper::Continuity::TEST_PINS)
+      license = DotPopper::Monetization::Continuity::License.new(Memory.new, pins: DotPopper::Monetization::Continuity::TEST_PINS)
       @entitlement = DotPopper::Monetization::Entitlement.new(forced: pro, license:, trust: DotPopper::Monetization::Receipt::TEST)
       @store = if channel
                       DotPopper::Monetization::Store.for(platform, entitlement:, native: DotPopper::Monetization::FakeStore.new(Memory.new), website: -> { website(fake: false) }, channel:)

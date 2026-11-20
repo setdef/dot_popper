@@ -73,7 +73,7 @@ module ChannelContents
               files: %w[lib/dot_popper/monetization/website_store.rb],
               marks: [/WebsiteStore/, /BrowserCheckout/, %r{dot-popper\.setdef\.com/buy}]),
     Piece.new(name: "license keys", needed_by: [TEST, Build::WEBSITE],
-              files: %w[lib/dot_popper/continuity/license_key.rb lib/dot_popper/continuity/license.rb],
+              files: %w[lib/dot_popper/monetization/continuity/license_key.rb lib/dot_popper/monetization/continuity/license.rb],
               marks: [/LicenseKey/, /license\.txt/, /license_checks/, /Paste license key/, /comes by email/]),
     Piece.new(name: "Google Play's receipts", needed_by: [TEST, Build::GOOGLE_PLAY],
               files: %w[lib/dot_popper/monetization/receipt/play.rb], marks: [/module Play\b/, /Receipt::Play\b/, /PLAY_KEYS/]),

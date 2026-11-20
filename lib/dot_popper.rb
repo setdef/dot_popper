@@ -48,7 +48,7 @@ require_relative "dot_popper/gameplay/game_flow"
 require_relative "dot_popper/gameplay/refresh"
 require_relative "dot_popper/network"
 require_relative "dot_popper/gameplay/groups"
-require_relative "dot_popper/continuity"
+require_relative "dot_popper/monetization/continuity"
 DotPopper::Build::PARTS.each { require_relative "dot_popper/#{it}/core" }
 require_relative "dot_popper/gameplay/theme_releases"
 require_relative "dot_popper/gameplay/server_choice"

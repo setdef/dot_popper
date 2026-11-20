@@ -39,7 +39,7 @@ Chosen: option 1, the approved proposal. The record gives these reasons for its 
 
 ### Confirmation
 
-`test/continuity/license_test.rb` and `test/continuity/signatures_test.rb` check keys, signatures and pins; `test/privacy/requests_test.rb` plays every continuity request against a local server. The Package workflow's playthroughs and the Android emulator check fail unless the packaged app prints that Ed25519 verifies the server's test vector.
+`test/monetization/continuity/license_test.rb` and `test/monetization/continuity/signatures_test.rb` check keys, signatures and pins; `test/privacy/requests_test.rb` plays every continuity request against a local server. The Package workflow's playthroughs and the Android emulator check fail unless the packaged app prints that Ed25519 verifies the server's test vector.
 
 ## More Information
 

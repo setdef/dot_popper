@@ -6,7 +6,7 @@ require "test_helper"
 # against the server's own test vector (docs/api.md, "Test vector") and the
 # test keys.
 class SignaturesTest < Minitest::Test
-  C = DotPopper::Continuity
+  C = DotPopper::Monetization::Continuity
   H = ->(hex) { [hex].pack("H*") }
 
   # The server's published test vector, public values only.

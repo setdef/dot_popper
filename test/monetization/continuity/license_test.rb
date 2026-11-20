@@ -6,7 +6,7 @@ require "uri"
 # One key, one device at a time, and the one test of whether setdef is
 # gone, played against the test build's fake server and fakes of the ports.
 class LicenseTest < Minitest::Test
-  C = DotPopper::Continuity
+  C = DotPopper::Monetization::Continuity
   Memory = DotPopper::Gameplay::ScoreRecord::Memory
   Reply = DotPopper::Network::Reply
   TODAY = Date.new(2026, 11, 9)

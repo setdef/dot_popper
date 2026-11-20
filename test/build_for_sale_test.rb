@@ -22,7 +22,7 @@ require_relative "../script/channel_contents"
 class BuildForSaleTest < Minitest::Test
   ROOT = File.expand_path("..", __dir__)
   B = DotPopper::Build
-  C = DotPopper::Continuity
+  C = DotPopper::Monetization::Continuity
   SYSTEMS = ["iOS", "Android", "OS X", "Windows", "Linux"].freeze
   # Every developer setting that could change what a player has.
   EVERY_SETTING = {
@@ -38,7 +38,7 @@ class BuildForSaleTest < Minitest::Test
     require "json"
     require "composition/fake_engine"
     receipt, key, every = ARGV
-    c = DotPopper::Continuity
+    c = DotPopper::Monetization::Continuity
     answers = { "channel" => DotPopper::Build::CHANNEL, "parts" => DotPopper::Build::PARTS,
                 "part loaded" => $LOADED_FEATURES.grep(%r{/test_build/}),
                 "pins are setdef's" => c.pins_for(DotPopper::Build::CHANNEL).equal?(c::PINNED) && c::PINNED == c::SETDEF_PINS,

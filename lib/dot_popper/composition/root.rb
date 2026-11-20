@@ -53,7 +53,7 @@ module DotPopper
         # With DOT_POPPER_PERF=1: whether this build's Ruby verifies
         # Ed25519, which the packaged-app playthroughs check. Where it
         # does not, setdef is never found gone (Continuity::Watch).
-        engine.say("Ed25519 #{Continuity::Ed25519.available? ? "verifies" : "does not verify"} the server's test vector") if flag?("DOT_POPPER_PERF")
+        engine.say("Ed25519 #{Monetization::Continuity::Ed25519.available? ? "verifies" : "does not verify"} the server's test vector") if flag?("DOT_POPPER_PERF")
         open_window
         build
       end
@@ -141,12 +141,12 @@ module DotPopper
         saved_stats = Gameplay::SavedStats.new(file("stats.txt"), today:, legacy:)
         achievements = Gameplay::Achievements.new(file("achievements.txt"))
         stats_backup = Gameplay::StatsBackup.new(score_record: @game_flow.score_record, saved_stats:, achievements:, folder: ->(name) { file(name) })
-        @gone = Continuity::Gone.new(file("setdef.txt"))
+        @gone = Monetization::Continuity::Gone.new(file("setdef.txt"))
         # What this build trusts, and where it keeps a license key, as
         # Monetization decides by the channel alone (ADR-0010).
         channel = settings.channel
-        pins = Continuity.pins_for(channel)
-        license = Continuity::License.new(Continuity::License.kept_in(channel) { file("license.txt") }, pins:)
+        pins = Monetization::Continuity.pins_for(channel)
+        license = Monetization::Continuity::License.new(Monetization::Continuity::License.kept_in(channel) { file("license.txt") }, pins:)
         @watch = watch_for(license, pins)
         @entitlement = Monetization::Entitlement.new(forced: Monetization::Entitlement.forced?(settings.env, platform:), license:, trust: Monetization::Receipt.trusted(channel))
         clipboard = @engine.clipboard
@@ -233,12 +233,12 @@ module DotPopper
       # nothing.
       def watch_for(license, pins)
         watch = test_watch(license, pins) and return watch
-        if Continuity.live? && !settings.automated?
-          return Continuity::Watch.new(server: Continuity::SetdefServer.new(Network::Link.new(Network::Server::SERVER_URL)),
-                                       connectivity: Continuity::Connectivity.new, gone: @gone, license:, today: settings.today, pins:)
+        if Monetization::Continuity.live? && !settings.automated?
+          return Monetization::Continuity::Watch.new(server: Monetization::Continuity::SetdefServer.new(Network::Link.new(Network::Server::SERVER_URL)),
+                                       connectivity: Monetization::Continuity::Connectivity.new, gone: @gone, license:, today: settings.today, pins:)
         end
 
-        Continuity::NoWatch.new(gone: @gone, license:)
+        Monetization::Continuity::NoWatch.new(gone: @gone, license:)
       end
 
       # The website's store, with +checkout+: in the browser, in a build

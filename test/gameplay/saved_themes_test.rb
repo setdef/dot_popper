@@ -8,7 +8,7 @@ require "test_helper"
 class SavedThemesTest < Minitest::Test
   Memory = DotPopper::Gameplay::ScoreRecord::Memory
   Theme = DotPopper::Gameplay::Theme
-  Continuity = DotPopper::Continuity
+  Continuity = DotPopper::Monetization::Continuity
 
   def setup
     @file = Memory.new

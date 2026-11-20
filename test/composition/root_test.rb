@@ -17,7 +17,7 @@ class RootTest < Minitest::Test
   WebsiteStore = DotPopper::Monetization::WebsiteStore
   FakeCheckout = DotPopper::Monetization::FakeCheckout
 
-  C = DotPopper::Continuity
+  C = DotPopper::Monetization::Continuity
   B = DotPopper::Build
   Root = DotPopper::Composition::Root
   SYSTEMS = ["iOS", "Android", "OS X", "Windows", "Linux"].freeze

@@ -161,9 +161,9 @@ class PrivacyRequestsTest < Minitest::Test
     banned = %r{\bNet::|\bTCPSocket\b|\bUDPSocket\b|\bUNIXSocket\b|\bSocket\.|\bOpenSSL\b|\bURI\.open\b|\bopen-uri\b|require\s+["'](?:net/|socket|openssl|open-uri)|HTTParty|Faraday|RestClient|Excon|Typhoeus}
 
     # automation.rb only refuses connections (Automation.guard!); it opens none.
-    # continuity/ed25519.rb takes OpenSSL's signatures, and the test build's
+    # monetization/continuity/ed25519.rb takes OpenSSL's signatures, and the test build's
     # signing.rb makes them, and nothing that connects.
-    signatures = %w[continuity/ed25519.rb test_build/signing.rb].map { File.join(ROOT, "lib/dot_popper", it) }
+    signatures = %w[monetization/continuity/ed25519.rb test_build/signing.rb].map { File.join(ROOT, "lib/dot_popper", it) }
     # receipt.rb and receipt/ check stores' signatures and certificates, and
     # the test build's receipt test key signs a fake store's, and nothing
     # that connects.
@@ -181,7 +181,7 @@ class PrivacyRequestsTest < Minitest::Test
   # each pointed at this machine with its own path; none answers as
   # expected, so every connectivity check is asked.
   def play_continuity
-    c = DotPopper::Continuity
+    c = DotPopper::Monetization::Continuity
     local = "http://127.0.0.1:#{@server.addr[1]}"
     server = c::SetdefServer.new(Network::Link.new(local))
     license = c::License.new(DotPopper::Gameplay::ScoreRecord::Memory.new, pins: c::TEST_PINS)

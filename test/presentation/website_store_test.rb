@@ -17,7 +17,7 @@ class WebsiteStoreTest < Minitest::Test
   WebsiteStore = DotPopper::Monetization::WebsiteStore
   FakeCheckout = DotPopper::Monetization::FakeCheckout
 
-  C = DotPopper::Continuity
+  C = DotPopper::Monetization::Continuity
   Memory = DotPopper::Gameplay::ScoreRecord::Memory
 
   def setup

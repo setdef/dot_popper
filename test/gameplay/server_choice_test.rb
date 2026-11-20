@@ -16,7 +16,7 @@ class ServerChoiceTest < Minitest::Test
 
   def setup
     @file = Memory.new
-    @gone = DotPopper::Continuity::Gone.new(Memory.new)
+    @gone = DotPopper::Monetization::Continuity::Gone.new(Memory.new)
     @clipboard = Clipboard.new
     @choice = DotPopper::Gameplay::ServerChoice.new(@file, gone: @gone, clipboard: @clipboard)
   end

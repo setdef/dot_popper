@@ -73,9 +73,9 @@ class CheckBuildTest < Minitest::Test
 
   def test_a_build_that_trusts_the_test_keys_or_has_another_version_fails
     stamp("website")
-    test_pins = DotPopper::Continuity::TEST_PINS
+    test_pins = DotPopper::Monetization::Continuity::TEST_PINS
     hexes = ->(keys) { "%w[#{keys.map { it.unpack1("H*") }.join(" ")}]" }
-    edit("lib/dot_popper/continuity/pins.rb", "PINNED = SETDEF_PINS",
+    edit("lib/dot_popper/monetization/continuity/pins.rb", "PINNED = SETDEF_PINS",
          "PINNED = Pins.of(roots: #{hexes.(test_pins.roots)}, license_keys: #{hexes.(test_pins.license_keys)})")
     ok, out = check("website", "0.0.1")
 
