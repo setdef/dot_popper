@@ -19,7 +19,7 @@ class StoreIdentifiersTest < Minitest::Test
   end
 
   def test_every_identifier_set_passes_for_every_channel
-    DotPopper::Build::CHANNEL_NAMES.each { assert check(it, SET), it }
+    DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES.each { assert check(it, SET), it }
   end
 
   def test_the_microsoft_store_needs_its_package_identity

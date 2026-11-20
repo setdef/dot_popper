@@ -21,7 +21,7 @@ require_relative "../script/channel_contents"
 # answers so: the part gives way to the shared answers for a channel.
 class BuildForSaleTest < Minitest::Test
   ROOT = File.expand_path("..", __dir__)
-  B = DotPopper::Build
+  B = DotPopper::ReleaseEngineering::Build
   C = DotPopper::Monetization::Continuity
   SYSTEMS = ["iOS", "Android", "OS X", "Windows", "Linux"].freeze
   # Every developer setting that could change what a player has.
@@ -39,9 +39,9 @@ class BuildForSaleTest < Minitest::Test
     require "composition/fake_engine"
     receipt, key, every = ARGV
     c = DotPopper::Monetization::Continuity
-    answers = { "channel" => DotPopper::Build::CHANNEL, "parts" => DotPopper::Build::PARTS,
+    answers = { "channel" => DotPopper::ReleaseEngineering::Build::CHANNEL, "parts" => DotPopper::ReleaseEngineering::Build::PARTS,
                 "part loaded" => $LOADED_FEATURES.grep(%r{/test_build/}),
-                "pins are setdef's" => c.pins_for(DotPopper::Build::CHANNEL).equal?(c::PINNED) && c::PINNED == c::SETDEF_PINS,
+                "pins are setdef's" => c.pins_for(DotPopper::ReleaseEngineering::Build::CHANNEL).equal?(c::PINNED) && c::PINNED == c::SETDEF_PINS,
                 "builds" => [] }
     #{SYSTEMS.inspect}.product({ "no setting" => {}, "every setting" => JSON.parse(every) }.to_a).each do |system, (label, env)|
       engine = FakeEngine.new(system)
@@ -82,7 +82,7 @@ class BuildForSaleTest < Minitest::Test
   def self.answers(channel, kind)
     Dir.mktmpdir("dot_popper_#{channel}") do |dir|
       FileUtils.cp_r(File.join(ROOT, "lib"), dir)
-      build = File.join(dir, "lib/dot_popper/build.rb")
+      build = File.join(dir, "lib/dot_popper/release_engineering/build.rb")
       source = BuildChannel.stamp(File.read(build), channel)
       if kind == :mistaken
         source = source.sub("PARTS = %w[]", "PARTS = %w[test_build]")

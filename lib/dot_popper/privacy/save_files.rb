@@ -80,5 +80,5 @@ module DotPopper
 end
 
 # A part's own save files (Build::PARTS), each declared beside its code.
-DotPopper::Build::PARTS.each { require_relative "../#{it}/save_files" }
+DotPopper::ReleaseEngineering::Build::PARTS.each { require_relative "../#{it}/save_files" }
 DotPopper::Privacy::SAVE_FILES.freeze

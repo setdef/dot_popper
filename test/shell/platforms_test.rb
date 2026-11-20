@@ -36,8 +36,8 @@ class PlatformsTest < Minitest::Test
   end
 
   def test_a_mac_and_a_windows_pc_each_have_their_own_store
-    assert_equal DotPopper::Build::MAC_APP_STORE, on("OS X").own_store
-    assert_equal DotPopper::Build::MICROSOFT_STORE, on("Windows").own_store
+    assert_equal DotPopper::ReleaseEngineering::Build::MAC_APP_STORE, on("OS X").own_store
+    assert_equal DotPopper::ReleaseEngineering::Build::MICROSOFT_STORE, on("Windows").own_store
     assert_nil on("Linux").own_store
   end
 

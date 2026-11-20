@@ -18,7 +18,7 @@ class RootTest < Minitest::Test
   FakeCheckout = DotPopper::Monetization::FakeCheckout
 
   C = DotPopper::Monetization::Continuity
-  B = DotPopper::Build
+  B = DotPopper::ReleaseEngineering::Build
   Root = DotPopper::Composition::Root
   SYSTEMS = ["iOS", "Android", "OS X", "Windows", "Linux"].freeze
   BUILDS = [nil, *B::CHANNEL_NAMES].freeze

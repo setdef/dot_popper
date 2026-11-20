@@ -258,4 +258,4 @@ module DotPopper
   end
 end
 
-DotPopper::Build::PARTS.each { require_relative "../#{it}/root" }
+DotPopper::ReleaseEngineering::Build::PARTS.each { require_relative "../#{it}/root" }

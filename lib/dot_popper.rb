@@ -8,7 +8,7 @@ require "date"
 module DotPopper
 end
 
-require_relative "dot_popper/build"
+require_relative "dot_popper/release_engineering/build"
 require_relative "dot_popper/platform"
 require_relative "dot_popper/automation"
 require_relative "dot_popper/gameplay/rules"
@@ -49,6 +49,6 @@ require_relative "dot_popper/gameplay/refresh"
 require_relative "dot_popper/network"
 require_relative "dot_popper/gameplay/groups"
 require_relative "dot_popper/monetization/continuity"
-DotPopper::Build::PARTS.each { require_relative "dot_popper/#{it}/core" }
+DotPopper::ReleaseEngineering::Build::PARTS.each { require_relative "dot_popper/#{it}/core" }
 require_relative "dot_popper/gameplay/theme_releases"
 require_relative "dot_popper/gameplay/server_choice"

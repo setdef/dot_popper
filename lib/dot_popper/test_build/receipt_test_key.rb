@@ -61,7 +61,7 @@ module DotPopper
       # A test build (no channel) trusts only the fake store's receipts; a
       # build for sale, its store's (Receipt.trusted).
       module TrustOfTestBuild
-        def trusted(channel) = Build.store?(channel) ? super : TEST
+        def trusted(channel) = ReleaseEngineering::Build.store?(channel) ? super : TEST
       end
       singleton_class.prepend(TrustOfTestBuild)
     end

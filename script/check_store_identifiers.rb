@@ -9,9 +9,9 @@
 # channel that needs none, such as the website's, passes.
 #
 #   MSIX_IDENTITY_NAME=... MSIX_PUBLISHER=... ruby script/check_store_identifiers.rb microsoft-store
-require_relative "../lib/dot_popper/build"
+require_relative "../lib/dot_popper/release_engineering/build"
 
-build = DotPopper::Build
+build = DotPopper::ReleaseEngineering::Build
 IDENTIFIERS = {
   "MSIX_IDENTITY_NAME" => ["the Microsoft Store's Package/Identity/Name, from Partner Center's Product identity page",
                            /\A[A-Za-z0-9.-]{3,50}\z/, "setdef.DotPopper"],

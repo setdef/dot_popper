@@ -202,7 +202,7 @@ module PlayPackagedApp
   def stage(work, channel)
     stage = PackagedApp.copy_tracked(File.join(work, "stage"))
     unless channel == ChannelContents::TEST
-      build = File.join(stage, "lib/dot_popper/build.rb")
+      build = File.join(stage, "lib/dot_popper/release_engineering/build.rb")
       File.write(build, BuildChannel.stamp(File.read(build), channel))
     end
     stage

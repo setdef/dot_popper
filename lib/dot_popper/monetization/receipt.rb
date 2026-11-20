@@ -41,7 +41,7 @@ module DotPopper
       # the Microsoft Store's build Windows' word (MICROSOFT_STORE), which
       # comes only down the store helper's pipe; in any other the signed
       # receipts of Apple and Google (STORES).
-      def self.trusted(channel) = channel == Build::MICROSOFT_STORE ? MICROSOFT_STORE : STORES
+      def self.trusted(channel) = channel == ReleaseEngineering::Build::MICROSOFT_STORE ? MICROSOFT_STORE : STORES
 
       # Whether +text+ is a receipt for Pro that +trust+ accepts.
       def self.valid?(text, trust)

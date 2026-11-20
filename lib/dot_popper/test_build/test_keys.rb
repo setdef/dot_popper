@@ -31,7 +31,7 @@ module DotPopper
       # A test build (no channel) trusts the test keys; a build for sale,
       # setdef's (Continuity.pins_for).
       module TestBuildPins
-        def pins_for(channel) = Build.store?(channel) ? super : TEST_PINS
+        def pins_for(channel) = ReleaseEngineering::Build.store?(channel) ? super : TEST_PINS
       end
       singleton_class.prepend(TestBuildPins)
     end

@@ -32,13 +32,13 @@ class ChannelContentsTest < Minitest::Test
   # Stamps the app's copy for +channel+ as script/set_build_channel.rb
   # stamps a build, and leaves out what that channel's build leaves out.
   def stamp(channel)
-    build = File.join(@game, "lib/dot_popper/build.rb")
+    build = File.join(@game, "lib/dot_popper/release_engineering/build.rb")
     File.write(build, BuildChannel.stamp(File.read(build), channel))
     ChannelContents.left_out(channel).each { FileUtils.rm_rf(File.join(@game, it)) }
   end
 
   def edit_build(from, to)
-    build = File.join(@game, "lib/dot_popper/build.rb")
+    build = File.join(@game, "lib/dot_popper/release_engineering/build.rb")
     source = File.binread(build)
     assert_includes source, from
     File.binwrite(build, source.sub(from, to))
@@ -72,7 +72,7 @@ class ChannelContentsTest < Minitest::Test
   def test_a_build_for_sale_leaves_out_the_privacy_declarations_the_game_never_loads
     expected = %w[lib/dot_popper/privacy/declared.rb lib/dot_popper/privacy/document.rb lib/dot_popper/privacy/requests.rb]
 
-    DotPopper::Build::CHANNEL_NAMES.each { assert_empty expected - ChannelContents.left_out(it), it }
+    DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES.each { assert_empty expected - ChannelContents.left_out(it), it }
     assert_empty ChannelContents.left_out("test")
     assert_includes run_script("excludes", "microsoft-store").last, "#{expected.join("\n")}\n"
     assert_equal "", run_script("excludes", "test").last
@@ -91,13 +91,13 @@ class ChannelContentsTest < Minitest::Test
   # and loaded as the app loads it (main.rb loads the shell), loads none
   # of what that channel leaves out.
   def test_no_build_for_sale_loads_what_it_leaves_out
-    DotPopper::Build::CHANNEL_NAMES.each do |channel|
+    DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES.each do |channel|
       FileUtils.rm_rf(File.join(@game, "lib"))
       FileUtils.cp_r(File.join(ROOT, "lib"), @game)
-      build = File.join(@game, "lib/dot_popper/build.rb")
+      build = File.join(@game, "lib/dot_popper/release_engineering/build.rb")
       File.write(build, BuildChannel.stamp(File.read(build), channel))
       ChannelContents.left_out(channel).each { FileUtils.rm_rf(File.join(@game, it)) }
-      load = 'require "lota"; require "dot_popper"; require "dot_popper/shell"; puts DotPopper::Build::CHANNEL'
+      load = 'require "lota"; require "dot_popper"; require "dot_popper/shell"; puts DotPopper::ReleaseEngineering::Build::CHANNEL'
       out, status = Open3.capture2e(RbConfig.ruby, "-I", File.join(@game, "lib"), "-e", load)
       skip "Lota isn't installed here (#{out.lines.first})" if !status.success? && out.include?("lota (LoadError)")
 

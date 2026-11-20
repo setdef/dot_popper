@@ -53,7 +53,7 @@ module DotPopper
         {} #: Hash[String, ^(entitlement: Entitlement) -> _Store]
       ).freeze
       # The channel this build is sold through (Build::CHANNEL).
-      BUILD_CHANNEL = Build::CHANNEL
+      BUILD_CHANNEL = ReleaseEngineering::Build::CHANNEL
 
       # The channels of the computers' own stores, each sold for the one
       # system whose own store it is (Platform#own_store). Their copies also
@@ -62,14 +62,14 @@ module DotPopper
       # StoreKit or Windows.Services.Store: the Mac App Store's uses StoreKit
       # 2 (macos/store), the Microsoft Store's Windows.Services.Store
       # (windows/store). On any other system those channels offer nothing.
-      MAC_APP_STORE = Build::MAC_APP_STORE
-      MICROSOFT_STORE = Build::MICROSOFT_STORE
+      MAC_APP_STORE = ReleaseEngineering::Build::MAC_APP_STORE
+      MICROSOFT_STORE = ReleaseEngineering::Build::MICROSOFT_STORE
       HELPER_CHANNELS = [MAC_APP_STORE, MICROSOFT_STORE].freeze
 
       # The channel for copies no store controls: setdef's website, whose
       # store is a WebsiteStore (license keys). An iOS build never takes it
       # (Apple 3.1.1); an Android build for an APK or another store does.
-      WEBSITE = Build::WEBSITE
+      WEBSITE = ReleaseEngineering::Build::WEBSITE
 
       # The store for +channel+'s build on +platform+ (Platform), chosen
       # once: the +native+ port where the host has a store or the channel is

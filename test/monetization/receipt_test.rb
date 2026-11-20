@@ -17,8 +17,8 @@ class ReceiptTest < Minitest::Test
   # word; in any other store build the signed receipts of Apple and Google.
   def test_a_build_trusts_receipts_by_its_channel_alone
     assert_same TEST, Receipt.trusted(nil)
-    assert_same Receipt::MICROSOFT_STORE, Receipt.trusted(DotPopper::Build::MICROSOFT_STORE)
-    (DotPopper::Build::CHANNEL_NAMES - [DotPopper::Build::MICROSOFT_STORE]).each do |channel|
+    assert_same Receipt::MICROSOFT_STORE, Receipt.trusted(DotPopper::ReleaseEngineering::Build::MICROSOFT_STORE)
+    (DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES - [DotPopper::ReleaseEngineering::Build::MICROSOFT_STORE]).each do |channel|
       assert_same Receipt::STORES, Receipt.trusted(channel), channel
     end
   end

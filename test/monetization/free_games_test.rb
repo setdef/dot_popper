@@ -175,7 +175,7 @@ class FreeGamesTest < Minitest::Test
   def test_a_store_build_counts_free_games_even_for_a_bot_or_a_scenario
     bot = { "DOT_POPPER_AUTOPLAY" => "1", "DOT_POPPER_SCENARIO" => "game" }
 
-    assert FreeGames.player?(bot, channel: DotPopper::Build::WEBSITE)
+    assert FreeGames.player?(bot, channel: DotPopper::ReleaseEngineering::Build::WEBSITE)
     refute FreeGames.player?(bot, channel: nil)
     refute FreeGames.player?({ "DOT_POPPER_AUTOPLAY" => "1" }, channel: nil)
     refute FreeGames.player?({ "DOT_POPPER_SCENARIO" => "game" }, channel: nil)
@@ -186,8 +186,8 @@ class FreeGamesTest < Minitest::Test
   # Counted only where Pro can be bought, since a limit with no way past it
   # is a dead end.
   def test_free_games_are_counted_only_where_pro_is_offered
-    assert FreeGames.metered?({}, channel: DotPopper::Build::WEBSITE, offered: true)
-    refute FreeGames.metered?({}, channel: DotPopper::Build::WEBSITE, offered: false)
+    assert FreeGames.metered?({}, channel: DotPopper::ReleaseEngineering::Build::WEBSITE, offered: true)
+    refute FreeGames.metered?({}, channel: DotPopper::ReleaseEngineering::Build::WEBSITE, offered: false)
     refute FreeGames.metered?({ "DOT_POPPER_AUTOPLAY" => "1" }, channel: nil, offered: true)
   end
 
@@ -199,6 +199,6 @@ class FreeGamesTest < Minitest::Test
 
   # Even with the test build's part loaded and the setting let through.
   def test_no_setting_changes_the_first_games_of_a_build_for_sale
-    DotPopper::Build::CHANNEL_NAMES.each { assert_nil FreeGames.starting({ "DOT_POPPER_FREE_GAMES" => "2" }, channel: it), it }
+    DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES.each { assert_nil FreeGames.starting({ "DOT_POPPER_FREE_GAMES" => "2" }, channel: it), it }
   end
 end

@@ -22,7 +22,7 @@ module DotPopper
     # as on a system that will not open the URL.
     class StoreHelper
       # The helper's file name, by the channel of the store it sells through.
-      NAMES = { Build::MAC_APP_STORE => "dot-popper-store", Build::MICROSOFT_STORE => "dot-popper-store.exe" }.freeze
+      NAMES = { ReleaseEngineering::Build::MAC_APP_STORE => "dot-popper-store", ReleaseEngineering::Build::MICROSOFT_STORE => "dot-popper-store.exe" }.freeze
       # The helper's path in what +path+ answers, which the URL names.
       PIPE = "-"
       # How many folders up from a start the helper is looked for.

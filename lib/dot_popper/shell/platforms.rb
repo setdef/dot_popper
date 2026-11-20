@@ -8,8 +8,8 @@ module DotPopper
     # named here plays as a computer.
     module Platforms
       BY_NAME = {
-        "OS X" => Platform::COMPUTER.with(command_key: true, own_store: Build::MAC_APP_STORE),
-        "Windows" => Platform::COMPUTER.with(own_store: Build::MICROSOFT_STORE),
+        "OS X" => Platform::COMPUTER.with(command_key: true, own_store: ReleaseEngineering::Build::MAC_APP_STORE),
+        "Windows" => Platform::COMPUTER.with(own_store: ReleaseEngineering::Build::MICROSOFT_STORE),
         "Linux" => Platform::COMPUTER,
         # iOS apps are left by the system, never by the app; LÖVE's buzz
         # there ignores its length (Haptics); and a copy sells through the

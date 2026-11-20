@@ -17,7 +17,7 @@ module DotPopper
       # the shared code answers.
       module ForcedByTestBuild
         def forced?(env, platform: nil)
-          return super if Build.store?
+          return super if ReleaseEngineering::Build.store?
 
           value = env.fetch(FORCED_BY, "")
           value.empty? ? super : value == "1"
@@ -36,14 +36,14 @@ module DotPopper
       # and no setting changes the first games, as the shared code answers.
       module PlayersOfTestBuild
         def player?(env, channel:)
-          return super if Build.store?(channel)
+          return super if ReleaseEngineering::Build.store?(channel)
           return false if env["DOT_POPPER_AUTOPLAY"] == "1"
 
           env.fetch("DOT_POPPER_SCENARIO", "").empty? || env.key?(STARTING)
         end
 
         def starting(env, channel:)
-          return super if Build.store?(channel)
+          return super if ReleaseEngineering::Build.store?(channel)
 
           Integer(env.fetch(STARTING, ""), exception: false)
         end

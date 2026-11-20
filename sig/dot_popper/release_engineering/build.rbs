@@ -1,0 +1,21 @@
+module DotPopper
+  module ReleaseEngineering
+    module Build
+      CHANNEL: String?
+      PARTS: Array[String]
+      APP_STORE: String
+      MAC_APP_STORE: String
+      GOOGLE_PLAY: String
+      MICROSOFT_STORE: String
+      WEBSITE: String
+      PREFIX: String
+      HARMLESS: Array[String]
+
+      def self.store?: (?String? channel) -> bool
+      def self.license_keys?: (?String? channel) -> bool
+      STORES: Array[String]
+      CHANNEL_NAMES: Array[String]
+      def self.settings: (?untyped env, ?channel: String?) -> untyped
+    end
+  end
+end

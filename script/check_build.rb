@@ -25,8 +25,8 @@ require "yaml"
 channel, version, folder = ARGV
 abort "usage: ruby script/check_build.rb CHANNEL VERSION FOLDER" unless channel && version && folder && File.directory?(folder)
 
-games = Dir.glob(File.join(File.expand_path(folder), "**", "game", "dot_popper", "lib", "dot_popper", "build.rb"))
-           .map { File.expand_path("../../..", it) }
+games = Dir.glob(File.join(File.expand_path(folder), "**", "game", "dot_popper", "lib", "dot_popper", "release_engineering", "build.rb"))
+           .map { File.expand_path("../../../..", it) }
 abort "#{folder} holds #{games.size} copies of the game; expected one" unless games.size == 1
 # Ruby records each file it loads by its real path, so the game's folder
 # is compared by its real path too: a folder reached through a symbolic
@@ -89,7 +89,7 @@ end
 ours = $LOADED_FEATURES.grep(%r{/lib/dot_popper(/|\.rb\z)})
 check.call("every file of the game's code loaded is the app's own") { ours.any? && ours.all? { it.start_with?(game) } }
 
-build = DotPopper::Build
+build = DotPopper::ReleaseEngineering::Build
 c = DotPopper::Monetization::Continuity
 check.call("it holds nothing a #{channel} build leaves out, and is stamped for it (script/channel_contents.rb check)") do
   contents.lines.grep(/^FAIL /).each { warn "  #{it.chomp}" }

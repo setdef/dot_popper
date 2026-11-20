@@ -34,7 +34,7 @@ These rules bind every agent working on Dot Popper. The maintainer set each of t
 
 - Tests are fast and reliable.
 - No automated test or check reaches the real internet: not setdef's server, not a store, not anything. Use local fakes with fixed answers. Talking to the real server is for the maintainer and playtesters only.
-- Rules stay Lota-free in `lib/dot_popper/*.rb`, `lib/dot_popper/gameplay/` and `lib/dot_popper/monetization/`, and presentation in `lib/dot_popper/presentation/`, so their tests need no window.
+- Rules stay Lota-free in `lib/dot_popper/*.rb`, `lib/dot_popper/gameplay/`, `lib/dot_popper/monetization/` and `lib/dot_popper/release_engineering/`, and presentation in `lib/dot_popper/presentation/`, so their tests need no window.
 - `doc/privacy.json` is generated from the code. Every saved file and network request must be declared, and its tests fail if one isn't.
 
 ## Machines and processes

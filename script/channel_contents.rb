@@ -33,11 +33,11 @@
 require "json"
 require "open3"
 require "rbconfig"
-require_relative "../lib/dot_popper/build"
+require_relative "../lib/dot_popper/release_engineering/build"
 require_relative "set_build_channel"
 
 module ChannelContents
-  Build = DotPopper::Build
+  Build = DotPopper::ReleaseEngineering::Build
   TEST = "test"
   CHANNELS = [TEST, *Build::CHANNEL_NAMES].freeze
 
@@ -112,7 +112,7 @@ module ChannelContents
 
   # Prints, as JSON, the Build::CHANNEL and Build::PARTS of the build.rb
   # it is given, in a Ruby of its own, so this repository's are untouched.
-  READ_STAMP = 'load ARGV.fetch(0); require "json"; puts JSON.generate([DotPopper::Build::CHANNEL, DotPopper::Build::PARTS])'
+  READ_STAMP = 'load ARGV.fetch(0); require "json"; puts JSON.generate([DotPopper::ReleaseEngineering::Build::CHANNEL, DotPopper::ReleaseEngineering::Build::PARTS])'
 
   module_function
 
@@ -123,9 +123,9 @@ module ChannelContents
 
   # The game's folder in the unpacked package +folder+, or nil.
   def game_in(folder)
-    games = Dir.glob(File.join(folder, "**", "game", "dot_popper", "lib", "dot_popper", "build.rb"))
+    games = Dir.glob(File.join(folder, "**", "game", "dot_popper", "lib", "dot_popper", "release_engineering", "build.rb"))
     abort "#{folder} holds #{games.size} copies of the game; expected one" if games.size > 1
-    games.first&.then { File.expand_path("../../..", it) }
+    games.first&.then { File.expand_path("../../../..", it) }
   end
 
   # What +folder+ holds of each piece +channel+ does not need: [piece,
@@ -182,9 +182,9 @@ module ChannelContents
   # channel's build does not carry.
   def misstamped(channel, folder)
     game = game_in(folder) or abort("#{folder} holds no game to check")
-    build = File.join(game, "lib", "dot_popper", "build.rb")
+    build = File.join(game, "lib", "dot_popper", "release_engineering", "build.rb")
     out, status = Open3.capture2e(RbConfig.ruby, "-e", READ_STAMP, build)
-    return ["its lib/dot_popper/build.rb does not load: #{out.lines.last&.chomp}"] unless status.success?
+    return ["its lib/dot_popper/release_engineering/build.rb does not load: #{out.lines.last&.chomp}"] unless status.success?
 
     stamped, parts = JSON.parse(out.lines.last)
     wanted = channel == TEST ? nil : channel

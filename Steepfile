@@ -11,7 +11,7 @@ target :core do
   library "date"
   library "socket"
   library "uri"
-  check "lib/dot_popper.rb", "lib/dot_popper/*.rb", "lib/dot_popper/gameplay/*.rb", "lib/dot_popper/monetization/*.rb", "lib/dot_popper/use_cases/*.rb",
+  check "lib/dot_popper.rb", "lib/dot_popper/*.rb", "lib/dot_popper/gameplay/*.rb", "lib/dot_popper/monetization/*.rb", "lib/dot_popper/release_engineering/*.rb", "lib/dot_popper/use_cases/*.rb",
         "lib/dot_popper/gameplay/groups/*.rb"
   configure_code_diagnostics(Steep::Diagnostic::Ruby.strict) do |hash|
     hash[Steep::Diagnostic::Ruby::UnsupportedSyntax] = :error

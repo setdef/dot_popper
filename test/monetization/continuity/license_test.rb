@@ -33,8 +33,8 @@ class LicenseTest < Minitest::Test
   # build, the test keys in a test build (ADR-0010).
   def test_a_build_trusts_setdefs_keys_by_its_channel_alone
     assert_same C::TEST_PINS, C.pins_for(nil)
-    DotPopper::Build::CHANNEL_NAMES.each { assert_same C::PINNED, C.pins_for(it), it }
-    refute @key.valid?(C.pins_for(DotPopper::Build::WEBSITE))
+    DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES.each { assert_same C::PINNED, C.pins_for(it), it }
+    refute @key.valid?(C.pins_for(DotPopper::ReleaseEngineering::Build::WEBSITE))
     assert @key.valid?(C.pins_for(nil))
   end
 
@@ -42,14 +42,14 @@ class LicenseTest < Minitest::Test
   # grants nothing and is never sent; the website's and a test build keep it.
   def test_only_a_build_that_takes_license_keys_keeps_one_in_license_txt
     file = Memory.new
-    DotPopper::Build::STORES.each do |channel|
+    DotPopper::ReleaseEngineering::Build::STORES.each do |channel|
       kept = C::License.kept_in(channel) { file }
 
       assert_instance_of Memory, kept, channel
       refute_same file, kept, channel
       refute(C::License.kept_in(channel) { flunk("#{channel} opened license.txt") }.nil?, channel)
     end
-    [DotPopper::Build::WEBSITE, nil].each { assert_same file, C::License.kept_in(it) { file }, it.inspect }
+    [DotPopper::ReleaseEngineering::Build::WEBSITE, nil].each { assert_same file, C::License.kept_in(it) { file }, it.inspect }
   end
 
   def test_a_valid_key_is_pro_at_once_offline_and_a_bad_one_is_refused

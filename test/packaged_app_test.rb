@@ -39,7 +39,7 @@ class PackagedAppTest < Minitest::Test
       Minitest.after_run { FileUtils.rm_rf(File.expand_path("../..", folder)) }
       PackagedApp.lay_out(self.class.tracked, folder, excludes: PackagedApp.excludes(channel))
       unless channel == ChannelContents::TEST
-        build = File.join(folder, "lib/dot_popper/build.rb")
+        build = File.join(folder, "lib/dot_popper/release_engineering/build.rb")
         File.write(build, BuildChannel.stamp(File.read(build), channel))
       end
       folder
@@ -70,7 +70,7 @@ class PackagedAppTest < Minitest::Test
   end
 
   def test_each_channels_build_starts_from_what_its_app_holds
-    DotPopper::Build::CHANNEL_NAMES.each do |channel|
+    DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES.each do |channel|
       out, ok = PackagedApp.start(game(channel))
 
       assert ok, "#{channel}: #{out}"

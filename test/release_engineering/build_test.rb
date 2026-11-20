@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "test_helper"
+require_relative "../test_helper"
 require "dot_popper/presentation"
 
 # A store build is decided by the build alone. Nothing a player can set, in
@@ -18,7 +18,7 @@ class BuildTest < Minitest::Test
   }.freeze
 
   def test_a_store_build_ignores_every_setting_that_touches_purchases_pro_or_the_server
-    settings = DotPopper::Build.settings(SETTINGS.merge("PATH" => "/bin"), channel: STORE)
+    settings = DotPopper::ReleaseEngineering::Build.settings(SETTINGS.merge("PATH" => "/bin"), channel: STORE)
 
     assert_equal({ "PATH" => "/bin" }, settings)
   end
@@ -26,37 +26,37 @@ class BuildTest < Minitest::Test
   def test_a_store_build_keeps_the_settings_that_touch_nothing_of_the_kind
     kept = { "DOT_POPPER_CALM" => "1", "DOT_POPPER_AUTOPLAY" => "1", "DOT_POPPER_QUIT_AFTER" => "20", "DOT_POPPER_WINDOW" => "400x850" }
 
-    assert_equal kept, DotPopper::Build.settings(kept, channel: STORE)
+    assert_equal kept, DotPopper::ReleaseEngineering::Build.settings(kept, channel: STORE)
   end
 
   def test_a_test_build_obeys_every_setting
-    assert_equal SETTINGS, DotPopper::Build.settings(SETTINGS, channel: nil)
+    assert_equal SETTINGS, DotPopper::ReleaseEngineering::Build.settings(SETTINGS, channel: nil)
   end
 
   # Apple's and Google's rules: an app store's copy never takes a website
   # license key, and each of the four stores is named here.
   def test_the_app_stores_copies_take_no_license_key_and_the_website_and_a_test_build_do
-    assert_equal %w[app-store mac-app-store google-play microsoft-store], DotPopper::Build::STORES
-    DotPopper::Build::STORES.each { refute DotPopper::Build.license_keys?(it), it }
-    assert DotPopper::Build.license_keys?("website")
-    assert DotPopper::Build.license_keys?(nil)
+    assert_equal %w[app-store mac-app-store google-play microsoft-store], DotPopper::ReleaseEngineering::Build::STORES
+    DotPopper::ReleaseEngineering::Build::STORES.each { refute DotPopper::ReleaseEngineering::Build.license_keys?(it), it }
+    assert DotPopper::ReleaseEngineering::Build.license_keys?("website")
+    assert DotPopper::ReleaseEngineering::Build.license_keys?(nil)
   end
 
   def test_every_channel_is_named_once_and_the_store_uses_those_names
-    assert_equal %w[app-store mac-app-store google-play microsoft-store website], DotPopper::Build::CHANNEL_NAMES
+    assert_equal %w[app-store mac-app-store google-play microsoft-store website], DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES
     store = DotPopper::Monetization::Store
 
     assert_equal [store::MAC_APP_STORE, store::MICROSOFT_STORE, store::WEBSITE],
-                 [DotPopper::Build::MAC_APP_STORE, DotPopper::Build::MICROSOFT_STORE, DotPopper::Build::WEBSITE]
-    assert_empty store::HELPER_CHANNELS - DotPopper::Build::CHANNEL_NAMES
+                 [DotPopper::ReleaseEngineering::Build::MAC_APP_STORE, DotPopper::ReleaseEngineering::Build::MICROSOFT_STORE, DotPopper::ReleaseEngineering::Build::WEBSITE]
+    assert_empty store::HELPER_CHANNELS - DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES
   end
 
   def test_the_store_takes_its_channel_from_the_build
-    assert_same DotPopper::Build::CHANNEL,DotPopper::Monetization::Store::BUILD_CHANNEL
+    assert_same DotPopper::ReleaseEngineering::Build::CHANNEL,DotPopper::Monetization::Store::BUILD_CHANNEL
   end
 
   def test_pro_and_the_server_stay_as_they_were_in_a_store_build
-    env = DotPopper::Build.settings(SETTINGS, channel: STORE)
+    env = DotPopper::ReleaseEngineering::Build.settings(SETTINGS, channel: STORE)
 
     refute DotPopper::Monetization::Entitlement.forced?(env)
     assert_equal DotPopper::Network::Server::SERVER_URL, DotPopper::Network::Server.url(env)
@@ -64,7 +64,7 @@ class BuildTest < Minitest::Test
   end
 
   def test_the_settings_do_work_in_a_test_build
-    env = DotPopper::Build.settings(SETTINGS, channel: nil)
+    env = DotPopper::ReleaseEngineering::Build.settings(SETTINGS, channel: nil)
 
     assert DotPopper::Monetization::Entitlement.forced?(env)
     assert_equal "http://localhost:9292", DotPopper::Network::Server.url(env)

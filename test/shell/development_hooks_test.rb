@@ -21,15 +21,15 @@ class DevelopmentHooksTest < Minitest::Test
   end
 
   def test_a_run_with_no_hook_set_has_none
-    [nil, *DotPopper::Build::CHANNEL_NAMES].each do |channel|
+    [nil, *DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES].each do |channel|
       assert_nil hooks({ "DOT_POPPER_SHOTS" => "", "DOT_POPPER_FAKE_DRAG" => "nonsense" }, channel:), channel.inspect
     end
   end
 
   def test_each_hook_is_obeyed_in_every_build
     HOOKS.each do |name, value|
-      assert_includes DotPopper::Build::HARMLESS, name
-      [nil, *DotPopper::Build::CHANNEL_NAMES].each do |channel|
+      assert_includes DotPopper::ReleaseEngineering::Build::HARMLESS, name
+      [nil, *DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES].each do |channel|
         refute_nil hooks({ name => value }, channel:), "#{name} in #{channel.inspect}"
       end
     end

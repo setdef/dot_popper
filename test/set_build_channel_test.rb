@@ -21,7 +21,7 @@ class SetBuildChannelTest < Minitest::Test
 
   def stamp(channel)
     _, status = Open3.capture2e(RbConfig.ruby, File.join(@copy, "script", "set_build_channel.rb"), *channel)
-    [status.success?, File.read(File.join(@copy, "lib", "dot_popper", "build.rb"))]
+    [status.success?, File.read(File.join(@copy, "lib", "dot_popper", "release_engineering", "build.rb"))]
   end
 
   def test_a_store_builds_channel_is_fixed_in_the_code
@@ -34,13 +34,13 @@ class SetBuildChannelTest < Minitest::Test
 
   # A build for sale loads none of the test build's code.
   def test_no_build_for_sale_carries_the_test_builds_part
-    assert_includes DotPopper::Build::PARTS, "test_build"
-    DotPopper::Build::CHANNEL_NAMES.each { refute_includes BuildChannel::PARTS.fetch(it), "test_build", it }
+    assert_includes DotPopper::ReleaseEngineering::Build::PARTS, "test_build"
+    DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES.each { refute_includes BuildChannel::PARTS.fetch(it), "test_build", it }
   end
 
   def test_every_channel_the_build_names_can_be_stamped
-    DotPopper::Build::CHANNEL_NAMES.each do |channel|
-      FileUtils.cp(File.join(ROOT, "lib", "dot_popper", "build.rb"), File.join(@copy, "lib", "dot_popper", "build.rb"))
+    DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES.each do |channel|
+      FileUtils.cp(File.join(ROOT, "lib", "dot_popper", "release_engineering", "build.rb"), File.join(@copy, "lib", "dot_popper", "release_engineering", "build.rb"))
       ok, source = stamp(channel)
 
       assert ok, channel
@@ -59,6 +59,6 @@ class SetBuildChannelTest < Minitest::Test
   end
 
   def test_the_repositorys_own_build_is_a_test_build
-    assert_nil DotPopper::Build::CHANNEL
+    assert_nil DotPopper::ReleaseEngineering::Build::CHANNEL
   end
 end

@@ -31,7 +31,7 @@ class CheckBuildTest < Minitest::Test
   # Stamps the copy as script/set_build_channel.rb stamps a build, and
   # leaves out what the channel's build leaves out.
   def stamp(channel)
-    build = File.join(@game, "lib/dot_popper/build.rb")
+    build = File.join(@game, "lib/dot_popper/release_engineering/build.rb")
     File.write(build, BuildChannel.stamp(File.read(build), channel))
     ChannelContents.left_out(channel).each { FileUtils.rm_rf(File.join(@game, it)) }
   end
@@ -107,7 +107,7 @@ class CheckBuildTest < Minitest::Test
     stamp("website")
     Dir.mktmpdir("dot_popper_checkout") do |checkout|
       FileUtils.cp_r(%w[lib script].map { File.join(ROOT, it) }, checkout)
-      build = File.join(checkout, "lib/dot_popper/build.rb")
+      build = File.join(checkout, "lib/dot_popper/release_engineering/build.rb")
       File.write(build, BuildChannel.stamp(File.read(build), "website"))
       out, status = Open3.capture2e(RbConfig.ruby, File.join(checkout, "script", "check_build.rb"), "website", @version, @app)
 
@@ -128,7 +128,7 @@ class CheckBuildTest < Minitest::Test
     assert_match(%r{FAIL .* holds lib/dot_popper/test_build \(the test build's part\)}, out)
     assert_match(/^ok   it loads none of the test build's part$/, out)
 
-    edit("lib/dot_popper/build.rb", "PARTS = %w[].freeze", "PARTS = %w[test_build].freeze")
+    edit("lib/dot_popper/release_engineering/build.rb", "PARTS = %w[].freeze", "PARTS = %w[test_build].freeze")
     ok, out = check("website")
 
     refute ok, out

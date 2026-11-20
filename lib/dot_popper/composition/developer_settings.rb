@@ -16,13 +16,13 @@ module DotPopper
     class DeveloperSettings
       attr_reader :channel, :env
 
-      def initialize(env = ENV, channel: Build::CHANNEL)
+      def initialize(env = ENV, channel: ReleaseEngineering::Build::CHANNEL)
         @channel = channel
-        @env = Build.settings(env, channel:)
+        @env = ReleaseEngineering::Build.settings(env, channel:)
       end
 
       # Whether this build has a channel (Build.store?).
-      def store_build? = Build.store?(channel)
+      def store_build? = ReleaseEngineering::Build.store?(channel)
 
       # Whether +name+ is set to 1.
       def flag?(name) = env[name] == "1"
@@ -60,4 +60,4 @@ module DotPopper
   end
 end
 
-DotPopper::Build::PARTS.each { require_relative "../#{it}/developer_settings" }
+DotPopper::ReleaseEngineering::Build::PARTS.each { require_relative "../#{it}/developer_settings" }
