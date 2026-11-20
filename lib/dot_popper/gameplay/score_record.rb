@@ -6,7 +6,8 @@ module DotPopper
     # phone's score record and a big monitor's are different contests. It reads and
     # writes through a save file that answers +read+ and +write(text)+, so the
     # rules never touch a file system themselves (Lota's save folder in the
-    # game, memory in tests). It saves as lines of +class=score+.
+    # game, memory in tests). What the file holds, and how it reads and
+    # writes, is ScoreRecordFile's.
     #
     # A save file written before scores were kept by class holds one bare
     # number. That record belongs to +legacy+, the class of the screen the
@@ -17,8 +18,8 @@ module DotPopper
         @file = file
         @legacy = legacy
         text = file.read.to_s
-        @values = Table.parse(text, legacy:)
-        save if Table.old?(text)
+        @values = ScoreRecordFile.parse(text, legacy:).scores
+        save if ScoreRecordFile.old?(text)
       end
 
       # The score record on screens of +size_class+, or 0 before there is one.
@@ -51,35 +52,12 @@ module DotPopper
       # Puts back +text+, the save file's whole text as #saved gave it.
       def restore(text)
         @file.write(text.to_s)
-        @values = Table.parse(text.to_s, legacy: @legacy)
+        @values = ScoreRecordFile.parse(text, legacy: @legacy).scores
       end
 
       private
 
-      def save = @file.write(Table.to_text(@values))
-
-      # How a save file's text reads and writes.
-      module Table
-        OLD = /\A\s*\d+\s*\z/
-
-        # Each class's score, read leniently: a line that is not
-        # +class=score+ for a known class, with a whole number, is skipped.
-        def self.parse(text, legacy:)
-          return { legacy => Integer(text.strip, 10) } if old?(text)
-
-          text.lines.filter_map do |line|
-            name, score = line.strip.split("=", 2)
-            size_class = SizeClass.named(name.to_s)
-            number = Integer(score.to_s, 10, exception: false)
-            [size_class, number] if size_class && number && !number.negative?
-          end.to_h
-        end
-
-        # Whether +text+ is the single number written before classes.
-        def self.old?(text) = OLD.match?(text)
-
-        def self.to_text(values) = values.map { |size_class, score| "#{size_class.name}=#{score}\n" }.join
-      end
+      def save = @file.write(ScoreRecordFile.new(scores: @values).to_s)
     end
   end
 end
