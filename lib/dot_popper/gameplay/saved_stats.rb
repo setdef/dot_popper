@@ -16,8 +16,8 @@ module DotPopper
         @today = today
         @legacy = legacy
         text = file.read
-        @stats = Stats.parse(text, legacy:)
-        file.write(stats.to_text) if Stats.old?(text)
+        @stats = StatsFile.parse(text, legacy:).stats
+        file.write(StatsFile.new(stats:).to_s) if StatsFile.old?(text)
       end
 
       # Adds a finished game's GameStats, played on a screen of
@@ -30,7 +30,7 @@ module DotPopper
         goal_met = !stats.streak.done_on?(day) && DailyGoal.for(day).met?(game)
         @stats = stats.add(game, day: day.iso8601, size_class:)
         @stats = stats.with(streak: stats.streak.meet(day)) if goal_met
-        @file.write(stats.to_text)
+        @file.write(StatsFile.new(stats:).to_s)
         Result.new(records:, goal_met:)
       end
 
@@ -49,7 +49,7 @@ module DotPopper
       # Puts back +text+, the save file's whole text as #saved gave it.
       def restore(text)
         @file.write(text.to_s)
-        @stats = Stats.parse(text, legacy: @legacy)
+        @stats = StatsFile.parse(text, legacy: @legacy).stats
       end
 
       # Today's goal, and whether a game has met it yet today.

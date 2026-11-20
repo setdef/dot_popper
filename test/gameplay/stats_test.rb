@@ -4,6 +4,7 @@ require "test_helper"
 
 class StatsTest < Minitest::Test
   Stats = DotPopper::Gameplay::Stats
+  StatsFile = DotPopper::Gameplay::StatsFile
   GameStats = DotPopper::Gameplay::GameStats
   SMALL = DotPopper::Gameplay::SizeClass::SMALL
   MEDIUM = DotPopper::Gameplay::SizeClass::MEDIUM
@@ -64,13 +65,13 @@ class StatsTest < Minitest::Test
   # Each last score keeps the class it was played in, for the chart; a
   # file written before they were kept leaves its scores' unknown.
   def test_each_last_score_keeps_its_class_and_older_ones_are_unknown
-    old = Stats.parse("games=2\nrecent=3,9\n")
+    old = StatsFile.parse("games=2\nrecent=3,9\n").stats
     stats = add(add(old, game(score: 4)), game(score: 6), size_class: DotPopper::Gameplay::SizeClass::STANDARD)
 
     assert_equal [3, 9, 4, 6], stats.recent
     assert_equal [nil, nil, MEDIUM, DotPopper::Gameplay::SizeClass::STANDARD], stats.recent_classes
-    assert_includes stats.to_text, "recent_classes=?,?,medium,fitted\n"
-    assert_equal stats.recent_classes, Stats.parse(stats.to_text).recent_classes
+    assert_includes StatsFile.new(stats:).to_s, "recent_classes=?,?,medium,fitted\n"
+    assert_equal stats.recent_classes, StatsFile.parse(StatsFile.new(stats:).to_s).stats.recent_classes
   end
 
   def test_the_last_scores_classes_are_trimmed_with_them
@@ -125,37 +126,37 @@ class StatsTest < Minitest::Test
                 size_class: SMALL)
     stats = stats.with(streak: DotPopper::Gameplay::GoalStreak.new(current: 2, longest: 4, last_met: "2026-11-05"))
 
-    assert_equal stats, Stats.parse(stats.to_text)
-    assert_includes stats.to_text, "small.most_dots_in_a_row=8\n"
-    refute Stats.old?(stats.to_text)
+    assert_equal stats, StatsFile.parse(StatsFile.new(stats:).to_s).stats
+    assert_includes StatsFile.new(stats:).to_s, "small.most_dots_in_a_row=8\n"
+    refute StatsFile.old?(StatsFile.new(stats:).to_s)
   end
 
   # Before records were kept by class, the file named them without one.
   # They go to the class the game is told is this screen's.
   def test_an_older_file_gives_its_records_to_this_screens_class
     old = "games=7\npops=80\nlongest_game=41.5\nmost_dots_in_a_row=12\nshortest_time_to_pop=0.4\nlongest_time_to_pop=5.5\nrecent=3,9\n"
-    stats = Stats.parse(old, legacy: SMALL)
+    stats = StatsFile.parse(old, legacy: SMALL).stats
 
-    assert Stats.old?(old)
+    assert StatsFile.old?(old)
     assert_equal 7, stats.games
     assert_equal [3, 9], stats.recent
     assert_equal [SMALL], stats.records.keys
     records = stats.records_in(SMALL)
     assert_equal [7, 41.5, 12, 0.4, 5.5],
                  [records.games, records.longest_game, records.most_dots_in_a_row, records.shortest_time_to_pop, records.longest_time_to_pop]
-    assert_equal stats, Stats.parse(stats.to_text)
+    assert_equal stats, StatsFile.parse(StatsFile.new(stats:).to_s).stats
   end
 
   def test_a_missing_file_reads_as_nothing_yet
-    assert_equal Stats.new, Stats.parse(nil)
-    assert_equal Stats.new, Stats.parse("")
-    refute Stats.old?(nil)
+    assert_equal Stats.new, StatsFile.parse(nil).stats
+    assert_equal Stats.new, StatsFile.parse("").stats
+    refute StatsFile.old?(nil)
   end
 
   def test_a_damaged_file_keeps_what_it_can
-    stats = Stats.parse("games=7\npops=lots\nmistakes=-3\nmedium.games=2\nmedium.longest_time_to_pop=nan\n" \
+    stats = StatsFile.parse("games=7\npops=lots\nmistakes=-3\nmedium.games=2\nmedium.longest_time_to_pop=nan\n" \
                                 "last_day=yesterday\nrecent=4,x,09,5\n\u0000garbage\nmedium.shortest_time_to_pop=0.5\n" \
-                                "huge.games=3\n")
+                                "huge.games=3\n").stats
 
     assert_equal 7, stats.games
     assert_equal 0, stats.dots_popped

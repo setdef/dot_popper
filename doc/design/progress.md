@@ -13,7 +13,7 @@ Every file lives in Lota's save folder (paths per system are in [README.md](../.
 | File | Holds | Class |
 | --- | --- | --- |
 | `score_record.txt` | the highest score of each size class, as `class=score` lines | `ScoreRecord`, which reads and writes it as a `ScoreRecordFile` |
-| `stats.txt` | totals, the last 20 scores, the goal streak, each class's records, as `key=value` lines | `SavedStats`, `Stats` |
+| `stats.txt` | totals, the last 20 scores, the goal streak, each class's records, as `key=value` lines | `SavedStats`, which reads and writes `Stats` as a `StatsFile` |
 | `achievements.txt` | each achievement earned and the day, as `id=YYYY-MM-DD` lines | `Achievements` |
 | `games.csv` | one line per finished game | `GamesLog` |
 | `games-YYYYMMDD-HHMMSS.csv` | an older log, kept whole when its columns changed | `GamesLog` |

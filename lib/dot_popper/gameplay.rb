@@ -20,6 +20,6 @@ end
 
 %w[rules visibility events field size_class dot_size dot_sizing dot
    touch_target spawn_check spawn spawner clock stack game score_record_file score_record
-   game_stats daily_goal goal_streak stats saved_stats achievement achievement_recorder achievements
+   game_stats daily_goal goal_streak stats stats_file saved_stats achievement achievement_recorder achievements
    stats_backup theme setdef saved_themes games_log game_flow refresh groups theme_releases
    server_choice].each { require_relative "gameplay/#{it}" }

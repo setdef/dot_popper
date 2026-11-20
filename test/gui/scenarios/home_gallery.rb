@@ -78,7 +78,7 @@ module DotPopperGui
       stats = show.saved_stats.stats
       met = done ? today : today - 1
       streak = stats.streak.with(current: done ? 4 : 3, longest: 4, last_met: met.iso8601)
-      show.saved_stats.restore(stats.with(streak:).to_text)
+      show.saved_stats.restore(DotPopper::Gameplay::StatsFile.new(stats: stats.with(streak:)).to_s)
       game_flow.score_record.restore("#{game_flow.size_class.name}=24\n#{DotPopper::Gameplay::SizeClass::STANDARD.name}=24\n")
       show.score_record_changed
     end

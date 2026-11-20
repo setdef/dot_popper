@@ -3,9 +3,7 @@ module DotPopper
     class Stats < ::Data
       RECENT: Integer
 
-      DAY: Regexp
 
-      UNKNOWN: String
 
       attr_reader games: Integer
 
@@ -35,17 +33,11 @@ module DotPopper
                        ?recent: Array[Integer], ?recent_classes: Array[SizeClass?], ?streak: GoalStreak,
                        ?records: Hash[SizeClass, RecordSet]) -> void
 
-      def self.parse: (String? text, ?legacy: SizeClass) -> Stats
-
-      def self.old?: (String? text) -> bool
-
       def records_in: (SizeClass size_class) -> RecordSet
 
       def add: (GameStats stats, day: String, size_class: SizeClass) -> Stats
 
       def records_set_by: (GameStats stats, SizeClass size_class) -> Array[Record]
-
-      def to_text: () -> String
 
       class RecordSet < ::Data
         attr_reader games: Integer
@@ -64,13 +56,9 @@ module DotPopper
         def initialize: (?games: Integer, ?longest_game: number, ?most_dots_in_a_row: Integer, ?shortest_time_to_pop: number?,
                          ?longest_time_to_pop: number) -> void
 
-        def self.parse: (Pairs pairs) -> RecordSet
-
         def add: (GameStats stats) -> RecordSet
 
         def records_set_by: (GameStats stats) -> Array[Record]
-
-        def pairs: () -> Array[[String, number?]]
 
         private
 
@@ -87,30 +75,6 @@ module DotPopper
         attr_reader value: number
 
         def self.new: (kind: Symbol, value: number) -> instance
-      end
-
-      class Pairs < ::Data
-        attr_reader values: Hash[String, String]
-
-        def self.new: (values: Hash[String, String]) -> instance
-
-        def self.parse: (String? text) -> Pairs
-
-        def count: (Symbol key) -> Integer
-
-        def time: (Symbol key) -> Float?
-
-        def counts: (Symbol key) -> Array[Integer]
-
-        def classes: (Symbol key) -> Array[SizeClass?]
-
-        def day: (Symbol key) -> String?
-
-        def within: (String prefix) -> Pairs
-
-        private
-
-        def natural: (String? text) -> Integer?
       end
     end
   end

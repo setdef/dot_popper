@@ -16,6 +16,7 @@ class SavedDotSizeWordsTest < Minitest::Test
   DotSizing = DotPopper::Gameplay::DotSizing
   ScoreRecord = DotPopper::Gameplay::ScoreRecord
   Stats = DotPopper::Gameplay::Stats
+  StatsFile = DotPopper::Gameplay::StatsFile
   SizeClass = DotPopper::Gameplay::SizeClass
 
   PHONE = DotPopper::Gameplay::Field.new(390, 844, 50)
@@ -59,11 +60,11 @@ class SavedDotSizeWordsTest < Minitest::Test
            "small.games=1\nsmall.longest_game=31.0\nsmall.most_dots_in_a_row=8\nsmall.shortest_time_to_pop=0.4\n" \
            "small.longest_time_to_pop=6.5\nfitted.games=2\nfitted.longest_game=44.25\nfitted.most_dots_in_a_row=12\n" \
            "fitted.shortest_time_to_pop=0.3\nfitted.longest_time_to_pop=7.0\n"
-    stats = Stats.parse(text)
+    stats = StatsFile.parse(text).stats
 
     assert_equal 2, stats.records_in(DotSizing.parse("fitted").size_class(PHONE)).games
     assert_equal 1, stats.records_in(DotSizing.parse("standard").size_class(PHONE)).games
     assert_equal [nil, "medium", "fitted", "small"], stats.recent_classes.map { it&.name }
-    assert_equal text, stats.to_text
+    assert_equal text, StatsFile.new(stats:).to_s
   end
 end
