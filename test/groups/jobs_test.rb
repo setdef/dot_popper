@@ -31,7 +31,7 @@ class JobsTest < Minitest::Test
   def reply(status, body = {}) = Reply.new(status:, body:)
 
   def every_kind
-    [Jobs::NewPlayer.new(next_job: Jobs::CreateGroup.new), Jobs::ListGroups.new(loud: false), Jobs::CreateGroup.new,
+    [Jobs::CreatePlayer.new(next_job: Jobs::CreateGroup.new), Jobs::ListGroups.new(loud: false), Jobs::CreateGroup.new,
      Jobs::JoinGroup.new("2345678"), Jobs::ReadGroup.new(3), Jobs::ReadHistory.new(3), Jobs::SendAchievement.new("steady"),
      Jobs::LeaveGroup.new(3), Jobs::SendGame.new(60), Jobs::DeletePlayer.new]
   end
@@ -68,7 +68,7 @@ class JobsTest < Minitest::Test
     join = Jobs::JoinGroup.new("2345678")
 
     assert_equal [:no_such_group, :no_such_group, :no_such_group, :too_many_tries, :failed], [400, 404, 422, 429, 500].map { join.reason(reply(it)) }
-    assert_equal :too_many_tries, Jobs::NewPlayer.new(next_job: join).reason(reply(429))
+    assert_equal :too_many_tries, Jobs::CreatePlayer.new(next_job: join).reason(reply(429))
     assert_equal :too_many_tries, Jobs::CreateGroup.new.reason(reply(429))
     assert_equal :failed, Jobs::LeaveGroup.new(3).reason(reply(429))
     assert_equal :group_full, Jobs::CreateGroup.new.reason(reply(409, { "error" => "group_full" }))
@@ -119,7 +119,7 @@ class JobsTest < Minitest::Test
   end
 
   def test_other_refusals_are_left_to_the_session
-    [Jobs::NewPlayer.new(next_job: Jobs::CreateGroup.new), Jobs::ListGroups.new(loud: true), Jobs::CreateGroup.new, Jobs::JoinGroup.new("1")].each do |job|
+    [Jobs::CreatePlayer.new(next_job: Jobs::CreateGroup.new), Jobs::ListGroups.new(loud: true), Jobs::CreateGroup.new, Jobs::JoinGroup.new("1")].each do |job|
       [400, 404, 409, 422, 429, 500].each { refute job.refused(@heard, reply(it)) }
     end
 
@@ -129,7 +129,7 @@ class JobsTest < Minitest::Test
   def test_a_new_player_comes_before_the_job_it_was_made_for
     create = Jobs::CreateGroup.new
 
-    assert_same create, Jobs::NewPlayer.new(next_job: create).next_job
+    assert_same create, Jobs::CreatePlayer.new(next_job: create).next_job
     assert_nil create.next_job
   end
 end

@@ -318,7 +318,7 @@ module DotPopper
     module Jobs
       TOO_MANY_TRIES: Hash[Integer, Symbol]
 
-      class NewPlayer < Job
+      class CreatePlayer < Job
         def initialize: (next_job: Job) -> void
       end
 

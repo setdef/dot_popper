@@ -80,7 +80,7 @@ module DotPopper
       # :player, making this device known to the server, before
       # +next_job+. A player is only a token: they give the server no name
       # or anything else.
-      class NewPlayer < Job
+      class CreatePlayer < Job
         def initialize(next_job:) = super(:player, next_job:, loud: true)
         def refusals = TOO_MANY_TRIES
         def taken(session, reply) = session.adopt(reply.body)

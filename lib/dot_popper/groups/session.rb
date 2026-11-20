@@ -250,7 +250,7 @@ module DotPopper
         @error = nil
         return @error = :too_many_tries if waiting_out?
 
-        known? ? ask(job) : ask(Jobs::NewPlayer.new(next_job: job))
+        known? ? ask(job) : ask(Jobs::CreatePlayer.new(next_job: job))
       end
 
       def send_achievements
