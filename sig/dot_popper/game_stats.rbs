@@ -22,13 +22,13 @@ module DotPopper
 
     def self.start: () -> GameStats
 
-    def self.opening: (Events::GameStarted started) -> GameStats
+    def self.opening: (Gameplay::Events::GameStarted started) -> GameStats
 
     def self.new: (dots_popped: Integer, mistakes: Integer, softened: Integer, times_to_pop: Array[Float], bright_since: number, duration: number, ?score: Integer, ?dots_in_a_row: Integer, ?most_dots_in_a_row: Integer, ?bonuses: Integer) -> instance
 
     def initialize: (dots_popped: Integer, mistakes: Integer, softened: Integer, times_to_pop: Array[Float], bright_since: number, duration: number, ?score: Integer, ?dots_in_a_row: Integer, ?most_dots_in_a_row: Integer, ?bonuses: Integer) -> void
 
-    def record: (event event, at: Float) -> GameStats
+    def record: (Gameplay::event event, at: Float) -> GameStats
 
     def longest_time_to_pop: () -> Float
 
@@ -40,7 +40,7 @@ module DotPopper
 
     private
 
-    def popped: (Events::Popped event, Float at) -> GameStats
+    def popped: (Gameplay::Events::Popped event, Float at) -> GameStats
 
     public
 
@@ -49,7 +49,7 @@ module DotPopper
 
       def initialize: () -> void
 
-      def call: (event event) -> void
+      def call: (Gameplay::event event) -> void
     end
   end
 end

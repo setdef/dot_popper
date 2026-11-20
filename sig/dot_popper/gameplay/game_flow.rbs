@@ -1,0 +1,171 @@
+module DotPopper
+  module Gameplay
+    class GameFlow
+      LARGEST_SEED: Integer
+
+      interface _Listener
+        def call: (event event) -> void
+      end
+
+      type state = Home | Playing | Paused | GameOver
+
+      attr_reader state: state
+
+      attr_reader score_record: ScoreRecord
+
+      attr_reader screen: Field
+
+      attr_reader sizing: DotSizing
+
+      @game: Game?
+
+      @random: Random
+
+      @listeners: Array[_Listener]
+
+      @starter_taken: bool
+
+      @transitions: Transitions
+
+      class StarterTaken < StandardError
+      end
+
+      def starter: () -> Starter
+
+      class Starter
+        @start: ^(Stack?, Integer?) -> GameFlow
+
+        def initialize: (^(Stack?, Integer?) -> GameFlow start) -> void
+
+        def game: (?Integer? seed) -> GameFlow
+
+        def paused: (Stack dots, ?Integer? seed) -> GameFlow
+      end
+
+      def initialize: (Field screen, ?score_record: ScoreRecord, ?random: Random, ?sizing: DotSizing) -> void
+
+      def subscribe: (?_Listener? listener) ?{ (event event) -> void } -> self
+
+      def press: (number x, number y) -> self
+
+      def update: (number seconds) -> self
+
+      def game: () -> Game::View?
+
+      def field: () -> Field
+
+      def size_class: () -> SizeClass
+
+      def screen=: (Field screen) -> void
+
+      def sizing=: (DotSizing sizing) -> void
+
+      def paused?: () -> bool
+
+      def playing?: () -> bool
+
+      def press_paused: (number x, number y) -> tap_event?
+
+      def move_paused: (number seconds) -> void
+
+      def arrange: (*Dot dots) -> void
+
+      def unpause: () -> self
+
+      private
+
+      def announce: [E < event] (E? event) -> E?
+
+      def show_home: () -> Home
+
+      def finish: (Game game, Integer seed, SizeClass size_class, bool tutorial) -> GameOver
+
+      def draw_seed: () -> Integer
+
+      def begin_game: (Game game, Integer seed, ?SizeClass size_class, ?tutorial: bool) -> Playing
+
+      def advance: (state next_state) -> self
+
+      class Transitions
+        @announce: ^(event? event) -> event?
+
+        @finish: ^(Game game, Integer seed, SizeClass size_class, bool tutorial) -> GameOver
+
+        @show_home: ^() -> Home
+
+        def initialize: (^(event? event) -> event? announce, ^(Game game, Integer seed, SizeClass size_class, bool tutorial) -> GameOver finish,
+                         ^() -> Home show_home) -> void
+
+        def announce: (event? event) -> event?
+
+        def finish: (Game game, Integer seed, SizeClass size_class, bool tutorial) -> GameOver
+
+        def show_home: () -> Home
+      end
+
+      class Home < ::Data
+        def self.new: () -> instance
+
+        def game: () -> nil
+
+        def press: (Transitions transitions, Game? live, number x, number y) -> Home
+
+        def update: (Transitions transitions, Game? live, number seconds) -> Home
+      end
+
+      class Playing < ::Data
+        attr_reader game: Game::View
+
+        attr_reader seed: Integer
+
+        attr_reader size_class: SizeClass
+
+        attr_reader tutorial: bool
+
+        def self.new: (game: Game::View, seed: Integer, size_class: SizeClass, tutorial: bool) -> instance
+
+        def press: (Transitions transitions, Game? live, number x, number y) -> (Playing | GameOver)
+
+        def update: (Transitions transitions, Game? live, number seconds) -> (Playing | GameOver)
+
+        private
+
+        def settle: (Transitions transitions, Game live) -> (Playing | GameOver)
+      end
+
+      class Paused < ::Data
+        attr_reader game: Game::View
+
+        attr_reader seed: Integer
+
+        attr_reader size_class: SizeClass
+
+        def self.new: (game: Game::View, seed: Integer, size_class: SizeClass) -> instance
+
+        def press: (Transitions transitions, Game? live, number x, number y) -> Paused
+
+        def update: (Transitions transitions, Game? live, number seconds) -> Paused
+      end
+
+      class GameOver < ::Data
+        attr_reader game: Game::View
+
+        attr_reader new_score_record: bool
+
+        attr_reader shown: Float
+
+        def self.new: (game: Game::View, new_score_record: bool, ?shown: Float) -> instance
+
+        def initialize: (game: Game::View, new_score_record: bool, ?shown: Float) -> void
+
+        def score: () -> Integer
+
+        def ready?: () -> bool
+
+        def press: (Transitions transitions, Game? live, number x, number y) -> (GameOver | Home)
+
+        def update: (Transitions transitions, Game? live, number seconds) -> GameOver
+      end
+    end
+  end
+end

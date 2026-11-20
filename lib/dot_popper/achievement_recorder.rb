@@ -20,11 +20,11 @@ module DotPopper
 
     def call(event)
       case event
-      when Events::GameStarted then begin_game(event)
-      when Events::Popped then popped(event) if @watching
-      when Events::MistakeMade then mistake_made(event) if @watching
-      when Events::Missed then @tapped = true
-      when Events::GameEnded then ended(event)
+      when Gameplay::Events::GameStarted then begin_game(event)
+      when Gameplay::Events::Popped then popped(event) if @watching
+      when Gameplay::Events::MistakeMade then mistake_made(event) if @watching
+      when Gameplay::Events::Missed then @tapped = true
+      when Gameplay::Events::GameEnded then ended(event)
       end
     end
 
@@ -75,7 +75,7 @@ module DotPopper
     end
 
     def sharp(dot, above)
-      share = Visibility.of(dot, above)
+      share = Gameplay::Visibility.of(dot, above)
       find(:sharpshooter) if share < Achievement::SHARP
       @sharp += 1 if share < Achievement::SHARP_TRIO_BELOW
       find(:sharp_trio) if @sharp >= Achievement::SHARP_TRIO
@@ -110,7 +110,7 @@ module DotPopper
       @last_pop = popped.elapsed
     end
 
-    def target(radius) = @targets[radius] ||= TouchTarget.on(radius)
+    def target(radius) = @targets[radius] ||= Gameplay::TouchTarget.on(radius)
 
     def find(id) = (@found << id unless @found.include?(id))
   end

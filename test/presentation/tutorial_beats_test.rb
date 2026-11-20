@@ -192,8 +192,8 @@ class TutorialBeatsTest < Minitest::Test
   # game, and answers its Show; with a block, it hears the Show each
   # frame.
   def self.play(width, height)
-    radius = DotPopper::DotSize.standard(width, height).radius
-    game_flow = DotPopper::GameFlow.new(DotPopper::Field.new(width, height, radius), random: Random.new(2))
+    radius = DotPopper::Gameplay::DotSize.standard(width, height).radius
+    game_flow = DotPopper::Gameplay::GameFlow.new(DotPopper::Gameplay::Field.new(width, height, radius), random: Random.new(2))
     screen = Layout.new(width:, height:, safe: Rect.new(x: 0, y: 0, width:, height:), style: Style::LAYOUT)
     show = PresentationTest.show(game_flow:, layout: screen, sounds: FakeSounds.new, radius:, random: Random.new(3),
                     tutorial_flag: TutorialFlag.new(DotPopper::ScoreRecord::Memory.new))

@@ -12,10 +12,10 @@ class StatsSheetTest < Minitest::Test
     DotPopper::Stats.new(games: 42, dots_popped: 812, mistakes: 61, seconds: 1890.0, days: 5, recent: [3, 9, 27, 12],
                                  recent_classes: [MEDIUM] * 4,
                                  streak: DotPopper::GoalStreak.new(current: 3, longest: 7, last_met: "2026-11-04"),
-                                 records: { MEDIUM => records, DotPopper::SizeClass::SMALL => phone })
+                                 records: { MEDIUM => records, DotPopper::Gameplay::SizeClass::SMALL => phone })
   end
 
-  MEDIUM = DotPopper::SizeClass::MEDIUM
+  MEDIUM = DotPopper::Gameplay::SizeClass::MEDIUM
 
   def sheet = StatsSheet.build(stats, score_record: 27, words: Style::WORDS, streak: 3, size_class: MEDIUM)
 
@@ -37,7 +37,7 @@ class StatsSheetTest < Minitest::Test
   end
 
   def test_the_records_are_this_screens_and_the_totals_every_screens
-    phone = StatsSheet.build(stats, score_record: 6, words: Style::WORDS, size_class: DotPopper::SizeClass::SMALL)
+    phone = StatsSheet.build(stats, score_record: 6, words: Style::WORDS, size_class: DotPopper::Gameplay::SizeClass::SMALL)
 
     assert_equal ["6", "12 seconds", "3", "None yet"], phone.records.rows.first(4).map(&:value)
     assert_equal "42", phone.totals.rows.first.value
@@ -46,7 +46,7 @@ class StatsSheetTest < Minitest::Test
   # Standard games keep records of their own, apart from every screen
   # class of the other size.
   def test_standard_games_keep_records_of_their_own
-    standard = StatsSheet.build(stats, score_record: 0, words: Style::WORDS, size_class: DotPopper::SizeClass::STANDARD)
+    standard = StatsSheet.build(stats, score_record: 0, words: Style::WORDS, size_class: DotPopper::Gameplay::SizeClass::STANDARD)
 
     assert_equal ["None yet"], standard.records.rows.map(&:value).values_at(3)
   end
@@ -54,7 +54,7 @@ class StatsSheetTest < Minitest::Test
   # Where some bars are of games that count elsewhere, a line under the
   # chart says which do.
   def test_the_chart_says_which_bars_count_where_some_do_not
-    phone = StatsSheet.build(stats, score_record: 6, words: Style::WORDS, size_class: DotPopper::SizeClass::SMALL)
+    phone = StatsSheet.build(stats, score_record: 6, words: Style::WORDS, size_class: DotPopper::Gameplay::SizeClass::SMALL)
 
     assert_equal "Brighter bars are games that count here.", phone.chart_note
     assert_nil sheet.chart_note, "every bar counts, so nothing needs saying"

@@ -62,28 +62,28 @@ module Simulation
   ].freeze
 
   # How one game went. +covered+ counts the bright dots that spawned
-  # under a popped one; +spawns+, how each was drawn (DotPopper::Spawn).
+  # under a popped one; +spawns+, how each was drawn (DotPopper::Gameplay::Spawn).
   Result = Data.define(:score, :seconds, :mistakes, :dots, :covered, :spawns, :stats) do
     def endless? = seconds > GIVE_UP
     def count(&) = spawns.count(&)
   end
 
-  SIZINGS = [DotPopper::DotSizing::BIGGER_OR_SMALLER, DotPopper::DotSizing::STANDARD].freeze
+  SIZINGS = [DotPopper::Gameplay::DotSizing::BIGGER_OR_SMALLER, DotPopper::Gameplay::DotSizing::STANDARD].freeze
 
   # One device with one choice of dot size, and the spawn rule's tries
   # (0 turns it off).
   Job = Data.define(:device, :sizing, :spawn_tries, :bonus) do
-    def initialize(device:, sizing:, spawn_tries:, bonus: DotPopper::Rules::BONUS) = super
+    def initialize(device:, sizing:, spawn_tries:, bonus: DotPopper::Gameplay::Rules::BONUS) = super
 
     # The field a game starts on: the device's screen in graphics
     # units, as the game would see it, with the dots sized as chosen.
     def field
-      r = DotPopper::Rules::RADIUS
-      sizing.fit(DotPopper::Field.new(device.width_r * r, device.height_r * r, r))
+      r = DotPopper::Gameplay::Rules::RADIUS
+      sizing.fit(DotPopper::Gameplay::Field.new(device.width_r * r, device.height_r * r, r))
     end
   end
 
-  TRIES = [DotPopper::Rules::SPAWN_TRIES, 0].freeze
+  TRIES = [DotPopper::Gameplay::Rules::SPAWN_TRIES, 0].freeze
 
   JOBS = SIZINGS.flat_map { |sizing| DEVICES.flat_map { |device| TRIES.map { Job.new(device:, sizing:, spawn_tries: it) } } }.freeze
 
@@ -101,7 +101,7 @@ module Simulation
     def play
       field = @field
       @hand = [field.width / 2, field.height / 2]
-      game = DotPopper::Game.new(field, random: @random, spawn_tries: @spawn_tries, bonus: @bonus)
+      game = DotPopper::Gameplay::Game.new(field, random: @random, spawn_tries: @spawn_tries, bonus: @bonus)
       stats = DotPopper::GameStats.start
       t = 0.0
       mistakes = 0
@@ -129,9 +129,9 @@ module Simulation
           stats = stats.record(event, at: game.elapsed) if event
           @hand = aim
           case event
-          in DotPopper::Events::Popped then break
-          in DotPopper::Events::MistakeMade then mistakes += 1
-          in DotPopper::Events::Missed | nil then next
+          in DotPopper::Gameplay::Events::Popped then break
+          in DotPopper::Gameplay::Events::MistakeMade then mistakes += 1
+          in DotPopper::Gameplay::Events::Missed | nil then next
           end
         end
       end
@@ -221,7 +221,7 @@ module Simulation
   # The row lengths, bonus points and bonus seconds to compare.
   # With no lists given: rows of 6 to 12, 2 or 4 points, 2, 4 or 6 seconds.
   def self.candidates(dots_in_a_rows, points, seconds)
-    [nil, *dots_in_a_rows.product(points, seconds).map { |args| DotPopper::Rules::Bonus.new(*args) }]
+    [nil, *dots_in_a_rows.product(points, seconds).map { |args| DotPopper::Gameplay::Rules::Bonus.new(*args) }]
   end
 
   def self.numbers(text, default, convert) = text ? text.split(",").map { convert.call(it) } : default
@@ -232,7 +232,7 @@ module Simulation
     list = candidates(numbers(dots_in_a_rows, [6, 8, 10, 12], :to_i.to_proc), numbers(points, [2, 4], :to_i.to_proc),
                       numbers(seconds, [2.0, 4.0, 6.0], :to_f.to_proc))
     jobs = BONUS_DEVICES.flat_map do |device|
-      list.map { Job.new(device:, sizing: DotPopper::DotSizing::STANDARD, spawn_tries: DotPopper::Rules::SPAWN_TRIES, bonus: it) }
+      list.map { Job.new(device:, sizing: DotPopper::Gameplay::DotSizing::STANDARD, spawn_tries: DotPopper::Gameplay::Rules::SPAWN_TRIES, bonus: it) }
     end
     results = jobs.map { |job| Ractor.new(job, games) { |each, count| Simulation.play(each, count) } }.map(&:value)
     jobs.zip(results).group_by { |job, _| job.device }.each do |device, rows|

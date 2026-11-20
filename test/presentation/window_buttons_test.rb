@@ -12,7 +12,7 @@ class WindowButtonsTest < Minitest::Test
 
   def setup
     @window = FakeWindow.new
-    @game_flow = DotPopper::GameFlow.new(field(1200, 800), random: Random.new(2))
+    @game_flow = DotPopper::Gameplay::GameFlow.new(field(1200, 800), random: Random.new(2))
     @show = new_show(game_flow: @game_flow, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, window: @window)
   end
 
@@ -67,7 +67,7 @@ class WindowButtonsTest < Minitest::Test
     @show.update(1.0)
     refute_includes names, :quit, "Game Over"
     assert @show.home_reach, "Game Over goes back Home"
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     @show.back
     @show.open_stats
     refute_includes names, :quit, "the Stats screen"

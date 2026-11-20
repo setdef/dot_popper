@@ -9,14 +9,14 @@ class RactorTest < Minitest::Test
   include DotPopperTest
 
   def test_the_rules_values_can_be_shared_between_ractors
-    stack = DotPopper::Stack.new(dots: [dot(100, 100), dot(200, 200, popped: true)])
-    stands = { dots: stack, score: 1, clock: DotPopper::Clock.new(remaining: 3), elapsed: 1.0 }
-    values = [field, stack, stack.dots.first, DotPopper::Clock.new(remaining: 3),
-              DotPopper::DotSize.for(DotPopper::Platform::PHONE, unit: "points"), DotPopper::DotSize.standard(395, 850), DotPopper::DotSizing::STANDARD,
-              DotPopper::SizeClass::STANDARD, DotPopper::Events::Missed.new(x: 1, y: 2),
-              DotPopper::Events::Popped.new(dot: stack.dots.first.pop, x: 1, y: 2, points: 1, seconds: 1.0,
+    stack = DotPopper::Gameplay::Stack.new(dots: [dot(100, 100), dot(200, 200, popped: true)])
+    stands = { dots: stack, score: 1, clock: DotPopper::Gameplay::Clock.new(remaining: 3), elapsed: 1.0 }
+    values = [field, stack, stack.dots.first, DotPopper::Gameplay::Clock.new(remaining: 3),
+              DotPopper::Gameplay::DotSize.for(DotPopper::Platform::PHONE, unit: "points"), DotPopper::Gameplay::DotSize.standard(395, 850), DotPopper::Gameplay::DotSizing::STANDARD,
+              DotPopper::Gameplay::SizeClass::STANDARD, DotPopper::Gameplay::Events::Missed.new(x: 1, y: 2),
+              DotPopper::Gameplay::Events::Popped.new(dot: stack.dots.first.pop, x: 1, y: 2, points: 1, seconds: 1.0,
                                             spawned: stack.dots.last, **stands),
-              DotPopper::Events::MistakeMade.new(dot: stack.dots.last, x: 1, y: 2, points: -2, seconds: -2.0, **stands)]
+              DotPopper::Gameplay::Events::MistakeMade.new(dot: stack.dots.last, x: 1, y: 2, points: -2, seconds: -2.0, **stands)]
 
     values.each { assert Ractor.shareable?(it), "#{it.class} is not shareable" }
   end
@@ -26,19 +26,19 @@ class RactorTest < Minitest::Test
   # event, the ones a GameFlow tells and the ones a paused game's presses
   # return to the tutorial, is deeply frozen, with no game in it.
   def test_every_event_is_a_value_with_no_game_in_it
-    game_flow = DotPopper::GameFlow.new(field, random: Random.new(3))
+    game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(3))
     heard = []
     game_flow.subscribe { heard << it }
     heard.concat(play_paused_then_on(game_flow))
 
-    assert_equal [DotPopper::Events::GameEnded, DotPopper::Events::GameStarted, DotPopper::Events::HomeShown,
-                  DotPopper::Events::Missed, DotPopper::Events::MistakeMade, DotPopper::Events::Popped],
+    assert_equal [DotPopper::Gameplay::Events::GameEnded, DotPopper::Gameplay::Events::GameStarted, DotPopper::Gameplay::Events::HomeShown,
+                  DotPopper::Gameplay::Events::Missed, DotPopper::Gameplay::Events::MistakeMade, DotPopper::Gameplay::Events::Popped],
                  heard.map(&:class).uniq.sort_by(&:name)
     heard.each { assert Ractor.shareable?(it), "#{it.class} is not a value" }
   end
 
   def test_the_rule_numbers_can_be_read_from_any_ractor
-    DotPopper::Rules.constants.each { assert Ractor.shareable?(DotPopper::Rules.const_get(it)), it }
+    DotPopper::Gameplay::Rules.constants.each { assert Ractor.shareable?(DotPopper::Gameplay::Rules.const_get(it)), it }
     [DotPopper::Platform::COMPUTER, DotPopper::Platform::PHONE].each { assert Ractor.shareable?(it), it }
   end
 
@@ -62,7 +62,7 @@ class RactorTest < Minitest::Test
   # Taps the center of the bright dot every half second, from a seeded
   # Random, and answers the score and the dots' final places.
   def self.play_a_game(field)
-    game = DotPopper::Game.new(field, random: Random.new(7))
+    game = DotPopper::Gameplay::Game.new(field, random: Random.new(7))
     until game.over?
       game.update(0.5)
       bright = game.dots.find(&:bright?)
@@ -77,7 +77,7 @@ class RactorTest < Minitest::Test
   # Over and Home, with a mistake and a miss on the way. Answers the
   # events the paused game's presses returned.
   def play_paused_then_on(game_flow)
-    start_paused!(game_flow, DotPopper::Stack.new(dots: [dot(300, 300, id: 0)]))
+    start_paused!(game_flow, DotPopper::Gameplay::Stack.new(dots: [dot(300, 300, id: 0)]))
     returned = [game_flow.press_paused(300, 300)]
     game_flow.unpause
     game = live(game_flow)

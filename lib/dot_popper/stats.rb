@@ -31,9 +31,9 @@ module DotPopper
     # or unreadable value keeps its starting value. A file written before
     # records were kept by class has them unnamed; they go to +legacy+, the
     # class of the screen the game opens on (see .old?).
-    def self.parse(text, legacy: SizeClass::MEDIUM)
+    def self.parse(text, legacy: Gameplay::SizeClass::MEDIUM)
       pairs = Pairs.parse(text)
-      records = SizeClass::ALL.to_h { [it, RecordSet.parse(pairs.within(it.name))] }
+      records = Gameplay::SizeClass::ALL.to_h { [it, RecordSet.parse(pairs.within(it.name))] }
       records[legacy] = RecordSet.parse(pairs) if old?(text)
       new(games: pairs.count(:games), dots_popped: pairs.count(:pops), mistakes: pairs.count(:mistakes),
           seconds: pairs.time(:seconds) || 0.0, days: pairs.count(:days), last_day: pairs.day(:last_day),
@@ -161,7 +161,7 @@ module DotPopper
       def counts(key) = values[key.to_s].to_s.split(",").filter_map { natural(it) }
 
       # The SizeClasses a list names, nil for each it does not know.
-      def classes(key) = values[key.to_s].to_s.split(",").map { SizeClass.named(it) }
+      def classes(key) = values[key.to_s].to_s.split(",").map { Gameplay::SizeClass.named(it) }
 
       def day(key)
         value = values[key.to_s].to_s

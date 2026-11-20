@@ -54,7 +54,7 @@ module DotPopper
       def call(event)
         @recorder.call(event)
         @achievement_recorder.call(event)
-        return unless event.is_a?(Events::GameEnded)
+        return unless event.is_a?(Gameplay::Events::GameEnded)
 
         result = finish(event, stats:, earned: @achievement_recorder.earned)
         finished = Finished.new(ended: event, stats:, result:)

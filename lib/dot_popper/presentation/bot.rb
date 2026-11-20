@@ -38,9 +38,9 @@ module DotPopper
         notice(game_flow.state)
         @waited += seconds
         case game_flow.state
-        when GameFlow::Home then home(show)
-        when GameFlow::GameOver then finish(game_flow, show)
-        when GameFlow::Playing then play(seconds, game_flow.game)
+        when Gameplay::GameFlow::Home then home(show)
+        when Gameplay::GameFlow::GameOver then finish(game_flow, show)
+        when Gameplay::GameFlow::Playing then play(seconds, game_flow.game)
         end
       end
 
@@ -49,8 +49,8 @@ module DotPopper
       def notice(state)
         return if state.class == @state
 
-        @game_overs += 1 if state.is_a?(GameFlow::GameOver)
-        @homes += 1 if state.is_a?(GameFlow::Home)
+        @game_overs += 1 if state.is_a?(Gameplay::GameFlow::GameOver)
+        @homes += 1 if state.is_a?(Gameplay::GameFlow::Home)
         @shared = false
         @state = state.class
         @waited = 0.0

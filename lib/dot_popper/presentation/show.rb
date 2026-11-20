@@ -162,7 +162,7 @@ module DotPopper
       end
 
       # Whether Home is showing.
-      def home? = game_flow.state.is_a?(GameFlow::Home)
+      def home? = game_flow.state.is_a?(Gameplay::GameFlow::Home)
 
       # Whether the Tutorial is playing (#tutorial) over the game, which is
       # paused meanwhile (GameFlow::Paused), so its clock is not running,
@@ -262,7 +262,7 @@ module DotPopper
       # follow it.
       def sizing_offered? = sizing_preview.offered?
       def playing? = game_flow.playing?
-      def game_over? = game_flow.state.is_a?(GameFlow::GameOver)
+      def game_over? = game_flow.state.is_a?(Gameplay::GameFlow::GameOver)
 
       # A tap at +x+, +y+, by +by+ (a finger's id, :mouse, or :gamepad),
       # which #let_go names when it lets go, on the screen on top
@@ -665,12 +665,12 @@ module DotPopper
       # hear the rules in.
       def call(event)
         case event
-        when Events::GameStarted then game_started(event)
-        when Events::Popped then popped(event)
-        when Events::MistakeMade then mistake_made(event)
-        when Events::Missed then effects.ring(event.x, event.y, style::TOUCH_RIPPLE)
+        when Gameplay::Events::GameStarted then game_started(event)
+        when Gameplay::Events::Popped then popped(event)
+        when Gameplay::Events::MistakeMade then mistake_made(event)
+        when Gameplay::Events::Missed then effects.ring(event.x, event.y, style::TOUCH_RIPPLE)
         when UseCases::FinishGame::Finished then game_ended(event.ended, event.stats, event.result)
-        when Events::HomeShown then home_shown(event)
+        when Gameplay::Events::HomeShown then home_shown(event)
         end
       end
 

@@ -5,7 +5,7 @@ require "test_helper"
 class SavedStatsTest < Minitest::Test
   SavedStats = DotPopper::SavedStats
   GameStats = DotPopper::GameStats
-  MEDIUM = DotPopper::SizeClass::MEDIUM
+  MEDIUM = DotPopper::Gameplay::SizeClass::MEDIUM
 
   def setup
     @file = DotPopper::ScoreRecord::Memory.new
@@ -56,7 +56,7 @@ class SavedStatsTest < Minitest::Test
 
   def test_an_older_file_is_given_to_this_screens_class_and_saved_again_at_once
     file = DotPopper::ScoreRecord::Memory.new("games=3\nlongest_game=20.0\nmost_dots_in_a_row=5\n")
-    small = DotPopper::SizeClass::SMALL
+    small = DotPopper::Gameplay::SizeClass::SMALL
     saved_stats = SavedStats.new(file, legacy: small)
 
     assert_equal 5, saved_stats.stats.records_in(small).most_dots_in_a_row

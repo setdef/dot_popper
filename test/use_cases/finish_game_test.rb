@@ -80,7 +80,7 @@ class FinishGameTest < Minitest::Test
   def test_every_game_but_the_tutorials_counts_in_a_friend_group_whatever_its_dot_size
     finish(ended(score: 4), stats: stats)
     finish(ended(score: 5, tutorial: true), stats: stats)
-    finish(ended(score: 6, size_class: DotPopper::SizeClass::SMALL), stats: stats)
+    finish(ended(score: 6, size_class: DotPopper::Gameplay::SizeClass::SMALL), stats: stats)
 
     assert_equal [[4, true], [5, false], [6, true]], @groups.games
   end
@@ -88,14 +88,14 @@ class FinishGameTest < Minitest::Test
   # Heard as the rules announce each event, what it finishes with is the
   # game's own: its numbers, and whether the tutorial opened it.
   def test_it_finishes_each_game_from_the_rules_events_alone
-    game_flow = DotPopper::GameFlow.new(field, random: Random.new(3), sizing: DotPopper::DotSizing::STANDARD)
+    game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(3), sizing: DotPopper::Gameplay::DotSizing::STANDARD)
     game_flow.subscribe(@finish)
     told = []
     @finish.subscribe(told.method(:<<))
-    play = ->(start) { start.call.then { game_flow.update(30) }.then { game_flow.update(DotPopper::Rules::GAME_OVER_GRACE) } }
+    play = ->(start) { start.call.then { game_flow.update(30) }.then { game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE) } }
     play.(-> { start!(game_flow) })
     game_flow.press(0, 0)
-    play.(-> { start_paused!(game_flow, DotPopper::Stack.new(dots: [dot(300, 300, id: 0)])).unpause })
+    play.(-> { start_paused!(game_flow, DotPopper::Gameplay::Stack.new(dots: [dot(300, 300, id: 0)])).unpause })
 
     assert_equal 2, @saved_stats.stats.games
     assert_equal [true, false], @groups.games.map(&:last), "the tutorial's game never counts"
@@ -107,16 +107,16 @@ class FinishGameTest < Minitest::Test
   # game is finished, never left to be read back: each is told once a
   # game is in Stats, with that game's own result and numbers.
   def test_it_tells_its_listeners_each_game_it_finishes_with_that_games_result
-    game_flow = DotPopper::GameFlow.new(field, random: Random.new(3))
+    game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(3))
     told = []
     heard = []
     @finish.subscribe(->(finished) { told << [finished, @saved_stats.stats.games] })
     game_flow.subscribe(@finish)
-    game_flow.subscribe { heard << it if it.is_a?(DotPopper::Events::GameEnded) }
+    game_flow.subscribe { heard << it if it.is_a?(DotPopper::Gameplay::Events::GameEnded) }
     2.times do
       start!(game_flow)
       game_flow.update(30)
-      game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+      game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
       game_flow.press(0, 0)
     end
 
@@ -135,8 +135,8 @@ class FinishGameTest < Minitest::Test
   # what the rules announce finishes a game.
   def finish(ended, stats:, earned: [], by: @finish) = by.send(:finish, ended, stats:, earned:)
 
-  def ended(score: 3, size_class: DotPopper::SizeClass::STANDARD, tutorial: false)
-    DotPopper::Events::GameEnded.new(score_record: score, new_score_record: false, seed: 1, size_class:, field:, dots: DotPopper::Stack.new,
+  def ended(score: 3, size_class: DotPopper::Gameplay::SizeClass::STANDARD, tutorial: false)
+    DotPopper::Gameplay::Events::GameEnded.new(score_record: score, new_score_record: false, seed: 1, size_class:, field:, dots: DotPopper::Gameplay::Stack.new,
                                      score:, elapsed: 10.0, tutorial:)
   end
 

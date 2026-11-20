@@ -104,7 +104,7 @@ module Inputs
       @clipboard = MemoryClipboard.new
       @clipboard.copy(copied) if copied
       @window = phone? ? NoWindowControl.new : FakeWindow.new
-      @game_flow = DotPopper::GameFlow.new(field(width, height), random: Random.new(5), sizing: DotPopper::DotSizing.parse(nil))
+      @game_flow = DotPopper::Gameplay::GameFlow.new(field(width, height), random: Random.new(5), sizing: DotPopper::Gameplay::DotSizing.parse(nil))
       @gone = DotPopper::Continuity::Gone.new(Memory.new)
       @gone.heard(:gone, @day - 200) if gone
       license = DotPopper::Continuity::License.new(Memory.new, pins: DotPopper::Continuity::TEST_PINS)
@@ -156,7 +156,7 @@ module Inputs
     # Shell::App#update runs them.
     def tick(seconds)
       while seconds.positive?
-        step = [seconds, DotPopper::Rules::LONGEST_FRAME].min
+        step = [seconds, DotPopper::Gameplay::Rules::LONGEST_FRAME].min
         game_flow.update(step)
         @handler.update(step, step, stick: P::Stick.rest, right_stick: P::Stick.rest)
         show.update(step)
@@ -250,7 +250,7 @@ module Inputs
       end
       return :still_playing if show.playing? || show.tutorial?
 
-      fixture.tick(DotPopper::Rules::GAME_OVER_GRACE) if show.game_over? # Game Over takes no press before it
+      fixture.tick(DotPopper::Gameplay::Rules::GAME_OVER_GRACE) if show.game_over? # Game Over takes no press before it
       :pressed
     end
 

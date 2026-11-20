@@ -282,7 +282,7 @@ class StoreTest < Minitest::Test
   end
 
   def build_show(**options)
-    game_flow = DotPopper::GameFlow.new(field, random: Random.new(3))
+    game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(3))
     new_show(game_flow:, layout: layout, sounds: FakeSounds.new, radius: R, measure: RoughMeasure.new, **options)
   end
 

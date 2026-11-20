@@ -26,7 +26,7 @@ class GamesTest < Minitest::Test
     @day = Date.new(2026, 11, 8)
     @entitlement = DotPopper::Entitlement.test
     @games = DotPopper::FreeGames.new(Memory.new, today: -> { @day }, entitlement: @entitlement, first_games: 0)
-    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(3))
+    @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(3))
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, games: @games, entitlement: @entitlement,
                      store: Store.new)
   end
@@ -70,7 +70,7 @@ class GamesTest < Minitest::Test
     press_main
     @game_flow.update(20)
     @show.update(0.016)
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     @show.update(0.016)
 
     assert_predicate @show, :game_over?
@@ -124,7 +124,7 @@ class GamesTest < Minitest::Test
     2.times { @games.spend! }
     press_main
     @game_flow.update(20)
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     @show.update(0.016)
     @show.primary
 
@@ -252,7 +252,7 @@ class GamesTest < Minitest::Test
       assert_equal 1, start_game.asked, name
       assert_empty started, name
       refute_predicate show, :tutorial?, name
-      assert_instance_of DotPopper::GameFlow::Home, @game_flow.state, name
+      assert_instance_of DotPopper::Gameplay::GameFlow::Home, @game_flow.state, name
     end
   end
 
@@ -291,7 +291,7 @@ class GamesTest < Minitest::Test
                                                     entitlement: @entitlement, store: Store.new,
                                                     tutorial_flag: TutorialFlag.new(Memory.new).tap { it.seen! if seen }, **)
 
-  def started_games = [].tap { |seen| @game_flow.subscribe { |event| seen << event if event.is_a?(DotPopper::Events::GameStarted) } }
+  def started_games = [].tap { |seen| @game_flow.subscribe { |event| seen << event if event.is_a?(DotPopper::Gameplay::Events::GameStarted) } }
 
   # The Tutorial played out as a player would, tapping each dot on its turn.
   def play_out(show)

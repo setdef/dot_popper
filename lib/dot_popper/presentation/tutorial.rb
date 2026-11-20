@@ -115,9 +115,9 @@ module DotPopper
       def self.opening(field, center, style: Style)
         across, down = style::TUTORIAL.start
         center_x, center_y = center
-        speed = Rules::SPEEDS.min * field.radius
+        speed = Gameplay::Rules::SPEEDS.min * field.radius
         # It drifts away from the middle, so the next dot slides out toward it.
-        Stack.new.slide_under(Dot.new(id: BRIGHT, x: center_x + (across * field.width), y: center_y + (down * field.height),
+        Gameplay::Stack.new.slide_under(Gameplay::Dot.new(id: BRIGHT, x: center_x + (across * field.width), y: center_y + (down * field.height),
                                       velocity_x: -speed, velocity_y: speed, radius: field.radius).confine(field))
       end
 
@@ -160,7 +160,7 @@ module DotPopper
         return @view if all.equal?(@viewed)
 
         @viewed = all
-        @view = Stack.new(dots: all.filter_map do |dot|
+        @view = Gameplay::Stack.new(dots: all.filter_map do |dot|
           next unless @shown.include?(dot.id)
 
           @bright.include?(dot.id) ? dot.with(popped: false) : dot
@@ -288,7 +288,7 @@ module DotPopper
       # bright, and the new dot unborn, until it shows them so.
       def pop_turn(dot, x, y)
         popped = @game_flow.press_paused(x, y)
-        return unless popped.is_a?(Events::Popped)
+        return unless popped.is_a?(Gameplay::Events::Popped)
 
         @bright << dot.id
         @viewed = nil
@@ -320,7 +320,7 @@ module DotPopper
       # turn, leaving out what was already at nothing: the score and the
       # seconds the rules took, and the row shown.
       def losses(mistake)
-        return [] unless mistake.is_a?(Events::MistakeMade)
+        return [] unless mistake.is_a?(Gameplay::Events::MistakeMade)
 
         alarm = @palette.alarm
         points = mistake.points

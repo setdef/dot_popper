@@ -7,7 +7,7 @@ class ShowTest < Minitest::Test
 
   def setup
     @sounds = FakeSounds.new
-    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2))
+    @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2))
     @clipboard = MemoryClipboard.new
     @sizing_file = DotPopper::ScoreRecord::Memory.new
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, random: Random.new(3),
@@ -45,7 +45,7 @@ class ShowTest < Minitest::Test
   # A game on a field so wide that the dots, which hold still here, never
   # cover one another, so each bright dot can be tapped on the spot.
   def calm_show
-    @game_flow = DotPopper::GameFlow.new(field(4000, 3000), random: Random.new(2))
+    @game_flow = DotPopper::Gameplay::GameFlow.new(field(4000, 3000), random: Random.new(2))
     show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, random: Random.new(3))
     show.tap(*middle(show.play_reach))
     show
@@ -58,7 +58,7 @@ class ShowTest < Minitest::Test
 
   def test_a_streak_earns_a_bonus_dot_that_arrives_with_a_chime_and_pays_with_a_chord
     show = calm_show
-    DotPopper::Rules::BONUS.dots_in_a_row.times { pop_bright(show) }
+    DotPopper::Gameplay::Rules::BONUS.dots_in_a_row.times { pop_bright(show) }
 
     assert_equal 1, @sounds.names.count(:bonus), "the bonus dot arrives with a chime"
     refute_includes @sounds.names, :bonus_pop
@@ -97,7 +97,7 @@ class ShowTest < Minitest::Test
     button = @show.home_plan.play_button
     layout = @show.layout
 
-    assert_operator button.height, :>=, 2 * DotPopper::DotSize.standard(layout.width, layout.height).radius
+    assert_operator button.height, :>=, 2 * DotPopper::Gameplay::DotSize.standard(layout.width, layout.height).radius
     assert_operator @show.play_reach.width, :>, button.width
     assert @show.play_reach.contains?(button.x - 5, button.y - 5)
   end
@@ -112,7 +112,7 @@ class ShowTest < Minitest::Test
     @game_flow.update(20)
     @show.tap(5, 5, by: :gamepad)
     assert @show.game_over?, "the grace still holds"
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     @show.tap(5, 5, by: :mouse)
     assert @show.game_over?, "a click on empty space is the pile's"
     @show.tap(5, 5, by: :gamepad)
@@ -138,7 +138,7 @@ class ShowTest < Minitest::Test
   def test_share_my_score_shows_the_result_and_only_copy_copies_it
     start_and_pop
     @game_flow.update(20)
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     @show.update(0.1)
     @show.tap(*middle(@show.share_reach))
 
@@ -213,7 +213,7 @@ class ShowTest < Minitest::Test
     continue = middle(@show.home_reach)
     tap_share
     assert_equal %i[close copy], @show.controls.map(&:name).sort, "only the preview's buttons take a press"
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     assert @game_flow.state.ready?, "the grace runs on under the preview"
     @show.primary
     assert @show.game_over?, "the main button copies there, and goes nowhere"
@@ -257,7 +257,7 @@ class ShowTest < Minitest::Test
     @game_flow.update(20)
     assert_nil @show.game_over.record, "a first game has nothing to beat"
 
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     @game_flow.press(10, 10)
     start_and_pop
     start_and_pop(started: true)
@@ -293,7 +293,7 @@ class ShowTest < Minitest::Test
     press_main
     assert @show.game_over?, "the grace still holds"
 
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     @show.tap(5, 5)
     assert @show.game_over?, "empty space is only for the pile"
     press_main
@@ -306,7 +306,7 @@ class ShowTest < Minitest::Test
     press_main
     refute @show.back, "in a game it does nothing"
     @game_flow.update(20)
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     assert @show.back
     assert @show.home?
   end
@@ -340,7 +340,7 @@ class ShowTest < Minitest::Test
   def test_the_share_buttons_place_on_home_shares_nothing
     finish_game(back_home: false)
     place = middle(@show.share_reach)
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     press_main
     assert @show.home?
     assert_nil @show.share_reach
@@ -401,7 +401,7 @@ class ShowTest < Minitest::Test
   # Resizing the window brings the choice back, or takes it away, for a
   # player with Standard saved (with the other size saved, it always shows).
   def test_the_choice_comes_and_goes_as_the_window_is_resized
-    @game_flow.sizing = DotPopper::DotSizing::STANDARD
+    @game_flow.sizing = DotPopper::Gameplay::DotSizing::STANDARD
     finish_game
     assert @show.sizing_offered?
 
@@ -418,7 +418,7 @@ class ShowTest < Minitest::Test
   # Stats' line over its cards names the saved size as Settings does,
   # and says nothing where the two sizes look alike.
   def test_stats_names_the_saved_size_where_the_two_sizes_look_different
-    notes = [DotPopper::DotSizing::STANDARD, DotPopper::DotSizing::BIGGER_OR_SMALLER].map do |sizing|
+    notes = [DotPopper::Gameplay::DotSizing::STANDARD, DotPopper::Gameplay::DotSizing::BIGGER_OR_SMALLER].map do |sizing|
       @game_flow.sizing = sizing
       [[400, 850], [2560, 1440], [1200, 800]].map do |width, height|
         @game_flow.screen = field(width, height)
@@ -434,10 +434,10 @@ class ShowTest < Minitest::Test
   # The shared result names no dot size and no screen, for a game of
   # either size: it ends with what the game was made of.
   def test_the_shared_result_says_nothing_of_either_dot_size
-    lines = [DotPopper::DotSizing::STANDARD, DotPopper::DotSizing::BIGGER_OR_SMALLER].map do |sizing|
+    lines = [DotPopper::Gameplay::DotSizing::STANDARD, DotPopper::Gameplay::DotSizing::BIGGER_OR_SMALLER].map do |sizing|
       @game_flow.sizing = sizing
       finish_game(back_home: false)
-      @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+      @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
       @show.update(0.1)
       @show.tap(*middle(@show.share_reach))
       line = @show.share_preview.lines.last
@@ -506,7 +506,7 @@ class ShowTest < Minitest::Test
     @show.start
     assert @show.game_over?, "the grace still holds"
 
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     @show.start
     assert @show.playing?
   end
@@ -515,13 +515,13 @@ class ShowTest < Minitest::Test
   def test_home_and_b_go_home_from_game_over
     @show.start
     @game_flow.update(20)
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     @show.tap(*middle(@show.home_reach))
     assert @show.on_home?
 
     @show.start
     @game_flow.update(20)
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     assert @show.back
     assert @show.on_home?
   end
@@ -632,7 +632,7 @@ class ShowTest < Minitest::Test
     @game_flow.update(20)
     assert_nil @show.game_over.lesson, "a mistake with nothing under it teaches nothing"
 
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     press_main
     hide_bright_under_a_popped_dot_and_tap_it
     popped = @game_flow.game.dots.first
@@ -642,7 +642,7 @@ class ShowTest < Minitest::Test
     assert_equal "1", file.read
     refute @show.game_over_plan.placed.key?(:lesson), "with no word"
 
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     press_main
     press_main
     hide_bright_under_a_popped_dot_and_tap_it(started: true)
@@ -673,7 +673,7 @@ class ShowTest < Minitest::Test
 
     (Style::LESSON.replays * 2).times { @show.update(Style::LESSON.every) }
     assert_equal Style::LESSON.replays, @show.game_over.replayed, "a few times, and no more"
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     press_main
     assert @show.home?, "Continue works as ever"
   end
@@ -713,7 +713,7 @@ class ShowTest < Minitest::Test
     assert @show.game_over.first
     assert_equal 1, @show.game_over.stats.dots_popped
     assert_in_delta 0.0, @show.game_over.prompt(@show.now)
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     @show.update(0.01)
     @show.update(1.0)
     assert_equal 1, @show.game_over.shown_score(@show.now)
@@ -746,7 +746,7 @@ class ShowTest < Minitest::Test
   # game, so each Game Over is its own game's, even for a Show that hears
   # the rules' events before FinishGame does.
   def test_each_game_over_shows_its_own_games_result_whatever_order_the_rules_are_heard_in
-    game_flow = DotPopper::GameFlow.new(field, random: Random.new(2))
+    game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2))
     show = nil
     game_flow.subscribe { show&.call(it) }
     entitlement = DotPopper::Entitlement.free
@@ -774,7 +774,7 @@ class ShowTest < Minitest::Test
 
       assert_equal [game_flow.game.score, result.record, result.goal_met, result.achievements],
                    [show.game_over.score, show.game_over.record, show.game_over.goal_met, show.game_over.achievements], "#{taps} taps on bright dots"
-      game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+      game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
       press_main(show)
     end
     refute_nil told.last.result.record, "the second game set a record the first did not"
@@ -809,7 +809,7 @@ class ShowTest < Minitest::Test
     @game_flow.update(20)
     return unless back_home
 
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     press_main
   end
 

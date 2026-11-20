@@ -12,7 +12,7 @@ module DotPopper
   # game opens on, and is saved again in the new form at once, so it
   # stays there whichever screen the game opens on next.
   class ScoreRecord
-    def initialize(file, legacy: SizeClass::MEDIUM)
+    def initialize(file, legacy: Gameplay::SizeClass::MEDIUM)
       @file = file
       @legacy = legacy
       text = file.read.to_s
@@ -68,7 +68,7 @@ module DotPopper
 
         text.lines.filter_map do |line|
           name, score = line.strip.split("=", 2)
-          size_class = SizeClass.named(name.to_s)
+          size_class = Gameplay::SizeClass.named(name.to_s)
           number = Integer(score.to_s, 10, exception: false)
           [size_class, number] if size_class && number && !number.negative?
         end.to_h

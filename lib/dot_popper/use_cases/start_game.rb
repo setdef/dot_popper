@@ -39,7 +39,7 @@ module DotPopper
       # once Home is shown.
       def call(opening = nil)
         return :offer if none_left?
-        return :not_home unless @game_flow.state.is_a?(GameFlow::Home)
+        return :not_home unless @game_flow.state.is_a?(Gameplay::GameFlow::Home)
         return :offer unless @free_games.spend!
 
         opening ? @starter.paused(opening) : @starter.game

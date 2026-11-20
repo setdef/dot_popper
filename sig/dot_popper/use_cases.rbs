@@ -3,11 +3,11 @@ module DotPopper
     class StartGame
       type result = :started | :offer | :not_home
 
-      @game_flow: GameFlow
-      @starter: GameFlow::Starter
+      @game_flow: Gameplay::GameFlow
+      @starter: Gameplay::GameFlow::Starter
       @free_games: FreeGames
 
-      def initialize: (game_flow: GameFlow, free_games: FreeGames, ?starter: GameFlow::Starter) -> void
+      def initialize: (game_flow: Gameplay::GameFlow, free_games: FreeGames, ?starter: Gameplay::GameFlow::Starter) -> void
 
       def none_left?: () -> bool
 
@@ -15,7 +15,7 @@ module DotPopper
 
       def daily: () -> Integer
 
-      def call: (?Stack? opening) -> result
+      def call: (?Gameplay::Stack? opening) -> result
     end
 
     # A player's friend groups, as Groups::Session tells them of games
@@ -45,7 +45,7 @@ module DotPopper
 
       def stats: () -> GameStats
 
-      def call: (event event) -> void
+      def call: (Gameplay::event event) -> void
 
       class Result < ::Data
         attr_reader record: Stats::Record?
@@ -58,28 +58,28 @@ module DotPopper
       end
 
       class Finished < ::Data
-        attr_reader ended: Events::GameEnded
+        attr_reader ended: Gameplay::Events::GameEnded
 
         attr_reader stats: GameStats
 
         attr_reader result: Result
 
-        def self.new: (ended: Events::GameEnded, stats: GameStats, result: Result) -> instance
+        def self.new: (ended: Gameplay::Events::GameEnded, stats: GameStats, result: Result) -> instance
       end
 
       private
 
-      def finish: (Events::GameEnded ended, stats: GameStats, ?earned: Array[Achievement::id]) -> Result
+      def finish: (Gameplay::Events::GameEnded ended, stats: GameStats, ?earned: Array[Achievement::id]) -> Result
     end
 
     class BuyPro
       @store: DotPopper::_Store
       @entitlement: Entitlement
-      @game_flow: GameFlow
+      @game_flow: Gameplay::GameFlow
       @achievements: Achievements
       @friend_groups: _FriendGroups
 
-      def initialize: (store: DotPopper::_Store, entitlement: Entitlement, game_flow: GameFlow, achievements: Achievements, friend_groups: _FriendGroups) -> void
+      def initialize: (store: DotPopper::_Store, entitlement: Entitlement, game_flow: Gameplay::GameFlow, achievements: Achievements, friend_groups: _FriendGroups) -> void
 
       def offered?: () -> bool
 

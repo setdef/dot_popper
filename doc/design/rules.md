@@ -4,12 +4,12 @@
 -->
 # The rules
 
-How a game of Dot Popper plays, as the code has it: the field, the dots and their size, spawning, the score and the clock, the bonus dot, and how time reaches the rules. It is for anyone changing the rules or the code that feeds them. The rules live in `lib/dot_popper/*.rb` and use no Lota, so their tests need no window.
+How a game of Dot Popper plays, as the code has it: the field, the dots and their size, spawning, the score and the clock, the bonus dot, and how time reaches the rules. It is for anyone changing the rules or the code that feeds them. The rules live in `lib/dot_popper/gameplay/` and use no Lota, so their tests need no window.
 
 ## The field and R
 
 - **R** is a dot's radius. Every distance and speed in the rules is a multiple of it. All dots in a game share one radius.
-- **The field** is the whole window: `Field` (`lib/dot_popper/field.rb`), a width, a height and the radius. A dot's center stays between `min_x` and `max_x` (and `min_y`, `max_y`), one radius in from each edge. On a field narrower than a dot, the center line is the only place.
+- **The field** is the whole window: `Field` (`lib/dot_popper/gameplay/field.rb`), a width, a height and the radius. A dot's center stays between `min_x` and `max_x` (and `min_y`, `max_y`), one radius in from each edge. On a field narrower than a dot, the center line is the only place.
 - **Units.** `conf.rb` turns on `t.highdpi`, so Lota's graphics units are logical pixels on a desktop, points on iOS and density-independent pixels (dp) on Android.
 - **The usual radius** is `Rules::RADIUS`, 50 units, on every system (`DotSize.for`). The aim is a physical size of about 8 mm. Neither Lota nor LÖVE reports a screen's physical density, so 50 units is the stand-in: 50 points is 7.9 to 9.6 mm on current iPhones and iPads, and 50 dp is 7.9 mm by Android's definition. `DotSize#reason` says which, and the game prints it at launch.
 
@@ -19,7 +19,7 @@ A desktop window opens at 24 × 16 R, 1200 × 800 units at the usual radius, shr
 
 ## Dots
 
-A dot is a value, `Dot` (`lib/dot_popper/dot.rb`): an `id`, a place, a velocity on each axis, the radius, and whether it is `popped` or a `bonus` dot. Moving or popping a dot gives a new dot with the same id.
+A dot is a value, `Dot` (`lib/dot_popper/gameplay/dot.rb`): an `id`, a place, a velocity on each axis, the radius, and whether it is `popped` or a `bonus` dot. Moving or popping a dot gives a new dot with the same id.
 
 - **A new dot** gets a uniformly random center on the field (`Field#random_center`) and, on each axis, a speed from `Rules::SPEEDS` (1.2, 2.4, 3.6, 4.8 or 6.0 R per second) with a random sign (`Field#random_speed`).
 - **Moving.** `Dot#move` bounces off the field's edges exactly: a dot that would pass an edge comes back by as far as it went past, however many edges one long frame crosses, so how far a dot travels does not depend on the frame rate.
@@ -31,7 +31,7 @@ A dot is a value, `Dot` (`lib/dot_popper/dot.rb`): an `id`, a place, a velocity 
 
 The default size, Standard, is worked out from the screen, so every screen is about equally crowded; the other, the bigger or smaller size, is the same on every screen, and Settings names it "Bigger" or "Smaller", by what it does on this device next to Standard. Why Standard is worked out from the screen is [below](#why-standard-is-worked-out-from-the-screen).
 
-`DotSizing` (`lib/dot_popper/dot_sizing.rb`) holds the player's choice:
+`DotSizing` (`lib/dot_popper/gameplay/dot_sizing.rb`) holds the player's choice:
 
 | Choice | Constant | Radius | Saved as |
 | --- | --- | --- | --- |
@@ -82,7 +82,7 @@ A new bright dot's place and velocity are drawn at random, under every popped do
 
 It uses no randomness unless it redraws, so most seeded games play as without it, and when no gap exists at all the dot spawns where it was first drawn. On a packed screen it does real work, so a crowded field is somewhat kinder than it would be without it ([How often the spawn check acts](#how-often-the-spawn-check-acts)), and every change to movement or stacking must keep its four classes (`Spawner`, `SpawnCheck`, `TouchTarget`, `Spawn`) in step. `Rules::SPAWN_TRIES` set to 0 turns the rule off, as `script/simulate.rb` uses for its comparison.
 
-A bright dot's place and velocity are drawn at random. Then `Spawner` (`lib/dot_popper/spawner.rb`) asks `SpawnCheck` whether the new dot will offer a **touch target** within `Rules::SPAWN_LOOKAHEAD`, one second.
+A bright dot's place and velocity are drawn at random. Then `Spawner` (`lib/dot_popper/gameplay/spawner.rb`) asks `SpawnCheck` whether the new dot will offer a **touch target** within `Rules::SPAWN_LOOKAHEAD`, one second.
 
 | Number | Constant | Value |
 | --- | --- | --- |
@@ -119,11 +119,11 @@ A dot too small to hold a target (under 44 units across, smaller than the rules 
 
 A spawn happens once per pop. On a packed phone screen the rule does real work: it finds the gaps that are left and puts the new dot in one when it can. Where no gap exists, the dot spawns as it would have.
 
-Tests: `test/spawner_test.rb`, `test/touch_target_test.rb`.
+Tests: `test/gameplay/spawner_test.rb`, `test/gameplay/touch_target_test.rb`.
 
 ## Score and clock
 
-`Game` (`lib/dot_popper/game.rb`) holds the dots, the score and the clock, and changes them in place by swapping in new values. Each tap returns an event (`Events::Popped`, `Events::MistakeMade`, `Events::Missed`); a pop's and a mistake's carry the dots, the score, the clock and the time played as the tap left them, so no listener reads the game itself.
+`Game` (`lib/dot_popper/gameplay/game.rb`) holds the dots, the score and the clock, and changes them in place by swapping in new values. Each tap returns an event (`Events::Popped`, `Events::MistakeMade`, `Events::Missed`); a pop's and a mistake's carry the dots, the score, the clock and the time played as the tap left them, so no listener reads the game itself.
 
 | | Points | Seconds | Constants |
 | --- | ---: | ---: | --- |
@@ -154,7 +154,7 @@ How the bonus dot and the row of eight look and sound is in [look-and-sound.md](
 
 **How the numbers were chosen** (measured with `bundle exec ruby script/simulate.rb bonus`, 400 games a cell, three devices, standard dots). Without a bonus dot the model player scores about 23 points in 34 s on the 24 × 16 R window. A row of 6 lifted scores 30 to 70%, too much of a game being bonus; a row of 10 was a small bump a player might not see in their first games. 8/3/3 gave 29.5 points (+30%), 40 s (+20%), a 90th percentile of 52 s, and no endless games on any device. Seconds beyond 3 lengthened games but barely raised scores, because crowding, not the clock, ends a long game.
 
-Tests: `test/bonus_test.rb`.
+Tests: `test/gameplay/bonus_test.rb`.
 
 ## Seeds
 
@@ -236,11 +236,11 @@ On every device but one, fewer than 1 spawn in 70 is redrawn, and a new place is
 
 | What | Where |
 | --- | --- |
-| Every rule, over thousands of random games with random resizes | `test/rules_fuzz_test.rb` |
-| A game: popping, mistakes, the floor, the clock, resuming from the tutorial | `test/game_test.rb`, `test/game_flow_test.rb`, `test/clock_test.rb` |
-| Dots, bounces, refitting | `test/dot_test.rb`, `test/field_test.rb`, `test/stack_test.rb` |
-| Dot size and the choice | `test/dot_size_test.rb`, `test/dot_sizing_test.rb`, `test/presentation/sizing_preview_test.rb` |
-| The spawn check | `test/spawner_test.rb`, `test/touch_target_test.rb` |
-| The bonus dot | `test/bonus_test.rb` |
+| Every rule, over thousands of random games with random resizes | `test/gameplay/rules_fuzz_test.rb` |
+| A game: popping, mistakes, the floor, the clock, resuming from the tutorial | `test/gameplay/game_test.rb`, `test/gameplay/game_flow_test.rb`, `test/gameplay/clock_test.rb` |
+| Dots, bounces, refitting | `test/gameplay/dot_test.rb`, `test/gameplay/field_test.rb`, `test/gameplay/stack_test.rb` |
+| Dot size and the choice | `test/gameplay/dot_size_test.rb`, `test/gameplay/dot_sizing_test.rb`, `test/presentation/sizing_preview_test.rb` |
+| The spawn check | `test/gameplay/spawner_test.rb`, `test/gameplay/touch_target_test.rb` |
+| The bonus dot | `test/gameplay/bonus_test.rb` |
 | The frame clock | `test/presentation/frame_clock_test.rb` |
 | The rules' values are shareable, and a game plays in a Ractor | `test/ractor_test.rb` |

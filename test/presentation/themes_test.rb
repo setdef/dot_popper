@@ -17,7 +17,7 @@ class ThemesTest < Minitest::Test
     entitlement = DotPopper::Entitlement.new(forced: @pro)
     @saved_themes = DotPopper::SavedThemes.new(DotPopper::ScoreRecord::Memory.new)
     @saved_themes.release(released)
-    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new))
+    @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new))
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, entitlement:, saved_themes: @saved_themes,
                      saved_stats: DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new, today: -> { @day }))
     settle
@@ -78,7 +78,7 @@ class ThemesTest < Minitest::Test
     @saved_themes.release(["ghost"])
     @saved_themes.told(:ghost)
     @saved_themes.use(:ghost)
-    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new))
+    @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new))
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, entitlement:, saved_themes: @saved_themes,
                      use_theme: DotPopper::UseCases::UseTheme.new(saved_themes: @saved_themes, entitlement:))
     settle
@@ -88,7 +88,7 @@ class ThemesTest < Minitest::Test
     @game_flow.update(20)
 
     assert_predicate @show.in_use, :ordinary?, "not in the game it arrived in, nor at its Game Over"
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     press_main
 
     assert_predicate @show, :on_home?

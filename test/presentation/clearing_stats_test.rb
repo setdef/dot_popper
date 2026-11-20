@@ -13,7 +13,7 @@ class ClearingStatsTest < Minitest::Test
   def setup
     @sounds = FakeSounds.new
     @folder = DotPopper::StatsBackup::Folder.new
-    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(@folder.call("score_record")))
+    @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(@folder.call("score_record")))
     @saved_stats = DotPopper::SavedStats.new(@folder.call("stats"), today: -> { Date.new(2026, 11, 5) })
     @stats_backup = DotPopper::StatsBackup.new(score_record: @game_flow.score_record, saved_stats: @saved_stats, folder: @folder)
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: @sounds, radius: R, saved_stats: @saved_stats, stats_backup: @stats_backup)
@@ -94,7 +94,7 @@ class ClearingStatsTest < Minitest::Test
     @show.back
     press_main
     @game_flow.update(20)
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     press_main
     @show.open_stats
     assert @show.stats?
@@ -143,7 +143,7 @@ class ClearingStatsTest < Minitest::Test
     clear_around!(live(@game_flow), bright)
     @show.tap(bright.x, bright.y)
     @game_flow.update(20)
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     press_main
   end
 end

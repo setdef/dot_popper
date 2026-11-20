@@ -133,9 +133,9 @@ class ProKnowledgeTest < Minitest::Test
   def play_out(game)
     press_main(game.show)
     game.game_flow.update(30)
-    game.game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    game.game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     game.show.update(1 / 60.0)
-    assert_instance_of DotPopper::GameFlow::GameOver, game.game_flow.state
+    assert_instance_of DotPopper::Gameplay::GameFlow::GameOver, game.game_flow.state
   end
 
   # What +object+ answers to +question+, or the error it raises, as some

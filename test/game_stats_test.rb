@@ -4,7 +4,7 @@ require "test_helper"
 
 class GameStatsTest < Minitest::Test
   include DotPopperTest
-  GameFlow = DotPopper::GameFlow
+  GameFlow = DotPopper::Gameplay::GameFlow
   GameStats = DotPopper::GameStats
 
   def setup
@@ -106,7 +106,7 @@ class GameStatsTest < Minitest::Test
     game_flow = GameFlow.new(field, random: Random.new(9))
     recorder = GameStats::Recorder.new
     game_flow.subscribe(recorder)
-    start_paused!(game_flow, DotPopper::Stack.new(dots: [dot(300, 300, id: 0)]))
+    start_paused!(game_flow, DotPopper::Gameplay::Stack.new(dots: [dot(300, 300, id: 0)]))
     game_flow.press_paused(300, 300)
     game_flow.press_paused(300, 300)
     spawned = game_flow.game.dots.to_a.last

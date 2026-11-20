@@ -67,7 +67,7 @@ class HudTest < Minitest::Test
   def test_it_shows_the_dots_in_a_row_toward_a_bonus_dot_as_dots_and_bumps_the_newest
     readout = @hud.dots_in_a_row_readout
 
-    assert_equal [0, DotPopper::Rules::BONUS.dots_in_a_row, false], [readout.lit, readout.size, readout.ready]
+    assert_equal [0, DotPopper::Gameplay::Rules::BONUS.dots_in_a_row, false], [readout.lit, readout.size, readout.ready]
     @game.instance_variable_set(:@dots_in_a_row, 3)
     hud = @hud.read(@game, 1.0)
 
@@ -98,7 +98,7 @@ class HudTest < Minitest::Test
   end
 
   def test_there_is_no_dots_in_a_row_without_a_bonus_rule_or_after_the_game
-    plain = DotPopper::Game.new(field, random: Random.new(1), bonus: nil)
+    plain = DotPopper::Gameplay::Game.new(field, random: Random.new(1), bonus: nil)
 
     assert_nil @hud.read(plain, 0.0).dots_in_a_row_readout
     @game.update(60)

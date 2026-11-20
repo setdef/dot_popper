@@ -244,7 +244,7 @@ class PointerTest < Minitest::Test
   def test_the_window_settles_by_real_time
     given
     at_time(0.0)
-    @handler.update(1.0, DotPopper::Rules::LONGEST_FRAME, stick: P::Stick.rest, right_stick: P::Stick.rest)
+    @handler.update(1.0, DotPopper::Gameplay::Rules::LONGEST_FRAME, stick: P::Stick.rest, right_stick: P::Stick.rest)
     show.input = P::InputKind::GAMEPAD
     mouse_move(300, 300)
     mouse_move(400, 400)
@@ -382,8 +382,8 @@ class PointerTest < Minitest::Test
     when :credits then show.open_settings.then { show.open_credits }
     when :game_over
       show.play
-      fixture.tick(DotPopper::Rules::STARTING_SECONDS + 1)
-      fixture.tick(DotPopper::Rules::GAME_OVER_GRACE + 0.1)
+      fixture.tick(DotPopper::Gameplay::Rules::STARTING_SECONDS + 1)
+      fixture.tick(DotPopper::Gameplay::Rules::GAME_OVER_GRACE + 0.1)
     end
     fixture.tick(0.1)
   end

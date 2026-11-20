@@ -15,7 +15,7 @@ class ShowTutorialTest < Minitest::Test
     @file = DotPopper::ScoreRecord::Memory.new
     @score_record = DotPopper::ScoreRecord.new(DotPopper::ScoreRecord::Memory.new)
     @saved_stats = DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new)
-    @game_flow = DotPopper::GameFlow.new(field, score_record: @score_record, random: Random.new(2))
+    @game_flow = DotPopper::Gameplay::GameFlow.new(field, score_record: @score_record, random: Random.new(2))
     @events = []
     @game_flow.subscribe { @events << it.class }
     @show = show
@@ -27,8 +27,8 @@ class ShowTutorialTest < Minitest::Test
     assert @show.tutorial?
     refute @show.home?
     refute @show.playing?
-    assert_instance_of DotPopper::GameFlow::Paused, @game_flow.state
-    assert_empty @events.grep(->(it) { it == DotPopper::Events::GameStarted })
+    assert_instance_of DotPopper::Gameplay::GameFlow::Paused, @game_flow.state
+    assert_empty @events.grep(->(it) { it == DotPopper::Gameplay::Events::GameStarted })
     assert_equal "seen", @file.read, "it is seen from the moment it opens"
   end
 
@@ -50,7 +50,7 @@ class ShowTutorialTest < Minitest::Test
     assert_equal [1, 1], [game.dots_in_a_row, @show.hud.dots_in_a_row], "and the row goes on as the player left it"
     assert_same scene.animations, @show.animations, "and the dots are drawn as they were"
     assert_equal 0, @saved_stats.stats.games
-    assert_equal [DotPopper::Events::GameStarted], @events.uniq - [DotPopper::Events::HomeShown]
+    assert_equal [DotPopper::Gameplay::Events::GameStarted], @events.uniq - [DotPopper::Gameplay::Events::HomeShown]
   end
 
   def test_the_game_it_goes_on_into_counts_as_any_game_does
@@ -93,7 +93,7 @@ class ShowTutorialTest < Minitest::Test
     assert_equal [1, 2], [@game_flow.game.score, @game_flow.game.dots.size], "the pop the player made is the game's"
     assert_in_delta 11.0, @game_flow.game.clock.remaining
     assert_equal [true, false], @game_flow.game.dots.map(&:popped?)
-    assert_equal [DotPopper::Events::GameStarted], @events.uniq - [DotPopper::Events::HomeShown], "nothing else starts"
+    assert_equal [DotPopper::Gameplay::Events::GameStarted], @events.uniq - [DotPopper::Gameplay::Events::HomeShown], "nothing else starts"
     @show.update(0.0)
     assert_equal [1, 11], [@show.hud.score, @show.hud.seconds], "and the HUD shows the game as it is"
   end
@@ -227,7 +227,7 @@ class ShowTutorialTest < Minitest::Test
   end
 
   def test_a_player_who_has_played_before_goes_straight_to_the_game
-    @saved_stats.record(DotPopper::GameStats.start.with(dots_popped: 3, duration: 13.0, score: 3), DotPopper::SizeClass::MEDIUM)
+    @saved_stats.record(DotPopper::GameStats.start.with(dots_popped: 3, duration: 13.0, score: 3), DotPopper::Gameplay::SizeClass::MEDIUM)
     press_main
 
     refute @show.tutorial?
@@ -244,7 +244,7 @@ class ShowTutorialTest < Minitest::Test
     @show.tap(reach.center_x, reach.center_y)
 
     assert @show.tutorial?
-    assert_instance_of DotPopper::GameFlow::Paused, @game_flow.state
+    assert_instance_of DotPopper::Gameplay::GameFlow::Paused, @game_flow.state
     assert_equal "seen", @file.read
     play_through(opened: true)
     assert @show.playing?
@@ -279,7 +279,7 @@ class ShowTutorialTest < Minitest::Test
 
   def test_its_dots_follow_a_resized_window
     press_main
-    @game_flow.screen = DotPopper::Field.new(400, 850, R)
+    @game_flow.screen = DotPopper::Gameplay::Field.new(400, 850, R)
     @show.resize(layout(400, 850), @game_flow.field)
 
     dot = @show.tutorial.dots.first
@@ -318,7 +318,7 @@ class ShowTutorialTest < Minitest::Test
 
   def finish_game
     update_for(0.1) until @show.game_over?
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     press_main
   end
 end

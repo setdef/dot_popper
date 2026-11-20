@@ -9,7 +9,7 @@ module DotPopperGui
   class DotSizeScenario < Scenario
     scenario :dot_size
 
-    R = DotPopper::Rules
+    R = DotPopper::Gameplay::Rules
 
     def play
       check_equal([400, 850], L::Graphics.dimensions, "the window opens at DOT_POPPER_WINDOW's size")
@@ -25,7 +25,7 @@ module DotPopperGui
       check(show.sizing_offered?, "Settings offers the dot size on a narrow window")
       settings = show.reach_of(:settings)
       click(settings.center_x, settings.center_y)
-      second = show.reach_of(DotPopper::DotSizing::BIGGER_OR_SMALLER) or fail!("Settings offers no bigger size")
+      second = show.reach_of(DotPopper::Gameplay::DotSizing::BIGGER_OR_SMALLER) or fail!("Settings offers no bigger size")
       click(second.center_x, second.center_y)
       check(!game_flow.sizing.standard?, "a click on the second segment picks the bigger size")
       check_equal(game_flow.sizing.to_text, File.read(saved("dot_size.txt")), "dot_size.txt remembers the choice")

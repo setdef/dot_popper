@@ -73,7 +73,7 @@ module DotPopper
       def update(seconds)
         @hooks&.frame_started(seconds)
         elapsed = seconds
-        seconds = seconds.clamp(0.0, Rules::LONGEST_FRAME)
+        seconds = seconds.clamp(0.0, Gameplay::Rules::LONGEST_FRAME)
         if @splash
           @splash.notes(seconds).each { @sound_player.play(:tick, pitch: it.pitch) }
           @splash = @splash.advance(seconds)
@@ -181,7 +181,7 @@ module DotPopper
         @show.resize(@engine.layout, @game_flow.field)
         # The heap keeps the finished game's dots, and their radius.
         game = @game_flow.game
-        @pile.refit(game ? Field.new(screen.width, screen.height, game.field.radius) : @game_flow.field)
+        @pile.refit(game ? Gameplay::Field.new(screen.width, screen.height, game.field.radius) : @game_flow.field)
         @renderer.prepare
         @inputs.resized(@show.layout.whole)
       end

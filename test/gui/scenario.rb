@@ -223,7 +223,7 @@ module DotPopperGui
       end
       before = events.size
       how.call(dot.x, dot.y)
-      popped = events.drop(before).find { it.is_a?(DotPopper::Events::Popped) }
+      popped = events.drop(before).find { it.is_a?(DotPopper::Gameplay::Events::Popped) }
       fail!("a press on the uncovered bright dot popped nothing") unless popped
       popped
     end

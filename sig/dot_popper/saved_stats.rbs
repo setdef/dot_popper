@@ -6,11 +6,11 @@ module DotPopper
 
     @today: ^() -> Date
 
-    @legacy: SizeClass
+    @legacy: Gameplay::SizeClass
 
-    def initialize: (ScoreRecord::_SaveFile file, ?today: ^() -> Date, ?legacy: SizeClass) -> void
+    def initialize: (ScoreRecord::_SaveFile file, ?today: ^() -> Date, ?legacy: Gameplay::SizeClass) -> void
 
-    def record: (GameStats game, SizeClass size_class) -> Result
+    def record: (GameStats game, Gameplay::SizeClass size_class) -> Result
 
     def today: () -> Date
 

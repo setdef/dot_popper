@@ -17,7 +17,7 @@ module DotPopper
     class SizingPreview < Data.define(:bigger_or_smaller, :standard, :style)
       # The preview for +screen+, a Field at the bigger or smaller dot size.
       def self.of(screen, style)
-        new(bigger_or_smaller: screen.radius, standard: DotSizing::STANDARD.fit(screen).radius, style:)
+        new(bigger_or_smaller: screen.radius, standard: Gameplay::DotSizing::STANDARD.fit(screen).radius, style:)
       end
 
       # How big a standard dot is next to one of the bigger or smaller size.

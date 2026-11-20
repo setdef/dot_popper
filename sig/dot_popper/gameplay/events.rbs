@@ -1,0 +1,112 @@
+module DotPopper
+  module Gameplay
+    type event = Events::Popped | Events::MistakeMade | Events::Missed
+               | Events::GameStarted | Events::GameEnded | Events::HomeShown
+
+    type tap_event = Events::Popped | Events::MistakeMade | Events::Missed
+
+    module Events
+      class Popped < ::Data
+        attr_reader dot: Dot
+
+        attr_reader x: number
+
+        attr_reader y: number
+
+        attr_reader points: Integer
+
+        attr_reader seconds: Float
+
+        attr_reader spawned: Dot
+
+        attr_reader dots: Stack
+
+        attr_reader score: Integer
+
+        attr_reader clock: Clock
+
+        attr_reader elapsed: Float
+
+        def self.new: (dot: Dot, x: number, y: number, points: Integer, seconds: Float, spawned: Dot, dots: Stack, score: Integer, clock: Clock, elapsed: Float) -> instance
+      end
+
+      class MistakeMade < ::Data
+        attr_reader dot: Dot
+
+        attr_reader x: number
+
+        attr_reader y: number
+
+        attr_reader points: Integer
+
+        attr_reader seconds: Float
+
+        attr_reader dots: Stack
+
+        attr_reader score: Integer
+
+        attr_reader clock: Clock
+
+        attr_reader elapsed: Float
+
+        def self.new: (dot: Dot, x: number, y: number, points: Integer, seconds: Float, dots: Stack, score: Integer, clock: Clock, elapsed: Float) -> instance
+
+        def softened?: () -> bool
+      end
+
+      class Missed < ::Data
+        attr_reader x: number
+
+        attr_reader y: number
+
+        def self.new: (x: number, y: number) -> instance
+      end
+
+      class GameStarted < ::Data
+        attr_reader seed: Integer
+
+        attr_reader field: Field
+
+        attr_reader dots: Stack
+
+        attr_reader score: Integer
+
+        attr_reader dots_in_a_row: Integer
+
+        def self.new: (seed: Integer, field: Field, dots: Stack, score: Integer, dots_in_a_row: Integer) -> instance
+      end
+
+      class GameEnded < ::Data
+        attr_reader score_record: Integer
+
+        attr_reader new_score_record: bool
+
+        attr_reader seed: Integer
+
+        attr_reader size_class: SizeClass
+
+        attr_reader first: bool
+
+        attr_reader field: Field
+
+        attr_reader dots: Stack
+
+        attr_reader score: Integer
+
+        attr_reader elapsed: Float
+
+        attr_reader tutorial: bool
+
+        def self.new: (score_record: Integer, new_score_record: bool, seed: Integer, size_class: SizeClass, field: Field, dots: Stack, score: Integer, elapsed: Float, ?first: bool, ?tutorial: bool) -> instance
+
+        def initialize: (score_record: Integer, new_score_record: bool, seed: Integer, size_class: SizeClass, field: Field, dots: Stack, score: Integer, elapsed: Float, ?first: bool, ?tutorial: bool) -> void
+      end
+
+      class HomeShown < ::Data
+        attr_reader score_record: Integer
+
+        def self.new: (score_record: Integer) -> instance
+      end
+    end
+  end
+end

@@ -8,18 +8,18 @@ ENV["DOT_POPPER_AUTOMATED"] = "1"
 DotPopper::Automation.guard!
 
 module DotPopperTest
-  R = DotPopper::Rules::RADIUS
+  R = DotPopper::Gameplay::Rules::RADIUS
 
-  def field(width = 800, height = 600) = DotPopper::Field.new(width, height, R)
+  def field(width = 800, height = 600) = DotPopper::Gameplay::Field.new(width, height, R)
 
   def dot(x, y, velocity_x: 0, velocity_y: 0, popped: false, bonus: false, id: (@ids = (@ids || 100) + 1))
-    DotPopper::Dot.new(id:, x:, y:, velocity_x:, velocity_y:, radius: R, popped:, bonus:)
+    DotPopper::Gameplay::Dot.new(id:, x:, y:, velocity_x:, velocity_y:, radius: R, popped:, bonus:)
   end
 
   # A game whose dots are exactly the ones given, top first, in place of
   # the one it would spawn.
   def game_with(*dots, random: Random.new(1))
-    DotPopper::Game.new(field, random:, dots: DotPopper::Stack.new(dots:))
+    DotPopper::Gameplay::Game.new(field, random:, dots: DotPopper::Gameplay::Stack.new(dots:))
   end
 
   # Each game flow's one Starter (GameFlow#starter), taken by the first start

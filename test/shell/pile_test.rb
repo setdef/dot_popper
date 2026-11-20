@@ -8,7 +8,7 @@ require "dot_popper/shell/pile"
 # the presentation never sees.
 class ShellPileTest < Minitest::Test
   def test_box2d_sees_a_dot_as_a_ball_about_a_meter_across
-    r = DotPopper::Rules::RADIUS
+    r = DotPopper::Gameplay::Rules::RADIUS
     meters = r / DotPopper::Shell::Pile.meter_for(r)
 
     assert_operator meters, :>=, 0.1

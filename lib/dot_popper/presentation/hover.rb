@@ -21,7 +21,7 @@ module DotPopper
         case name
         when Array then name.first
         when Theme then :theme
-        when DotSizing then :dot_size
+        when Gameplay::DotSizing then :dot_size
         else name
         end
       end

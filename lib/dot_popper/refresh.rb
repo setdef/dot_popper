@@ -39,7 +39,7 @@ module DotPopper
 
     # Hears GameFlow's events: Home shown after a game.
     def call(event)
-      ask_if_due if event.is_a?(Events::HomeShown)
+      ask_if_due if event.is_a?(Gameplay::Events::HomeShown)
     end
 
     private

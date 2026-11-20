@@ -52,7 +52,7 @@ module DotPopper
       SHARE_GLYPH = 0.45
       SHARE_SIDES = 1.1
 
-      def initialize(layout:, type:, words:, measure:, scrim:, game_over:, below:, radius: Rules::RADIUS, chips: [], play_word: "Play again",
+      def initialize(layout:, type:, words:, measure:, scrim:, game_over:, below:, radius: Gameplay::Rules::RADIUS, chips: [], play_word: "Play again",
                      play_note: nil)
         super
       end

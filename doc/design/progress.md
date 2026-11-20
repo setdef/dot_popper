@@ -72,7 +72,7 @@ Tests: `test/stats_test.rb`, `test/saved_stats_test.rb`, `test/score_record_test
 
 ## Size classes
 
-A game's records count only among games of its size class (`SizeClass`, `lib/dot_popper/size_class.rb`), the class of the screen it started on. A game keeps its class if the window changes size during it.
+A game's records count only among games of its size class (`SizeClass`, `lib/dot_popper/gameplay/size_class.rb`), the class of the screen it started on. A game keeps its class if the window changes size during it.
 
 | Class | Which games | Rule |
 | --- | --- | --- |
@@ -172,7 +172,7 @@ Names, figures and sentences are in `Presentation::AchievementWords`. Each has a
 
 **Showing.** Nothing shows during a game. For a Pro player, Game Over adds "New achievement: Sharpshooter" (or "New achievements: …") for the ones first earned that game, and friend groups hear of them. A Free player sees how each is earned on the Achievements screen but no earned marks, dates, count or progress; what they earned is kept, shown once Pro is bought, and then reported to their friend groups. What the screen may show is `UseCases::ViewAchievements`'s to say (`#earned?`, `#day`, `#count`, `#progress`, all held back while `#locked?`), so the `Show` and the painters only draw it. See [store-and-pro.md](store-and-pro.md) and [screens.md](screens.md).
 
-Tests: `test/achievement_recorder_test.rb`, `test/achievements_test.rb`, `test/visibility_test.rb`, `test/presentation/achievements_test.rb`.
+Tests: `test/achievement_recorder_test.rb`, `test/achievements_test.rb`, `test/gameplay/visibility_test.rb`, `test/presentation/achievements_test.rb`.
 
 ## Clearing Stats
 

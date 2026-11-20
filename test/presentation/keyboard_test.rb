@@ -458,8 +458,8 @@ class KeyboardTest < Minitest::Test
 
   def game_over(share:)
     show.play
-    fixture.tick(DotPopper::Rules::STARTING_SECONDS + 1)
-    fixture.tick(DotPopper::Rules::GAME_OVER_GRACE + 0.1)
+    fixture.tick(DotPopper::Gameplay::Rules::STARTING_SECONDS + 1)
+    fixture.tick(DotPopper::Gameplay::Rules::GAME_OVER_GRACE + 0.1)
     show.pad(:y) if share
   end
 

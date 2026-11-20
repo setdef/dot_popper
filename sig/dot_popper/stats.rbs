@@ -20,29 +20,29 @@ module DotPopper
 
     attr_reader recent: Array[Integer]
 
-    attr_reader recent_classes: Array[SizeClass?]
+    attr_reader recent_classes: Array[Gameplay::SizeClass?]
 
     attr_reader streak: GoalStreak
 
-    attr_reader records: Hash[SizeClass, RecordSet]
+    attr_reader records: Hash[Gameplay::SizeClass, RecordSet]
 
     def self.new: (?games: Integer, ?dots_popped: Integer, ?mistakes: Integer, ?seconds: number, ?days: Integer, ?last_day: String?,
-                   ?recent: Array[Integer], ?recent_classes: Array[SizeClass?], ?streak: GoalStreak,
-                   ?records: Hash[SizeClass, RecordSet]) -> instance
+                   ?recent: Array[Integer], ?recent_classes: Array[Gameplay::SizeClass?], ?streak: GoalStreak,
+                   ?records: Hash[Gameplay::SizeClass, RecordSet]) -> instance
 
     def initialize: (?games: Integer, ?dots_popped: Integer, ?mistakes: Integer, ?seconds: number, ?days: Integer, ?last_day: String?,
-                     ?recent: Array[Integer], ?recent_classes: Array[SizeClass?], ?streak: GoalStreak,
-                     ?records: Hash[SizeClass, RecordSet]) -> void
+                     ?recent: Array[Integer], ?recent_classes: Array[Gameplay::SizeClass?], ?streak: GoalStreak,
+                     ?records: Hash[Gameplay::SizeClass, RecordSet]) -> void
 
-    def self.parse: (String? text, ?legacy: SizeClass) -> Stats
+    def self.parse: (String? text, ?legacy: Gameplay::SizeClass) -> Stats
 
     def self.old?: (String? text) -> bool
 
-    def records_in: (SizeClass size_class) -> RecordSet
+    def records_in: (Gameplay::SizeClass size_class) -> RecordSet
 
-    def add: (GameStats stats, day: String, size_class: SizeClass) -> Stats
+    def add: (GameStats stats, day: String, size_class: Gameplay::SizeClass) -> Stats
 
-    def records_set_by: (GameStats stats, SizeClass size_class) -> Array[Record]
+    def records_set_by: (GameStats stats, Gameplay::SizeClass size_class) -> Array[Record]
 
     def to_text: () -> String
 
@@ -101,7 +101,7 @@ module DotPopper
 
       def counts: (Symbol key) -> Array[Integer]
 
-      def classes: (Symbol key) -> Array[SizeClass?]
+      def classes: (Symbol key) -> Array[Gameplay::SizeClass?]
 
       def day: (Symbol key) -> String?
 

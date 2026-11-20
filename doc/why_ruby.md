@@ -10,7 +10,7 @@ tutorials.
 
 ## A dot is a value
 
-Here is a dot, from `lib/dot_popper/dot.rb`:
+Here is a dot, from `lib/dot_popper/gameplay/dot.rb`:
 
 ```ruby
 class Dot < Data.define(:id, :x, :y, :velocity_x, :velocity_y, :radius, :popped)
@@ -49,12 +49,12 @@ Third, pattern matching. The fuzz test takes apart each event by shape:
 
 ```ruby
 case event
-in DotPopper::Events::Missed
+in DotPopper::Gameplay::Events::Missed
   assert_nil top, "#{where}: a tap on a dot missed"
-in DotPopper::Events::Popped(dot:, spawned:)
+in DotPopper::Gameplay::Events::Popped(dot:, spawned:)
   assert_equal top&.id, dot.id, "#{where}: a pop reached past the top dot"
   # ...and that the stack gained exactly +spawned+, at the bottom
-in DotPopper::Events::MistakeMade(dot:)
+in DotPopper::Gameplay::Events::MistakeMade(dot:)
   assert top.popped?, "#{where}: a tap on a bright dot was a mistake"
 end
 ```
@@ -138,7 +138,7 @@ silently `nil` until something far away does arithmetic on it.
 
 ## Testing the rules without a window
 
-Nothing in `lib/dot_popper/*.rb` mentions Lota. The rules take a field, a
+Nothing in `lib/dot_popper/gameplay/` mentions Lota. The rules take a field, a
 `Random`, and taps, and report events; drawing and sound listen. So the
 tests are plain minitest, and CI runs them on an Ubuntu machine with no
 screen:

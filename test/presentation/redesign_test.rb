@@ -23,9 +23,9 @@ class RedesignTest < Minitest::Test
 
   def show(pro: false, played: true)
     @sounds = FakeSounds.new
-    @game_flow = DotPopper::GameFlow.new(field(1200, 800), random: Random.new(2))
+    @game_flow = DotPopper::Gameplay::GameFlow.new(field(1200, 800), random: Random.new(2))
     @book = DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new)
-    @book.record(DotPopper::GameStats.start.with(most_dots_in_a_row: 19), DotPopper::SizeClass::MEDIUM) if played
+    @book.record(DotPopper::GameStats.start.with(most_dots_in_a_row: 19), DotPopper::Gameplay::SizeClass::MEDIUM) if played
     @earned = DotPopper::Achievements.new(DotPopper::ScoreRecord::Memory.new)
     new_show(game_flow: @game_flow, layout: layout(1200, 800), sounds: @sounds, radius: R, saved_stats: @book, achievements: @earned,
              entitlement: pro ? DotPopper::Entitlement.new(forced: true) : DotPopper::Entitlement.free)
@@ -40,7 +40,7 @@ class RedesignTest < Minitest::Test
     @game_flow.update(30)
     s.update(1.0)
     s.instance_variable_set(:@game_over, s.game_over.with(**lines))
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     s
   end
 
@@ -136,7 +136,7 @@ class RedesignTest < Minitest::Test
   def test_a_free_tap_on_a_theme_opens_the_offer_over_themes_and_back_returns
     store = Store.new
     entitlement = DotPopper::Entitlement.test
-    game_flow = DotPopper::GameFlow.new(field(1200, 800), random: Random.new(2))
+    game_flow = DotPopper::Gameplay::GameFlow.new(field(1200, 800), random: Random.new(2))
     s = new_show(game_flow:, layout: layout(1200, 800), sounds: FakeSounds.new, radius: R, entitlement:, store:,
                  saved_themes: DotPopper::SavedThemes.new(DotPopper::ScoreRecord::Memory.new))
     s.open_themes

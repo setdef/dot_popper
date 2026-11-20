@@ -8,7 +8,7 @@ class AchievementsOnStatsTest < Minitest::Test
   include PresentationTest
 
   Memory = DotPopper::ScoreRecord::Memory
-  MEDIUM = DotPopper::SizeClass::MEDIUM
+  MEDIUM = DotPopper::Gameplay::SizeClass::MEDIUM
 
   def setup
     @folder = DotPopper::StatsBackup::Folder.new
@@ -16,7 +16,7 @@ class AchievementsOnStatsTest < Minitest::Test
   end
 
   def show(pro:)
-    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(@folder.call("score_record")))
+    @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2), score_record: DotPopper::ScoreRecord.new(@folder.call("score_record")))
     saved_stats = DotPopper::SavedStats.new(@folder.call("stats"), today: -> { Date.new(2026, 11, 8) })
     stats_backup = DotPopper::StatsBackup.new(score_record: @game_flow.score_record, saved_stats:, achievements: @achievements, folder: @folder)
     entitlement = DotPopper::Entitlement.new(forced: pro)
@@ -30,7 +30,7 @@ class AchievementsOnStatsTest < Minitest::Test
     press_main
     game = live(@game_flow)
     covered = dot(400, 300, popped: true)
-    game.instance_variable_set(:@dots, DotPopper::Stack.new(dots: [covered, dot(395, 300, id: 900)]))
+    game.instance_variable_set(:@dots, DotPopper::Gameplay::Stack.new(dots: [covered, dot(395, 300, id: 900)]))
     @show.tap(346, 300)
     @game_flow.update(30)
   end
@@ -55,7 +55,7 @@ class AchievementsOnStatsTest < Minitest::Test
   def test_a_achievement_is_announced_only_the_game_it_is_first_earned
     show(pro: true)
     play_a_sharp_game
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     press_main
     play_a_sharp_game
 
@@ -93,7 +93,7 @@ class AchievementsOnStatsTest < Minitest::Test
   def test_a_pro_player_has_nothing_to_tap_among_the_achievements
     show(pro: true)
     play_a_sharp_game
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     press_main
     @show.open_stats
 
@@ -158,7 +158,7 @@ class AchievementsOnStatsTest < Minitest::Test
   def test_clearing_the_stats_clears_the_achievements_and_undo_brings_them_back
     show(pro: true)
     play_a_sharp_game
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     press_main
     @show.open_stats
     assert_equal :earned, @show.stats.achievements.rows.first.mark

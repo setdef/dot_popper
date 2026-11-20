@@ -24,7 +24,7 @@ How Dot Popper is tested and worked on: what each test tier checks and how to ru
 
 Every test task runs with Ruby's warnings on (`t.warning = true`), and `test/no_warnings_test.rb` compiles every file in `lib/`, `script/`, `test/` and the top folder with `-w` and fails on any warning, since a key written twice in one hash only warns.
 
-To run one file: `bundle exec ruby -Ilib -Itest test/rules_fuzz_test.rb`.
+To run one file: `bundle exec ruby -Ilib -Itest test/gameplay/rules_fuzz_test.rb`.
 
 Before a push, run the narrowest check that shows the change broke nothing: the tests it reaches, Steep if it touches typed code, and the one GUI scenario for a screen it changes ([AGENTS.md](../../AGENTS.md), which also says where heavy work runs). Then push: every tier above that names a workflow runs in CI after the push, and a red trunk is fixed or reverted at once. Tests are fast and reliable, and none reaches the real internet (see [Automated runs stay off the internet](#automated-runs-stay-off-the-internet)).
 
@@ -40,7 +40,7 @@ What could stop the packaged app starting is checked in two places.
 
 The rules decide every score and every second on the clock, and they are built from immutable `Data` values that the presentation and the shell read, so a wrong type there, such as an integer radius leaking into a dot's position, would play on silently. That is why they are type-checked, strictly: a check that silently skips code is worse than none, because it is trusted. When first run, Steep found two real faults: an integer radius that could reach a dot's position through `Dot#confine`, and `Game#subscribe` with neither a listener nor a block failing late. The cost is a hand-kept signature for every typed class, and branches written with `if` and `is_a?` where pattern matching would read better ([below](#why-the-rules-avoid-pattern-matching)). How:
 
-- The `Steepfile` has one target, `core`, which checks `lib/dot_popper.rb`, `lib/dot_popper/*.rb`, the use cases, `lib/dot_popper/use_cases/*.rb` ([architecture](../architecture.md#use-cases)), and friend groups, `lib/dot_popper/groups/*.rb`, against `sig/`, with the `date`, `socket` and `uri` libraries. The presentation (`lib/dot_popper/presentation/`), the composition root (`lib/dot_popper/composition/`) and the shell (`lib/dot_popper/shell/`) are not typed; the shell would need Lota's signatures too. The composition root only puts together the presentation and what the engine makes, neither of which has signatures, so typing it would make nearly every call in it `untyped`, a check that looks like one and isn't.
+- The `Steepfile` has one target, `core`, which checks `lib/dot_popper.rb`, `lib/dot_popper/*.rb`, Gameplay and Metagame's `lib/dot_popper/gameplay/*.rb`, the use cases, `lib/dot_popper/use_cases/*.rb` ([architecture](../architecture.md#use-cases)), and friend groups, `lib/dot_popper/groups/*.rb`, against `sig/`, with the `date`, `socket` and `uri` libraries. The presentation (`lib/dot_popper/presentation/`), the composition root (`lib/dot_popper/composition/`) and the shell (`lib/dot_popper/shell/`) are not typed; the shell would need Lota's signatures too. The composition root only puts together the presentation and what the engine makes, neither of which has signatures, so typing it would make nearly every call in it `untyped`, a check that looks like one and isn't.
 - Diagnostics are `Steep::Diagnostic::Ruby.strict`, so a call Steep cannot type is an error, not a silent `untyped`.
 - `sig/dot_popper/` holds one `.rbs` file for each rules file, and `use_cases.rbs` the use cases with interfaces for the collaborators the core does not type, and `sig/dot_popper.rbs` the module. `untyped` appears only where a parameter takes anything (an environment, a host, a receipt's text), for a server's parsed JSON, which friend groups read only through `Group.parse` and its kind, in `Network::Link` and `Network::Worker`'s jobs (`lib/dot_popper/network/` is declared in `network.rbs` but not checked), and in `Automation`'s guards over `TCPSocket` and `Socket`. `automation.rb` has two `# steep:ignore UnexpectedSuper` comments, on the `super` calls of its prepended modules.
 - RBS's built-in signatures leave out `Data#initialize`, so `sig/core/data.rbs` declares it. That lets a value class's own `initialize` call `super` with keywords, as `Field` does.
@@ -59,7 +59,7 @@ Pattern matching is fine wherever Steep does not look: the tests (the fuzz test 
 
 ## The seeded fuzz test
 
-`test/rules_fuzz_test.rb` plays random games against the real rules and checks, after every step, what must always be true. It needs no extra gem.
+`test/gameplay/rules_fuzz_test.rb` plays random games against the real rules and checks, after every step, what must always be true. It needs no extra gem.
 
 `test_random_play_keeps_every_rule` plays `ROUNDS` (2,000) games of up to `STEPS` (40) steps each, every one on a random field from 40 to 3,000 units wide and 40 to 1,800 high, with dots of radius `Rules::RADIUS`: from a sliver narrower than a dot to a large monitor. Each step is one of:
 
@@ -86,7 +86,7 @@ After each step it checks that:
 Both tests start from seed 20,261,105. Every failure message names the seed and the game (`seed 20261105, game 512`). To try other seeds, or replay one that failed:
 
 ```console
-$ RULES_FUZZ_SEED=12345 bundle exec ruby -Ilib -Itest test/rules_fuzz_test.rb
+$ RULES_FUZZ_SEED=12345 bundle exec ruby -Ilib -Itest test/gameplay/rules_fuzz_test.rb
 ```
 
 ## Ractors

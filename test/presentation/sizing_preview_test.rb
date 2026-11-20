@@ -5,8 +5,8 @@ require_relative "presentation_helper"
 class SizingPreviewTest < Minitest::Test
   include PresentationTest
 
-  BIGGER_OR_SMALLER = DotPopper::DotSizing::BIGGER_OR_SMALLER
-  STANDARD = DotPopper::DotSizing::STANDARD
+  BIGGER_OR_SMALLER = DotPopper::Gameplay::DotSizing::BIGGER_OR_SMALLER
+  STANDARD = DotPopper::Gameplay::DotSizing::STANDARD
 
   def preview(standard, bigger_or_smaller: 50) = SizingPreview.new(bigger_or_smaller:, standard:, style: Style::SIZING)
   def named(sizing, standard) = Style::WORDS.sizing(sizing, preview(standard))
@@ -35,9 +35,9 @@ class SizingPreviewTest < Minitest::Test
   end
 
   def test_it_reads_this_screens_sizes
-    assert_equal :smaller, SizingPreview.of(DotPopper::Field.new(400, 850, 50), Style::SIZING).effect
-    assert_equal :bigger, SizingPreview.of(DotPopper::Field.new(2400, 1500, 50), Style::SIZING).effect
-    assert_equal :alike, SizingPreview.of(DotPopper::Field.new(1200, 800, 50), Style::SIZING).effect
+    assert_equal :smaller, SizingPreview.of(DotPopper::Gameplay::Field.new(400, 850, 50), Style::SIZING).effect
+    assert_equal :bigger, SizingPreview.of(DotPopper::Gameplay::Field.new(2400, 1500, 50), Style::SIZING).effect
+    assert_equal :alike, SizingPreview.of(DotPopper::Gameplay::Field.new(1200, 800, 50), Style::SIZING).effect
   end
 
   # The icons stand in true proportion to the two sizes, as far as they

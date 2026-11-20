@@ -13,7 +13,7 @@ module DotPopperGui
 
     SIZES = [[400, 568, true], [400, 850, true], [844, 390, true], [1200, 800, false], [560, 1600, true], [2560, 1440, false]].freeze
     P = DotPopper::Presentation
-    DEFAULT = DotPopper::DotSizing::DEFAULT
+    DEFAULT = DotPopper::Gameplay::DotSizing::DEFAULT
 
     def play
       @size = "1200x800"

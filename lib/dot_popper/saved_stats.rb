@@ -10,7 +10,7 @@ module DotPopper
   class SavedStats
     attr_reader :stats
 
-    def initialize(file, today: -> { Date.today }, legacy: SizeClass::MEDIUM)
+    def initialize(file, today: -> { Date.today }, legacy: Gameplay::SizeClass::MEDIUM)
       @file = file
       @today = today
       @legacy = legacy

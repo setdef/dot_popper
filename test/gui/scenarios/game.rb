@@ -11,7 +11,7 @@ module DotPopperGui
   class GameScenario < Scenario
     scenario :game
 
-    R = DotPopper::Rules
+    R = DotPopper::Gameplay::Rules
     DOTS_POPPED = 4
 
     def play
@@ -58,7 +58,7 @@ module DotPopperGui
       x, y = wait_for("a popped dot over the bright one", within: 1200) { covering_point }
       before = events.size
       click(x, y)
-      mistake = events.drop(before).grep(DotPopper::Events::MistakeMade).first
+      mistake = events.drop(before).grep(DotPopper::Gameplay::Events::MistakeMade).first
       check(mistake, "a click on a popped dot over the bright one is a mistake")
       check(!show.effects.mistake_outlines.empty?, "the bright dot hidden under it is outlined")
     end
@@ -79,7 +79,7 @@ module DotPopperGui
     end
 
     def game_over
-      ended = events.grep(DotPopper::Events::GameEnded).last
+      ended = events.grep(DotPopper::Gameplay::Events::GameEnded).last
       score = expected_score(DOTS_POPPED, 1)
       check_equal(score, ended.score, "Game Over's score")
       check_close(R::STARTING_SECONDS + DOTS_POPPED - (R::MISTAKE_SECONDS * 1), ended.elapsed,

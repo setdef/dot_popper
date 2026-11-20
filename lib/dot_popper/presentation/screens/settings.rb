@@ -11,7 +11,7 @@ module DotPopper
 
         # The dot-size choices in the order its row draws them: the
         # default, Standard, first.
-        SIZINGS = [DotSizing::STANDARD, DotSizing::BIGGER_OR_SMALLER].freeze
+        SIZINGS = [Gameplay::DotSizing::STANDARD, Gameplay::DotSizing::BIGGER_OR_SMALLER].freeze
 
         # +sizing_file+ keeps the player's DotSizing.
         def initialize(show, sizing_file:)
@@ -117,7 +117,7 @@ module DotPopper
         def pressed(name, by)
           case name
           in [:sound, on] then set_sound(on)
-          in DotSizing => sizing then choose_sizing(sizing)
+          in Gameplay::DotSizing => sizing then choose_sizing(sizing)
           in [:display, mode] then show.window.display = mode
           in :credits then show.open_credits
           in :privacy then show.open_privacy

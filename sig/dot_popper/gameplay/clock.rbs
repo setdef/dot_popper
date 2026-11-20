@@ -1,0 +1,19 @@
+module DotPopper
+  module Gameplay
+    class Clock < ::Data
+      attr_reader remaining: Float
+
+      def self.new: (remaining: number) -> instance
+
+      def initialize: (remaining: number) -> void
+
+      def tick: (number seconds) -> Clock
+
+      def adjust: (number seconds) -> Clock
+
+      def expired?: () -> bool
+
+      def whole_seconds: () -> Integer
+    end
+  end
+end

@@ -44,7 +44,7 @@ class ScreenPlansTest < Minitest::Test
   def test_game_overs_lines_never_overlap_each_other
     SIZES.each do |width, height|
       screen_layout = layout(width, height)
-      radius = DotPopper::DotSize.standard(width, height).radius
+      radius = DotPopper::Gameplay::DotSize.standard(width, height).radius
       [true, false].repeated_permutation(2).to_a.product([[], CHIPS.first(1), CHIPS]) do |(new_score_record, record), chips|
         plan = GameOverLayout.new(layout: screen_layout, type: Style::TYPE, words: WORDS, measure: RoughMeasure.new,
                                   scrim: Style::GAME_OVER_BACKING, game_over: game_over(new_score_record:, record:),
@@ -311,12 +311,12 @@ class ScreenPlansTest < Minitest::Test
     long = ["License text with a longer word, #{"x" * 90}, and a ruled line", "-" * 70, "", "  1. an indented item"]
     notices = Notices.new(iosevka: Array.new(40) { long.join("\n") }.join("\n\n"), ofl: "Fredoka text", lota: "Lota text",
                           fledge: ["Fledge text"])
-    game_flow = DotPopper::GameFlow.new(field(screen_layout.width, screen_layout.height), random: Random.new(2))
+    game_flow = DotPopper::Gameplay::GameFlow.new(field(screen_layout.width, screen_layout.height), random: Random.new(2))
     show = new_show(game_flow:, layout: screen_layout, sounds: FakeSounds.new, radius: R, notices:, measure: RoughMeasure.new)
     show.primary
     game_flow.update(30)
     show.update(1.0)
-    game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     show.back
     show.open_settings
     show
@@ -328,7 +328,7 @@ class ScreenPlansTest < Minitest::Test
   # cleared, Achievements and an achievement's dialog, Themes, Settings
   # at its top and scrolled to its end, Credits, and Privacy.
   def each_screen(width, height, window: NoWindowControl.new)
-    game_flow = DotPopper::GameFlow.new(field(width, height), random: Random.new(2))
+    game_flow = DotPopper::Gameplay::GameFlow.new(field(width, height), random: Random.new(2))
     show = new_show(game_flow:, layout: layout(width, height), sounds: FakeSounds.new, radius: R, window:)
     yield "the first Home", show
     show.primary
@@ -338,7 +338,7 @@ class ScreenPlansTest < Minitest::Test
     show.pad(:y)
     yield "the share preview", show
     show.close_share
-    game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     show.back
     yield "Home after a game", show
     show.open_stats

@@ -1,0 +1,13 @@
+module DotPopper
+  module Gameplay
+    module Visibility
+      SAMPLES: Integer
+
+      GOLDEN_ANGLE: Float
+
+      POINTS: Array[[Float, Float]]
+
+      def self.of: (Dot dot, Array[Dot] above) -> Float
+    end
+  end
+end

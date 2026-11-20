@@ -48,7 +48,7 @@ module DotPopper
         @settings = settings
         @now = now
         @platform = engine.platform
-        @dot_size = DotSize.for(platform, unit: engine.unit)
+        @dot_size = Gameplay::DotSize.for(platform, unit: engine.unit)
         engine.say("a dot's radius is #{dot_size.reason}")
         # With DOT_POPPER_PERF=1: whether this build's Ruby verifies
         # Ed25519, which the packaged-app playthroughs check. Where it
@@ -133,10 +133,10 @@ module DotPopper
         random = settings.seed ? Random.new(settings.seed) : Random.new
         # A record saved before records were kept by size of screen goes to
         # this screen's class.
-        legacy = SizeClass.of(screen)
+        legacy = Gameplay::SizeClass.of(screen)
         sizing_file = file("dot_size.txt")
-        @game_flow = GameFlow.new(screen, score_record: ScoreRecord.new(file("score_record.txt"), legacy:), random:,
-                                       sizing: DotSizing.parse(sizing_file.read))
+        @game_flow = Gameplay::GameFlow.new(screen, score_record: ScoreRecord.new(file("score_record.txt"), legacy:), random:,
+                                       sizing: Gameplay::DotSizing.parse(sizing_file.read))
         @engine.say("dots are standard, worked out from the screen as each game starts") if @game_flow.sizing.standard?
         saved_stats = SavedStats.new(file("stats.txt"), today:, legacy:)
         achievements = Achievements.new(file("achievements.txt"))

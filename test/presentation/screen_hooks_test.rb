@@ -11,7 +11,7 @@ class ScreenHooksTest < Minitest::Test
   HOOKS = %i[update release cancel_hold page_changed game_started resized input_used].freeze
 
   def setup
-    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2))
+    @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2))
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R)
     @heard = @show.screens.transform_values { hear(it) }
   end
@@ -26,7 +26,7 @@ class ScreenHooksTest < Minitest::Test
     @show.resize(layout(640, 480), field(640, 480))
     press_main
     @game_flow.update(30)
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     press_main
 
     missed = @heard.filter_map { |name, heard| "#{name} missed #{(HOOKS - heard).join(", ")}" unless (HOOKS - heard).empty? }
@@ -57,7 +57,7 @@ class ScreenHooksTest < Minitest::Test
   def test_a_game_started_forgets_the_last_games_result_for_the_friend_groups
     session = DotPopper::Groups::Session.off
     session.instance_variable_set(:@result_due, true) # as a game that counts finishes
-    show = new_show(game_flow: DotPopper::GameFlow.new(field, random: Random.new(2)), layout:, sounds: FakeSounds.new, radius: R, groups: session)
+    show = new_show(game_flow: DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2)), layout:, sounds: FakeSounds.new, radius: R, groups: session)
     assert_equal " ", show.group_panel.game_line, "a result on its way holds the line's place"
     press_main(show)
 

@@ -28,13 +28,13 @@ class TutorTest < Minitest::Test
 # Game Over points at the mistake only while its bright dot is still the
   # bright one, and its popped dot is there.
   def test_a_mistake_can_be_pointed_at_only_while_its_bright_dot_is_still_bright
-    popped = DotPopper::Dot.new(id: 3, x: 100, y: 100, velocity_x: 0, velocity_y: 0, radius: R, popped: true)
-    bright = DotPopper::Dot.new(id: 4, x: 130, y: 100, velocity_x: 0, velocity_y: 0, radius: R)
-    dots = DotPopper::Stack.new(dots: [popped, bright])
+    popped = DotPopper::Gameplay::Dot.new(id: 3, x: 100, y: 100, velocity_x: 0, velocity_y: 0, radius: R, popped: true)
+    bright = DotPopper::Gameplay::Dot.new(id: 4, x: 130, y: 100, velocity_x: 0, velocity_y: 0, radius: R)
+    dots = DotPopper::Gameplay::Stack.new(dots: [popped, bright])
   
     assert_equal MISTAKE, MISTAKE.among(dots)
     assert_nil MISTAKE.among(dots.replace(bright.pop)), "once it was popped, nothing shows which it was"
-    assert_nil MISTAKE.among(DotPopper::Stack.new(dots: [bright])), "nor without the popped dot"
+    assert_nil MISTAKE.among(DotPopper::Gameplay::Stack.new(dots: [bright])), "nor without the popped dot"
   end
   
   def test_its_mistake_replays_a_few_times_after_the_score_has_counted

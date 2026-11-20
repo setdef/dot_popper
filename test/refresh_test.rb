@@ -6,7 +6,7 @@ require "dot_popper/presentation"
 class RefreshTest < Minitest::Test
   include DotPopperTest
   Refresh = DotPopper::Refresh
-  GameFlow = DotPopper::GameFlow
+  GameFlow = DotPopper::Gameplay::GameFlow
 
   def setup
     @now = 1_000.0
@@ -68,7 +68,7 @@ class RefreshTest < Minitest::Test
   end
 
   def test_nothing_is_asked_while_the_tutorial_plays_over_a_game
-    start_paused!(@game_flow, DotPopper::Stack.new)
+    start_paused!(@game_flow, DotPopper::Gameplay::Stack.new)
     later
     @refresh.came_back
 
@@ -108,8 +108,8 @@ class RefreshTest < Minitest::Test
   end
 
   def finish_and_go_home
-    @game_flow.update(DotPopper::Rules::STARTING_SECONDS + 1) until @game_flow.state.is_a?(GameFlow::GameOver)
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::STARTING_SECONDS + 1) until @game_flow.state.is_a?(GameFlow::GameOver)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     @game_flow.press(0, 0)
   end
 end

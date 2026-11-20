@@ -13,12 +13,12 @@ require "test_helper"
 # reach the sizes only through what the files say, so they read the same
 # before and after a rename.
 class SavedDotSizeWordsTest < Minitest::Test
-  DotSizing = DotPopper::DotSizing
+  DotSizing = DotPopper::Gameplay::DotSizing
   ScoreRecord = DotPopper::ScoreRecord
   Stats = DotPopper::Stats
-  SizeClass = DotPopper::SizeClass
+  SizeClass = DotPopper::Gameplay::SizeClass
 
-  PHONE = DotPopper::Field.new(390, 844, 50)
+  PHONE = DotPopper::Gameplay::Field.new(390, 844, 50)
 
   def test_dot_size_txt_reads_each_word_a_build_wrote
     assert_equal 50, DotSizing.parse("standard").fit(PHONE).radius, "\"standard\" is the size that is the same on every screen"

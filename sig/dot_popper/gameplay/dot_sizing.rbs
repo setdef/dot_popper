@@ -1,0 +1,31 @@
+module DotPopper
+  module Gameplay
+    class DotSizing < ::Data
+      attr_reader name: String
+
+      def self.new: (name: String) -> instance
+
+      def initialize: (name: String) -> void
+
+      BIGGER_OR_SMALLER: DotSizing
+
+      STANDARD: DotSizing
+
+      EARLIER_NAMES: Hash[String, DotSizing]
+
+      DEFAULT: DotSizing
+
+      def self.parse: (String? text) -> DotSizing
+
+      def standard?: () -> bool
+
+      def toggled: () -> DotSizing
+
+      def fit: (Field screen) -> Field
+
+      def size_class: (Field screen) -> SizeClass
+
+      def to_text: () -> String
+    end
+  end
+end

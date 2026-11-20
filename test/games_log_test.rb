@@ -7,7 +7,7 @@ class GamesLogTest < Minitest::Test
 
   def setup
     @file = DotPopper::ScoreRecord::Memory.new
-    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(9))
+    @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(9))
     @game_flow.subscribe(DotPopper::GamesLog.new(@file, now: -> { Time.utc(2026, 11, 5, 9, 30) },
                                                today: -> { Date.new(2026, 11, 5) }))
   end
@@ -31,7 +31,7 @@ class GamesLogTest < Minitest::Test
     old = "time,mode,seed,score\n2026-11-04T20:00:00Z,daily,7,12\n"
     file = DotPopper::ScoreRecord::Memory.new(old)
     archives = {}
-    game_flow = DotPopper::GameFlow.new(field, random: Random.new(9))
+    game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(9))
     game_flow.subscribe(DotPopper::GamesLog.new(file, now: -> { Time.utc(2026, 11, 5, 9, 30, 15) },
                                               archive: ->(name) { archives[name] = DotPopper::ScoreRecord::Memory.new }))
     @game_flow = game_flow

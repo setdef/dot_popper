@@ -8,11 +8,11 @@ class HoverTest < Minitest::Test
   include PresentationTest
 
   LOOK = Style::HOVER
-  BIGGER_OR_SMALLER = DotPopper::DotSizing::BIGGER_OR_SMALLER
+  BIGGER_OR_SMALLER = DotPopper::Gameplay::DotSizing::BIGGER_OR_SMALLER
 
   def setup
     @sounds = FakeSounds.new
-    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2))
+    @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2))
     @show = new_show(game_flow: @game_flow, layout:, sounds: @sounds, radius: R, random: Random.new(3))
   end
 
@@ -79,7 +79,7 @@ class HoverTest < Minitest::Test
   def finish_game
     press_main
     @game_flow.update(20)
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     press_main
   end
 end

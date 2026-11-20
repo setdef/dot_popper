@@ -32,10 +32,10 @@ module DotPopper
     # The stats after +event+, which happened +at+ seconds into the game.
     def record(event, at:)
       case event
-      when Events::Popped then popped(event, at)
-      when Events::MistakeMade
+      when Gameplay::Events::Popped then popped(event, at)
+      when Gameplay::Events::MistakeMade
         with(mistakes: mistakes + 1, softened: softened + (event.softened? ? 1 : 0), score: score + event.points, dots_in_a_row: 0)
-      when Events::GameEnded then with(duration: at)
+      when Gameplay::Events::GameEnded then with(duration: at)
       else self
       end
     end
@@ -68,8 +68,8 @@ module DotPopper
 
       def call(event)
         case event
-        when Events::GameStarted then @stats = GameStats.opening(event)
-        when Events::Popped, Events::MistakeMade, Events::GameEnded then @stats = stats.record(event, at: event.elapsed)
+        when Gameplay::Events::GameStarted then @stats = GameStats.opening(event)
+        when Gameplay::Events::Popped, Gameplay::Events::MistakeMade, Gameplay::Events::GameEnded then @stats = stats.record(event, at: event.elapsed)
         end
       end
     end

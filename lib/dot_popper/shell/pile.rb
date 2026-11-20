@@ -31,8 +31,8 @@ module DotPopper
 
       def call(event)
         case event
-        when Events::GameEnded then fill(event)
-        when Events::GameStarted, Events::HomeShown then empty
+        when Gameplay::Events::GameEnded then fill(event)
+        when Gameplay::Events::GameStarted, Gameplay::Events::HomeShown then empty
         end
       end
 

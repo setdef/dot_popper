@@ -28,7 +28,7 @@ module DotPopper
 
     def call(event)
       @recorder.call(event)
-      append(row(event, @recorder.stats)) if event.is_a?(Events::GameEnded)
+      append(row(event, @recorder.stats)) if event.is_a?(Gameplay::Events::GameEnded)
     end
 
     private

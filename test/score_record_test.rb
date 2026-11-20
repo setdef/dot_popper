@@ -4,9 +4,9 @@ require "test_helper"
 
 class ScoreRecordTest < Minitest::Test
   ScoreRecord = DotPopper::ScoreRecord
-  SMALL = DotPopper::SizeClass::SMALL
-  MEDIUM = DotPopper::SizeClass::MEDIUM
-  LARGE = DotPopper::SizeClass::LARGE
+  SMALL = DotPopper::Gameplay::SizeClass::SMALL
+  MEDIUM = DotPopper::Gameplay::SizeClass::MEDIUM
+  LARGE = DotPopper::Gameplay::SizeClass::LARGE
 
   def test_it_reads_each_class_of_screens_score_record
     score_record = ScoreRecord.new(ScoreRecord::Memory.new("small=6\nmedium=24\n"))

@@ -83,7 +83,7 @@ class ThemeTest < Minitest::Test
   # lightness or size is test/gui/scenarios/popped_dots.rb's to check,
   # since a shader draws them.
   def test_a_dot_keeps_its_seed_through_its_pop
-    dots = (1..40).map { DotPopper::Dot.new(id: it, x: 0, y: 0, velocity_x: 0, velocity_y: 0, radius: 1, popped: false, bonus: false) }
+    dots = (1..40).map { DotPopper::Gameplay::Dot.new(id: it, x: 0, y: 0, velocity_x: 0, velocity_y: 0, radius: 1, popped: false, bonus: false) }
 
     dots.each { assert_equal Style::DOT.seed(it), Style::DOT.seed(it.pop) }
     assert_equal 40, dots.map { Style::DOT.seed(it.pop) }.uniq.size

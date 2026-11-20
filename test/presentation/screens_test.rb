@@ -9,7 +9,7 @@ class ScreensTest < Minitest::Test
   include PresentationTest
 
   def setup
-    @game_flow = DotPopper::GameFlow.new(field, random: Random.new(2))
+    @game_flow = DotPopper::Gameplay::GameFlow.new(field, random: Random.new(2))
     @show = new_show(game_flow: @game_flow, layout: layout, sounds: FakeSounds.new, radius: R, entitlement: DotPopper::Entitlement.free)
   end
 

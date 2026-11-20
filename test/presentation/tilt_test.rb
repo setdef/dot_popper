@@ -227,7 +227,7 @@ class TiltTest < Minitest::Test
     gentlest = style.kick_for(style.shake + 0.01) * style.fling.least
 
     assert_operator style.shake, :<=, 1.0
-    assert_operator gentlest, :>=, 2 * DotPopper::Rules::SPEEDS.max
+    assert_operator gentlest, :>=, 2 * DotPopper::Gameplay::Rules::SPEEDS.max
     assert_operator style.most_kick, :>=, 3 * 36.0
   end
 

@@ -26,7 +26,7 @@ module DotPopper
 
       def call(event)
         case event
-        when Events::GameEnded, Events::GameStarted, Events::HomeShown then drop
+        when Gameplay::Events::GameEnded, Gameplay::Events::GameStarted, Gameplay::Events::HomeShown then drop
         end
       end
 

@@ -13,9 +13,9 @@ class ViewAchievementsTest < Minitest::Test
     @achievements = DotPopper::Achievements.new(Memory.new)
     @achievements.award(%i[blink], day: "2026-11-01")
     @saved_stats = DotPopper::SavedStats.new(Memory.new, today: -> { Date.new(2026, 11, 13) })
-    @saved_stats.record(DotPopper::GameStats.start.with(duration: 31.6, most_dots_in_a_row: 12), DotPopper::SizeClass::SMALL)
+    @saved_stats.record(DotPopper::GameStats.start.with(duration: 31.6, most_dots_in_a_row: 12), DotPopper::Gameplay::SizeClass::SMALL)
     @score_record = DotPopper::ScoreRecord.new(Memory.new)
-    @score_record.record(40, DotPopper::SizeClass::SMALL)
+    @score_record.record(40, DotPopper::Gameplay::SizeClass::SMALL)
   end
 
   def view(pro:) = DotPopper::UseCases::ViewAchievements.new(achievements: @achievements, entitlement: DotPopper::Entitlement.new(forced: pro),

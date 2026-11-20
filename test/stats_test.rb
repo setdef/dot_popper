@@ -5,8 +5,8 @@ require "test_helper"
 class StatsTest < Minitest::Test
   Stats = DotPopper::Stats
   GameStats = DotPopper::GameStats
-  SMALL = DotPopper::SizeClass::SMALL
-  MEDIUM = DotPopper::SizeClass::MEDIUM
+  SMALL = DotPopper::Gameplay::SizeClass::SMALL
+  MEDIUM = DotPopper::Gameplay::SizeClass::MEDIUM
 
   def game(score: 10, dots_popped: 12, mistakes: 1, duration: 30.0, most_dots_in_a_row: 8, times_to_pop: [0.8, 2.5, 1.2])
     GameStats.start.with(score:, dots_popped:, mistakes:, duration:, most_dots_in_a_row:, times_to_pop:)
@@ -56,7 +56,7 @@ class StatsTest < Minitest::Test
     assert_equal 20, stats.records_in(MEDIUM).most_dots_in_a_row
     assert_equal 4, stats.records_in(SMALL).most_dots_in_a_row
     assert_equal 1, stats.records_in(SMALL).games
-    assert_equal 0, stats.records_in(DotPopper::SizeClass::LARGE).games
+    assert_equal 0, stats.records_in(DotPopper::Gameplay::SizeClass::LARGE).games
     assert_equal 2, stats.games
     assert_equal [30, 5], stats.recent
   end
@@ -65,10 +65,10 @@ class StatsTest < Minitest::Test
   # file written before they were kept leaves its scores' unknown.
   def test_each_last_score_keeps_its_class_and_older_ones_are_unknown
     old = Stats.parse("games=2\nrecent=3,9\n")
-    stats = add(add(old, game(score: 4)), game(score: 6), size_class: DotPopper::SizeClass::STANDARD)
+    stats = add(add(old, game(score: 4)), game(score: 6), size_class: DotPopper::Gameplay::SizeClass::STANDARD)
 
     assert_equal [3, 9, 4, 6], stats.recent
-    assert_equal [nil, nil, MEDIUM, DotPopper::SizeClass::STANDARD], stats.recent_classes
+    assert_equal [nil, nil, MEDIUM, DotPopper::Gameplay::SizeClass::STANDARD], stats.recent_classes
     assert_includes stats.to_text, "recent_classes=?,?,medium,fitted\n"
     assert_equal stats.recent_classes, Stats.parse(stats.to_text).recent_classes
   end
@@ -86,7 +86,7 @@ class StatsTest < Minitest::Test
 
     assert_equal [:most_dots_in_a_row], stats.records_set_by(game(most_dots_in_a_row: 6), SMALL).map(&:kind)
     assert_empty stats.records_set_by(game(most_dots_in_a_row: 6), MEDIUM).map(&:kind)
-    assert_empty stats.records_set_by(game(most_dots_in_a_row: 60), DotPopper::SizeClass::LARGE),
+    assert_empty stats.records_set_by(game(most_dots_in_a_row: 60), DotPopper::Gameplay::SizeClass::LARGE),
                  "a class's first game has nothing to beat"
   end
 

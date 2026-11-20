@@ -1,0 +1,19 @@
+module DotPopper
+  module Gameplay
+    class DotSize < ::Data
+      attr_reader radius: number
+
+      attr_reader reason: String
+
+      def self.new: (radius: number, reason: String) -> instance
+
+      def initialize: (radius: number, reason: String) -> void
+
+      def self.for: (Platform platform, unit: String) -> DotSize
+
+      def self.standard: (number width, number height) -> DotSize
+
+      def field: (number width, number height) -> Field
+    end
+  end
+end

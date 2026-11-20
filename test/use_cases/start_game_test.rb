@@ -8,7 +8,7 @@ require "dot_popper/use_cases"
 # (doc/design/store-and-pro.md).
 class StartGameTest < Minitest::Test
   include DotPopperTest
-  GameFlow = DotPopper::GameFlow
+  GameFlow = DotPopper::Gameplay::GameFlow
 
   def setup
     @day = Date.new(2026, 11, 8)
@@ -16,7 +16,7 @@ class StartGameTest < Minitest::Test
                                                                          first_games: 0, daily: 2)
     @game_flow = GameFlow.new(field, random: Random.new(3))
     @started = []
-    @game_flow.subscribe { @started << it if it.is_a?(DotPopper::Events::GameStarted) }
+    @game_flow.subscribe { @started << it if it.is_a?(DotPopper::Gameplay::Events::GameStarted) }
     @start = DotPopper::UseCases::StartGame.new(game_flow: @game_flow, free_games: @games)
   end
 
@@ -30,7 +30,7 @@ class StartGameTest < Minitest::Test
   end
 
   def test_with_an_opening_it_starts_the_game_paused_with_those_dots_and_spends_one_then
-    opening = DotPopper::Stack.new(dots: [dot(300, 300, id: 0)])
+    opening = DotPopper::Gameplay::Stack.new(dots: [dot(300, 300, id: 0)])
 
     assert_equal :started, @start.call(opening)
     assert_predicate @game_flow, :paused?
@@ -50,7 +50,7 @@ class StartGameTest < Minitest::Test
 
     assert_predicate @start, :none_left?
     assert_equal :offer, @start.call
-    assert_equal :offer, @start.call(DotPopper::Stack.new(dots: [dot(300, 300, id: 0)]))
+    assert_equal :offer, @start.call(DotPopper::Gameplay::Stack.new(dots: [dot(300, 300, id: 0)]))
     assert_instance_of GameFlow::Home, @game_flow.state
     assert_equal 2, @started.size
   end
@@ -111,7 +111,7 @@ class StartGameTest < Minitest::Test
 
   def finish_game
     @game_flow.update(20)
-    @game_flow.update(DotPopper::Rules::GAME_OVER_GRACE)
+    @game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
     @game_flow.press(0, 0)
   end
 end

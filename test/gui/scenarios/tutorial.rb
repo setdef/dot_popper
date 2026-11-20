@@ -17,7 +17,7 @@ module DotPopperGui
     scenario :tutorial
 
     T = DotPopper::Presentation::TutorialScene
-    R = DotPopper::Rules
+    R = DotPopper::Gameplay::Rules
 
     def play
       return by_gamepad if hand == "gamepad"

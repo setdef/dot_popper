@@ -13,14 +13,14 @@ class TutorialTest < Minitest::Test
     @sounds = FakeSounds.new
     @haptics = FakeHaptics.new
     @effects = Effects.new(radius: R)
-    @field = DotPopper::Field.new(1200, 800, R)
-    @game_flow = DotPopper::GameFlow.new(@field)
+    @field = DotPopper::Gameplay::Field.new(1200, 800, R)
+    @game_flow = DotPopper::Gameplay::GameFlow.new(@field)
     @tutorial = tutorial_on(@game_flow, [600.0, 400.0], effects: @effects, sounds: @sounds,
                              haptics: @haptics, style: Style)
   end
 
   def test_it_plays_over_a_paused_game_with_its_first_dot
-    assert_instance_of DotPopper::GameFlow::Paused, @game_flow.state
+    assert_instance_of DotPopper::Gameplay::GameFlow::Paused, @game_flow.state
     assert_equal [TutorialScene::BRIGHT], @game_flow.game.dots.map(&:id)
     assert_equal @game_flow.game.dots.to_a, @tutorial.dots.to_a, "it draws the game's own dot"
     assert_same @game_flow.game.field, @tutorial.field
@@ -29,7 +29,7 @@ class TutorialTest < Minitest::Test
 
   def test_the_bright_dot_drifts_at_the_slowest_speed_then_time_eases_to_a_stop
     dot = bright
-    speed = DotPopper::Rules::SPEEDS.min * R
+    speed = DotPopper::Gameplay::Rules::SPEEDS.min * R
     assert_equal [-speed, speed], [dot.velocity_x, dot.velocity_y]
     assert_equal :drift, @tutorial.beat
 
@@ -47,11 +47,11 @@ class TutorialTest < Minitest::Test
   def test_the_bright_dot_freezes_well_away_from_the_middle_where_a_gamepad_cursor_starts
     sizes = ScreenPlansTest::SIZES
     sizes.each do |width, height|
-      radius = DotPopper::DotSize.standard(width, height).radius
-      field = DotPopper::Field.new(width, height, radius)
+      radius = DotPopper::Gameplay::DotSize.standard(width, height).radius
+      field = DotPopper::Gameplay::Field.new(width, height, radius)
       inset = Rect.new(x: 0.0, y: 44.0, width: width.to_f, height: height - 78.0)
       screen = Layout.new(width:, height:, safe: inset, style: Style::LAYOUT)
-      tutorial = tutorial_on(DotPopper::GameFlow.new(field), [screen.center_x, screen.center_y],
+      tutorial = tutorial_on(DotPopper::Gameplay::GameFlow.new(field), [screen.center_x, screen.center_y],
                              effects: Effects.new(radius:), sounds: @sounds, haptics: @haptics, style: Style)
       (((SCRIPT.drift + SCRIPT.stop + 0.2) / STEP).ceil).times { tutorial.update(STEP) }
       dot = tutorial.dots.find { it.id == TutorialScene::BRIGHT }
@@ -208,7 +208,7 @@ class TutorialTest < Minitest::Test
   end
 
   def test_a_calm_guide_wags_gentler
-    calm = tutorial_on(DotPopper::GameFlow.new(@field), [600.0, 400.0], effects: @effects,
+    calm = tutorial_on(DotPopper::Gameplay::GameFlow.new(@field), [600.0, 400.0], effects: @effects,
                         sounds: @sounds, haptics: @haptics, style: Style, calm: true)
     assert_equal Style::CALM_WAG, calm.guide.style.wag
     assert_operator Style::CALM_WAG.angle, :<, SCRIPT.guide.wag.angle
@@ -219,7 +219,7 @@ class TutorialTest < Minitest::Test
   # beside the popped one, never clear. There they part up and down, the
   # new one going down, away from where the guide waits.
   def test_near_a_side_wall_the_dots_part_up_and_down
-    @game_flow = DotPopper::GameFlow.new(DotPopper::Field.new(400, 850, R))
+    @game_flow = DotPopper::Gameplay::GameFlow.new(DotPopper::Gameplay::Field.new(400, 850, R))
     @tutorial = tutorial_on(@game_flow, [200.0, 425.0], effects: Effects.new(radius: R), sounds: @sounds,
                              haptics: @haptics, style: Style)
     to_the_peek
@@ -305,7 +305,7 @@ class TutorialTest < Minitest::Test
     assert_equal [TutorialScene::BRIGHT, TutorialScene::NEXT, TutorialScene::LAST], @tutorial.dots.map(&:id)
     assert_equal [true, true, false], @tutorial.dots.map(&:popped?), "as it flows, a bright dot goes in under them all"
     last = @tutorial.dots.to_a.last
-    assert_includes DotPopper::Rules::SPEEDS.map { it * R }, last.velocity_x.abs, "at one of the game's speeds"
+    assert_includes DotPopper::Gameplay::Rules::SPEEDS.map { it * R }, last.velocity_x.abs, "at one of the game's speeds"
     still = last
     now = @tutorial.dots.to_a.last
     assert_operator Math.hypot(now.x - still.x, now.y - still.y), :<, 0.1, "time held still till then"
@@ -322,7 +322,7 @@ class TutorialTest < Minitest::Test
   # The maintainer: the first good "can also highlight the '1 in a row'",
   # and the first bad "can highlight that resetting to 0".
   def test_the_row_is_the_games_own_and_empty_from_the_start
-    assert_equal [0, DotPopper::Rules::BONUS.dots_in_a_row, false], row_shown
+    assert_equal [0, DotPopper::Gameplay::Rules::BONUS.dots_in_a_row, false], row_shown
     assert_nil @tutorial.row_notice
   end
 
@@ -405,7 +405,7 @@ class TutorialTest < Minitest::Test
   end
 
   def test_a_resized_window_keeps_the_dots_on_it
-    @game_flow.screen = DotPopper::Field.new(400, 850, R)
+    @game_flow.screen = DotPopper::Gameplay::Field.new(400, 850, R)
 
     assert bright.x.between?(R, 400 - R)
     assert_equal 400, @tutorial.field.width

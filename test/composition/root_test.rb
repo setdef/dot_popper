@@ -43,7 +43,7 @@ class RootTest < Minitest::Test
     SYSTEMS.product(BUILDS).each do |system, channel|
       game = root(system, channel:)
 
-      assert_instance_of DotPopper::GameFlow::Home, game.game_flow.state, "#{system}, #{channel.inspect}"
+      assert_instance_of DotPopper::Gameplay::GameFlow::Home, game.game_flow.state, "#{system}, #{channel.inspect}"
       assert_predicate game.show, :home?, "#{system}, #{channel.inspect}"
       assert_equal DotPopperTest.platform(system), game.platform
     end
@@ -87,7 +87,7 @@ class RootTest < Minitest::Test
       assert_equal [line, "dots are standard, worked out from the screen as each game starts", "each game is logged in /save/games.csv"], engine.said, system
     end
     engine = FakeEngine.new("Linux")
-    engine.file("dot_size.txt").write(DotPopper::DotSizing::BIGGER_OR_SMALLER.name)
+    engine.file("dot_size.txt").write(DotPopper::Gameplay::DotSizing::BIGGER_OR_SMALLER.name)
     root(engine:, env: { "DOT_POPPER_PERF" => "1" })
 
     refute_includes engine.said, "dots are standard, worked out from the screen as each game starts"
@@ -309,7 +309,7 @@ class RootTest < Minitest::Test
   # The game flow's Starter is UseCases::StartGame's, which the root makes,
   # so nothing else in the game can start one.
   def test_only_the_use_case_can_start_a_game
-    SYSTEMS.each { |system| assert_raises(DotPopper::GameFlow::StarterTaken, system) { root(system).game_flow.starter } }
+    SYSTEMS.each { |system| assert_raises(DotPopper::Gameplay::GameFlow::StarterTaken, system) { root(system).game_flow.starter } }
   end
 
   # The root makes the use cases and subscribes them, and the offer, to
@@ -336,7 +336,7 @@ class RootTest < Minitest::Test
     assert_predicate game.game_flow, :playing?
     game.game_flow.update(30)
 
-    assert_instance_of DotPopper::GameFlow::GameOver, game.game_flow.state
+    assert_instance_of DotPopper::Gameplay::GameFlow::GameOver, game.game_flow.state
     assert_equal game.game_flow.state.score, game.show.game_over&.score
   end
 
@@ -362,7 +362,7 @@ class RootTest < Minitest::Test
     listeners = game.game_flow.instance_variable_get(:@listeners).map(&:class)
 
     assert_equal [DotPopper::UseCases::FinishGame, Show, DotPopper::Refresh, DotPopper::GamesLog], listeners
-    game_flow = DotPopper::GameFlow.new(field)
+    game_flow = DotPopper::Gameplay::GameFlow.new(field)
     entitlement = DotPopper::Entitlement.free
     saved_stats = DotPopper::SavedStats.new(DotPopper::ScoreRecord::Memory.new)
     achievements = DotPopper::Achievements.new(DotPopper::ScoreRecord::Memory.new)
@@ -399,7 +399,7 @@ class RootTest < Minitest::Test
       engine.file("themes.txt").write(saved)
       game = root(engine:, env: pro)
 
-      assert_instance_of DotPopper::GameFlow::Home, game.game_flow.state, saved
+      assert_instance_of DotPopper::Gameplay::GameFlow::Home, game.game_flow.state, saved
       assert_equal in_use, game.context.theme.key, saved
       assert_equal in_use, game.sound_player.theme.key, saved
       assert_equal %i[classic ghost], DotPopper::SavedThemes.new(engine.file("themes.txt")).choices, saved
@@ -471,7 +471,7 @@ class RootTest < Minitest::Test
 
     assert_equal %i[themes groups], asked
     now += DotPopper::Refresh::FLOOR
-    game.game_flow.send(:announce, DotPopper::Events::HomeShown.new(score_record: 0)) # as the game_flow does, back on Home
+    game.game_flow.send(:announce, DotPopper::Gameplay::Events::HomeShown.new(score_record: 0)) # as the game_flow does, back on Home
 
     assert_equal %i[themes groups themes groups], asked
   end

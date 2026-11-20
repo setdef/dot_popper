@@ -39,7 +39,7 @@ module DotPopper
         StatsSection.new(heading: AchievementWords.heading(achievements.count), rows:)
       end
 
-      def self.build(stats, score_record:, words:, streak: 0, size_class: SizeClass::MEDIUM, achievements: nil)
+      def self.build(stats, score_record:, words:, streak: 0, size_class: Gameplay::SizeClass::MEDIUM, achievements: nil)
         labels = words.labels
         mine = stats.records_in(size_class)
         records = StatsSection.new(heading: nil, rows: [

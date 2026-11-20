@@ -6,17 +6,17 @@ module DotPopper
 
     @askers: Array[^() -> void]
 
-    @game_flow: GameFlow
+    @game_flow: Gameplay::GameFlow
 
     @now: ^() -> Float
 
     @asked_at: Float
 
-    def initialize: (Array[^() -> void] askers, game_flow: GameFlow, ?now: ^() -> Float) -> void
+    def initialize: (Array[^() -> void] askers, game_flow: Gameplay::GameFlow, ?now: ^() -> Float) -> void
 
     def came_back: () -> void
 
-    def call: (event event) -> void
+    def call: (Gameplay::event event) -> void
 
     private
 

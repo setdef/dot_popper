@@ -7,8 +7,8 @@ module DotPopper
     # rules' own bounce, and nothing taps them.
     class Attract < Data.define(:field, :dots)
       def self.spawn(field, style, random: Random.new(3))
-        dots = (0...style.dots).reduce(Stack.new) do |stack, id|
-          dot = Dot.spawn(field, random, id:)
+        dots = (0...style.dots).reduce(Gameplay::Stack.new) do |stack, id|
+          dot = Gameplay::Dot.spawn(field, random, id:)
           # The older half are popped, so they sit on top, as they would.
           stack.slide_under(dot.with(velocity_x: dot.velocity_x * style.drift, velocity_y: dot.velocity_y * style.drift,
                                      popped: id < style.dots / 2))
