@@ -19,11 +19,20 @@
 # in as `lota fuse` copies them (PackagedApp.lay_out, Lota's own copy), and
 # plays. Each fuse also checks that its own game folder is the one
 # lay_out makes of the same files, so a Lota whose copy differs fails
-# rather than passing on a stale app. What is fused and laid out is what
+# rather than passing on a stale app; the rest of the app is trusted to
+# the key, which names every input of the fuse but the game folder that
+# the repository pins. What is fused and laid out is what
 # git tracks, as in a checkout of the commit: other files in the working
 # copy never reach the app. The cache is
 # $XDG_CACHE_HOME/dot_popper/packaged-app (~/.cache without it), safe for
 # runs at once; its three newest apps are kept.
+#
+# Nothing it starts outlives it, however it ends: each program it runs,
+# Xvfb and the app among them, is a process group that a watcher of its
+# own (Lifeline) ends, with the work folder and a half-made cache folder,
+# as soon as this process is gone, killed outright included. A cache
+# folder half made by a run killed before this watcher could end it is
+# removed by the next run that finds it.
 #
 # --channel stamps the build for a channel (script/set_build_channel.rb)
 # and leaves out what it leaves out (script/channel_contents.rb).
@@ -59,6 +68,70 @@ module PlayPackagedApp
 
   class Failure < StandardError; end
 
+  # A process of its own, in a session of its own, that ends what this
+  # process started once this process is gone, however it went: it reads
+  # a pipe only this process writes to (Ruby gives a child process no
+  # descriptor it is not handed), told of each process group and folder
+  # as it is made and as it is ended or removed, and at the pipe's end,
+  # or at a TERM, ends the groups left and removes the folders left.
+  module Lifeline
+    module_function
+
+    def start
+      return if @writer
+
+      reader, @writer = IO.pipe
+      pid = fork do
+        @writer.close
+        Process.setsid
+        # Nothing of this process's output held open, for whoever reads it.
+        [$stdin, $stdout, $stderr].each { it.reopen(File::NULL, it == $stdin ? "r" : "w") }
+        watch(reader)
+      end
+      reader.close
+      @writer.sync = true
+      Process.detach(pid)
+    end
+
+    def watch(reader)
+      groups = []
+      folders = []
+      finish = lambda do
+        groups.each { |group| signal("TERM", group) }
+        sleep 1 unless groups.empty?
+        groups.each { |group| signal("KILL", group) }
+        folders.each { FileUtils.rm_rf(it) }
+        exit!(0)
+      end
+      Signal.trap("TERM") { finish.call }
+      Signal.trap("INT", "IGNORE")
+      reader.each_line do |line|
+        what, kind, value = line.chomp.split(" ", 3)
+        list = kind == "group" ? groups : folders
+        item = kind == "group" ? Integer(value) : value
+        what == "+" ? list << item : list.delete(item)
+      end
+      finish.call
+    end
+
+    def signal(name, group)
+      Process.kill(name, -group)
+    rescue Errno::ESRCH, Errno::EPERM
+      nil
+    end
+
+    def tell(what, kind, value)
+      @writer&.puts("#{what} #{kind} #{value}")
+    rescue IOError, Errno::EPIPE
+      nil
+    end
+
+    def group(pid) = tell("+", "group", pid)
+    def ended(pid) = tell("-", "group", pid)
+    def folder(path) = tell("+", "folder", path)
+    def removed(path) = tell("-", "folder", path)
+  end
+
   module_function
 
   def main(argv)
@@ -72,7 +145,9 @@ module PlayPackagedApp
     abort "#{$PROGRAM_NAME} plays the Linux x86_64 app only; CI plays the others" unless RUBY_PLATFORM.match?(/x86_64-linux/)
 
     started = now
+    Lifeline.start
     Dir.mktmpdir("dot_popper-play") do |work|
+      Lifeline.folder(work)
       app = options[:archive] ? unpack(options[:archive], work) : assemble(work, options[:channel])
       play(app, work, options[:seconds])
     end
@@ -150,13 +225,17 @@ module PlayPackagedApp
       lock.flock(File::LOCK_EX)
       return if File.directory?(folder)
 
+      # Only a run that holds the lock makes the folder, so any folder
+      # half made beside it is a killed run's.
+      Dir.glob("#{folder}.making-*").each { FileUtils.rm_rf(it) }
       making = "#{folder}.making-#{Process.pid}"
-      FileUtils.rm_rf(making)
+      Lifeline.folder(making)
       FileUtils.mkdir_p(making)
       yield making
       File.rename(making, folder)
     ensure
       FileUtils.rm_rf(making) if making
+      Lifeline.removed(making) if making
     end
   end
 
@@ -247,8 +326,14 @@ module PlayPackagedApp
     end
   end
 
-  # Removes all but the KEPT newest apps in the cache.
+  # Removes all but the KEPT newest apps in the cache, and what a killed
+  # run left half made or half removed, whose lock no run holds.
   def forget_old
+    Dir.glob(File.join(cache, "apps", "*.{making,gone}-*")).each do |left|
+      File.open("#{left.sub(/\.(making|gone)-\d+\z/, "")}.lock", File::RDWR | File::CREAT) do |lock|
+        FileUtils.rm_rf(left) if lock.flock(File::LOCK_EX | File::LOCK_NB)
+      end
+    end
     apps = Dir.glob(File.join(cache, "apps", "*")).select { File.directory?(it) && !it.match?(/\.(making|gone)-/) }
     apps.sort_by { -File.mtime(it).to_f }.drop(KEPT).each do |old|
       File.open("#{old}.lock", File::RDWR | File::CREAT) do |lock|
@@ -297,6 +382,7 @@ module PlayPackagedApp
     log = File.join(work, "xvfb.txt")
     xvfb = spawn("Xvfb", "-displayfd", writer.fileno.to_s, "-screen", "0", "1280x800x24", "-nolisten", "tcp",
                  writer.fileno => writer, %i[out err] => log, pgroup: true)
+    Lifeline.group(xvfb)
     writer.close
     number = Timeout.timeout(30) { reader.gets }
     raise Failure, "Xvfb did not start:\n#{File.read(log)}" unless number
@@ -306,7 +392,10 @@ module PlayPackagedApp
     raise Failure, "Xvfb did not start within 30 s:\n#{File.read(log)}"
   ensure
     reader&.close
-    stop(xvfb) if xvfb
+    if xvfb
+      stop(xvfb)
+      Lifeline.ended(xvfb)
+    end
   end
 
   # Runs a command, with +env+, to its end or +limit+ seconds, then stops
@@ -314,11 +403,20 @@ module PlayPackagedApp
   def bounded(env, *command, limit:, out: File::NULL, **options)
     # [program, program]: a path with a space is a program, not a shell's line.
     pid = spawn(env, [command.first, command.first], *command.drop(1), in: File::NULL, %i[out err] => out, pgroup: true, **options)
-    Timeout.timeout(limit) { Process.wait2(pid).last }
-  rescue Timeout::Error
-    nil
+    Lifeline.group(pid)
+    deadline = now + limit
+    loop do
+      _, status = Process.wait2(pid, Process::WNOHANG)
+      return status if status
+      return nil if now > deadline
+
+      sleep 0.1
+    end
   ensure
-    stop(pid) if pid
+    if pid
+      stop(pid)
+      Lifeline.ended(pid)
+    end
   end
 
   # Ends the process group +pid+ leads, if anything of it is left.
