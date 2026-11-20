@@ -1,6 +1,10 @@
 # The Ruby Dot Popper runs on. Lota 0.5 needs Ruby 4.1, which is not
 # released yet, so on Linux and macOS it is the preview .ruby-version also
-# names.
+# names. mise.lock fixes where that Ruby comes from on each system: the
+# prebuilt archive of jdx/ruby's release 4.1.0-preview1-1, checked by its
+# SHA-256, which mise unpacks in seconds. Without the lock, a mise older
+# than 2026.11.10 looks for a prebuilt Ruby only among jdx/ruby's full
+# releases, which a preview is not, and compiles one instead.
 #
 # RubyInstaller publishes no 4.1 preview for Windows, so mise has no
 # Windows Ruby to install for that version. There the Ruby is

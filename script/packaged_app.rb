@@ -20,7 +20,7 @@ module PackagedApp
   # `lota fuse --exclude`, and test/packaged_app_test.rb holds its list to
   # this one.
   REPOSITORY_ONLY = %w[test doc sig script playtest android ios macos windows .github Rakefile Steepfile
-                       mise.toml mise.android.toml mise.ios.toml
+                       mise.toml mise.lock mise.android.toml mise.ios.toml
                        AGENTS.md GLOSSARY.md INSIPIRATION.md PACKAGING.md README.md .gitignore .gitattributes].freeze
 
   # Run in a Ruby of its own, with the game's folder in the app and then
