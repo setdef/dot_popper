@@ -35,8 +35,8 @@ class EmulatorDriverTest < Minitest::Test
       "shell wm size") echo "Physical size: 320x640" ;;
       "shell pidof"*) echo 1234 ;;
       install*) echo Success ;;
-      "logcat -v raw"*) printf 'ready\nError: lib/dot_popper/cabinet.rb:186: a fault\nstack traceback:\n'; exec sleep 600 ;;
-      "logcat -d -v raw"*) printf 'ready\nError: lib/dot_popper/cabinet.rb:186: a fault\nstack traceback:\n' ;;
+      "logcat -v raw"*) printf 'ready\nError: lib/dot_popper/game_flow.rb:186: a fault\nstack traceback:\n'; exec sleep 600 ;;
+      "logcat -d -v raw"*) printf 'ready\nError: lib/dot_popper/game_flow.rb:186: a fault\nstack traceback:\n' ;;
     esac
   SH
 
@@ -80,7 +80,7 @@ class EmulatorDriverTest < Minitest::Test
     said, status = drive(File.join(@folder, "out"), "--ready", "ready", "--timeout", "120", "--expect", "ready")
 
     refute_predicate status, :success?, said
-    assert_includes said, "the game raised:\nError: lib/dot_popper/cabinet.rb:186: a fault"
+    assert_includes said, "the game raised:\nError: lib/dot_popper/game_flow.rb:186: a fault"
     assert_operator Process.clock_gettime(Process::CLOCK_MONOTONIC) - started, :<, 30, said
   end
 
