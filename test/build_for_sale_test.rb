@@ -54,7 +54,8 @@ class BuildForSaleTest < Minitest::Test
                 "games" => root.show.games_line, "pro" => root.entitlement.pro?,
                 "themes.txt" => engine.file("themes.txt").read.to_s, "theme" => root.context.theme&.key.to_s,
                 "today" => settings.today.call.to_s, "date" => Date.today.to_s,
-                "utc now off by" => (settings.utc_now.call - Time.now.utc).abs.round }
+                "utc now off by" => (settings.utc_now.call - Time.now.utc).abs.round,
+                "takes license keys" => DotPopper::Composition::Root.license_keys?(settings) }
       root.entitlement.verify_receipt(receipt)
       built["pro after a test receipt"] = root.entitlement.pro?
       root.entitlement.enter(key)
@@ -141,6 +142,12 @@ class BuildForSaleTest < Minitest::Test
     B::CHANNEL_NAMES.each do |channel|
       assert all_answers[[channel, :right]]["builds"].any? { it["offered"] }, "#{channel} sells Pro on no system"
     end
+  end
+
+  # Only the website's build keeps and checks a license key; an app
+  # store's never reads license.txt.
+  def test_only_the_website_build_takes_license_keys
+    each_build { |channel, built, where| assert_equal channel == B::WEBSITE, built["takes license keys"], where }
   end
 
   def test_a_build_for_sale_releases_no_theme_and_uses_the_ordinary_one
