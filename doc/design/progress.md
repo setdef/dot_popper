@@ -136,7 +136,7 @@ The words are `goals:` in `Style::WORDS`. A bonus pop is a pop.
 
 **When the goal is met.** `SavedStats#record` says `goal_met` for the first game of the day to meet it; Game Over shows "You met today's goal!" with a check, once. Home's goal card shows "Today's goal", the sentence, and a check once it is met (`SavedStats#goal_done?`).
 
-**The streak** (`GoalStreak`, `lib/dot_popper/gameplay/goal_streak.rb`) is the days in a row the goal was met: `current`, `longest`, and `last_met`, saved in `stats.txt` as `goal_streak`, `longest_goal_streak` and `goal_met_on`. Meeting the goal again the same day changes nothing. Meeting it the day after `last_met` adds one; any later day starts again at 1. `GoalStreak#current_on(today)` is the streak as it stands: still whole through the day after it was last met, and 0 once a day has gone by without it. `longest` keeps.
+**The streak** (`GoalStreak`, `gems/dot_popper-gameplay/lib/dot_popper/gameplay/goal_streak.rb`) is the days in a row the goal was met: `current`, `longest`, and `last_met`, saved in `stats.txt` as `goal_streak`, `longest_goal_streak` and `goal_met_on`. Meeting the goal again the same day changes nothing. Meeting it the day after `last_met` adds one; any later day starts again at 1. `GoalStreak#current_on(today)` is the streak as it stands: still whole through the day after it was last met, and 0 once a day has gone by without it. `longest` keeps.
 
 Home's goal card shows the current streak beside the goal, as a number over "days in a row"; the Stats screen shows "Days in a row" and "Most days in a row". A missed day costs nothing and is never mentioned, because a reward for coming back can crowd out the reason to play (Nguyen, *Games: Agency as Art*), and a failure should feel fair (Juul).
 
@@ -146,7 +146,7 @@ Tests: `test/gameplay/daily_goal_test.rb`, `test/gameplay/goal_streak_test.rb`, 
 
 ## Achievements
 
-Eleven goals, each earned once, each for skill and none for time spent (Ferrara, *Playful Design*; Nguyen, *Games: Agency as Art*). Their numbers are in `Achievement` (`lib/dot_popper/gameplay/achievement.rb`), apart from the rules, which they never touch. `Achievement::IDS` is the order they are listed in.
+Eleven goals, each earned once, each for skill and none for time spent (Ferrara, *Playful Design*; Nguyen, *Games: Agency as Art*). Their numbers are in `Achievement` (`gems/dot_popper-gameplay/lib/dot_popper/gameplay/achievement.rb`), apart from the rules, which they never touch. `Achievement::IDS` is the order they are listed in.
 
 | Id | Name | Earned by | Constants |
 | --- | --- | --- | --- |
