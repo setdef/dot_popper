@@ -33,6 +33,26 @@ class StatsBackupTest < Minitest::Test
     end
   end
 
+  # The game stopped part way through writing a save file (a full disk,
+  # the system ending it): Lota's save folder truncates a file and then
+  # writes it, so the first +at+ characters of the text that +stop+
+  # matches are kept, and the write raises, once.
+  class CuttingFile < Memory
+    def initialize(text = nil, at:, &stop)
+      super(text)
+      @at = at
+      @stop = stop
+    end
+
+    def write(text)
+      return super unless @stop&.call(text)
+
+      @stop = nil
+      super(text[0, @at])
+      raise Stopped
+    end
+  end
+
   # A save folder in memory, as the game's is on disk.
   class FakeFolder
     attr_reader :files
@@ -253,6 +273,46 @@ class StatsBackupTest < Minitest::Test
     played = KEPT.map { @folder[it] }
     keep
     assert_equal played, KEPT.map { @folder[it] }, "after a game"
+  end
+
+  # Undo drops the mark before it puts the files back. When the clear's
+  # last note write was lost, the mark is still there at Undo, so a game
+  # stopped as Undo writes the note must not have put the files back yet:
+  # files Undo put back beside a mark would be emptied again at the next
+  # launch, which takes them for a clear under way.
+  def test_undo_stopped_as_it_drops_a_mark_leaves_nothing_for_the_next_launch_to_empty
+    @folder.files["cleared.txt"] = StoppingFile.new(lose: true) { !it.include?("clearing=") }
+    @folder.call("achievements.txt").write(ACHIEVEMENTS)
+    keep
+    cleared = @stats_backup.clear
+    @folder.files["cleared.txt"] = StoppingFile.new(@folder["cleared.txt"]) { !it.include?("clearing=") }
+    assert_raises(Stopped) { @stats_backup.restore(cleared) }
+    stopped = KEPT.map { @folder[it] }
+    keep
+
+    assert_equal stopped, KEPT.map { @folder[it] }, "the launch changes nothing Undo left"
+    assert_backup_whole
+  end
+
+  # The mark is the note's last line, written whole, so a note cut short
+  # as the clear writes it, before any file is emptied, has no mark: the
+  # next launch changes nothing, and never empties some of the files and
+  # keeps the rest. A cut mark ("clearing=1" without its newline, or less)
+  # is no mark.
+  def test_a_note_cut_short_as_the_clear_writes_it_never_makes_a_launch_empty_anything
+    marked = nil
+    (0...200).each do |at|
+      setup
+      @folder.call("achievements.txt").write(ACHIEVEMENTS)
+      @folder.files["cleared.txt"] = CuttingFile.new(at:) { it.include?("clearing=") && (marked = it) }
+      keep
+      assert_raises(Stopped) { @stats_backup.clear }
+      break if at >= marked.size
+
+      keep
+      assert_equal [SCORE_RECORD, STATS, ACHIEVEMENTS], KEPT.map { @folder[it] }, "the note cut after #{at} characters"
+    end
+    assert_operator marked.to_s.size, :<, 200
   end
 
   private
