@@ -128,9 +128,9 @@ module DotPopper
         @privacy.draw(screen.drawing)
       end
 
-      def stats_screen(_screen, width, height, layout)
+      def stats_screen(screen, width, height, _layout)
         page_veil(width, height)
-        @stats.draw(@show, layout)
+        @stats.draw(screen.drawing, @show.now)
       end
 
       def themes_screen(screen, width, height, _layout)

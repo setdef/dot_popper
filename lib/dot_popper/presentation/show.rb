@@ -219,9 +219,6 @@ module DotPopper
       # The hold of "Clear my stats…" (HoldToConfirm).
       def clearing = @screens[:stats].clearing
 
-      # The Stats screen laid out for the fonts this screen is measured with.
-      def stats_layout = @screens[:stats].plan
-
       # Whether Home offers "Your stats" and the choice of dot size:
       # only once a game has finished, so a first-time player's Home says
       # only how to play. A player who cleared their Stats has played, so
@@ -468,10 +465,6 @@ module DotPopper
 
       # Moves the list on top by +pixels+.
       def scroll_by(pixels) = (screen.scroll_by(pixels) if scrolling?)
-
-      # The list on top reports its content's height and the window it
-      # shows in, as the Stats screen's painter measures them.
-      def list_fit(content, window) = screen.fit(content, window)
 
       # A mouse wheel's notches, +notches+ of them, positive for up.
       def wheel_scroll(notches)

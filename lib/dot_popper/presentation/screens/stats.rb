@@ -46,6 +46,30 @@ module DotPopper
         # Where its parts go (StatsLayout).
         def plan = StatsLayout.measured(layout:, sheet:, style: style::STATS, measure:)
 
+        # Everything its painter draws (StatsDrawing), or nil before it has
+        # been opened, made again only when the window, the sheet, the
+        # list's scroll, the hold, Undo, the words or a button's light
+        # changes. Its list is fitted to its window here, as it is drawn.
+        def drawing
+          sheet = self.sheet or return
+          plan = self.plan
+          words = self.words
+          hover = show.hover
+          note = show.stats_note
+          undo = undoable_clear
+          offered = clear_offered?
+          offset = (fit(plan.cards.last, plan.window.height).offset unless sheet.empty)
+          drawn(sheet, plan, words, hover, note, clearing, undo, offered, offset) do
+            StatsDrawing.new(header: HeaderDrawing.for(words.stats, layout:, measure:, words:, hover:), sheet:, plan:, note:,
+                             center_x: layout.center_x, center_y: layout.center_y, offset:, clearing:,
+                             keep_holding: words.keep_holding(clearing.by == :y ? "Y" : "A"), hold_to_clear: words.hold_to_clear,
+                             prompt_y: (layout.short? ? layout.safe.bottom : layout.back_button.y) - 14, prompt_width: layout.safe.width - 32,
+                             clear: (layout.clear_stats_button if offered), clear_word: words.clear, clear_hover: hover.level(:clear), undo:,
+                             undo_rect: layout.undo_button, undo_word: words.undo, undo_hover: hover.level(:undo), cleared: words.cleared,
+                             no_games: words.no_games)
+          end
+        end
+
         # Undo, while it is offered here (UndoableClear), or nil.
         def undoable_clear = (@undo if show.stats?)
 

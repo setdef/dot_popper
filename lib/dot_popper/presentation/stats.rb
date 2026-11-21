@@ -121,6 +121,23 @@ module DotPopper
     # heading and its note: one column on a phone, two on a wide window,
     # three on a short one, as tall as their rows need. It scrolls where
     # the cards are taller than the window.
+    # What the Stats screen hands its painter (Shell::StatsPainter), which
+    # draws the hold of "Clear my stats…" and Undo's time left as they
+    # stand when it draws: its +header+ (HeaderDrawing), what it shows
+    # (+sheet+, StatsSheet) and where (+plan+, StatsLayout), the note under
+    # the heading (+note+, or nil), the page's middle (+center_x+,
+    # +center_y+), how far its list is scrolled (+offset+, nil with no
+    # games), the hold (+clearing+, HoldToConfirm) and what the prompt says
+    # while it is held (+keep_holding+) or let go too soon
+    # (+hold_to_clear+), the prompt's bottom line at +prompt_y+ in
+    # +prompt_width+, "Clear my stats…" at +clear+ while it is offered (or
+    # nil) with its word and light, Undo while it is offered (+undo+,
+    # UndoableClear, or nil) at +undo_rect+ with its word, light and
+    # +cleared+ beside it, and what an empty sheet says (+no_games+).
+    class StatsDrawing < Data.define(:header, :sheet, :plan, :note, :center_x, :center_y, :offset, :clearing, :keep_holding,
+                                     :hold_to_clear, :prompt_y, :prompt_width, :clear, :clear_word, :clear_hover, :undo, :undo_rect,
+                                     :undo_word, :undo_hover, :cleared, :no_games); end
+
     class StatsLayout < Data.define(:layout, :sheet, :style)
       SMALLEST_TEXT = 11
       RECORD_ROW = 33.0

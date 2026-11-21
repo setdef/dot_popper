@@ -35,6 +35,8 @@ class FreshDrawingsTest < Minitest::Test
     home: [{}, ->(_show) {}, { "asked to quit" => ->(show) { show.screen.ask_to_quit } }],
     tutorial: [{ played: false }, ->(show) { show.screen.primary }, {}],
     offer: [{}, ->(show) { show.open_offer_for(:themes) }, {}],
+    stats: [{}, ->(show) { show.open_stats }, { "a scroll" => ->(show) { show.wheel_scroll(-3) }, "holding Clear" => ->(show) { show.pad(:y) },
+                                                "letting go" => ->(show) { show.screen.release(:y) } }],
     themes: [{ pro: true }, ->(show) { show.open_themes }, { "using the next theme" => ->(show) { show.screen.step(1) } }],
     achievements: [{ pro: true }, ->(show) { show.open_achievements }, { "a scroll" => ->(show) { show.wheel_scroll(-3) } }],
     friend_groups: [{ member: true, pro: true }, ->(show) { show.open_groups }, {
