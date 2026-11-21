@@ -188,8 +188,8 @@ class GlossaryTest < Minitest::Test
   # everything else line by line, with names split in signatures and
   # shaders, and only in `code` in Markdown, where prose has capitals.
   def texts
-    ruby = Dir.glob("{lib,bin,script,test,.github}/**/*.rb", base: ROOT) + %w[main.rb conf.rb Rakefile bin/dot_popper android/android_kit]
-    other = Dir.glob("{sig/**/*.rbs,assets/shaders/**/*.glsl,*.md,doc/**/*.md,playtest/*.{txt,sh,ps1}}", base: ROOT)
+    ruby = Dir.glob("{lib,gems,bin,script,test,.github}/**/*.{rb,gemspec}", base: ROOT) + %w[main.rb conf.rb Rakefile bin/dot_popper android/android_kit]
+    other = Dir.glob("{sig/**/*.rbs,gems/*/sig/**/*.rbs,assets/shaders/**/*.glsl,*.md,doc/**/*.md,playtest/*.{txt,sh,ps1}}", base: ROOT)
     files = (ruby + other).reject { |path| UNCHECKED.any? { path.match?(it) } }
     files.map do |path|
       pieces = ruby.include?(path) ? ruby_pieces(path) : plain_pieces(path)

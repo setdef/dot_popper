@@ -36,7 +36,7 @@
 GC_HEAP = (0..2).to_h { ["RUBY_GC_HEAP_#{it}_INIT_SLOTS", "1000000"] }.freeze
 exec(GC_HEAP, RbConfig.ruby, __FILE__, *ARGV) unless GC_HEAP.all? { |name, slots| ENV[name] == slots }
 
-$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
+$LOAD_PATH.unshift File.expand_path("../lib", __dir__), *Dir[File.expand_path("../gems/*/lib", __dir__)].sort
 require "dot_popper"
 require "etc"
 

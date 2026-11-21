@@ -17,9 +17,13 @@ class PrivacyDeclaredTest < Minitest::Test
   def read(path) = File.read(File.join(ROOT, path)).gsub(/<!--.*?-->/m, "")
 
   # A desktop app ships Gemfile.lock's default group: lota fuse leaves out
-  # the development and test groups.
+  # the development and test groups. The game's own gems (gems/, taken by
+  # their path inside this repository) are the game, not other people's
+  # code, so the record lists them no more than it lists lib/.
   def test_the_gems_a_desktop_app_ships_are_declared
-    shipped = Bundler.definition.specs_for([:default]).map(&:name).uniq - ["bundler"]
+    shipped = Bundler.definition.specs_for([:default]).map(&:name).uniq - ["bundler"] - own_gems
+
+    assert_includes Bundler.definition.specs_for([:default]).map(&:name), "dot_popper-gameplay"
 
     assert_equal Privacy::DESKTOP_GEMS.keys.sort, shipped.sort
   end
@@ -32,14 +36,21 @@ class PrivacyDeclaredTest < Minitest::Test
   def test_the_gems_a_phone_app_ships_are_declared
     named = %w[script/android_build.sh script/ios_app.sh .github/workflows/kits.yml].to_h { [it, phone_gemfile_gems(it)] }
     specs = Bundler.definition.specs.to_h { [it.name, it] }
-    shipped = named.values.first.flat_map { with_dependencies(it, specs) }.uniq - ["bundler"]
+    shipped = named.values.first.flat_map { with_dependencies(it, specs) }.uniq - ["bundler"] - own_gems
 
+    assert_includes named.values.first, "dot_popper-gameplay"
     assert_equal 1, named.values.uniq.size, "the phone build scripts write different Gemfiles: #{named}"
     assert_equal Privacy::PHONE_GEMS.keys.sort, shipped.sort
   end
 
   def test_the_record_lists_every_gem_any_app_ships
     assert_equal (Privacy::DESKTOP_GEMS.keys | Privacy::PHONE_GEMS.keys).sort, Privacy::SHIPPED_GEMS.keys.sort
+  end
+
+  # The gems whose source is a folder inside this repository.
+  def own_gems
+    Bundler.definition.specs.select { it.source.is_a?(Bundler::Source::Path) && File.expand_path(it.full_gem_path).start_with?("#{ROOT}/gems/") }
+           .map(&:name).uniq
   end
 
   def phone_gemfile_gems(script)
@@ -121,7 +132,7 @@ class PrivacyDeclaredTest < Minitest::Test
   def test_only_save_file_writes_to_the_save_folder
     allowed = { "lib/dot_popper/shell/store_answers.rb" => "File.delete", "lib/dot_popper/shell/development_hooks.rb" => "capture_screenshot" }
     ban = /\bFile\.(?:write|binwrite|open|delete|rename)\b|\bIO\.(?:write|binwrite)\b|\bFileUtils\b|Filesystem\.(?:write|append|remove|mkdir|create_directory|new_file)\b|capture_screenshot/
-    hits = Dir[File.join(ROOT, "lib/**/*.rb")].reject { it.end_with?("shell/save_file.rb") }.filter_map do |path|
+    hits = Dir[File.join(ROOT, "{lib,gems/*/lib}/**/*.rb")].reject { it.end_with?("shell/save_file.rb") }.filter_map do |path|
       found = source_of(path).scan(ban)
       rel = path.delete_prefix("#{ROOT}/")
       left = found - [allowed[rel]]
@@ -132,13 +143,13 @@ class PrivacyDeclaredTest < Minitest::Test
   end
 
   def test_the_sensor_is_only_read_by_the_accelerometer
-    users = Dir[File.join(ROOT, "lib/**/*.rb")].select { source_of(it).include?("Lota::Sensor") }.map { File.basename(it) }
+    users = Dir[File.join(ROOT, "{lib,gems/*/lib}/**/*.rb")].select { source_of(it).include?("Lota::Sensor") }.map { File.basename(it) }
 
     assert_equal ["accelerometer.rb"], users
   end
 
   def test_the_urls_the_game_opens_stay_on_the_device
-    openers = Dir[File.join(ROOT, "lib/**/*.rb")].select { source_of(it).include?("open_url") }.map { File.basename(it) }
+    openers = Dir[File.join(ROOT, "{lib,gems/*/lib}/**/*.rb")].select { source_of(it).include?("open_url") }.map { File.basename(it) }
 
     assert_equal ["url_opener.rb"], openers
     assert_equal %w[dotpopper-share dotpopper-store], [DotPopper::Presentation::SheetSharing::SCHEME, DotPopper::Monetization::Store::SCHEME].sort

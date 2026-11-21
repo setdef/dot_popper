@@ -124,6 +124,8 @@ cat > "$phone/Gemfile" << EOF
 source "https://rubygems.org"
 
 gem "lota", path: "$lota/tmp/phone/lota"
+# The game's own gems, in the game's copy (PACKAGING.md).
+gem "dot_popper-gameplay", path: "game/dot_popper/gems/dot_popper-gameplay"
 EOF
 # Fledge runs from a Gemfile of its own, outside the phone project, and
 # builds the project by its path (Fledge's README, "Installation"), so

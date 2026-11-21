@@ -209,7 +209,7 @@ class PrivacyRequestsTest < Minitest::Test
     assert_equal request.query.keys.map(&:to_s).sort, URI.decode_www_form(path_of(head)[/\?(.*)/, 1].to_s).map(&:first).sort, "#{request.kind}: query"
   end
 
-  def ruby_files = Dir[File.join(ROOT, "{lib/**/*.rb,main.rb,bin/*}")].select { File.file?(it) }
+  def ruby_files = Dir[File.join(ROOT, "{lib/**/*.rb,gems/*/lib/**/*.rb,main.rb,bin/*}")].select { File.file?(it) }
   def native_files = Dir[File.join(ROOT, "android/host/src/**/*.java"), File.join(ROOT, "ios/host/Host/*.{swift,m}")]
   def game_source = ruby_files.reject { it.end_with?("privacy/requests.rb") }.map { uncommented(it) }.join("\n")
 

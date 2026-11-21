@@ -262,8 +262,10 @@ module PlayPackagedApp
     raise Failure, "the game's conf.rb did not load:\n#{settings}" unless ok
 
     identity, title = settings.lines.last(2).map(&:chomp)
+    # The game's own gems are in its folder, but Fledge may carry a gem
+    # taken by its path in the app's bundle too, so they key the app.
     files = %w[Gemfile Gemfile.lock] + Dir.glob("#{ICON}*", base: stage).sort +
-            Dir.glob("vendor/cache/*.gem", base: stage).sort
+            Dir.glob("vendor/cache/*.gem", base: stage).sort + Dir.glob("gems/**/*", base: stage).select { File.file?(File.join(stage, it)) }.sort
     parts = ["lota #{sha}", "fledge #{PackagedApp.fledge_ref(File.join(stage, "Gemfile.lock"))}", "ruby #{RUBY_VERSION} #{RUBY_PLATFORM}",
              "identity #{identity}", "title #{title}", *fuse_options(stage, channel),
              *files.map { "#{it} #{Digest::SHA256.file(File.join(stage, it)).hexdigest}" },

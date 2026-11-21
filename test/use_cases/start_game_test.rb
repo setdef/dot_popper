@@ -99,7 +99,7 @@ class StartGameTest < Minitest::Test
   # the source, so it cannot see a name built at run time.
   def test_nothing_else_starts_a_game
     root = File.expand_path("../..", __dir__)
-    files = Dir["#{root}/{lib,script}/**/*.rb"] + Dir["#{root}/bin/*"] + ["#{root}/main.rb", "#{root}/conf.rb", "#{root}/android/android_kit"]
+    files = Dir["#{root}/{lib,gems/*/lib,script}/**/*.rb"] + Dir["#{root}/bin/*"] + ["#{root}/main.rb", "#{root}/conf.rb", "#{root}/android/android_kit"]
     callers = files.select { File.file?(it) }.flat_map do |path|
       File.readlines(path).filter_map { |line| path.delete_prefix("#{root}/") if line.match?(STARTERS) && !line.strip.start_with?("#") }
     end

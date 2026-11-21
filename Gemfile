@@ -35,6 +35,11 @@ end
 # checked against the release's SHA256SUMS.
 gem "lota", "~> 0.5.5"
 
+# The game's own gems, each an area of the game in a folder of its own
+# under gems/, taken by its path and published nowhere (PACKAGING.md,
+# "The game's own gems"). Every app carries them, as it carries lib/.
+gem "dot_popper-gameplay", path: "gems/dot_popper-gameplay"
+
 # Fledge packages the game for people who don't have Ruby (PACKAGING.md).
 # Pinned to a tag, which the phone builds take (script/lota_pins.sh)
 # and every desktop build names to lota fuse, which would otherwise run

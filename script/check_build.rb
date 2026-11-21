@@ -62,7 +62,10 @@ MAKE_PROOFS = <<~RUBY
   puts JSON.generate("roots" => c::TEST_PINS.roots.map(&hex), "license_keys" => l::TEST_SIGNING_KEYS.map(&hex),
                      "keys" => keys, "certificate" => hex.(certificate), "receipt" => receipt, "controls" => controls)
 RUBY
-made, status = Open3.capture2e(RbConfig.ruby, "-I", File.expand_path("../lib", __dir__), "-e", MAKE_PROOFS)
+# The game's code is lib/ and the game's own gems under gems/ (PACKAGING.md),
+# found by their folders here, as this Ruby may have no Bundler.
+code = ->(top) { [File.join(top, "lib"), *Dir[File.join(top, "gems", "*", "lib")].sort] }
+made, status = Open3.capture2e(RbConfig.ruby, *code.(File.expand_path("..", __dir__)).flat_map { ["-I", it] }, "-e", MAKE_PROOFS)
 abort "The repository could not make the test build's proofs:\n#{made}" unless status.success?
 proofs = JSON.parse(made.lines.last)
 
@@ -71,7 +74,7 @@ proofs = JSON.parse(made.lines.last)
 contents, status = Open3.capture2e(RbConfig.ruby, File.expand_path("channel_contents.rb", __dir__), "check", channel, folder)
 contents_held = status.success?
 
-$LOAD_PATH.unshift(File.join(game, "lib"))
+$LOAD_PATH.unshift(*code.(game))
 require "dot_popper"
 require "lota"
 require "dot_popper/shell"
@@ -88,8 +91,9 @@ check = lambda do |what, &passes|
   failures << what unless ok
 end
 
-# The game's code is lib/dot_popper.rb and what is under lib/dot_popper/;
-# another folder named dot_popper (one holding Ruby itself, say) is not.
+# The game's code is lib/dot_popper.rb and what is under lib/dot_popper/,
+# in the game's folder or one of its own gems; another folder named
+# dot_popper (one holding Ruby itself, say) is not.
 ours = $LOADED_FEATURES.grep(%r{/lib/dot_popper(/|\.rb\z)})
 check.call("every file of the game's code loaded is the app's own") { ours.any? && ours.all? { it.start_with?(game) } }
 

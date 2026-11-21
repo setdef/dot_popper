@@ -7,7 +7,7 @@
 #
 #   bundle exec ruby script/benchmark_spawn.rb [spawns]
 
-$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
+$LOAD_PATH.unshift File.expand_path("../lib", __dir__), *Dir[File.expand_path("../gems/*/lib", __dir__)].sort
 require "dot_popper"
 
 module SpawnBenchmark

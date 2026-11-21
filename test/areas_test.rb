@@ -44,9 +44,10 @@ class AreasTest < Minitest::Test
   SHARED = %w[Network Platform Automation MemoryFile].freeze
 
   # The files of each area, and of the code the areas share, under
-  # lib/dot_popper.
+  # lib/dot_popper, and in the gem that holds part of Gameplay
+  # (gems/dot_popper-gameplay).
   FILES = {
-    "Gameplay" => %w[gameplay.rb gameplay/**/*.rb],
+    "Gameplay" => %w[gameplay.rb gameplay/**/*.rb ../../gems/dot_popper-gameplay/lib/**/*.rb],
     "Monetization" => %w[monetization.rb monetization/**/*.rb website/license_keys.rb website/license_keys/**/*.rb website/website_store.rb
                        apple/receipt.rb play/receipt.rb microsoft/receipt.rb],
     "ReleaseEngineering" => %w[release_engineering.rb release_engineering/**/*.rb],
@@ -70,7 +71,7 @@ class AreasTest < Minitest::Test
   def test_each_area_names_only_what_the_context_map_allows
     found = Hash.new(0)
     FILES.each do |area, patterns|
-      Dir[*patterns, base: File.join(ROOT, "lib/dot_popper")].map { File.join(ROOT, "lib/dot_popper", it) }.each do |path|
+      Dir[*patterns, base: File.join(ROOT, "lib/dot_popper")].map { File.expand_path(it, File.join(ROOT, "lib/dot_popper")) }.each do |path|
         file = path.delete_prefix("#{ROOT}/")
         named(path).each { found[[file, it]] += 1 unless allowed?(area, it) }
       end
@@ -85,6 +86,7 @@ class AreasTest < Minitest::Test
 
     assert_includes files, "gameplay.rb"
     assert_includes files, "network/link.rb"
+    assert_includes files, "../../gems/dot_popper-gameplay/lib/dot_popper/gameplay/visibility.rb"
     assert_equal Dir["*.rb", base: File.join(ROOT, "lib/dot_popper")].sort - %w[presentation.rb shell.rb use_cases.rb],
                  files.grep_v(%r{/}).sort, "every file at the top of lib/dot_popper but the outer layers' loaders"
   end
@@ -124,7 +126,7 @@ class AreasTest < Minitest::Test
   # Every module, class and constant the game's code defines, by its full
   # name.
   def definitions
-    @definitions ||= Dir[File.join(ROOT, "lib/**/*.rb")].each_with_object({}) do |path, all|
+    @definitions ||= Dir[File.join(ROOT, "{lib,gems/*/lib}/**/*.rb")].each_with_object({}) do |path, all|
       Resolver.new({}).definitions(Prism.parse_file(path).value).each { all[it] = true }
     end
   end

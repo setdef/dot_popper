@@ -127,7 +127,7 @@ class PackagedAppTest < Minitest::Test
 
   # What the top of the game's folder in an app holds: the game's own
   # files, and what Lota and the phone guide read there.
-  THE_APPS_OWN = %w[.ruby-version Gemfile Gemfile.lock LICENSE LICENSES assets bin conf.rb fledge.yml icons lib main.rb
+  THE_APPS_OWN = %w[.ruby-version Gemfile Gemfile.lock LICENSE LICENSES assets bin conf.rb fledge.yml gems icons lib main.rb
                     vendor].freeze
 
   # A file added at the top of the repository goes into every app unless

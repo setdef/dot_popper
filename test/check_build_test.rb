@@ -182,12 +182,12 @@ class CheckBuildTest < Minitest::Test
   def lay_out_app
     FileUtils.rm_rf(@game)
     FileUtils.mkdir_p(@game)
-    FileUtils.cp_r(%w[lib fledge.yml].map { File.join(ROOT, it) }, @game)
+    FileUtils.cp_r(%w[lib gems fledge.yml].map { File.join(ROOT, it) }, @game)
   end
 
   def check_from_stamped_checkout(channel)
     Dir.mktmpdir("dot_popper_checkout") do |checkout|
-      FileUtils.cp_r(%w[lib script].map { File.join(ROOT, it) }, checkout)
+      FileUtils.cp_r(%w[lib gems script].map { File.join(ROOT, it) }, checkout)
       build = File.join(checkout, "lib/dot_popper/release_engineering/build.rb")
       File.write(build, BuildChannel.stamp(File.read(build), channel))
       out, status = Open3.capture2e(RbConfig.ruby, File.join(checkout, "script", "check_build.rb"), channel, @version, @app)

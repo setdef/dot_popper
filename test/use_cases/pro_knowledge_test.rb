@@ -83,7 +83,7 @@ class ProKnowledgeTest < Minitest::Test
 
   def test_only_monetization_the_use_cases_and_the_composition_root_name_pro
     root = File.expand_path("../..", __dir__)
-    knowing = Dir["#{root}/lib/**/*.rb"].select { |path| File.foreach(path).any? { it.match?(NAMES) && !it.start_with?("require") } }
+    knowing = Dir["#{root}/{lib,gems/*/lib}/**/*.rb"].select { |path| File.foreach(path).any? { it.match?(NAMES) && !it.start_with?("require") } }
     knowing = knowing.map { it.delete_prefix("#{root}/") }
 
     assert_equal KNOWS.sort, knowing.sort

@@ -91,7 +91,8 @@ module PackagedApp
 
   # The folders the gems an app ships load from, for a Ruby that has no
   # gems: those of the Gemfile's default group, as `lota fuse` ships them
-  # (Lota alone today), or Lota's when Bundler isn't loaded.
+  # (Lota and the game's own gems, under gems/), or Lota's when Bundler
+  # isn't loaded.
   def shipped_load_path
     require "lota"
     specs = defined?(Bundler) ? Bundler.definition.specs_for([:default]).to_a : [Gem.loaded_specs.fetch("lota")]
