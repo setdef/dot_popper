@@ -72,7 +72,8 @@ class FreshDrawingsTest < Minitest::Test
   # Pro arriving. After each, every frame for two seconds is checked, as
   # what it sets off goes on by itself.
   OUTSIDE = {
-    offer: [[{}, { "buying" => ->(fixture) { fixture.show.screen.pressed(:buy, :mouse) },
+    offer: [[{}, { "a theme released" => ->(fixture) { fixture.saved_themes.release(%w[ornament]) },
+                   "buying" => ->(fixture) { fixture.show.screen.pressed(:buy, :mouse) },
                    "pasting the key" => ->(fixture) { fixture.show.screen.pressed(:paste, :mouse) } }],
             # From an achievement's dialog, by a Free player who has earned it,
             # whose thank-you hands it earned (OfferPainterTest).
@@ -106,7 +107,8 @@ class FreshDrawingsTest < Minitest::Test
              fixture.tick(0.5)
              show.back
            } }]],
-    themes: [[{ pro: true }, { "a new season" => ->(fixture) { fixture.day = Date.new(2026, 12, 20) } }]],
+    themes: [[{ pro: true }, { "a new season" => ->(fixture) { fixture.day = Date.new(2026, 12, 20) },
+                               "a theme released" => ->(fixture) { fixture.saved_themes.release(%w[ornament]) } }]],
     achievements: [[{}, { "Pro arriving" => ->(fixture) { FreshDrawingsTest.pro(fixture) } }],
                    [{ pro: true }, SCROLLED],
                    [{ pro: true }, { "an achievement earned" => ->(fixture) { fixture.achievements.award([:steady], day: fixture.day) } }]],
