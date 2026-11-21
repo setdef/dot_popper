@@ -74,6 +74,22 @@ class HomePainterTest < Minitest::Test
     end
   end
 
+  # A game that meets today's goal, whatever it is, turns its card to
+  # done, a day into the streak.
+  def test_todays_goal_met_is_handed_and_drawn_as_done
+    show, fixture = home
+    refute show.screen.drawing.goal.done
+    met = DotPopper::Gameplay::GameStats.start.with(most_dots_in_a_row: 15, times_to_pop: [3.0] + ([0.5] * 9), duration: 50.0, mistakes: 0,
+                                                     score: 30)
+    assert fixture.saved_stats.record(met, fixture.game_flow.size_class).goal_met
+    fixture.tick(0.1)
+    given = show.screen.drawing
+    assert given.goal.done
+    assert_equal 1, given.goal.streak
+    refute_equal marks_of(given.with(goal: given.goal.with(done: false))) { draw(it, show.now) }, marks_of(given) { draw(it, show.now) },
+                 "drawn as done"
+  end
+
   def test_its_screen_hands_todays_goal_and_each_tiles_value
     show, = home
     given = show.screen.drawing

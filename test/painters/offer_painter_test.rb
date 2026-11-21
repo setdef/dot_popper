@@ -62,6 +62,24 @@ class OfferPainterTest < Minitest::Test
     said(given.achievement.name, drawn(given))
   end
 
+  # A Free player who has earned an achievement opens the offer from its
+  # dialog and buys there: while Free it is handed as not earned (Pro
+  # shows what is earned), and on the thank-you as earned, and drawn so.
+  def test_the_thank_you_draws_the_achievement_it_leads_with_as_earned
+    show, fixture = offer(nil, achievement: :steady)
+    fixture.achievements.award([:steady], day: fixture.day)
+    fixture.tick(0.1)
+    refute show.screen.drawing.achievement.earned, "not earned while Free"
+    show.screen.pressed(:buy, :mouse)
+    fixture.tick(0.5)
+    show.screen.pressed(:paste, :mouse)
+    fixture.tick(0.5)
+    given = show.screens.fetch(:offer).drawing
+    assert_equal show.words.offer[:thanks], given.status
+    assert given.achievement.earned, "earned on the thank-you"
+    refute_equal drawn(given.with(achievement: given.achievement.with(earned: false))), drawn(given), "drawn as earned"
+  end
+
   def test_buy_and_its_neighbour_are_lit_by_the_mouse_over_them
     show, fixture = offer(:games)
     show.input = P::InputKind::MOUSE
