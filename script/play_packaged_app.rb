@@ -301,14 +301,20 @@ module PlayPackagedApp
       laid = File.join(work, "laid-out", "game")
       lay_out(stage, laid, channel)
       game = File.join(app, "app", "game", Lota::Fuse.folder_name(identity))
+      # Fledge writes each path gem's gemspec in the app as Bundler
+      # evaluated it (Fledge's lib/fledge/bundle.rb, app_files), so the
+      # game's own gems' gemspecs are the app's, and are kept with it.
       differs = (tree(game) - tree(laid)) + (tree(laid) - tree(game))
+      differs.reject! { |path,| path.match?(EVALUATED_GEMSPEC) }
       unless differs.empty?
         raise Failure, "the game's folder lota fuse made differs from PackagedApp.lay_out's of the same files:\n" +
                        differs.sort.first(10).map { |path, sha, mode| format("  %s %s %o", path, sha[0, 12], mode) }.join("\n")
       end
 
+      gemspecs = evaluated_gemspecs(game)
       FileUtils.rm_rf(game)
       FileUtils.mkdir_p(game)
+      put_back(gemspecs, game)
       # Into the cache's own folder, which may be on another file system.
       Dir.rmdir(into)
       FileUtils.mv(app, into)
@@ -330,8 +336,24 @@ module PlayPackagedApp
     run({}, "cp", "-a", "--reflink=auto", base, app, what: "cp")
     FileUtils.touch(base)
     game = Dir.glob(File.join(app, "app", "game", "*")).first
+    gemspecs = evaluated_gemspecs(game)
     lay_out(stage, game, channel)
+    put_back(gemspecs, game)
     app
+  end
+
+  # The game's own gems' gemspecs, as Fledge wrote them in the app.
+  EVALUATED_GEMSPEC = %r{\Agems/[^/]+/[^/]+\.gemspec\z}
+
+  def evaluated_gemspecs(game)
+    Dir.glob("gems/*/*.gemspec", base: game).to_h { [it, File.binread(File.join(game, it))] }
+  end
+
+  def put_back(files, game)
+    files.each do |path, bytes|
+      FileUtils.mkdir_p(File.dirname(File.join(game, path)))
+      File.binwrite(File.join(game, path), bytes)
+    end
   end
 
   # The game laid out in +to+ as the app holds it: Fledge's app gives each

@@ -115,7 +115,10 @@ class KitTest < Minitest::Test
     env = ENV.keys.grep(/\A(DOT_POPPER_|BUNDLE_|RUBY)/).to_h { [it, nil] }
     env["FAKE_ANDROID_DRIVE"] = JSON.generate(drive(run.options))
     run.options.each { |option, value| env.store(*value.split("=", 2)) if option == "--env" }
-    out, status = Open3.capture2e(env, RbConfig.ruby, "-I", FAKE, "main.rb", chdir: self.class.project)
+    # The app's Ruby finds the gems the phone project's Gemfile names on
+    # its load path, the game's own (gems/, PACKAGING.md) among them.
+    own_gems = Dir[File.join(self.class.project, "game", "dot_popper", "gems", "*", "lib")].sort.flat_map { ["-I", it] }
+    out, status = Open3.capture2e(env, RbConfig.ruby, "-I", FAKE, *own_gems, "main.rb", chdir: self.class.project)
     [out.lines.map(&:chomp), status.exitstatus]
   end
 

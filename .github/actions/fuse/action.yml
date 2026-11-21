@@ -53,7 +53,8 @@ runs:
       run: |
         exclude=()
         for path in test doc sig script playtest android ios macos windows .github Rakefile Steepfile mise.toml mise.lock mise.android.toml mise.ios.toml \
-          AGENTS.md GLOSSARY.md INSIPIRATION.md PACKAGING.md README.md .gitignore .gitattributes; do
+          AGENTS.md GLOSSARY.md INSIPIRATION.md PACKAGING.md README.md .gitignore .gitattributes \
+          gems/dot_popper-gameplay/sig; do
           exclude+=(--exclude "$path")
         done
         channel_excludes=$(ruby script/channel_contents.rb excludes | tr -d '\r')
