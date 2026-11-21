@@ -424,12 +424,6 @@ module DotPopper
       def offer_layout = offer.screen_layout
 
 
-      # The themes the offer shows: every one but the ordinary, as Pro
-      # would give them now.
-      def offer_themes = themes.reject(&:ordinary?)
-
-      # The achievement a Free player tapped, which the offer leads with.
-      def offer_achievement = offer.achievement
 
       # The price the store gave, or nil before it has.
       def offer_price = offer.price

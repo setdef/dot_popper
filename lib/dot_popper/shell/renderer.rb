@@ -150,9 +150,9 @@ module DotPopper
         @group.draw(screen.drawing)
       end
 
-      def offer_screen(_screen, width, height, layout)
+      def offer_screen(screen, width, height, _layout)
         page_veil(width, height)
-        @offer.draw(@show, layout)
+        @offer.draw(screen.drawing)
       end
 
       def share_preview_screen(screen, width, height, _layout) = @share.draw(screen.drawing, width, height)

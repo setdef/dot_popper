@@ -5,6 +5,22 @@ module DotPopper
     # Where the offer of Pro puts its parts, worked out by
     # OfferLayout#plan: each block's Rect by name (Stacked), the font size
     # each is set in, and the note broken into lines.
+    # What the offer of Pro hands its painter (Shell::OfferPainter): its
+    # +header+ (HeaderDrawing), where everything goes (+plan+, OfferPlan),
+    # what it leads with (+focus+) and its name (+focus_word+), the rest of
+    # what Pro adds (+others+), the line of how the store or the key is
+    # getting on (+status+), Buy's words and Restore Purchases' and Paste
+    # license key's (+buy+, +restore+, +paste+) and each one's light
+    # (+lit+, by name), the themes Pro would give (+themes+, each a Theme
+    # and its name) and the achievement a Free player tapped (+achievement+,
+    # OfferAchievement, or nil).
+    class OfferDrawing < Data.define(:header, :plan, :focus, :focus_word, :others, :status, :buy, :restore, :paste, :lit, :themes,
+                                     :achievement); end
+
+    # The achievement the offer leads with: its +id+, +name+, how to earn
+    # it (+how+), and whether it is +earned+.
+    class OfferAchievement < Data.define(:id, :name, :how, :earned); end
+
     class OfferPlan < Data.define(:placed, :sizes, :note_lines)
       def [](name) = placed[name]
       def key?(name) = placed.key?(name)

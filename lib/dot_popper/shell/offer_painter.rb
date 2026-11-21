@@ -13,17 +13,17 @@ module DotPopper
     class OfferPainter < Data.define(:context, :dots)
       SIGNS = { "Unlimited games" => :infinity, "Achievements" => :ribbon, "Friend groups" => :crown }.freeze
 
-      def draw(show, layout)
-        plan = show.offer_plan
-        words = show.words.offer
+      # The offer as its +drawing+ (Presentation::OfferDrawing) says.
+      def draw(drawing)
+        plan = drawing.plan
         palette = context.palette
-        Header.new(context:).draw(show, layout, words[:heading])
+        Header.new(context:).draw(drawing.header)
         note(plan) if plan.key?(:note)
-        art(show, plan[:art]) if plan.key?(:art)
-        centered(plan, :focus, :bold, :focus, show.offer_layout.focus_word, palette.cream)
-        items(plan, show.offer_layout.others)
-        status(plan, show.offer_status)
-        buttons(show, plan, words)
+        art(drawing, plan[:art]) if plan.key?(:art)
+        centered(plan, :focus, :bold, :focus, drawing.focus_word, palette.cream)
+        items(plan, drawing.others)
+        status(plan, drawing.status)
+        buttons(drawing)
       end
 
       private
@@ -41,19 +41,19 @@ module DotPopper
       end
 
       # What was tapped, shown in the room the plan gives it.
-      def art(show, rect)
-        case show.offer_focus
-        when :themes then themes(show, rect)
-        when :achievements then achievement(show, rect)
-        else Glyphs.new(context:).draw(show.offer_focus == :groups ? :crown : :infinity, rect.center_x, rect.center_y, rect.height,
-                                   color: context.palette.bright_body, weight: 2.0)
+      def art(drawing, rect)
+        case drawing.focus
+        when :themes then themes(drawing.themes, rect)
+        when :achievements then achievement(drawing.achievement, rect)
+        else Glyphs.new(context:).draw(drawing.focus == :groups ? :crown : :infinity, rect.center_x, rect.center_y, rect.height,
+                                       color: context.palette.bright_body, weight: 2.0)
         end
       end
 
       # A small card for each theme Pro would give, each its own night and
       # dots, in a row.
-      def themes(show, rect)
-        list = show.offer_themes
+      def themes(named, rect)
+        list = named.map(&:first)
         return if list.empty?
 
         gap = 10.0
@@ -68,7 +68,7 @@ module DotPopper
             dots.icon(box.center_x - (radius * 0.6), box.y + (box.height * 0.4), radius, bright: true)
             dots.icon(box.center_x + (radius * 0.6), box.y + (box.height * 0.4), radius, bright: false)
           end
-          name = show.words.themes.fetch(theme.key)
+          name = named[i].last
           art = theme.art
           name = name.upcase if art&.wordmark && art.dotted_name
           size = [(box.height * 0.16).round, 18].min
@@ -81,19 +81,21 @@ module DotPopper
       # The achievement tapped, on a card: its sign in the grid's dashed
       # ring, its name, and how to earn it. No progress: that is what Pro
       # adds (doc/design/store-and-pro.md).
-      def achievement(show, rect)
-        id = show.offer_achievement or return
+      def achievement(shown, rect)
+        return unless shown
+
+        id = shown.id
         Card.new(context:).draw(rect)
         radius = rect.height * 0.32
         x = rect.x + 16 + radius
-        AchievementsPainter.new(context:).emblem(id, x, rect.center_y, radius, show.achievement_earned?(id))
+        AchievementsPainter.new(context:).emblem(id, x, rect.center_y, radius, shown.earned)
         left = x + radius + 16
         room = rect.right - left - 16
         bold = context.fonts.bold(18)
         small = context.fonts.semibold(14)
-        lines = Presentation::Words.wrap(Presentation::AchievementWords.how(id), room) { small.width(it) }.first(3)
+        lines = Presentation::Words.wrap(shown.how, room) { small.width(it) }.first(3)
         top = rect.center_y - (((lines.size * small.height) + bold.height) / 2.0)
-        name = Presentation::AchievementWords.name(id)
+        name = shown.name
         context.text(name, bold, left + (bold.width(name) / 2.0), top + (bold.height / 2.0), context.palette.cream)
         lines.each_with_index do |line, i|
           context.text(line, small, left + (small.width(line) / 2.0), top + bold.height + (small.height * (i + 0.5)), context.palette.cream)
@@ -125,11 +127,10 @@ module DotPopper
       end
 
       # Buy, while Pro is sold, and Restore Purchases or Paste license key.
-      def buttons(show, plan, words)
-        if plan.key?(:buy)
-          PrimaryButton.new(context:).draw(plan[:buy], show.buy_label, hover: show.hover.level(:buy))
-        end
-        %i[restore paste].each { PillButton.new(context:).draw(plan[it], words[it], hover: show.hover.level(it)) if plan.key?(it) }
+      def buttons(drawing)
+        plan = drawing.plan
+        PrimaryButton.new(context:).draw(plan[:buy], drawing.buy, hover: drawing.lit.fetch(:buy)) if plan.key?(:buy)
+        %i[restore paste].each { PillButton.new(context:).draw(plan[it], drawing.public_send(it), hover: drawing.lit.fetch(it)) if plan.key?(it) }
       end
     end
   end

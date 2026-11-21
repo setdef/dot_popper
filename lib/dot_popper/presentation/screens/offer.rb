@@ -9,9 +9,10 @@ module DotPopper
       # shows what it says of the store, and thanks the player once it says
       # they have Pro.
       class Offer < Screen
-        def initialize(show, buy_pro:)
+        def initialize(show, buy_pro:, view_achievements:)
           super(show)
           @buy_pro = buy_pro
+          @view_achievements = view_achievements
           @focus = nil
           @for_play = false
           @key_hint = nil
@@ -84,6 +85,28 @@ module DotPopper
         end
 
         def plan = screen_layout.plan
+
+        # Everything its painter draws (OfferDrawing), made again only when
+        # what it lays out, its status, Buy's words, a button's light, the
+        # themes or the achievement it leads with changes.
+        def drawing
+          screen = screen_layout
+          words = self.words
+          hover = show.hover
+          status = self.status
+          buy = buy_label
+          themes = show.themes.reject(&:ordinary?) # every theme but the ordinary, as Pro would give them now
+          id = achievement
+          earned = id && @view_achievements.earned?(id)
+          drawn(screen, words, hover, status, buy, themes, id, earned) do
+            offer = words.offer
+            OfferDrawing.new(header: HeaderDrawing.for(offer[:heading], layout:, measure:, words:, hover:), plan: screen.plan, focus:,
+                             focus_word: screen.focus_word, others: screen.others, status:, buy:, restore: offer[:restore],
+                             paste: offer[:paste], lit: %i[buy restore paste].to_h { [it, hover.level(it)] },
+                             themes: themes.map { [it, words.themes.fetch(it.key)] },
+                             achievement: id && OfferAchievement.new(id:, name: AchievementWords.name(id), how: AchievementWords.how(id), earned:))
+          end
+        end
 
         # How tall its picture of what was tapped is: the themes' cards,
         # the achievement's card, or a feature's sign.
