@@ -66,7 +66,8 @@ class ChannelContentsTest < Minitest::Test
 
     assert ok, out
     refute_match(/^the test build's part|^the fake store|^the test keys|^the website checkout|^license keys/, out)
-    assert_match(/^Apple's receipts \(needed by app-store, mac-app-store\)/, out)
+    refute_match(/^Apple's receipts|^Google Play's receipts|^the Microsoft Store's license/, out)
+    assert_match(/^StoreKit \(needed by app-store, mac-app-store\)/, out)
   end
 
   def test_a_build_for_sale_leaves_out_the_privacy_declarations_the_game_never_loads
@@ -146,7 +147,7 @@ class ChannelContentsTest < Minitest::Test
 
     refute ok, out
     assert_match(/FAIL .* is not stamped for website: its Build::CHANNEL is nil, where a website build's is "website"/, out)
-    assert_match(/FAIL .* is not stamped for website: its Build::PARTS names test_build, which a website build does not carry/, out)
+    assert_match(/FAIL .* is not stamped for website: its Build::PARTS names apple, play, microsoft, test_build, which a website build does not carry/, out)
 
     stamp("microsoft-store")
     ok, out = run_script("check", "website", @app)
@@ -187,9 +188,31 @@ class ChannelContentsTest < Minitest::Test
     end
   end
 
+  # Each store's receipt code is a part only its own store's build
+  # carries: an app store's package holding another store's, at its own
+  # place or copied anywhere, fails.
+  def test_check_fails_when_an_app_store_build_holds_another_stores_receipts
+    stamp("app-store")
+    { "play" => "Google Play's receipts", "microsoft" => "the Microsoft Store's license" }.each do |part, piece|
+      FileUtils.cp_r(File.join(ROOT, "lib/dot_popper", part), File.join(@game, "lib/dot_popper", part))
+      ok, out = run_script("check", "app-store", @app)
+
+      refute ok, out
+      assert_match(%r{FAIL .* holds lib/dot_popper/#{part} \(#{piece}\)}, out)
+
+      FileUtils.rm_rf(File.join(@game, "lib/dot_popper", part))
+      FileUtils.cp(File.join(ROOT, "lib/dot_popper", part, "receipt.rb"), File.join(@game, "lib/dot_popper/monetization/stray.rb"))
+      ok, out = run_script("check", "app-store", @app)
+
+      refute ok, out
+      assert_match(%r{FAIL .* holds lib/dot_popper/monetization/stray\.rb, which names #{piece}}, out)
+      FileUtils.rm_f(File.join(@game, "lib/dot_popper/monetization/stray.rb"))
+    end
+  end
+
   def test_check_fails_when_a_build_for_sale_names_the_test_builds_part
     stamp("app-store")
-    edit_build("PARTS = %w[].freeze", "PARTS = %w[test_build].freeze")
+    edit_build("PARTS = %w[apple].freeze", "PARTS = %w[apple test_build].freeze")
     ok, out = run_script("check", "app-store", @app)
 
     refute ok, out

@@ -80,12 +80,17 @@ module ChannelContents
               files: %w[lib/dot_popper/website/license_keys.rb lib/dot_popper/website/license_keys],
               marks: [/LicenseKey/, /license\.txt/, /license_checks/, /Paste license key/, /comes by email/],
               defined_by: [/module LicenseKeys\b/]),
-    Piece.new(name: "Google Play's receipts", needed_by: [TEST, Build::GOOGLE_PLAY],
-              files: %w[lib/dot_popper/monetization/receipt/play.rb], marks: [/module Play\b/, /Receipt::Play\b/, /PLAY_KEYS/]),
-    Piece.new(name: "Apple's receipts", needed_by: [Build::APP_STORE, Build::MAC_APP_STORE],
-              files: %w[lib/dot_popper/monetization/receipt/apple.rb], marks: [/module Apple\b/, /APPLE_ROOT_G3/]),
-    Piece.new(name: "the Microsoft Store's license", needed_by: [Build::MICROSOFT_STORE],
-              files: %w[lib/dot_popper/monetization/receipt/microsoft.rb], marks: [/module Microsoft\b/, /Receipt::Microsoft\b/]),
+    # Each store's receipt code is a part of its own (lib/dot_popper/PART),
+    # which only its store's build carries, and a test build.
+    Piece.new(name: "Google Play's receipts", needed_by: [TEST, Build::GOOGLE_PLAY], apart: :files,
+              files: %w[lib/dot_popper/play], marks: [/module Play\b/, /Receipt::Play\b/, /PLAY_KEYS/],
+              defined_by: [/module Play\b/]),
+    Piece.new(name: "Apple's receipts", needed_by: [TEST, Build::APP_STORE, Build::MAC_APP_STORE], apart: :files,
+              files: %w[lib/dot_popper/apple], marks: [/module Apple\b/, /APPLE_ROOT_G3/],
+              defined_by: [/module Apple\b/]),
+    Piece.new(name: "the Microsoft Store's license", needed_by: [TEST, Build::MICROSOFT_STORE], apart: :files,
+              files: %w[lib/dot_popper/microsoft], marks: [/module Microsoft\b/, /Receipt::Microsoft\b/],
+              defined_by: [/module Microsoft\b/]),
     Piece.new(name: "the computer stores' helper", needed_by: [Build::MAC_APP_STORE, Build::MICROSOFT_STORE],
               files: %w[lib/dot_popper/shell/store_helper.rb], marks: [/StoreHelper/]),
     Piece.new(name: "Google Play Billing", needed_by: [Build::GOOGLE_PLAY], everywhere: true,
@@ -111,10 +116,10 @@ module ChannelContents
     [channel, PIECES.select { it.apart && !it.needed_by.include?(channel) }.freeze]
   end.freeze
 
-  # The parts (lib/dot_popper/PART) each build carries: a test build its
-  # own and the website's, and a build for sale its channel's
+  # The parts (lib/dot_popper/PART) each build carries: a test build every
+  # one, and a build for sale its channel's
   # (script/set_build_channel.rb).
-  PARTS = { TEST => %w[website test_build], **BuildChannel::PARTS }.freeze
+  PARTS = { TEST => %w[apple play microsoft website test_build], **BuildChannel::PARTS }.freeze
 
   # Prints, as JSON, the Build::CHANNEL and Build::PARTS of the build.rb
   # it is given, in a Ruby of its own, so this repository's are untouched.

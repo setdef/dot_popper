@@ -10,6 +10,9 @@
 #   DOT_POPPER_TODAY=2026-11-07 plays as if it were that date, for its
 #                               daily goal and the goal's streak, and for
 #                               which holiday look is in season.
+# Its fake store's receipts are in Google Play's form, so it leans on the
+# play part, which every build with no channel carries as well.
+require_relative "../play/core"
 require_relative "signing"
 require_relative "test_keys"
 require_relative "receipt_test_key"

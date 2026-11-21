@@ -116,6 +116,15 @@ signing_keys = root.license_signing_keys(settings)
 website = build::PARTS.include?("website")
 hex = ->(bytes) { bytes.unpack1("H*") }
 check.call("it carries its channel's parts alone (Build::CHANNELS)") { build::PARTS == build::CHANNELS[channel]&.parts }
+# Each store's receipt code is in a part of its own, which only its
+# store's channel carries (Build::CHANNELS).
+receipts = { "apple" => :Apple, "play" => :Play, "microsoft" => :Microsoft }
+own = receipts.keys & (build::CHANNELS[channel]&.parts || [])
+check.call("it loads no other store's receipt code (#{own.empty? ? "none" : own.join(", ")} alone)") do
+  (receipts.keys - own).all? do |part|
+    !DotPopper::Monetization::Receipt.const_defined?(receipts.fetch(part), false) && $LOADED_FEATURES.none? { it.include?("/dot_popper/#{part}/") }
+  end
+end
 check.call("it loads the website's store and license keys only if it carries the website part") do
   website || (!defined?(DotPopper::Monetization::LicenseKeys) && !defined?(DotPopper::Monetization::WebsiteStore) &&
               $LOADED_FEATURES.none? { it.include?("/dot_popper/website/") } && signing_keys.empty?)

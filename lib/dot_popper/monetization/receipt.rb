@@ -41,7 +41,8 @@ module DotPopper
 
       # What a build sold through no store trusts: no receipt at all (the
       # website's, whose copies prove Pro by license key). Each store's own
-      # is beside its check (APPLE, PLAY, MICROSOFT_STORE).
+      # is beside its check, in its store's part (APPLE, PLAY,
+      # MICROSOFT_STORE).
       NOTHING = ([] #: Array[String]
                 ).freeze
       NONE = Trust.new(store: nil, keys: NOTHING, app_id: APP_ID, product_id: PRODUCT_ID)
@@ -64,6 +65,6 @@ module DotPopper
   end
 end
 
-# Apple's and Play's checks and the test key need OpenSSL and JSON, and
-# are left out of the rules' type check (Steepfile).
-%w[apple play microsoft].each { require_relative "receipt/#{it}" }
+# Each store's check is in a part of its own, which only its own store's
+# build carries, and every build with no channel (Build::PARTS):
+# lib/dot_popper/apple, play and microsoft.

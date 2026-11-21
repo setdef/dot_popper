@@ -52,7 +52,7 @@ Each part of the game that makes requests declares its own, as `REQUESTS`, where
 
 **Source scans.** Comments are stripped first (Prism).
 
-- No network primitive (`Net::`, sockets, `OpenSSL`, `open-uri`, HTTP gems) appears outside `network/link.rb`, except `automation.rb`, which only refuses connections, and the signature checks in `monetization/continuity/ed25519.rb` and `monetization/receipt/`, which may use OpenSSL's keys and certificates and nothing that connects. The native hosts use no `URLSession`, `NSURLConnection`, `HttpURLConnection`, OkHttp or Volley.
+- No network primitive (`Net::`, sockets, `OpenSSL`, `open-uri`, HTTP gems) appears outside `network/link.rb`, except `automation.rb`, which only refuses connections, and the signature checks in `monetization/continuity/ed25519.rb`, `monetization/receipt.rb` and each store's `receipt.rb` (`apple/`, `play/`, `microsoft/`), which may use OpenSSL's keys and certificates and nothing that connects. The native hosts use no `URLSession`, `NSURLConnection`, `HttpURLConnection`, OkHttp or Volley.
 - No file write, delete or rename appears outside `shell/save_file.rb`, except `StoreAnswers`' `File.delete` and the screenshot capture in `shell/app.rb`.
 - Every `SaveFile.new` name in the code is declared and every declared fixed name is in the code; exactly three names are computed, and those match their patterns.
 - Only `accelerometer.rb` reads `Lota::Sensor`, and only `url_opener.rb` calls `open_url`, whose own schemes are `dotpopper-share` and `dotpopper-store`.

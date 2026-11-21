@@ -91,7 +91,7 @@ class BuildForSaleTest < Minitest::Test
       build = File.join(dir, "lib/dot_popper/release_engineering/build.rb")
       source = BuildChannel.stamp(File.read(build), channel)
       if kind == :mistaken
-        source = source.sub(/PARTS = %w\[[a-z_ ]*\]/, "PARTS = %w[website test_build]")
+        source = source.sub(/PARTS = %w\[[a-z_ ]*\]/, "PARTS = %w[#{B::PARTS.join(" ")}]")
                        .sub("HARMLESS = %w[", "HARMLESS = %w[#{EVERY_SETTING.keys.map { it.delete_prefix(B::PREFIX) }.join(" ")} ")
       else
         ChannelContents.left_out(channel).each { FileUtils.rm_rf(File.join(dir, it)) }

@@ -57,7 +57,8 @@ if ENV["STEEP_PROJECT"] == "areas"
     %w[digest json openssl securerandom].each { library it }
     unreferenced!
     check "lib/dot_popper/monetization/**/*.rb", "lib/dot_popper/website/license_keys.rb", "lib/dot_popper/website/license_keys/*.rb",
-          "lib/dot_popper/website/website_store.rb"
+          "lib/dot_popper/website/website_store.rb", "lib/dot_popper/apple/receipt.rb", "lib/dot_popper/play/receipt.rb",
+          "lib/dot_popper/microsoft/receipt.rb"
     configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)
   end
 

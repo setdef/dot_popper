@@ -12,6 +12,7 @@
 #
 #   ruby -Ilib store_helper_stand_in.rb FOLDER FAILS URL
 require "dot_popper/monetization/receipt"
+require "dot_popper/play/receipt"
 require "dot_popper/test_build/receipt_test_key"
 
 folder, fails, url = ARGV

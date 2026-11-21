@@ -29,13 +29,23 @@ class SetBuildChannelTest < Minitest::Test
 
     assert ok
     assert_includes source, %(    CHANNEL = "microsoft-store"\n)
-    assert_includes source, %(    PARTS = %w[].freeze\n)
+    assert_includes source, %(    PARTS = %w[microsoft].freeze\n)
   end
 
   # A build for sale loads none of the test build's code.
   def test_no_build_for_sale_carries_the_test_builds_part
     assert_includes DotPopper::ReleaseEngineering::Build::PARTS, "test_build"
     DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES.each { refute_includes BuildChannel::PARTS.fetch(it), "test_build", it }
+  end
+
+  # Each store's receipt code is a part of its own: a store's build
+  # carries its own store's and no other's, and the website's none.
+  def test_each_build_for_sale_carries_its_own_stores_receipts_alone
+    b = DotPopper::ReleaseEngineering::Build
+    stores = { b::APP_STORE => %w[apple], b::MAC_APP_STORE => %w[apple], b::GOOGLE_PLAY => %w[play],
+               b::MICROSOFT_STORE => %w[microsoft], b::WEBSITE => [] }
+    stores.each { |channel, own| assert_equal own, BuildChannel::PARTS.fetch(channel) & %w[apple play microsoft], channel }
+    assert_equal %w[apple play microsoft], b::PARTS & %w[apple play microsoft]
   end
 
   def test_every_channel_the_build_names_can_be_stamped
@@ -54,7 +64,7 @@ class SetBuildChannelTest < Minitest::Test
 
       refute ok, channel.inspect
       assert_includes source, "    CHANNEL = nil\n"
-      assert_includes source, "    PARTS = %w[website test_build].freeze\n"
+      assert_includes source, "    PARTS = %w[apple play microsoft website test_build].freeze\n"
     end
   end
 

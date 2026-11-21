@@ -47,7 +47,8 @@ class AreasTest < Minitest::Test
   # lib/dot_popper.
   FILES = {
     "Gameplay" => %w[gameplay.rb gameplay/**/*.rb],
-    "Monetization" => %w[monetization.rb monetization/**/*.rb website/license_keys.rb website/license_keys/**/*.rb website/website_store.rb],
+    "Monetization" => %w[monetization.rb monetization/**/*.rb website/license_keys.rb website/license_keys/**/*.rb website/website_store.rb
+                       apple/receipt.rb play/receipt.rb microsoft/receipt.rb],
     "ReleaseEngineering" => %w[release_engineering.rb release_engineering/**/*.rb],
     "Shared" => %w[network.rb network/**/*.rb platform.rb automation.rb memory_file.rb]
   }.freeze

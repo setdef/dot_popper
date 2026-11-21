@@ -164,10 +164,14 @@ class PrivacyRequestsTest < Minitest::Test
     # monetization/continuity/ed25519.rb takes OpenSSL's signatures, and the test build's
     # signing.rb makes them, and nothing that connects.
     signatures = %w[monetization/continuity/ed25519.rb test_build/signing.rb].map { File.join(ROOT, "lib/dot_popper", it) }
-    # receipt.rb and receipt/ check stores' signatures and certificates, and
+    # receipt.rb and each store's receipt.rb (its part's) check stores'
+    # signatures and certificates, and
     # the test build's receipt test key signs a fake store's, and nothing
     # that connects.
-    receipts = ruby_files.select { it.end_with?("dot_popper/monetization/receipt.rb", "test_build/receipt_test_key.rb") || it.include?("dot_popper/monetization/receipt/") }
+    receipts = ruby_files.select do
+      it.end_with?("dot_popper/monetization/receipt.rb", "test_build/receipt_test_key.rb", "dot_popper/apple/receipt.rb",
+                   "dot_popper/play/receipt.rb", "dot_popper/microsoft/receipt.rb")
+    end
 
     assert_empty ruby_files.reject { it.end_with?("network/link.rb", "dot_popper/automation.rb") || signatures.include?(it) || receipts.include?(it) }.select { uncommented(it).match?(banned) }
     signatures.each { assert_empty uncommented(it).gsub(/OpenSSL::PKey\b|require "openssl"/, "").scan(banned), it }

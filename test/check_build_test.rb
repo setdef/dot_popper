@@ -39,11 +39,29 @@ class CheckBuildTest < Minitest::Test
 
     FileUtils.rm_rf(File.join(@game, "lib/dot_popper/website"))
     FileUtils.cp_r(File.join(ROOT, "lib/dot_popper/website"), File.join(@game, "lib/dot_popper/website"))
-    edit("lib/dot_popper/release_engineering/build.rb", "PARTS = %w[].freeze", "PARTS = %w[website].freeze")
+    edit("lib/dot_popper/release_engineering/build.rb", "PARTS = %w[apple].freeze", "PARTS = %w[apple website].freeze")
     ok, out = check("mac-app-store")
 
     refute ok, out
     assert_match(/^FAIL it carries its channel's parts alone/, out)
+  end
+
+  # Each store's build carries its own store's receipt code alone: the Mac
+  # App Store's, Apple's; one that carries Google Play's fails.
+  def test_an_app_store_build_carries_its_own_stores_receipts_alone
+    stamp("mac-app-store")
+    ok, out = check("mac-app-store")
+
+    assert ok, out
+    assert_match(/^ok   it loads no other store's receipt code \(apple alone\)$/, out)
+
+    FileUtils.cp_r(File.join(ROOT, "lib/dot_popper/play"), File.join(@game, "lib/dot_popper/play"))
+    edit("lib/dot_popper/release_engineering/build.rb", "PARTS = %w[apple].freeze", "PARTS = %w[apple play].freeze")
+    ok, out = check("mac-app-store")
+
+    refute ok, out
+    assert_match(/^FAIL it loads no other store's receipt code \(apple alone\)$/, out)
+    assert_match(%r{FAIL .* holds lib/dot_popper/play \(Google Play's receipts\)}, out)
   end
 
   # Stamps the copy as script/set_build_channel.rb stamps a build, and
@@ -158,6 +176,7 @@ class CheckBuildTest < Minitest::Test
   def test_a_build_holding_what_its_channel_leaves_out_fails
     stamp("website")
     FileUtils.cp_r(File.join(ROOT, "lib/dot_popper/test_build"), File.join(@game, "lib/dot_popper/test_build"))
+    FileUtils.cp_r(File.join(ROOT, "lib/dot_popper/play"), File.join(@game, "lib/dot_popper/play"))
     ok, out = check("website")
 
     refute ok, out
@@ -165,12 +184,12 @@ class CheckBuildTest < Minitest::Test
     assert_match(%r{FAIL .* holds lib/dot_popper/test_build \(the test build's part\)}, out)
     assert_match(/^ok   it loads none of the test build's part$/, out)
 
-    edit("lib/dot_popper/release_engineering/build.rb", "PARTS = %w[website].freeze", "PARTS = %w[website test_build].freeze")
+    edit("lib/dot_popper/release_engineering/build.rb", "PARTS = %w[website].freeze", "PARTS = %w[play website test_build].freeze")
     ok, out = check("website")
 
     refute ok, out
     assert_match(/FAIL it loads none of the test build's part/, out)
-    assert_match(/its Build::PARTS names test_build, which a website build does not carry/, out)
+    assert_match(/its Build::PARTS names play, test_build, which a website build does not carry/, out)
   end
 
   def test_a_build_naming_a_test_key_fails

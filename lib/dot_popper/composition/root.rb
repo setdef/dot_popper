@@ -73,19 +73,14 @@ module DotPopper
 
       NO_SIGNING_KEYS = [].freeze
 
-      # Whose receipts it trusts, by its channel alone (ADR-0010): only its
-      # own store's. The App Store's and the Mac App Store's build Apple's,
-      # the Google Play build Google's, the Microsoft Store's Windows' word,
-      # which comes only down the store helper's pipe, and the website's,
-      # which sells through no store, none.
-      def self.receipt_trust(settings) = RECEIPTS.fetch(settings.channel, Monetization::Receipt::NONE)
-
-      RECEIPTS = {
-        ReleaseEngineering::Build::APP_STORE => Monetization::Receipt::APPLE,
-        ReleaseEngineering::Build::MAC_APP_STORE => Monetization::Receipt::APPLE,
-        ReleaseEngineering::Build::GOOGLE_PLAY => Monetization::Receipt::PLAY,
-        ReleaseEngineering::Build::MICROSOFT_STORE => Monetization::Receipt::MICROSOFT_STORE
-      }.freeze
+      # Whose receipts it trusts, by its channel alone (ADR-0010): none,
+      # without its store's part. Each store's part answers its own store's
+      # for its builds (lib/dot_popper/apple, play and microsoft): the App
+      # Store's and the Mac App Store's build Apple's, the Google Play build
+      # Google's, the Microsoft Store's Windows' word, which comes only down
+      # the store helper's pipe; and the website's, which sells through no
+      # store, none.
+      def self.receipt_trust(_settings) = Monetization::Receipt::NONE
 
       # Whether this build's copy on +platform+ is Pro without a purchase
       # (Entitlement.forced?), which no setting decides in a build for sale.
