@@ -8,6 +8,7 @@ require "fileutils"
 require "yaml"
 require_relative "../script/set_build_channel"
 require_relative "../script/channel_contents"
+require_relative "../script/packaged_app"
 
 # A release checks the app it built (script/check_build.rb), laid out here
 # as `lota fuse` lays one out: the game's copy in game/dot_popper.
@@ -183,6 +184,9 @@ class CheckBuildTest < Minitest::Test
     FileUtils.rm_rf(@game)
     FileUtils.mkdir_p(@game)
     FileUtils.cp_r(%w[lib gems fledge.yml].map { File.join(ROOT, it) }, @game)
+    # Every app leaves out the game's own gems' tests, signatures and
+    # checks, as it leaves out the repository's (PackagedApp).
+    PackagedApp::REPOSITORY_ONLY.grep(%r{\Agems/}).each { FileUtils.rm_rf(File.join(@game, it)) }
   end
 
   def check_from_stamped_checkout(channel)
