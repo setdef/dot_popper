@@ -47,7 +47,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install --assume-yes xvfb openbox x11-utils libgl1 libegl1 libgl1-mesa-dri
 
-      - uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
+      - uses: ruby/setup-ruby@be3c7df29b3349ec6bcfc6b4792f1cf9f5237d18 # v1.343.0
         with:
           ruby-version: .ruby-version
           bundler-cache: true

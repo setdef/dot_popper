@@ -56,7 +56,7 @@ jobs:
       # builds with the same GCC. Its MSYS2 also has the zlib1.dll the
       # pinned Windows Ruby does not carry. Then that Ruby, first on the
       # PATH (mise.toml), and the bundle installed with it.
-      - uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
+      - uses: ruby/setup-ruby@be3c7df29b3349ec6bcfc6b4792f1cf9f5237d18 # v1.343.0
         with:
           ruby-version: head
           windows-toolchain: default
