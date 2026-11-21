@@ -45,4 +45,15 @@ class BuildTest < Minitest::Test
 
     assert_equal "http://localhost:9292", DotPopper::Network::Server.url(env)
   end
+
+  # One list names every channel, whether it is an app store's, and the
+  # parts its build carries, none of them the test build's.
+  def test_one_list_names_every_channel_and_what_its_build_carries
+    build = DotPopper::ReleaseEngineering::Build
+
+    assert_equal build::CHANNEL_NAMES, build::CHANNELS.values.map(&:name)
+    assert_equal [build::WEBSITE], build::CHANNEL_NAMES - build::STORES
+    assert_predicate build::CHANNELS, :frozen?
+    build::CHANNELS.each_value { refute_includes it.parts, "test_build", it.name }
+  end
 end

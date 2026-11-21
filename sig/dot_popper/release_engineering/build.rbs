@@ -12,6 +12,17 @@ module DotPopper
       HARMLESS: Array[String]
 
       def self.store?: (?String? channel) -> bool
+      class Channel < ::Data
+        attr_reader name: String
+
+        attr_reader store: bool
+
+        attr_reader parts: Array[String]
+
+        def self.new: (name: String, store: bool, parts: Array[String]) -> instance
+      end
+
+      CHANNELS: Hash[String, Channel]
       STORES: Array[String]
       CHANNEL_NAMES: Array[String]
       def self.settings: (?untyped env, ?channel: String?) -> untyped

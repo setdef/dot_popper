@@ -16,8 +16,9 @@ module BuildChannel
   KNOWN = DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES
   CHANNEL_LINE = /^      CHANNEL = nil$/
   PARTS_LINE = /^      PARTS = %w\[[a-z_ ]*\]\.freeze$/
-  # The parts (lib/dot_popper/PART) each channel's build carries.
-  PARTS = KNOWN.to_h { [it, []] }.freeze
+  # The parts (lib/dot_popper/PART) each channel's build carries
+  # (Build::CHANNELS).
+  PARTS = DotPopper::ReleaseEngineering::Build::CHANNELS.transform_values(&:parts).freeze
 
   # +source+, a test build's build.rb, as +channel+'s; raises ArgumentError
   # for a channel the game doesn't name or a file that isn't a test build's.
