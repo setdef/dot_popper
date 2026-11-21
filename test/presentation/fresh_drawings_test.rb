@@ -95,7 +95,15 @@ class FreshDrawingsTest < Minitest::Test
                   "the day's goal met" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) },
                   "a game spent elsewhere" => ->(fixture) { fixture.games.spend! },
                   "Pro arriving" => ->(fixture) { FreshDrawingsTest.pro(fixture) },
-                  "an achievement earned" => ->(fixture) { fixture.achievements.award([:steady], day: fixture.day) } }]],
+                  "an achievement earned" => ->(fixture) { fixture.achievements.award([:steady], day: fixture.day) } }],
+           [{ pro: true }, { "a game played, and Home again" => lambda { |fixture|
+             show = fixture.show
+             show.screen.primary
+             show.game_flow.update(31)
+             show.game_flow.update(DotPopper::Gameplay::Rules::GAME_OVER_GRACE)
+             fixture.tick(0.5)
+             show.back
+           } }]],
     themes: [[{ pro: true }, { "a new season" => ->(fixture) { fixture.day = Date.new(2026, 12, 20) } }]],
     achievements: [[{}, { "Pro arriving" => ->(fixture) { FreshDrawingsTest.pro(fixture) } }],
                    [{ pro: true }, SCROLLED],
@@ -106,7 +114,9 @@ class FreshDrawingsTest < Minitest::Test
     }]],
     share_preview: [[{}, { "copied" => ->(fixture) { fixture.show.screen.pressed(:copy, :mouse) } }]],
     credits: [[{}, SCROLLED]],
-    stats: [[{}, SCROLLED], [{}, { "a game recorded" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) } }]],
+    stats: [[{}, SCROLLED.merge("the other dot size" => lambda { |fixture|
+      fixture.game_flow.sizing = (P::Screens::Settings::SIZINGS - [fixture.game_flow.sizing]).first
+    })], [{}, { "a game recorded" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) } }]],
     # No press of a player's opens a screen over the Tutorial today, but its
     # drawing says Skip is drawn only while it is on top.
     tutorial: [[{ played: false }, { "the offer opened over it" => ->(fixture) { fixture.show.open_offer_for(:themes) } }]]
