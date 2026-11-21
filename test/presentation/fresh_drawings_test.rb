@@ -55,6 +55,27 @@ class FreshDrawingsTest < Minitest::Test
     share_preview: [{}, ->(show) { show.screens.fetch(:share_preview).open_with(P::ShareText.open("🟡 27 dots\n⏱ 30s", show.now)) }, {}]
   }.freeze
 
+  # A game that meets every day's goal (DailyGoal::LIST).
+  GOAL_MET = DotPopper::Gameplay::GameStats.start.with(most_dots_in_a_row: 15, times_to_pop: [3.0] + ([0.5] * 9), duration: 50.0, mistakes: 0,
+                                                      score: 30)
+
+  # What changes under each open screen from outside it, each a name and
+  # what makes it, given the fixture: a purchase, the day, a game recorded
+  # elsewhere, an achievement earned. Each is checked on every frame for a
+  # while after, as what it sets off goes on by itself.
+  OUTSIDE = {
+    offer: { "buying" => ->(fixture) { fixture.show.screen.pressed(:buy, :mouse) } },
+    home: { "the next day" => ->(fixture) { fixture.day += 1 },
+            "the day's goal met" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) },
+            "an achievement earned" => ->(fixture) { fixture.achievements.award([:steady], day: fixture.day) },
+            "Pro bought" => ->(fixture) { fixture.store.buy } },
+    themes: { "a new season" => ->(fixture) { fixture.day = Date.new(2026, 12, 20) } },
+    achievements: { "an achievement earned" => ->(fixture) { fixture.achievements.award([:steady], day: fixture.day) } },
+    achievement_dialog: { "it earned" => ->(fixture) { fixture.achievements.award([:steady], day: fixture.day) },
+                          "a record nearer it" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) } },
+    stats: { "a game recorded" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) } }
+  }.freeze
+
   # Sizes a desktop window is dragged to, one after another: some change
   # only the height, which moves Back and the page but may leave a plan
   # equal to the last.
@@ -101,6 +122,13 @@ class FreshDrawingsTest < Minitest::Test
         change.call(show)
         fixture.tick(0.3)
         check.call(what)
+      end
+      OUTSIDE.fetch(name, {}).each do |what, change|
+        change.call(fixture)
+        40.times do |frame|
+          fixture.tick(0.05)
+          check.call("#{what} (frame #{frame})")
+        end
       end
       assert_empty stale, "#{name} drew a stale drawing after #{stale.join(", ")}"
       kept = screen.drawing

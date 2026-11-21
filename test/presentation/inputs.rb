@@ -64,7 +64,9 @@ module Inputs
     THEMES = %i[ghost jack_o_lantern].freeze
 
     attr_reader :os, :show, :game_flow, :sounds, :window, :clipboard, :opener, :entitlement, :games, :store, :server_choice, :to_pop,
-                :shell
+                :shell, :saved_stats, :achievements
+    # The day it is, which a test may move on (Date).
+    attr_accessor :day
 
     # Game Over's pile as Shell::Dragging takes a press on it that drags
     # nothing: a click, heard as a tap where it lets go.
@@ -119,11 +121,12 @@ module Inputs
       saved_themes = DotPopper::Gameplay::SavedThemes.new(Memory.new)
       saved_themes.release(THEMES.map(&:to_s))
       (new_theme ? saved_themes.choices[0...-1] : saved_themes.choices).each { saved_themes.told(it) }
-      book = DotPopper::Gameplay::SavedStats.new(Memory.new, today: -> { @day })
+      book = @saved_stats = DotPopper::Gameplay::SavedStats.new(Memory.new, today: -> { @day })
       book.record(DotPopper::Gameplay::GameStats.start, @game_flow.size_class) if played
+      @achievements = DotPopper::Gameplay::Achievements.new(Memory.new)
       session = DotPopper::Gameplay::Groups::Session.new(file: Memory.new, worker: Server.new(groups:))
       @server_choice = DotPopper::Gameplay::ServerChoice.new(Memory.new, gone: @gone.gone?, clipboard:)
-      @show = new_show(game_flow:, layout: layout(width, height), sounds:, radius: R, random: Random.new(5), clipboard:, window:, saved_stats: book,
+      @show = new_show(game_flow:, layout: layout(width, height), sounds:, radius: R, random: Random.new(5), clipboard:, window:, saved_stats: book, achievements:,
                        sharing: P::SheetSharing.for(platform, opener:), links: opener, entitlement:, store:, games:,
                        saved_themes:, groups: session, group_notice: P::GroupNotice.new(Memory.new),
                        tutorial_flag: P::TutorialFlag.new(Memory.new((P::TutorialFlag::SEEN if played))), input: P::InputKind.starting(touch: phone?),
