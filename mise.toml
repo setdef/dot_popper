@@ -32,7 +32,7 @@
 [tools]
 ruby = { version = "4.1.0-preview1", os = ["linux", "macos"] }
 "http:rubyinstaller-head" = { version = "20261110", url = "https://github.com/setdef/Fledge/releases/download/inputs-rubyinstaller-head-20261110/rubyinstaller-head-x64.7z", checksum = "sha256:901473edafd6b174d79978fc109d3df3ab73b1436719233f35c1a31b5b18bf58", strip_components = 1, bin_path = "bin", os = ["windows"] }
-"http:msys2_ucrt64" = { version = "20261115.002214", url = "https://github.com/ruby/setup-msys2-gcc/releases/download/v20261115.002214/msys2-ucrt64.7z", checksum = "sha256:e9ca55648fe65bf701222a9fadf197103e5433d418a16b0962db430b61adbe6c", bin_path = "ucrt64/bin", os = ["windows"] }
+"http:msys2_ucrt64" = { version = "20261120.002211", url = "https://github.com/ruby/setup-msys2-gcc/releases/download/v20261120.002211/msys2-ucrt64.7z", checksum = "sha256:4d97fe700099a44d003391b99d3595929f4911ace6a5f43ca84a7f25adf5ba32", bin_path = "ucrt64/bin", os = ["windows"] }
 
 [env]
 RUBY_DLL_PATH = { value = "{% if tools.msys2_ucrt64 is defined %}{{ tools.msys2_ucrt64.path }}\\ucrt64\\bin{% endif %}", tools = true }

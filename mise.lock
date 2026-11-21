@@ -3,13 +3,13 @@
 lockfile_version = 3
 
 [[tools."http:msys2_ucrt64"]]
-version = "20261115.002214"
+version = "20261120.002211"
 backend = "http:msys2_ucrt64"
-specifiers = ["20261115.002214"]
+specifiers = ["20261120.002211"]
 
 [tools."http:msys2_ucrt64"."platforms.windows-x64"]
-checksum = "sha256:e9ca55648fe65bf701222a9fadf197103e5433d418a16b0962db430b61adbe6c"
-url = "https://github.com/ruby/setup-msys2-gcc/releases/download/v20261115.002214/msys2-ucrt64.7z"
+checksum = "sha256:4d97fe700099a44d003391b99d3595929f4911ace6a5f43ca84a7f25adf5ba32"
+url = "https://github.com/ruby/setup-msys2-gcc/releases/download/v20261120.002211/msys2-ucrt64.7z"
 
 [[tools."http:rubyinstaller-head"]]
 version = "20261110"
