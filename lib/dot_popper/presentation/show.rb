@@ -615,7 +615,6 @@ module DotPopper
       # Long haul), or nil for the rest and for a Free player.
       def achievement_progress(id) = @view_achievements.progress(id)
 
-      def dialog_plan = (@screens[:achievement_dialog].plan if dialog)
 
       # What the dialog says of +id+'s state (Screens::AchievementDialog#status).
       def dialog_status(id) = @screens[:achievement_dialog].status(id)

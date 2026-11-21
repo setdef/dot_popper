@@ -18,19 +18,19 @@ module DotPopper
         PillButton.new(context:).draw(drawing.how_to_earn, drawing.how_to_earn_word) if drawing.how_to_earn
       end
 
-      def dialog(show, layout)
-        plan = show.dialog_plan
-        id = show.dialog
-        shade(layout)
+      # An achievement's dialog as its +drawing+ (Presentation::
+      # AchievementDialogDrawing) says.
+      def dialog(drawing)
+        plan = drawing.plan
+        shade(drawing.shade)
         card(plan.card)
-        emblem(id, plan.card.center_x, plan.icon_y, plan.radius, show.achievement_earned?(id))
-        name = Presentation::AchievementWords.name(id)
-        context.text(name, context.fonts.bold(32), plan.card.center_x, plan.name_y, context.palette.cream)
-        status(show, id, plan) if show.dialog_status(id)
+        emblem(drawing.id, plan.card.center_x, plan.icon_y, plan.radius, drawing.earned)
+        context.text(drawing.name, context.fonts.bold(32), plan.card.center_x, plan.name_y, context.palette.cream)
+        status(drawing) if drawing.status
         font = context.fonts.semibold(plan.line_size)
         plan.lines.each_with_index { |line, i| context.text(line, font, plan.card.center_x, plan.lines_y + (font.height * (i + 0.5)), context.palette.cream) }
-        progress(show, id, plan) if plan.bar
-        buttons(show, plan)
+        progress(drawing) if drawing.progress
+        buttons(drawing.buttons)
       end
 
       # An achievement's sign at +x+, +y+, +radius+ across: on gold where
@@ -80,10 +80,11 @@ module DotPopper
         end
       end
 
-      def status(show, id, plan)
-        text = show.dialog_status(id)
+      def status(drawing)
+        plan = drawing.plan
+        text = drawing.status
         font = context.fonts.semibold(17)
-        if show.achievement_earned?(id)
+        if drawing.earned
           x = plan.card.center_x - (font.width(text) / 2.0) - 14
           Glyphs.new(context:).draw(:check, x, plan.status_y, 15, color: context.palette.gain)
           context.text(text, font, plan.card.center_x + 8, plan.status_y, context.palette.gain)
@@ -92,11 +93,11 @@ module DotPopper
         end
       end
 
-      def progress(show, id, plan)
-        have, goal = show.achievement_progress(id)
-        rect = plan.bar
+      def progress(drawing)
+        have, goal = drawing.progress
+        rect = drawing.plan.bar
         small = context.fonts.semibold(15)
-        label = show.words.button(:your_record)
+        label = drawing.progress_label
         context.text(label, small, rect.x + (small.width(label) / 2.0), rect.y - 16, context.palette.soft)
         count = "#{have} of #{goal}"
         context.text(count, small, rect.right - (small.width(count) / 2.0), rect.y - 16, context.palette.cream)
@@ -107,29 +108,30 @@ module DotPopper
         context.rectangle(:fill, rect.x, rect.y, [rect.width * share, rect.height].max, rect.height, rect.height / 2.0, rect.height / 2.0, 12) if share.positive?
       end
 
-      def buttons(show, plan)
-        plan.buttons.each do |name, rect|
-          case name
+      def buttons(buttons)
+        buttons.each do |button|
+          rect = button.rect
+          case button.name
           when :achievement_pro
-            PrimaryButton.new(context:).draw(rect, show.words.button(:achievement_pro), hover: show.hover.level(name), ratio: PillButton::LABEL)
+            PrimaryButton.new(context:).draw(rect, button.word, hover: button.hover, ratio: PillButton::LABEL)
           when :achievement_close
-            PillButton.new(context:).draw(rect, show.words.button(:achievement_close), hover: show.hover.level(name))
+            PillButton.new(context:).draw(rect, button.word, hover: button.hover)
           when :achievement_prev
-            step(show, name, rect, :chevron_left, "LB")
+            step(button, :chevron_left, "LB")
           when :achievement_next
-            step(show, name, rect, :chevron_right, "RB")
+            step(button, :chevron_right, "RB")
           end
         end
       end
 
-      def step(show, name, rect, glyph, word)
-        PillButton.new(context:).draw(rect, word, hover: show.hover.level(name),
-                                  icon: ->(x, y, size) { Glyphs.new(context:).draw(glyph, x, y, size * 0.34) })
+      def step(button, glyph, word)
+        PillButton.new(context:).draw(button.rect, word, hover: button.hover,
+                                      icon: ->(x, y, size) { Glyphs.new(context:).draw(glyph, x, y, size * 0.34) })
       end
 
-      def shade(layout)
+      def shade(rect)
         context.color(context.palette.ink_edge, 0.85)
-        context.rectangle(:fill, -1, -1, layout.width + 2, layout.height + 2)
+        context.rectangle(:fill, rect.x, rect.y, rect.width, rect.height)
       end
 
       def card(rect)

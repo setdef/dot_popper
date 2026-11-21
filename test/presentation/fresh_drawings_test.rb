@@ -35,6 +35,10 @@ class FreshDrawingsTest < Minitest::Test
     tutorial: [{ played: false }, ->(show) { show.screen.primary }, {}],
     themes: [{ pro: true }, ->(show) { show.open_themes }, { "using the next theme" => ->(show) { show.screen.step(1) } }],
     achievements: [{ pro: true }, ->(show) { show.open_achievements }, { "a scroll" => ->(show) { show.wheel_scroll(-3) } }],
+    achievement_dialog: [{ pro: true }, lambda { |show|
+      show.open_achievements
+      show.open_achievement(:steady)
+    }, { "the next" => ->(show) { show.screen.step(1) } }],
     game_over: [{ pro: true }, lambda { |show|
       show.screen.primary
       show.game_flow.update(31)

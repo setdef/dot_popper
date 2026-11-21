@@ -62,6 +62,28 @@ module DotPopper
           end
         end
 
+        # Everything its painter draws (AchievementDialogDrawing), made
+        # again only when the window, the achievement, what the player has
+        # of it, the words or a button's light changes.
+        def drawing
+          id = achievement
+          plan = self.plan
+          words = self.words
+          hover = show.hover
+          earned = @view.earned?(id)
+          status = status(id)
+          progress = @view.progress(id)
+          drawn(id, plan, words, hover, earned, status, progress) do
+            buttons = plan.buttons.map do |name, rect|
+              word = words.button(name) if %i[achievement_pro achievement_close].include?(name)
+              DialogButtonDrawing.new(name:, rect:, word:, hover: hover.level(name))
+            end
+            AchievementDialogDrawing.new(id:, name: AchievementWords.name(id), plan:, earned:, status:,
+                                         shade: Rect.new(x: -1, y: -1, width: layout.width + 2, height: layout.height + 2),
+                                         progress: (progress if plan.bar), progress_label: words.button(:your_record), buttons:)
+          end
+        end
+
         def controls = plan.buttons.map { |name, rect| button(name, rect) }
 
         def primary = close

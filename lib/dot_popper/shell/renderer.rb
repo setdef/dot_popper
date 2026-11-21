@@ -143,7 +143,7 @@ module DotPopper
         @achievements.draw(screen.drawing)
       end
 
-      def achievement_dialog_screen(_screen, _width, _height, layout) = @achievements.dialog(@show, layout)
+      def achievement_dialog_screen(screen, _width, _height, _layout) = @achievements.dialog(screen.drawing)
 
       def friend_groups_screen(_screen, width, height, layout)
         veil(width, height, @context.style::GROUPS.veil)

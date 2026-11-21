@@ -97,6 +97,22 @@ module DotPopper
     # (+hover+, from 0 to 1).
     class AchievementCellDrawing < Data.define(:cell, :name, :earned, :hover); end
 
+    # What an achievement's dialog hands its painter (Shell::
+    # AchievementsPainter#dialog): the achievement +id+ and its +name+,
+    # where its parts go (+plan+, AchievementDialogPlan), the +shade+ over
+    # the grid, whether it is +earned+, its +status+ (or nil where the
+    # dialog offers Pro), how far along the player is as [have, goal]
+    # under +progress_label+ (+progress+, nil where it shows no bar), and
+    # its +buttons+ (DialogButtonDrawing).
+    class AchievementDialogDrawing < Data.define(:id, :name, :plan, :shade, :earned, :status, :progress, :progress_label,
+                                                 :buttons); end
+
+    # One of the dialog's buttons: +name+ (:achievement_pro,
+    # :achievement_close, :achievement_prev or :achievement_next) at
+    # +rect+, saying +word+ (nil for LB and RB, which say only that), as
+    # lit as the mouse over it has made it (+hover+).
+    class DialogButtonDrawing < Data.define(:name, :rect, :word, :hover); end
+
     # The grid of achievements: as many columns as fit, a short last row
     # centered, as tall as it needs, in a window that scrolls.
     class AchievementsLayout < Data.define(:layout, :ids)
