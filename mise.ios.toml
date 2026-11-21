@@ -7,6 +7,6 @@
 #
 #   MISE_ENV=ios mise install
 [tools]
-xcodegen = "2.46.0"
+xcodegen = "2.48.0"
 cmake = "4.3.2"
 ninja = "1.13.2"
