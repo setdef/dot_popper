@@ -33,12 +33,14 @@
 require "json"
 require "open3"
 require "rbconfig"
-require_relative "../lib/dot_popper/release_engineering/build"
+require_relative "../gems/dot_popper-release_engineering/lib/dot_popper/release_engineering/build"
 require_relative "set_build_channel"
 
 module ChannelContents
   Build = DotPopper::ReleaseEngineering::Build
   TEST = "test"
+  # Where a game's build.rb is in its folder: in Release Engineering's gem.
+  BUILD = "gems/dot_popper-release_engineering/lib/dot_popper/release_engineering/build.rb"
   CHANNELS = [TEST, *Build::CHANNEL_NAMES].freeze
 
   # +needed_by+ the channels that use it; +files+ its own files, relative
@@ -137,9 +139,9 @@ module ChannelContents
 
   # The game's folder in the unpacked package +folder+, or nil.
   def game_in(folder)
-    games = Dir.glob(File.join(folder, "**", "game", "dot_popper", "lib", "dot_popper", "release_engineering", "build.rb"))
+    games = Dir.glob(File.join(folder, "**", "game", "dot_popper", BUILD))
     abort "#{folder} holds #{games.size} copies of the game; expected one" if games.size > 1
-    games.first&.then { File.expand_path("../../../..", it) }
+    games.first&.then { it.delete_suffix("/#{BUILD}") }
   end
 
   # What +folder+ holds of each piece +channel+ does not need: [piece,
@@ -199,9 +201,9 @@ module ChannelContents
   # channel's build does not carry.
   def misstamped(channel, folder)
     game = game_in(folder) or abort("#{folder} holds no game to check")
-    build = File.join(game, "lib", "dot_popper", "release_engineering", "build.rb")
+    build = File.join(game, BUILD)
     out, status = Open3.capture2e(RbConfig.ruby, "-e", READ_STAMP, build)
-    return ["its lib/dot_popper/release_engineering/build.rb does not load: #{out.lines.last&.chomp}"] unless status.success?
+    return ["its #{BUILD} does not load: #{out.lines.last&.chomp}"] unless status.success?
 
     stamped, parts = JSON.parse(out.lines.last)
     wanted = channel == TEST ? nil : channel

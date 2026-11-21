@@ -69,17 +69,19 @@ if ENV["STEEP_PROJECT"] == "areas"
 
   # Release Engineering names neither area.
   target :release_engineering do
-    signature "sig/dot_popper/release_engineering"
+    # The area is the gem dot_popper-release_engineering, with its signatures.
+    signature "gems/dot_popper-release_engineering/sig"
     LIBRARIES.each { library it }
     unreferenced!
-    check "lib/dot_popper/release_engineering/*.rb"
+    check "gems/dot_popper-release_engineering/lib/**/*.rb"
     configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)
   end
 else
   # The use cases, which need two areas, and what loads and serves them,
   # against all of sig/.
   target :application do
-    signature "sig", "gems/dot_popper-gameplay/sig", "gems/dot_popper-monetization/sig", *SHARED
+    signature "sig", "gems/dot_popper-gameplay/sig", "gems/dot_popper-monetization/sig",
+              "gems/dot_popper-release_engineering/sig", *SHARED
     LIBRARIES.each { library it }
     check "lib/dot_popper.rb", "lib/dot_popper/*.rb", "lib/dot_popper/use_cases/*.rb"
     configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)

@@ -41,6 +41,7 @@ gem "lota", "~> 0.7.1"
 # carries them, as it carries lib/.
 gem "dot_popper-shared", path: "gems/dot_popper-shared"
 gem "dot_popper-gameplay", path: "gems/dot_popper-gameplay"
+gem "dot_popper-release_engineering", path: "gems/dot_popper-release_engineering"
 gem "dot_popper-monetization", path: "gems/dot_popper-monetization"
 
 # Fledge packages the game for people who don't have Ruby (PACKAGING.md).

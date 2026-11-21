@@ -14,14 +14,14 @@ class SetBuildChannelTest < Minitest::Test
 
   def setup
     @copy = Dir.mktmpdir("dot_popper_channel")
-    FileUtils.cp_r(%w[lib script].map { File.join(ROOT, it) }, @copy)
+    FileUtils.cp_r(%w[lib gems script].map { File.join(ROOT, it) }, @copy)
   end
 
   def teardown = FileUtils.rm_rf(@copy)
 
   def stamp(channel)
     _, status = Open3.capture2e(RbConfig.ruby, File.join(@copy, "script", "set_build_channel.rb"), *channel)
-    [status.success?, File.read(File.join(@copy, "lib", "dot_popper", "release_engineering", "build.rb"))]
+    [status.success?, File.read(File.join(@copy, "gems", "dot_popper-release_engineering", "lib", "dot_popper", "release_engineering", "build.rb"))]
   end
 
   def test_a_store_builds_channel_is_fixed_in_the_code
@@ -50,7 +50,7 @@ class SetBuildChannelTest < Minitest::Test
 
   def test_every_channel_the_build_names_can_be_stamped
     DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES.each do |channel|
-      FileUtils.cp(File.join(ROOT, "lib", "dot_popper", "release_engineering", "build.rb"), File.join(@copy, "lib", "dot_popper", "release_engineering", "build.rb"))
+      FileUtils.cp(File.join(ROOT, "gems", "dot_popper-release_engineering", "lib", "dot_popper", "release_engineering", "build.rb"), File.join(@copy, "gems", "dot_popper-release_engineering", "lib", "dot_popper", "release_engineering", "build.rb"))
       ok, source = stamp(channel)
 
       assert ok, channel

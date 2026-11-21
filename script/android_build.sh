@@ -121,6 +121,7 @@ gem "lota", path: "$LOTA_GEM"
 gem "dot_popper-shared", path: "game/dot_popper/gems/dot_popper-shared"
 gem "dot_popper-gameplay", path: "game/dot_popper/gems/dot_popper-gameplay"
 gem "dot_popper-monetization", path: "game/dot_popper/gems/dot_popper-monetization"
+gem "dot_popper-release_engineering", path: "game/dot_popper/gems/dot_popper-release_engineering"
 EOF
 # Fledge runs from a Gemfile of its own, outside the phone project, and
 # builds the project by its path (Fledge's README, "Installation"): an

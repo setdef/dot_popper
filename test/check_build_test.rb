@@ -40,7 +40,7 @@ class CheckBuildTest < Minitest::Test
 
     FileUtils.rm_rf(File.join(@game, "lib/dot_popper/website"))
     FileUtils.cp_r(File.join(ROOT, "lib/dot_popper/website"), File.join(@game, "lib/dot_popper/website"))
-    edit("lib/dot_popper/release_engineering/build.rb", "PARTS = %w[apple].freeze", "PARTS = %w[apple website].freeze")
+    edit("gems/dot_popper-release_engineering/lib/dot_popper/release_engineering/build.rb", "PARTS = %w[apple].freeze", "PARTS = %w[apple website].freeze")
     ok, out = check("mac-app-store")
 
     refute ok, out
@@ -57,7 +57,7 @@ class CheckBuildTest < Minitest::Test
     assert_match(/^ok   it loads no other store's receipt code \(apple alone\)$/, out)
 
     FileUtils.cp_r(File.join(ROOT, "lib/dot_popper/play"), File.join(@game, "lib/dot_popper/play"))
-    edit("lib/dot_popper/release_engineering/build.rb", "PARTS = %w[apple].freeze", "PARTS = %w[apple play].freeze")
+    edit("gems/dot_popper-release_engineering/lib/dot_popper/release_engineering/build.rb", "PARTS = %w[apple].freeze", "PARTS = %w[apple play].freeze")
     ok, out = check("mac-app-store")
 
     refute ok, out
@@ -68,7 +68,7 @@ class CheckBuildTest < Minitest::Test
   # Stamps the copy as script/set_build_channel.rb stamps a build, and
   # leaves out what the channel's build leaves out.
   def stamp(channel)
-    build = File.join(@game, "lib/dot_popper/release_engineering/build.rb")
+    build = File.join(@game, "gems/dot_popper-release_engineering/lib/dot_popper/release_engineering/build.rb")
     File.write(build, BuildChannel.stamp(File.read(build), channel))
     ChannelContents.left_out(channel).each { FileUtils.rm_rf(File.join(@game, it)) }
   end
@@ -192,7 +192,7 @@ class CheckBuildTest < Minitest::Test
   def check_from_stamped_checkout(channel)
     Dir.mktmpdir("dot_popper_checkout") do |checkout|
       FileUtils.cp_r(%w[lib gems script].map { File.join(ROOT, it) }, checkout)
-      build = File.join(checkout, "lib/dot_popper/release_engineering/build.rb")
+      build = File.join(checkout, "gems/dot_popper-release_engineering/lib/dot_popper/release_engineering/build.rb")
       File.write(build, BuildChannel.stamp(File.read(build), channel))
       out, status = Open3.capture2e(RbConfig.ruby, File.join(checkout, "script", "check_build.rb"), channel, @version, @app)
       [status.success?, out]
@@ -213,7 +213,7 @@ class CheckBuildTest < Minitest::Test
     assert_match(%r{FAIL .* holds lib/dot_popper/test_build \(the test build's part\)}, out)
     assert_match(/^ok   it loads none of the test build's part$/, out)
 
-    edit("lib/dot_popper/release_engineering/build.rb", "PARTS = %w[website].freeze", "PARTS = %w[play website test_build].freeze")
+    edit("gems/dot_popper-release_engineering/lib/dot_popper/release_engineering/build.rb", "PARTS = %w[website].freeze", "PARTS = %w[play website test_build].freeze")
     ok, out = check("website")
 
     refute ok, out

@@ -89,7 +89,7 @@ class BuildForSaleTest < Minitest::Test
   def self.answers(channel, kind)
     Dir.mktmpdir("dot_popper_#{channel}") do |dir|
       FileUtils.cp_r(%w[lib gems].map { File.join(ROOT, it) }, dir)
-      build = File.join(dir, "lib/dot_popper/release_engineering/build.rb")
+      build = File.join(dir, "gems/dot_popper-release_engineering/lib/dot_popper/release_engineering/build.rb")
       source = BuildChannel.stamp(File.read(build), channel)
       if kind == :mistaken
         source = source.sub(/PARTS = %w\[[a-z_ ]*\]/, "PARTS = %w[#{B::PARTS.join(" ")}]")

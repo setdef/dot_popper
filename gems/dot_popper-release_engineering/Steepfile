@@ -1,0 +1,12 @@
+# frozen_string_literal: true
+
+# The gem checked against its own signatures, strictly, as the game's
+# Steepfile checks the areas. It names no other gem, so it sees only its
+# own signatures and Ruby's.
+target :lib do
+  signature "sig"
+  check "lib"
+  configure_code_diagnostics(Steep::Diagnostic::Ruby.strict) do |hash|
+    hash[Steep::Diagnostic::Ruby::UnsupportedSyntax] = :error
+  end
+end

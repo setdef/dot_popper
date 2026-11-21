@@ -40,6 +40,7 @@ fi
   Gemfile Gemfile.lock mise.toml mise.lock mise.android.toml mise.ios.toml .ruby-version AGENTS.md GLOSSARY.md INSIPIRATION.md PACKAGING.md README.md .gitignore .gitattributes \
   gems/dot_popper-gameplay/sig gems/dot_popper-gameplay/test gems/dot_popper-gameplay/Rakefile gems/dot_popper-gameplay/Steepfile \
   gems/dot_popper-monetization/sig gems/dot_popper-monetization/test gems/dot_popper-monetization/Rakefile gems/dot_popper-monetization/Steepfile \
+  gems/dot_popper-release_engineering/sig gems/dot_popper-release_engineering/test gems/dot_popper-release_engineering/Rakefile gems/dot_popper-release_engineering/Steepfile \
   gems/dot_popper-shared/sig gems/dot_popper-shared/test gems/dot_popper-shared/Rakefile gems/dot_popper-shared/Steepfile)
 if $worktree; then
   cp "$repo/android/android_kit" "$project/main.rb"

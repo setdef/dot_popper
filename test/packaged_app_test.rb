@@ -39,7 +39,7 @@ class PackagedAppTest < Minitest::Test
       Minitest.after_run { FileUtils.rm_rf(File.expand_path("../..", folder)) }
       PackagedApp.lay_out(self.class.tracked, folder, excludes: PackagedApp.excludes(channel))
       unless channel == ChannelContents::TEST
-        build = File.join(folder, "lib/dot_popper/release_engineering/build.rb")
+        build = File.join(folder, "gems/dot_popper-release_engineering/lib/dot_popper/release_engineering/build.rb")
         File.write(build, BuildChannel.stamp(File.read(build), channel))
       end
       folder
@@ -109,7 +109,7 @@ class PackagedAppTest < Minitest::Test
   # and names Lota's classes itself.
   def test_the_phones_program_finds_lota_and_the_game
     report = File.join(Dir.mktmpdir("dot_popper-smoke"), "smoke.txt")
-    out, ok = PackagedApp.bare_ruby(File.join(game, "bin", "dot_popper"), env: { "DOT_POPPER_SMOKE" => report })
+    out, ok = PackagedApp.bare_ruby(File.join(game, "bin", "dot_popper"), env: { "DOT_POPPER_SMOKE" => report }, game:)
 
     assert ok, "#{out}#{File.read(report) if File.file?(report)}"
     assert_match(/^callbacks load update draw$/, File.read(report))

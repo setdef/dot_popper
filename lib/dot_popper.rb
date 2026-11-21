@@ -8,7 +8,8 @@ require "date"
 module DotPopper
 end
 
-require_relative "dot_popper/release_engineering"
+# Release Engineering is the gem dot_popper-release_engineering.
+require "dot_popper/release_engineering"
 # The code the areas share is a gem of its own, dot_popper-shared
 # (gems/dot_popper-shared, which the Gemfile names by its path).
 %w[platform automation network memory_file].each { require "dot_popper/#{it}" }

@@ -3,13 +3,13 @@
 require "test_helper"
 require "prism"
 
-# The domain is in three areas, each a module in a gem or a folder of its
-# own (doc/architecture.md, ADR-0019, ADR-0025): Gameplay and Metagame
+# The domain is in three areas, each a module in a gem of its own
+# (doc/architecture.md, ADR-0019, ADR-0025): Gameplay and Metagame
 # (the gem gems/dot_popper-gameplay, DotPopper::Gameplay), Monetization
 # (the gem gems/dot_popper-monetization, with what the build parts under
 # lib/dot_popper add to it) and Release Engineering
-# (lib/dot_popper/release_engineering); the code they share is the gem
-# gems/dot_popper-shared. What each may name is the
+# (the gem gems/dot_popper-release_engineering); the code they share is
+# the gem gems/dot_popper-shared. What each may name is the
 # context map's:
 #
 # - Gameplay and Metagame names nothing of Monetization or Release
@@ -27,8 +27,8 @@ require "prism"
 # - That shared code names nothing of the three areas, so it never
 #   carries one area to another, and nothing outside it.
 #
-# An area's files are its folder and its loader (lib/dot_popper/release_engineering.rb
-# and the like), or its gem's lib/ (gems/dot_popper-gameplay, gems/dot_popper-monetization). Every constant an area's Ruby names is resolved as Ruby resolves it
+# An area's files are its gem's lib/ (gems/dot_popper-gameplay and the
+# like), and Monetization's also the build parts' files that are its. Every constant an area's Ruby names is resolved as Ruby resolves it
 # (the module nesting, then the superclasses defined here, then the top
 # level), from the source, so this holds for code Steep does not type
 # as for the rest. Steep holds
@@ -49,13 +49,15 @@ class AreasTest < Minitest::Test
   # lib/dot_popper, and in the game's own gems: Gameplay's
   # (gems/dot_popper-gameplay), all of which is Gameplay, Monetization's
   # (gems/dot_popper-monetization), which with the build parts' receipt
-  # checks, license keys and website store is Monetization, and the shared
-  # code's (gems/dot_popper-shared), all of which is the shared code.
+  # checks, license keys and website store is Monetization, Release
+  # Engineering's (gems/dot_popper-release_engineering), all of which is
+  # Release Engineering, and the shared code's (gems/dot_popper-shared),
+  # all of which is the shared code.
   FILES = {
     "Gameplay" => %w[../../gems/dot_popper-gameplay/lib/**/*.rb],
     "Monetization" => %w[../../gems/dot_popper-monetization/lib/**/*.rb website/license_keys.rb website/license_keys/**/*.rb website/website_store.rb
                        apple/receipt.rb play/receipt.rb microsoft/receipt.rb],
-    "ReleaseEngineering" => %w[release_engineering.rb release_engineering/**/*.rb],
+    "ReleaseEngineering" => %w[../../gems/dot_popper-release_engineering/lib/**/*.rb],
     "Shared" => %w[../../gems/dot_popper-shared/lib/**/*.rb]
   }.freeze
 
@@ -93,6 +95,7 @@ class AreasTest < Minitest::Test
     assert_includes files, "../../gems/dot_popper-shared/lib/dot_popper/network/link.rb"
     assert_includes files, "../../gems/dot_popper-gameplay/lib/dot_popper/gameplay/visibility.rb"
     assert_includes files, "../../gems/dot_popper-monetization/lib/dot_popper/monetization.rb"
+    assert_includes files, "../../gems/dot_popper-release_engineering/lib/dot_popper/release_engineering/build.rb"
     assert_equal Dir["*.rb", base: File.join(ROOT, "lib/dot_popper")].sort - %w[presentation.rb shell.rb use_cases.rb],
                  files.grep_v(%r{/}).sort, "every file at the top of lib/dot_popper but the outer layers' loaders"
   end

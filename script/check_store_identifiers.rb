@@ -9,7 +9,7 @@
 # channel that needs none, such as the website's, passes.
 #
 #   MSIX_IDENTITY_NAME=... MSIX_PUBLISHER=... ruby script/check_store_identifiers.rb microsoft-store
-require_relative "../lib/dot_popper/release_engineering/build"
+require_relative "../gems/dot_popper-release_engineering/lib/dot_popper/release_engineering/build"
 
 build = DotPopper::ReleaseEngineering::Build
 IDENTIFIERS = {

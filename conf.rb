@@ -6,7 +6,7 @@
 # before anything else of the game's.
 $stdout.sync = true
 
-require_relative "lib/dot_popper/release_engineering/build"
+require_relative "gems/dot_popper-release_engineering/lib/dot_popper/release_engineering/build"
 require_relative "lib/dot_popper/shell/vulkan_rescue"
 
 # Lota reads this before it opens the window. main.rb then sizes the

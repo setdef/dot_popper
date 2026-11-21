@@ -18,6 +18,11 @@ PATH
       dot_popper-shared (= 0.0.0)
 
 PATH
+  remote: gems/dot_popper-release_engineering
+  specs:
+    dot_popper-release_engineering (0.0.0)
+
+PATH
   remote: gems/dot_popper-shared
   specs:
     dot_popper-shared (0.0.0)
@@ -99,6 +104,7 @@ PLATFORMS
 DEPENDENCIES
   dot_popper-gameplay!
   dot_popper-monetization!
+  dot_popper-release_engineering!
   dot_popper-shared!
   fledge!
   lota (~> 0.7.1)
@@ -114,6 +120,7 @@ CHECKSUMS
   csv (3.3.7) sha256=15a3f16f6628da8664d455eb634e7f22031bcf53044923caf56975109e71b9f8
   dot_popper-gameplay (0.0.0)
   dot_popper-monetization (0.0.0)
+  dot_popper-release_engineering (0.0.0)
   dot_popper-shared (0.0.0)
   drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
   ffi (1.17.4) sha256=bcd1642e06f0d16fc9e09ac6d49c3a7298b9789bcb58127302f934e437d60acf

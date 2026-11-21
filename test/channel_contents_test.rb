@@ -41,13 +41,13 @@ class ChannelContentsTest < Minitest::Test
   # Stamps the app's copy for +channel+ as script/set_build_channel.rb
   # stamps a build, and leaves out what that channel's build leaves out.
   def stamp(channel)
-    build = File.join(@game, "lib/dot_popper/release_engineering/build.rb")
+    build = File.join(@game, "gems/dot_popper-release_engineering/lib/dot_popper/release_engineering/build.rb")
     File.write(build, BuildChannel.stamp(File.read(build), channel))
     ChannelContents.left_out(channel).each { FileUtils.rm_rf(File.join(@game, it)) }
   end
 
   def edit_build(from, to)
-    build = File.join(@game, "lib/dot_popper/release_engineering/build.rb")
+    build = File.join(@game, "gems/dot_popper-release_engineering/lib/dot_popper/release_engineering/build.rb")
     source = File.binread(build)
     assert_includes source, from
     File.binwrite(build, source.sub(from, to))
@@ -102,8 +102,8 @@ class ChannelContentsTest < Minitest::Test
   def test_a_checkout_stamped_for_a_channel_leaves_out_what_that_channel_does
     DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES.each do |channel|
       Dir.mktmpdir("dot_popper_checkout") do |checkout|
-        FileUtils.cp_r(%w[lib script].map { File.join(ROOT, it) }, checkout)
-        build = File.join(checkout, "lib/dot_popper/release_engineering/build.rb")
+        FileUtils.cp_r(%w[lib gems script].map { File.join(ROOT, it) }, checkout)
+        build = File.join(checkout, "gems/dot_popper-release_engineering/lib/dot_popper/release_engineering/build.rb")
         File.write(build, BuildChannel.stamp(File.read(build), channel))
         out, status = Open3.capture2e(RbConfig.ruby, File.join(checkout, "script", "channel_contents.rb"), "excludes")
 
@@ -119,7 +119,7 @@ class ChannelContentsTest < Minitest::Test
   def test_no_build_for_sale_loads_what_it_leaves_out
     DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES.each do |channel|
       lay_out_game
-      build = File.join(@game, "lib/dot_popper/release_engineering/build.rb")
+      build = File.join(@game, "gems/dot_popper-release_engineering/lib/dot_popper/release_engineering/build.rb")
       File.write(build, BuildChannel.stamp(File.read(build), channel))
       ChannelContents.left_out(channel).each { FileUtils.rm_rf(File.join(@game, it)) }
       load = 'require "lota"; require "dot_popper"; require "dot_popper/shell"; puts DotPopper::ReleaseEngineering::Build::CHANNEL'

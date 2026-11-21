@@ -25,6 +25,7 @@ class PrivacyDeclaredTest < Minitest::Test
 
     assert_includes Bundler.definition.specs_for([:default]).map(&:name), "dot_popper-gameplay"
     assert_includes Bundler.definition.specs_for([:default]).map(&:name), "dot_popper-shared"
+    assert_includes Bundler.definition.specs_for([:default]).map(&:name), "dot_popper-release_engineering"
     assert_includes Bundler.definition.specs_for([:default]).map(&:name), "dot_popper-monetization"
 
     assert_equal Privacy::DESKTOP_GEMS.keys.sort, shipped.sort
@@ -42,6 +43,7 @@ class PrivacyDeclaredTest < Minitest::Test
 
     assert_includes named.values.first, "dot_popper-gameplay"
     assert_includes named.values.first, "dot_popper-shared"
+    assert_includes named.values.first, "dot_popper-release_engineering"
     assert_includes named.values.first, "dot_popper-monetization"
     assert_equal 1, named.values.uniq.size, "the phone build scripts write different Gemfiles: #{named}"
     assert_equal Privacy::PHONE_GEMS.keys.sort, shipped.sort

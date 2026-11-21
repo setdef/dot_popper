@@ -1,0 +1,18 @@
+# frozen_string_literal: true
+
+require "rake/testtask"
+
+# The gem's own checks, which the game's Rakefile runs too (rake test,
+# rake steep): its tests, which load the gem alone, and Steep.
+Rake::TestTask.new(:test) do |t|
+  t.libs << "lib" << "test"
+  t.test_files = FileList["test/**/*_test.rb"]
+  t.warning = true
+end
+
+desc "Type-check the gem with Steep"
+task :steep do
+  sh "bundle exec steep check"
+end
+
+task default: %i[test steep]

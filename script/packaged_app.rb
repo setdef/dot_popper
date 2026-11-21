@@ -24,8 +24,10 @@ module PackagedApp
                        AGENTS.md GLOSSARY.md INSIPIRATION.md PACKAGING.md README.md .gitignore .gitattributes
                        gems/dot_popper-gameplay/sig gems/dot_popper-gameplay/test gems/dot_popper-gameplay/Rakefile
                        gems/dot_popper-gameplay/Steepfile gems/dot_popper-monetization/sig gems/dot_popper-monetization/test
-                       gems/dot_popper-monetization/Rakefile gems/dot_popper-monetization/Steepfile gems/dot_popper-shared/sig
-                       gems/dot_popper-shared/test gems/dot_popper-shared/Rakefile gems/dot_popper-shared/Steepfile].freeze
+                       gems/dot_popper-monetization/Rakefile gems/dot_popper-monetization/Steepfile
+                       gems/dot_popper-release_engineering/sig gems/dot_popper-release_engineering/test
+                       gems/dot_popper-release_engineering/Rakefile gems/dot_popper-release_engineering/Steepfile
+                       gems/dot_popper-shared/sig gems/dot_popper-shared/test gems/dot_popper-shared/Rakefile gems/dot_popper-shared/Steepfile].freeze
 
   # Run in a Ruby of its own, with the game's folder in the app and then
   # the libraries to require: reads the game's settings as `lota fuse`
@@ -96,11 +98,16 @@ module PackagedApp
   # The folders the gems an app ships load from, for a Ruby that has no
   # gems: those of the Gemfile's default group, as `lota fuse` ships them
   # (Lota and the game's own gems, under gems/), or Lota's when Bundler
-  # isn't loaded.
-  def shipped_load_path
+  # isn't loaded. Given the laid-out +game+, the game's own gems load from
+  # its copy of them, as in the app, and not from this repository's.
+  def shipped_load_path(game = nil)
     require "lota"
     specs = defined?(Bundler) ? Bundler.definition.specs_for([:default]).to_a : [Gem.loaded_specs.fetch("lota")]
-    specs.reject { it.name == "bundler" }.flat_map(&:full_require_paths)
+    paths = specs.reject { it.name == "bundler" }.flat_map(&:full_require_paths)
+    return paths unless game
+
+    own = File.join(ROOT, "gems", "")
+    paths.map { it.start_with?(own) ? File.join(game, it.delete_prefix(File.join(ROOT, ""))) : it }
   end
 
   # The libraries the Ruby files in +game+ require by name.
@@ -115,22 +122,22 @@ module PackagedApp
 
   # Runs START on the laid-out +game+ as a player's computer would; returns
   # the output and whether it passed.
-  def start(game) = bare_ruby("-e", START, game, *libraries(game))
+  def start(game) = bare_ruby("-e", START, game, *libraries(game), game:)
 
   # Runs this Ruby with +arguments+ as the app's Ruby runs: no Bundler, no
   # gem but those the app ships, none of this process's settings, and a
   # home of its own, with +env+ added. Ruby's own default libraries load;
   # its bundled gems, which the app's Ruby also carries, do not, since the
-  # game must lock a gem it uses. Returns the output and whether it exited
-  # with 0.
-  def bare_ruby(*arguments, env: {})
+  # game must lock a gem it uses. The game's own gems load from +game+, when given.
+  # Returns the output and whether it exited with 0.
+  def bare_ruby(*arguments, env: {}, game: nil)
     Dir.mktmpdir("dot_popper-home") do |home|
       gems = File.join(home, "no-gems")
       Dir.mkdir(gems)
       kept = %w[PATH SystemRoot SYSTEMROOT windir TEMP TMP].to_h { [it, ENV.fetch(it, nil)] }.compact
       bare = kept.merge("HOME" => home, "USERPROFILE" => home, "APPDATA" => home, "LOCALAPPDATA" => home,
                         "GEM_HOME" => gems, "GEM_PATH" => gems, "DOT_POPPER_AUTOMATED" => "1")
-      load_path = shipped_load_path.flat_map { ["-I", it] }
+      load_path = shipped_load_path(game).flat_map { ["-I", it] }
       out, status = Open3.capture2e(bare.merge(env), RbConfig.ruby, *load_path, *arguments,
                                     unsetenv_others: true, chdir: home)
       [out, status.success?]
