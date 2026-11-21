@@ -28,7 +28,7 @@ module DotPopper
           @listeners = []
           @since = begin
             Date.iso8601(file.read.to_s.strip)
-          rescue Date::Error
+          rescue ArgumentError # Date::Error, or a line too long to read
             nil
           end
         end
@@ -60,7 +60,8 @@ module DotPopper
               @file.write(today.iso8601)
             end
           end
-          announce(SetdefGone.new(since:, today:)) if gone?
+          since = @since
+          announce(SetdefGone.new(since:, today:)) if since
         end
 
         private
@@ -116,10 +117,11 @@ module DotPopper
         def update
           return nil if @done.empty?
 
-          result = @done.pop
+          result = @done.pop or return nil
           @thread&.join
           @gone.heard(result.answer, @today.call)
-          @verdict = (@license.heard(result.due, result.nonce, result.reply) if result.reply)
+          reply = result.reply
+          @verdict = (@license.heard(result.due, result.nonce, reply) if reply)
           start if @again
           result.answer
         end

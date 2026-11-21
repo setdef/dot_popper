@@ -39,7 +39,7 @@ module DotPopper
 
         # A check: its declaration, and the answer that shows the internet
         # works.
-        Check = Data.define(:request, :status, :body) do
+        class Check < Data.define(:request, :status, :body)
           def url = "http://#{request.to}"
         end
 

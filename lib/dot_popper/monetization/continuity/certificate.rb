@@ -27,7 +27,7 @@ module DotPopper
           root = roots.find { id_of(it) == bytes[5, 8] } or return nil
           return nil unless Ed25519.verify(root, bytes[77, 64].to_s, SIGNING_LABEL + bytes[0, 77].to_s)
 
-          new(root_id: bytes[5, 8], purpose:, public_key: bytes[45, 32])
+          new(root_id: bytes[5, 8].to_s, purpose:, public_key: bytes[45, 32].to_s)
         end
       end
     end

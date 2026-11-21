@@ -22,7 +22,7 @@ module DotPopper
           return false unless public_key.bytesize == 32 && signature.bytesize == 64
 
           require "openssl"
-          OpenSSL::PKey.read(PUBLIC_DER + public_key.b).verify(nil, signature.b, message.b)
+          OpenSSL::PKey.read(PUBLIC_DER + public_key.b).verify(nil, signature.b, message.b) # steep:ignore ArgumentTypeMismatch
         rescue StandardError, ScriptError
           false
         end
@@ -49,7 +49,7 @@ module DotPopper
       # docs/api.md).
       def self.label(text) = text.b.ljust(32, "\0".b).freeze
 
-      def self.hex(bytes) = bytes.unpack1("H*")
+      def self.hex(bytes) = bytes.unpack1("H*").to_s
 
       # +text+'s bytes when it is lowercase hex of +size+ bytes, else nil.
       def self.unhex(text, size)

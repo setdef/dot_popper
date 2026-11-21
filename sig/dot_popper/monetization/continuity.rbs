@@ -1,27 +1,43 @@
 module DotPopper
   module Monetization
+    # setdef being there (continuity.rb and continuity/).
     module Continuity
-      # A check left setdef gone (Gone#heard).
-      class SetdefGone < ::Data
-        attr_reader since: Date
+      # ASCII +text+ padded to 32 zero bytes, hex and back (ed25519.rb).
+      def self.label: (String text) -> String
 
-        attr_reader today: Date
+      def self.hex: (String bytes) -> String
 
-        def self.new: (since: Date, today: Date) -> instance
+      def self.unhex: (untyped text, Integer size) -> String?
 
-        def days: () -> Integer
+      module Ed25519
+        PUBLIC_DER: String
+
+        def self?.verify: (String public_key, String signature, String message) -> bool
+
+        def self?.available?: () -> bool
+
+        def self?.sha256: (String bytes) -> String
       end
 
-      # Whether setdef is gone (watch.rb); what the typed core asks of it.
-      class Gone
-        def gone?: () -> bool
+      # A setdef certificate (certificate.rb).
+      class Certificate < ::Data
+        SIZE: Integer
+        MAGIC: String
+        VERSION: Integer
+        SIGNING_LABEL: String
+        PROOF: String
 
-        def days: (Date today) -> Integer
-      end
+        attr_reader root_id: String
 
-      # setdef's server answered (Gone#heard).
-      class SetdefHere < ::Data
-        def self.new: () -> instance
+        attr_reader purpose: String
+
+        attr_reader public_key: String
+
+        def self.new: (root_id: String, purpose: String, public_key: String) -> instance
+
+        def self.id_of: (String root) -> String
+
+        def self.verified: (untyped bytes, roots: Array[String], purpose: String) -> Certificate?
       end
 
       # The proof roots a build trusts (pins.rb).
@@ -38,23 +54,10 @@ module DotPopper
 
       def self.live?: (?Pins pins) -> bool
 
-      # ASCII +text+ padded to 32 zero bytes, hex and back (ed25519.rb).
-      def self.label: (String text) -> String
-
-      def self.hex: (String bytes) -> String
-
-      def self.unhex: (untyped text, Integer size) -> String?
-
-      module Ed25519
-        def self?.verify: (String public_key, String signature, String message) -> bool
-
-        def self?.available?: () -> bool
-
-        def self?.sha256: (String bytes) -> String
-      end
-
       # setdef's signed proof and its online key (signed_answers.rb).
       module SignedAnswers
+        PROOF: String
+
         def self?.fresh: () -> String
 
         def self?.proof?: (untyped body, String nonce, ?Pins pins) -> bool
@@ -62,8 +65,182 @@ module DotPopper
         def self?.online_key: (untyped body, Pins pins) -> String?
       end
 
+      # The port to setdef's server for its proof (setdef_server.rb).
+      class SetdefServer
+        REQUESTS: Hash[Symbol, Network::Request]
+
+        @link: Network::Link
+
+        def initialize: (Network::Link link) -> void
+
+        def proof: (String nonce) -> Network::Reply
+      end
+
+      # The port to the connectivity checks (setdef_server.rb).
+      class Connectivity
+        REQUESTS: Hash[Symbol, Network::Request]
+
+        class Check < ::Data
+          attr_reader request: Network::Request
+
+          attr_reader status: Integer
+
+          attr_reader body: Regexp
+
+          def self.new: (request: Network::Request, status: Integer, body: Regexp) -> instance
+
+          def url: () -> String
+        end
+
+        CHECKS: Array[Check]
+
+        interface _Link
+          def call: (untyped job, String? token) -> Network::Reply
+        end
+
+        @checks: Array[Check]
+        @link: ^(String url) -> _Link
+
+        def initialize: (?checks: Array[Check], ?link: ^(String url) -> _Link) -> void
+
+        def online?: () -> bool
+      end
+
+      # A check left setdef gone (Gone#heard).
+      class SetdefGone < ::Data
+        attr_reader since: Date
+
+        attr_reader today: Date
+
+        def self.new: (since: Date, today: Date) -> instance
+
+        def days: () -> Integer
+      end
+
+      # setdef's server answered (Gone#heard).
+      class SetdefHere < ::Data
+        def self.new: () -> instance
+      end
+
+      type event = SetdefGone | SetdefHere
+
+      interface _Listener
+        def call: (event event) -> void
+      end
+
+      # Whether setdef is gone (watch.rb).
+      class Gone
+        @file: ::DotPopper::_SaveFile
+        @listeners: Array[_Listener]
+        @since: Date?
+
+        def initialize: (::DotPopper::_SaveFile file) -> void
+
+        attr_reader since: Date?
+
+        def gone?: () -> bool
+
+        def days: (Date today) -> Integer
+
+        def subscribe: (_Listener listener) -> self
+
+        def heard: (:here | :gone | :unknown answer, Date today) -> void
+
+        private
+
+        def announce: (event event) -> void
+      end
+
+      # What the watch asks of setdef's server (SetdefServer, or the test
+      # build's fake).
+      interface _Server
+        def proof: (String nonce) -> Network::Reply
+      end
+
+      # What the watch asks of the connectivity checks.
+      interface _Connectivity
+        def online?: () -> bool
+      end
+
+      # What the watch asks of a license key: what it owes setdef's server,
+      # and what it hears back (LicenseKeys::License).
+      interface _License
+        def due: (String nonce) -> untyped
+
+        def heard: (untyped due, String nonce, Network::Reply reply) -> (:current | :moved)?
+      end
+
+      # Where the watch asks what the license owes (LicenseKeys::Server).
+      interface _LicenseServer
+        def ask: (untyped due) -> Network::Reply
+      end
+
+      # Asks setdef's server and the connectivity checks (watch.rb).
+      class Watch
+        PRIORITY: Integer
+
+        class Result < ::Data
+          attr_reader answer: :here | :gone | :unknown
+
+          attr_reader due: untyped
+
+          attr_reader nonce: String
+
+          attr_reader reply: Network::Reply?
+
+          def self.new: (answer: :here | :gone | :unknown, due: untyped, nonce: String, reply: Network::Reply?) -> instance
+        end
+
+        @pins: Pins
+        @server: _Server
+        @license_server: _LicenseServer
+        @connectivity: _Connectivity
+        @gone: Gone
+        @license: _License
+        @today: ^() -> Date
+        @done: Thread::Queue[Result]
+        @thread: Thread?
+        @again: bool
+        @verdict: (:current | :moved)?
+
+        def initialize: (server: _Server, connectivity: _Connectivity, gone: Gone, license: _License, license_server: _LicenseServer,
+                         today: ^() -> Date, ?pins: Pins) -> void
+
+        attr_reader gone: Gone
+
+        attr_reader license: _License
+
+        attr_reader verdict: (:current | :moved)?
+
+        def start: () -> void
+
+        def update: () -> (:here | :gone | :unknown)?
+
+        def join: () -> void
+
+        def check: (untyped due, String nonce) -> Result
+      end
+
+      # No watch (watch.rb).
+      class NoWatch
+        @gone: Gone
+        @license: _License
+
+        def initialize: (gone: Gone, license: _License) -> void
+
+        attr_reader gone: Gone
+
+        attr_reader license: _License
+
+        def start: () -> nil
+
+        def update: () -> nil
+
+        def join: () -> nil
+      end
+
       # The throwaway keys whose private seeds ship for the test build's
-      # fakes (the rest of Continuity's files are not typed yet).
+      # fakes.
       module TestKeys
         LICENSE: String
       end
