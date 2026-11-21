@@ -28,7 +28,9 @@ module DotPopper
     # What a player does that needs two of the game's areas goes through
     # the use cases it is given, made by the composition root (ADR-0019):
     # +start_game+, +finish_game+, +buy_pro+, +use_theme+,
-    # +join_or_create_friend_group+ and +view_achievements+. It is never
+    # +join_or_create_friend_group+ and +view_achievements+, and the
+    # offer's second action for the build's store, +offer_second+ (nil
+    # for Restore Purchases; Screens::Offer). It is never
     # given what decides Pro, the store or the free games, so nothing here
     # can ask them.
     class Show
@@ -45,7 +47,7 @@ module DotPopper
                      sizing_file: MemoryFile.new, input: InputKind::MOUSE, measure: RoughMeasure.new,
                      stats_backup: Gameplay::StatsBackup.new(score_record: game_flow.score_record, saved_stats:, achievements:), notices: Notices.none,
                      sharing: InGameSharing.new, tutorial_flag: TutorialFlag.never, window: NoWindowControl.new,
-                     links: NoLinks.new, group_notice: GroupNotice.read, server_choice: nil)
+                     links: NoLinks.new, group_notice: GroupNotice.read, server_choice: nil, offer_second: nil)
         @game_flow = game_flow
         @window = window
         @links = links
@@ -89,7 +91,7 @@ module DotPopper
         @hover = Hover.none
         @screens = Screens.made_for(self, clipboard:, buy_pro:, start_game:, sharing:, view_achievements:, stats_backup:, saved_stats:,
                                           achievements:, haptics:, notices:, sizing_file:, server_choice:, saved_themes:, use_theme:,
-                                          tutorial_flag:)
+                                          tutorial_flag:, offer_second:)
       end
 
       # The screen on top, which every press, button, key and scroll asks
@@ -394,10 +396,6 @@ module DotPopper
       # they are on, leading with it (Screens::Offer#open_led_by).
       def open_offer_for(feature) = offer.open_led_by(feature)
 
-      # Whether the store takes a license key (WebsiteStore), rather than
-      # restoring its purchases.
-      def keys? = offer.keys?
-
       # The friend groups' screens opened (+open+) or closed, on the stack.
       def friend_groups_shown(open) = open ? push(:friend_groups) : pop(:friend_groups)
 
@@ -428,9 +426,6 @@ module DotPopper
       # What the offer says of how the store is getting on.
       def offer_status = offer.status
 
-
-      # Paste license key, on the offer (Screens::Offer#paste_key).
-      def paste_key = offer.paste_key
 
 
       # Buy's words (Screens::Offer#buy_label).

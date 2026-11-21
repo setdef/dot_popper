@@ -6,9 +6,9 @@ module DotPopper
     # itch.io, Homebrew, winget, a Linux package or an APK. Buy opens a
     # checkout in a web browser, which sells a license key by email, and
     # Paste license key enters it (+entitlement+, Entitlement#enter, into
-    # its LicenseKeys::License), so it answers the
-    # Store's methods and two of its own: #keys?, that a key is how
-    # Pro arrives here, and #paste. It has no Restore: the key is the
+    # its LicenseKeys::License), so it answers the Store's methods and its
+    # own for a key (#paste, #type, #typed), which the offer reaches
+    # through UseCases::EnterLicenseKey. It has no Restore: the key is the
     # purchase, and it works on any device. While setdef is gone (+gone+,
     # Continuity::Gone) Pro is no longer sold: Buy goes, and the offer says
     # so, but a key bought earlier still enters.
@@ -35,7 +35,6 @@ module DotPopper
       end
 
       def offered? = true
-      def keys? = true
       def sold? = !@gone.gone?
       def price = (PRICE if sold?)
 

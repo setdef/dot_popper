@@ -227,7 +227,7 @@ class StoreTest < Minitest::Test
   end
 
   def test_no_word_of_the_offer_calls_it_a_trial_or_a_demo
-    words = Style::WORDS.offer.values.flatten.join(" ")
+    words = [*Style::WORDS.offer.values, *DotPopper::Presentation::LicenseKeyEntry::WORDS.values].flatten.join(" ")
 
     refute_match(/trial|demo/i, words)
   end

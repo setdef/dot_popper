@@ -39,7 +39,8 @@ class OfferPainterTest < Minitest::Test
     plan = drawing.plan
     [*UNUSED.select { |path| paths(drawing).any? { under?(it, path) } },
      *([[:themes]] unless drawing.focus == :themes), *([[:achievement]] unless drawing.focus == :achievements),
-     *%i[buy restore paste].reject { plan.key?(it) }.flat_map { [[it], [:lit, it]] },
+     *([[:buy], %i[lit buy]] unless plan.key?(:buy)),
+     *([[:second], [:second_words], [:lit, drawing.second]] unless plan.key?(drawing.second)),
      *([[:status]] unless plan.key?(:status))]
   end
 
@@ -84,7 +85,7 @@ class OfferPainterTest < Minitest::Test
     show, fixture = offer(:games)
     show.input = P::InputKind::MOUSE
     given = show.screen.drawing
-    (%i[buy restore paste] & given.lit.keys).select { given.plan.key?(it) }.each do |name|
+    ([:buy, given.second] & given.lit.keys).select { given.plan.key?(it) }.each do |name|
       rect = given.plan[name]
       show.pointer_at(rect.center_x, rect.center_y)
       fixture.tick(1.0)

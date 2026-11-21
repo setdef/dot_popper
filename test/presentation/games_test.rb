@@ -16,9 +16,7 @@ class GamesTest < Minitest::Test
     def connect = nil
     def buy = nil
     def restore = nil
-    def keys? = false
     def sold? = true
-    def paste = nil
     def update(_seconds) = nil
   end
 

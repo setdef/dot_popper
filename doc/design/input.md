@@ -117,7 +117,7 @@ Each screen's own buttons (`Show#pad` asks the screen on top, `Show#screen`: `Sc
 | Settings | Select: Sound. LB: Dot size, where it is offered. RB: Display, on a computer. X: Credits and licenses. Y: Privacy. B: Back |
 | Privacy | X: Read the privacy policy. Y: hold to delete my friend group data. B: Back |
 | Credits | Left stick, d-pad or right stick: scroll. B: Back |
-| Pro offer | Y: Buy, wherever the offer is open, over Game Over too. X: Paste license key where the copy takes license keys, or else Restore Purchases. A at no button, Start and B: Back, so no one buys by reflex ([store-and-pro.md](store-and-pro.md)) |
+| Pro offer | Y: Buy, wherever the offer is open, over Game Over too. X: the second button, Restore Purchases, or Paste license key on a copy the website's store sells. A at no button, Start and B: Back, so no one buys by reflex ([store-and-pro.md](store-and-pro.md)) |
 | Tutorial | B: Skip |
 | The new theme card | A at no button: Use. B: Not now |
 | Friend groups | See [friend-groups.md](friend-groups.md). B is Back on every one of them |
@@ -186,10 +186,10 @@ The table below is the keys' order. `test/presentation/input_doc_test.rb` fails 
 | Key | Where | What it does |
 | --- | --- | --- |
 | Any key | During the splash | Skips the splash |
-| Ctrl+V or Cmd+V | Pro offer, Change Server | Pastes a license key, where the copy takes one, or a server's address (`Screens::Offer#paste`, `Screens::ChangeServer#paste`) |
+| Ctrl+V or Cmd+V | A website copy's offer, Change Server | Pastes a license key, on a copy the website's store sells, or a server's address (`Presentation::LicenseKeyEntry#paste`, in the website's part; `Screens::ChangeServer#paste`) |
 | Ctrl+B or Cmd+B | Pro offer | Buy (`Screens::Offer#buy`) |
-| Letters, digits, hyphen, Backspace, Delete, Enter | Pro offer | On a copy that takes license keys: the key being typed (`WebsiteStore#type`). A letter, digit or hyphen alone or with Alt (Option types characters on a Mac); with Ctrl or Cmd it types nothing, as below. Backspace, Delete and Enter with any modifier keys or none |
-| Space | Pro offer | Nothing, while a license key is being typed (`Screens::Offer#typing?`): a key's text ignores spaces, so one typed as it is printed, in groups, never closes the offer. *Designing for People* (Lee, Wickens, Liu and Boyle): most "human error" is a design problem, so the right action is made easy and the wrong one hard. With nothing typed, Space goes on to the main button, Back |
+| Letters, digits, hyphen, Backspace, Delete, Enter | A website copy's offer | The license key being typed (`WebsiteStore#type`). A letter, digit or hyphen alone or with Alt (Option types characters on a Mac); with Ctrl or Cmd it types nothing, as below. Backspace, Delete and Enter with any modifier keys or none |
+| Space | A website copy's offer | Nothing, while a license key is being typed (`Presentation::LicenseKeyEntry#typing?`): a key's text ignores spaces, so one typed as it is printed, in groups, never closes the offer. *Designing for People* (Lee, Wickens, Liu and Boyle): most "human error" is a design problem, so the right action is made easy and the wrong one hard. With nothing typed, Space goes on to the main button, Back |
 | Digits, Backspace, Delete | Friend groups | On the keypad that joins a friend group: a digit, or the last one away (`GroupPanel#type`) |
 | H | Home | How to play (`Screens::Home#type`) |
 | C | Settings | Credits and licenses (`Screens::Settings#type`) |

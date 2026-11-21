@@ -30,7 +30,7 @@ module DotPopperGui
       wait(0.5)
       keep_screenshot("website-offer-#{name}")
       ::Lota::System.clipboard_text = "not a key"
-      show.paste_key
+      show.pad(:x) # Paste license key, the website copy's second action
       wait(0.3)
       keep_screenshot("website-offer-invalid-#{name}")
       show.back

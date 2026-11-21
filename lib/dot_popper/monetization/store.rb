@@ -78,13 +78,9 @@ module DotPopper
       end
 
       def offered? = true
-      # A store's purchase is restored, never pasted as a key (Apple 3.1.1),
-      # and it sells for as long as the store lists it.
-      def keys? = false
+      # A store's purchase is restored (Apple 3.1.1), and it sells for as
+      # long as the store lists it.
       def sold? = true
-      def paste = nil
-      def type(_key) = false
-      def typed = ""
 
       # Asks the store for the price and what this player owns: at launch,
       # so a purchase on another device or after a reinstall simply
@@ -146,11 +142,7 @@ module DotPopper
     # nobody has built: nothing is offered.
     class NoStore
       def offered? = false
-      def keys? = false
       def sold? = false
-      def paste = nil
-      def type(_key) = false
-      def typed = ""
       def status = :unavailable
       def price = nil
       def connect = nil

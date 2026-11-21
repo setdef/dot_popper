@@ -126,11 +126,12 @@ module DotPopper
         context.text(text, context.fonts.semibold(size), rect.center_x, rect.center_y, context.palette.cream)
       end
 
-      # Buy, while Pro is sold, and Restore Purchases or Paste license key.
+      # Buy, while Pro is sold, and the second button.
       def buttons(drawing)
         plan = drawing.plan
         PrimaryButton.new(context:).draw(plan[:buy], drawing.buy, hover: drawing.lit.fetch(:buy)) if plan.key?(:buy)
-        %i[restore paste].each { PillButton.new(context:).draw(plan[it], drawing.public_send(it), hover: drawing.lit.fetch(it)) if plan.key?(it) }
+        second = drawing.second
+        PillButton.new(context:).draw(plan[second], drawing.second_words, hover: drawing.lit.fetch(second)) if plan.key?(second)
       end
     end
   end

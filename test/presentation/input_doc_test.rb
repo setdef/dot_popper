@@ -14,7 +14,7 @@ class InputDocTest < Minitest::Test
 
   # The screens that take keys of their own, by the name the document's
   # "Where" column gives them; "Every screen" is the InputHandler's.
-  WHERE = { "Pro offer" => Screens::Offer, "Change Server" => Screens::ChangeServer, "Friend groups" => Screens::FriendGroups,
+  WHERE = { "Pro offer" => Screens::Offer, "A website copy's offer" => LicenseKeyEntry, "Change Server" => Screens::ChangeServer, "Friend groups" => Screens::FriendGroups,
             "Home" => Screens::Home, "Settings" => Screens::Settings, "Every screen" => InputHandler }.freeze
 
   # The document's words for groups of keys.

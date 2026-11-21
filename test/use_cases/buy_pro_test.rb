@@ -22,8 +22,6 @@ class BuyProTest < Minitest::Test
     def connect = @asked << :connect
     def buy = @asked << :buy
     def restore = @asked << :restore
-    def paste = @asked << :paste
-    def type(key) = (@asked << [:type, key]) && true
     def update(seconds) = @asked << [:update, seconds]
   end
 
@@ -64,7 +62,6 @@ class BuyProTest < Minitest::Test
     @entitlement.verify_receipt(DotPopper::Monetization::Receipt.issue)
 
     refute @buy.buy
-    refute @buy.type(:a)
     refute_predicate @buy, :offered?
     assert_equal :thanks, @buy.status
     assert_empty @store.asked

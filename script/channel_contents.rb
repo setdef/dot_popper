@@ -72,14 +72,17 @@ module ChannelContents
               marks: [/\.sign\(/, /PRIVATE_DER/, /def self\.issue\b/]),
     Piece.new(name: "the test build's settings that grant Pro or skip the free-game limit", needed_by: [TEST], apart: :all,
               marks: [/DOT_POPPER_PRO\b/, /DOT_POPPER_FREE_GAMES/, /DOT_POPPER_TODAY/, /DOT_POPPER_THEME_UNLOCKS/]),
-    Piece.new(name: "the website checkout", needed_by: [TEST, Build::WEBSITE], apart: :files,
+    # No shared file names the website's store (the offer asks the second
+    # action the store comes with), so a build that lacks the part names
+    # it nowhere.
+    Piece.new(name: "the website checkout", needed_by: [TEST, Build::WEBSITE], apart: :all,
               files: %w[lib/dot_popper/website],
               marks: [/WebsiteStore/, /BrowserCheckout/, %r{dot-popper\.setdef\.com/buy}],
               defined_by: [/class WebsiteStore\b/, /class BrowserCheckout\b/, %r{dot-popper\.setdef\.com/buy}]),
     Piece.new(name: "license keys", needed_by: [TEST, Build::WEBSITE], apart: :files,
               files: %w[lib/dot_popper/website/license_keys.rb lib/dot_popper/website/license_keys],
               marks: [/LicenseKey/, /license\.txt/, /license_checks/, /Paste license key/, /comes by email/],
-              defined_by: [/module LicenseKeys\b/]),
+              defined_by: [/module LicenseKeys\b/, /class LicenseKeyEntry\b/, /class EnterLicenseKey\b/, /Paste license key/, /comes by email/]),
     # Each store's receipt code is a part of its own (lib/dot_popper/PART),
     # which only its store's build carries, and a test build.
     Piece.new(name: "Google Play's receipts", needed_by: [TEST, Build::GOOGLE_PLAY], apart: :files,

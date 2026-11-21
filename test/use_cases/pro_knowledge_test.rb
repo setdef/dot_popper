@@ -58,6 +58,7 @@ class ProKnowledgeTest < Minitest::Test
     lib/dot_popper/composition/use_cases.rb
     lib/dot_popper/monetization.rb
     lib/dot_popper/website/license_keys/license.rb
+    lib/dot_popper/website/offer.rb
     lib/dot_popper/website/root.rb
     lib/dot_popper/monetization/entitlement.rb
     lib/dot_popper/monetization/free_games.rb

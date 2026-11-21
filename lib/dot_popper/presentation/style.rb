@@ -75,10 +75,7 @@ module DotPopper
           buy: "Buy for %s", retry: "Try again", restore: "Restore Purchases",
           loading: "Asking the store…", busy: "One moment…", pending: "Waiting for approval.",
           failed: "That didn't go through.", none: "Nothing to restore on this account.",
-          unavailable: "The store isn't answering.", thanks: "Thank you. It's yours.",
-          paste: "Paste license key", browser: "Finish in your browser. Your key comes by email.",
-          copied: "Your license key is copied. Paste it here.", invalid: "That isn't a license key.",
-          typing: "Key:", empty: "Copy your license key first.", same: "That key is already here.", not_sold: "Pro is no longer sold."
+          unavailable: "The store isn't answering.", thanks: "Thank you. It's yours."
         }.freeze,
         hold_to_clear: ByInput.new(
           touch: "Press and hold to clear your records, totals, chart, achievements, and streak.",

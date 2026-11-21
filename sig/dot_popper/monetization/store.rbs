@@ -5,25 +5,17 @@ module DotPopper
     interface _Store
       def offered?: () -> bool
 
-      def keys?: () -> bool
-
       def sold?: () -> bool
 
       def price: () -> String?
 
       def status: () -> Symbol
 
-      def typed: () -> String
-
       def connect: () -> void
 
       def buy: () -> void
 
       def restore: () -> void
-
-      def paste: () -> Symbol?
-
-      def type: (Symbol key) -> bool
 
       def update: (Float seconds) -> void
     end
@@ -68,15 +60,7 @@ module DotPopper
 
       def offered?: () -> bool
 
-      def keys?: () -> bool
-
       def sold?: () -> bool
-
-      def paste: () -> nil
-
-      def type: (Symbol _key) -> bool
-
-      def typed: () -> String
 
       def connect: () -> void
 
@@ -126,15 +110,7 @@ module DotPopper
     class NoStore
       def offered?: () -> bool
 
-      def keys?: () -> bool
-
       def sold?: () -> bool
-
-      def paste: () -> nil
-
-      def type: (Symbol _key) -> bool
-
-      def typed: () -> String
 
       def status: () -> Symbol
 
@@ -230,8 +206,6 @@ module DotPopper
       def initialize: (checkout: _Checkout, entitlement: Entitlement, gone: _Gone, clipboard: _Clipboard, ?entered: ^() -> void) -> void
 
       def offered?: () -> bool
-
-      def keys?: () -> bool
 
       def sold?: () -> bool
 

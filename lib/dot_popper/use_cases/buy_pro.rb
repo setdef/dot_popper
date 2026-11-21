@@ -3,10 +3,9 @@
 module DotPopper
   module UseCases
     # Buying Pro, from the offer: asking the store (+store+, the
-    # Store port) for the price as the offer opens, Buy, Restore
-    # Purchases, and a license key pasted or typed on a copy that takes
-    # one; once the player has Pro (+entitlement+, Entitlement), Buy and a
-    # typed key do nothing. The store is heard only while no game
+    # Store port) for the price as the offer opens, Buy, and Restore
+    # Purchases; once the player has Pro (+entitlement+, Entitlement), Buy
+    # does nothing. The store is heard only while no game
     # is in play (+game_flow+, GameFlow), so a purchase never lands mid-game.
     # When Pro arrives (Entitlement::ProGranted, which the composition
     # root subscribes it to), the player's friend groups (+friend_groups+)
@@ -27,15 +26,11 @@ module DotPopper
       # who has not bought it.
       def offered? = @store.offered? && !owned?
 
-      # Whether the store sells Pro here, and whether it takes a license
-      # key (WebsiteStore) rather than restoring its purchases.
+      # Whether the store sells Pro here.
       def sold? = @store.sold?
-      def keys? = @store.keys?
 
-      # The price the store gave, or nil before it has; and the license
-      # key typed so far, or "".
+      # The price the store gave, or nil before it has.
       def price = @store.price
-      def typed = @store.typed
 
       # What the offer says of buying: :thanks once the player has Pro,
       # which the offer thanks them for in place of selling it; until
@@ -57,13 +52,6 @@ module DotPopper
       end
 
       def restore = @store.restore
-
-      # Paste license key, on a copy that takes one.
-      def paste = @store.paste
-
-      # A key typed as a license key, on a copy that takes one; says
-      # whether it was taken.
-      def type(key) = !owned? && @store.type(key)
 
       # Hears the store, +seconds+ on, unless a game is in play.
       def update(seconds)

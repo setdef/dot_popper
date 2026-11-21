@@ -214,7 +214,7 @@ class InputsTest < Minitest::Test
         # license key; a computer's test build sells as a website copy does.
         assert_includes show.controls.map(&:name), fixture.phone? ? :restore : :paste
         assert_equal :pressed, player.press(:buy)
-        assert_equal :pressed, player.press(:paste) if fixture.store.keys?
+        assert_equal :pressed, player.press(:paste) if fixture.store.is_a?(DotPopper::Monetization::WebsiteStore)
         fixture.tick(1.0)
 
         assert_predicate fixture.entitlement, :pro?
@@ -304,9 +304,9 @@ class InputsTest < Minitest::Test
     player.press(:buy)
 
     assert_equal DotPopper::Monetization::BrowserCheckout::URL, fixture.opener.urls.last
-    assert_equal fixture.show.words.offer[:browser], fixture.show.offer_status
+    assert_equal DotPopper::Presentation::LicenseKeyEntry::WORDS[:browser], fixture.show.offer_status
     assert_equal :pressed, player.press(:paste)
-    assert_equal fixture.show.words.offer[:empty], fixture.show.offer_status, "Copy your license key first."
+    assert_equal DotPopper::Presentation::LicenseKeyEntry::WORDS[:empty], fixture.show.offer_status, "Copy your license key first."
     refute_predicate fixture.entitlement, :pro?
 
     fixture.clipboard.copy(DotPopper::Monetization::Continuity::TestKeys.license_key.text) # copied from the email

@@ -179,12 +179,30 @@ class ChannelContentsTest < Minitest::Test
   def test_check_fails_when_an_app_store_build_holds_a_copy_of_a_website_file_elsewhere
     stamp("app-store")
     stray = File.join(@game, "lib/dot_popper/monetization/stray.rb")
-    Dir.glob("lib/dot_popper/website/{website_store.rb,license_keys.rb,license_keys/*.rb}", base: ROOT).each do |file|
+    Dir.glob("lib/dot_popper/website/{website_store.rb,offer.rb,license_keys.rb,license_keys/*.rb}", base: ROOT).each do |file|
       FileUtils.cp(File.join(ROOT, file), stray)
       ok, out = run_script("check", "app-store", @app)
 
       refute ok, "#{file}:\n#{out}"
       assert_match(%r{FAIL .* holds lib/dot_popper/monetization/stray\.rb, which names (the website checkout|license keys)}, out)
+    end
+  end
+
+  # The offer asks the second action the build's store comes with, so no
+  # shared file names the website's store or says the website's words: an
+  # app store's package whose shared code names the store, or says "Paste
+  # license key" or that a key comes by email, anywhere, fails.
+  def test_check_fails_when_an_app_store_builds_shared_code_names_the_website_store_or_its_words
+    stamp("app-store")
+    show = File.join(@game, "lib/dot_popper/presentation/show.rb")
+    original = File.read(show)
+    { "# the WebsiteStore" => "the website checkout", 'X = "Paste license key"' => "license keys",
+      'X = "Your key comes by email."' => "license keys" }.each do |line, piece|
+      File.write(show, "#{original}#{line}\n")
+      ok, out = run_script("check", "app-store", @app)
+
+      refute ok, "#{line}:\n#{out}"
+      assert_match(%r{FAIL .* holds lib/dot_popper/presentation/show\.rb, which names #{piece}}, out)
     end
   end
 

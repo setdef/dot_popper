@@ -29,7 +29,7 @@ module DotPopperGui
       keep_screenshot("purchase-offer")
       buy = show.reach_of(:buy)
       click(buy.center_x, buy.center_y)
-      check(show.offer_status == words.offer[:copied], "Buy reaches the checkout, which sends a license key")
+      check(show.offer_status == DotPopper::Presentation::LicenseKeyEntry::WORDS[:copied], "Buy reaches the checkout, which sends a license key")
       paste = show.reach_of(:paste)
       click(paste.center_x, paste.center_y)
       wait_for("the thanks") { show.offer_status == words.offer[:thanks] }

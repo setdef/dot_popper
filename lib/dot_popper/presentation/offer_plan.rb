@@ -8,14 +8,14 @@ module DotPopper
     # What the offer of Pro hands its painter (Shell::OfferPainter): its
     # +header+ (HeaderDrawing), where everything goes (+plan+, OfferPlan),
     # what it leads with (+focus+) and its name (+focus_word+), the rest of
-    # what Pro adds (+others+), the line of how the store or the key is
-    # getting on (+status+), Buy's words and Restore Purchases' and Paste
-    # license key's (+buy+, +restore+, +paste+) and each one's light
+    # what Pro adds (+others+), the line of how the store is getting on
+    # (+status+), Buy's words (+buy+), the second button's name in the plan
+    # (+second+) and its words (+second_words+), each button's light
     # (+lit+, by name), the themes Pro would give (+themes+, each a Theme
     # and its name) and the achievement a Free player tapped (+achievement+,
     # OfferAchievement, or nil).
-    class OfferDrawing < Data.define(:header, :plan, :focus, :focus_word, :others, :status, :buy, :restore, :paste, :lit, :themes,
-                                     :achievement); end
+    class OfferDrawing < Data.define(:header, :plan, :focus, :focus_word, :others, :status, :buy, :second, :second_words, :lit,
+                                     :themes, :achievement); end
 
     # The achievement the offer leads with: its +id+, +name+, how to earn
     # it (+how+), and whether it is +earned+.
@@ -34,12 +34,13 @@ module DotPopper
     # get, an achievement and how to earn it, or the feature's sign), its
     # name, then the rest of what Pro adds, a line for how the store is
     # getting on (kept even while empty, so nothing moves when it speaks),
-    # Buy and Restore Purchases. Short of room the type shrinks, then the
+    # Buy and a second button. Short of room the type shrinks, then the
     # art goes. A short window held sideways puts the buttons on the right.
     # The buttons are the plan's only while +offering+: a player who owns
     # it has nothing left to press here but Back. Buy is there while Pro is
-    # +sold+; the second button, +second+, is Restore Purchases on a
-    # store's copy and Paste license key (:paste) on a website copy.
+    # +sold+; the second button is named +second+: Restore Purchases
+    # (:restore), or the one the build's store comes with
+    # (Screens::Offer).
     class OfferLayout < Data.define(:layout, :type, :words, :measure, :offering, :note, :focus, :art, :sold, :second)
       GAPS = { note: 0, art: 14, focus: 10, items: 12, status: 10, buy: 12, restore: 10 }.freeze
       LINE = 1.45 # the items apart, in a line's height

@@ -80,7 +80,7 @@ class WebsiteStoreTest < Minitest::Test
     open_offer(s)
     click(s, :buy)
 
-    assert_equal s.words.offer[:copied], s.offer_status
+    assert_equal DotPopper::Presentation::LicenseKeyEntry::WORDS[:copied], s.offer_status
   end
 
   def test_a_controllers_y_buys_and_the_button_says_so
@@ -91,7 +91,7 @@ class WebsiteStoreTest < Minitest::Test
     assert_equal "Buy for $1.99 (Y)", s.buy_label
     s.pad(:y)
 
-    assert_equal s.words.offer[:copied], s.offer_status
+    assert_equal DotPopper::Presentation::LicenseKeyEntry::WORDS[:copied], s.offer_status
   end
 
   def test_the_keyboards_buy_shortcut_buys_only_on_the_offer
@@ -103,7 +103,7 @@ class WebsiteStoreTest < Minitest::Test
     open_offer(s)
     press_key(:b, :ctrl, show: s)
 
-    assert_equal s.words.offer[:copied], s.offer_status
+    assert_equal DotPopper::Presentation::LicenseKeyEntry::WORDS[:copied], s.offer_status
   end
 
   def test_the_buy_label_names_the_keyboards_key_until_a_pointer_or_controller_is_used
@@ -136,7 +136,7 @@ class WebsiteStoreTest < Minitest::Test
     open_offer(s)
     click(s, :buy)
 
-    assert_equal s.words.offer[:copied], s.offer_status
+    assert_equal DotPopper::Presentation::LicenseKeyEntry::WORDS[:copied], s.offer_status
     refute @entitlement.pro?
     before = s.sounds.played.size
     click(s, :paste)
@@ -193,7 +193,7 @@ class WebsiteStoreTest < Minitest::Test
 
       press_key(c == "-" ? :minus : c.downcase.to_sym, show: s)
     end
-    assert_equal "#{s.words.offer[:typing]} …#{text.upcase[-24..]}", s.offer_status
+    assert_equal "#{DotPopper::Presentation::LicenseKeyEntry::WORDS[:typing]} …#{text.upcase[-24..]}", s.offer_status
     refute @entitlement.pro?
     press_key(:backspace, show: s)
     press_key(text[-1].downcase.to_sym, show: s)
@@ -207,7 +207,7 @@ class WebsiteStoreTest < Minitest::Test
     press_key(:a, show: s)
     open_offer(s)
 
-    refute_includes s.offer_status, s.words.offer[:typing]
+    refute_includes s.offer_status, DotPopper::Presentation::LicenseKeyEntry::WORDS[:typing]
   end
 
   def test_paste_says_what_was_wrong_and_changes_nothing
@@ -215,15 +215,15 @@ class WebsiteStoreTest < Minitest::Test
     open_offer(s)
     click(s, :paste)
 
-    assert_equal s.words.offer[:empty], s.offer_status
+    assert_equal DotPopper::Presentation::LicenseKeyEntry::WORDS[:empty], s.offer_status
     @clipboard.copy("my shopping list")
     click(s, :paste)
 
-    assert_equal s.words.offer[:invalid], s.offer_status
+    assert_equal DotPopper::Presentation::LicenseKeyEntry::WORDS[:invalid], s.offer_status
     @clipboard.copy(C::TestKeys.license_key(:online).text)
     click(s, :paste)
 
-    assert_equal s.words.offer[:invalid], s.offer_status
+    assert_equal DotPopper::Presentation::LicenseKeyEntry::WORDS[:invalid], s.offer_status
     refute @entitlement.pro?
   end
 
@@ -233,7 +233,7 @@ class WebsiteStoreTest < Minitest::Test
     open_offer(s)
 
     assert_equal %i[back paste], names(s).sort
-    assert_equal s.words.offer[:not_sold], s.offer_status
+    assert_equal DotPopper::Presentation::LicenseKeyEntry::WORDS[:not_sold], s.offer_status
     assert_nil s.offer_price
     @clipboard.copy(C::TestKeys.license_key.text)
     click(s, :paste)

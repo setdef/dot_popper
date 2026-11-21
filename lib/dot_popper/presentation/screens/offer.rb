@@ -4,15 +4,32 @@ module DotPopper
   module Presentation
     module Screens
       # The offer of Pro, over the screen it was opened from (OfferLayout):
-      # Buy, Restore Purchases or Paste license key, and Back. It asks
-      # everything of +buy_pro+ (UseCases::BuyPro): it sells through it,
-      # shows what it says of the store, and thanks the player once it says
-      # they have Pro.
+      # Buy, a second action, and Back. It asks everything of +buy_pro+
+      # (UseCases::BuyPro): it sells through it, shows what it says of the
+      # store, and thanks the player once it says they have Pro. The second
+      # action is the one the build's store comes with (+offer_second+, which
+      # the composition root chooses for the store), or Restore Purchases
+      # (RestorePurchases): the button, its words, its controller button
+      # and keys, and what the status line says of it.
       class Offer < Screen
-        def initialize(show, buy_pro:, view_achievements:)
+        # The second action of a store's copy: Restore Purchases, with no
+        # keys of its own and nothing of its own to say.
+        class RestorePurchases
+          def name = :restore
+          def label(words) = words.offer[:restore]
+          def press(offer, _sounds) = offer.restore
+          def key_bindings = []
+          def status(_status) = nil
+          def paste(_sounds) = false
+          def type(_key) = false
+          def typing? = false
+        end
+
+        def initialize(show, buy_pro:, view_achievements:, offer_second:)
           super(show)
           @buy_pro = buy_pro
           @view_achievements = view_achievements
+          @second = offer_second || RestorePurchases.new
           @focus = nil
           @for_play = false
           @key_hint = nil
@@ -81,7 +98,7 @@ module DotPopper
         def screen_layout
           OfferLayout.new(layout:, type: style::TYPE, words:, measure:, offering: !thanking?,
                           note: (words.offer[:no_games] if for_play), focus:, art:,
-                          sold: @buy_pro.sold?, second: keys? ? :paste : :restore)
+                          sold: @buy_pro.sold?, second: @second.name)
         end
 
         def plan = screen_layout.plan
@@ -101,8 +118,8 @@ module DotPopper
           drawn(screen, words, hover, status, buy, themes, id, earned) do
             offer = words.offer
             OfferDrawing.new(header: HeaderDrawing.for(offer[:heading], layout:, measure:, words:, hover:), plan: screen.plan, focus:,
-                             focus_word: screen.focus_word, others: screen.others, status:, buy:, restore: offer[:restore],
-                             paste: offer[:paste], lit: %i[buy restore paste].to_h { [it, hover.level(it)] },
+                             focus_word: screen.focus_word, others: screen.others, status:, buy:, second: @second.name,
+                             second_words: @second.label(words), lit: [:buy, @second.name].to_h { [it, hover.level(it)] },
                              themes: themes.map { [it, words.themes.fetch(it.key)] },
                              achievement: id && OfferAchievement.new(id:, name: AchievementWords.name(id), how: AchievementWords.how(id), earned:))
           end
@@ -118,20 +135,15 @@ module DotPopper
           end
         end
 
-        # Whether the store takes a license key (WebsiteStore), rather than
-        # restoring its purchases.
-        def keys? = @buy_pro.keys?
-
         # The price the store gave, or nil before it has.
         def price = @buy_pro.price
 
         # What it says of buying, as BuyPro#status answers: thanks once the
         # player has Pro, and otherwise a word only when there is something
-        # to say of the store.
+        # to say of the store, the second action's own first.
         def status
-          return "#{words.offer[:typing]} #{typed_tail}" if @buy_pro.status == :ready && !@buy_pro.typed.empty?
-
-          words.offer.fetch(@buy_pro.status, "")
+          status = @buy_pro.status
+          @second.status(status) || words.offer.fetch(status, "")
         end
 
         # Buy's words, with the controller's button that presses it (Y) while
@@ -161,23 +173,14 @@ module DotPopper
 
         def restore = @buy_pro.restore
 
-        # Paste license key: what is on the clipboard, entered as a key, on a
-        # copy that takes one (WebsiteStore). A key that is good is Pro at
-        # once, which is announced as Pro arriving (#call).
-        def paste_key
-          @buy_pro.paste
-          sounds.play(:tick)
-        end
-
-        # A key typed into a copy that takes a license key, on a computer:
-        # Paste license key's other way in (WebsiteStore#type).
-        def type_license_key(key) = @buy_pro.type(key)
+        # The second action, pressed: Restore Purchases, or the store's own.
+        def second = @second.press(self, sounds)
 
         def controls
           plan = self.plan
+          name = @second.name
           [(button(:buy, plan[:buy]) if plan.key?(:buy)),
-           (button(:restore, plan[:restore]) if plan.key?(:restore)),
-           (button(:paste, plan[:paste]) if plan.key?(:paste)),
+           (button(name, plan[name]) if plan.key?(name)),
            back_button].compact
         end
 
@@ -190,63 +193,38 @@ module DotPopper
         end
 
         # A controller's buttons here, by what each presses: Y Buy, and X
-        # Paste license key on a copy that takes one, or else Restore
-        # Purchases.
-        BUTTONS = { y: :buy, x: :paste_or_restore }.freeze
+        # the second action.
+        BUTTONS = { y: :buy, x: :second }.freeze
 
         def pad(button)
           case BUTTONS[button]
-          in :paste_or_restore then keys? ? paste_key : restore
+          in :second then second
           in :buy then buy
           else nil
           end
         end
 
-        # Ctrl+V or Cmd+V pastes a license key, and Ctrl+B or Cmd+B buys:
-        # chords, so no press that means continue or back, and no letter
-        # of a typed license key, buys. Then, on a copy that takes license
-        # keys, a letter, digit or hyphen, alone or with Alt (Option types
-        # characters on a Mac), is typed into one, whatever the key does
-        # on other screens, so a key's letters are never shortcuts; with
-        # Ctrl or Cmd it is the system's shortcut (select all, copy, quit),
-        # and types nothing. Backspace, Delete or Enter edits or enters it,
-        # with any modifier keys held or none. While a key is being typed,
-        # Space does nothing: a key's text ignores spaces, so one typed as
-        # it is printed, in groups, never closes the offer.
-        def key_bindings = KEY_BINDINGS
-        CHARACTERS = [*("a".."z"), *("0".."9"), "minus"].map(&:to_sym).freeze
-        KEY_BINDINGS = [
-          KeyBinding.new(keys: :v, with: KeyBinding::COMMAND, does: :paste),
-          KeyBinding.new(keys: :b, with: KeyBinding::COMMAND, does: :buy),
-          KeyBinding.new(keys: CHARACTERS, does: :type),
-          KeyBinding.new(keys: CHARACTERS, with: %i[alt], does: :type),
-          KeyBinding.new(keys: %i[backspace delete enter], held_or_not: true, does: :type),
-          KeyBinding.new(keys: :space, does: :typing?)
-        ].freeze
+        # Ctrl+B or Cmd+B buys: a chord, so no press that means continue or
+        # back, and no letter typed into the second action, buys. Then the
+        # second action's own keys (none for Restore Purchases), each
+        # pressing what it names here (#paste, #type, #typing?).
+        def key_bindings = [*KEY_BINDINGS, *@second.key_bindings]
+        KEY_BINDINGS = [KeyBinding.new(keys: :b, with: KeyBinding::COMMAND, does: :buy)].freeze
 
-        # A license key typed, on a copy that takes one.
-        def type(key) = keys? && type_license_key(key)
+        # The system's paste shortcut, a key typed, and whether something
+        # is being typed, as the second action takes them; each says whether
+        # it took the key.
+        def paste = @second.paste(sounds)
+        def type(key) = @second.type(key)
+        def typing? = @second.typing?
 
-        # Whether a license key is being typed, on a copy that takes one.
-        def typing? = keys? && !@buy_pro.typed.empty?
-
-        # Paste license key, on a copy that takes one.
-        def paste
-          return false unless keys?
-
-          paste_key
-          true
-        end
-
-        def answers = %i[buy restore paste back]
+        def answers = [:buy, @second.name, :back]
 
         def pressed(name, by)
           case name
           in :buy then buy
-          in :restore then restore
-          in :paste then paste_key
           in :back then close
-          else nil
+          else second if name == @second.name
           end
         end
 
@@ -262,12 +240,6 @@ module DotPopper
         # Whether it thanks the player (BuyPro#status), in place of selling:
         # no buttons but Back, and not opened over what was tapped.
         def thanking? = @buy_pro.status == :thanks
-
-        # The last of the key being typed, for the line to show.
-        def typed_tail
-          typed = @buy_pro.typed
-          typed.length > 24 ? "…#{typed[-24..]}" : typed
-        end
       end
     end
   end

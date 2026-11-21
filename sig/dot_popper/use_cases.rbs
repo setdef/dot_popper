@@ -85,23 +85,15 @@ module DotPopper
 
       def sold?: () -> bool
 
-      def keys?: () -> bool
-
       def price: () -> String?
 
       def status: () -> Symbol
-
-      def typed: () -> String
 
       def open: () -> void
 
       def buy: () -> bool
 
       def restore: () -> void
-
-      def paste: () -> void
-
-      def type: (untyped key) -> bool
 
       def update: (Float seconds) -> void
 
