@@ -125,7 +125,12 @@ class FreshDrawingsTest < Minitest::Test
     credits: [[{}, SCROLLED]],
     stats: [[{}, SCROLLED.merge("the other dot size" => lambda { |fixture|
       fixture.game_flow.sizing = (P::Screens::Settings::SIZINGS - [fixture.game_flow.sizing]).first
-    })], [{}, { "a game recorded" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) } }]],
+    })], [{}, { "a game recorded" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) },
+                                  "closed, a game recorded, and opened again" => lambda { |fixture|
+                                    fixture.show.back
+                                    fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class)
+                                    fixture.show.open_stats
+                                  } }]],
     # No press of a player's opens a screen over the Tutorial today, but its
     # drawing says Skip is drawn only while it is on top.
     tutorial: [[{ played: false }, { "the offer opened over it" => ->(fixture) { fixture.show.open_offer_for(:themes) } }]]
