@@ -184,6 +184,26 @@ class RootTest < Minitest::Test
     end
   end
 
+  # Each part that answers what a build trusts answers for its own builds
+  # alone, asked on its own. The repository carries every part, so there a
+  # part's answer for another's channel is hidden by that part's own,
+  # which comes first; a build carries only its own channel's part.
+  def test_each_part_answers_what_its_own_builds_trust_alone
+    below = Module.new { def receipt_trust(_settings) = :not_its_own }
+    { AppleChoices: [B::APP_STORE, B::MAC_APP_STORE], PlayChoices: [B::GOOGLE_PLAY], MicrosoftChoices: [B::MICROSOFT_STORE],
+      TestBuildChoices: [nil] }.each do |name, own|
+      part = Object.new.extend(below).extend(Root.const_get(name))
+      [nil, *B::CHANNEL_NAMES].each do |channel|
+        answer = part.receipt_trust(DotPopper::Composition::DeveloperSettings.new(SETTINGS, channel:))
+        if own.include?(channel)
+          assert_instance_of DotPopper::Monetization::Receipt::Trust, answer, "#{name} for #{channel.inspect}"
+        else
+          assert_equal :not_its_own, answer, "#{name} answers for #{channel.inspect}"
+        end
+      end
+    end
+  end
+
   # The root gives what it trusts to the license and the Entitlement,
   # whatever the environment says.
   def test_a_test_signed_license_key_unlocks_only_a_test_build
