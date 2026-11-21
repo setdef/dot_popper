@@ -116,6 +116,10 @@ class FreshDrawingsTest < Minitest::Test
       "a record nearer it" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) },
       "it earned" => ->(fixture) { fixture.achievements.award([:steady], day: fixture.day) }
     }]],
+    change_server: [[{ gone: true }, { "an address pasted" => lambda { |fixture|
+      fixture.clipboard.copy("https://dots.example.org")
+      fixture.show.screen.pressed(:server_paste, :mouse)
+    }, "set back" => ->(fixture) { fixture.show.screen.pressed(:server_reset, :mouse) } }]],
     share_preview: [[{}, { "copied" => ->(fixture) { fixture.show.screen.pressed(:copy, :mouse) } }]],
     credits: [[{}, SCROLLED]],
     stats: [[{}, SCROLLED.merge("the other dot size" => lambda { |fixture|
