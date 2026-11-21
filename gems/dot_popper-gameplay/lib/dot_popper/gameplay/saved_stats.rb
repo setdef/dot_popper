@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "date"
+
 module DotPopper
   module Gameplay
     # This device's Stats, kept in a save file that answers +read+ and

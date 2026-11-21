@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "date"
+
 module DotPopper
   module Gameplay
     # A theme as Gameplay and Metagame knows it: its +key+, which is what is

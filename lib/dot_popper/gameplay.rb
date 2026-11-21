@@ -22,10 +22,12 @@ end
 # (gems/dot_popper-gameplay, which the Gemfile names by its path): the
 # rules of a game, the game and its events, a game's numbers, the score
 # record and Stats with today's goal and its streak, and the
-# achievements, each with its save file's format.
+# achievements, each with its save file's format, the themes a player has
+# with what Gameplay hears of setdef, and when to ask the server again.
 %w[rules visibility field size_class dot_size dot_sizing dot touch_target spawn_check spawn spawner clock
    stack events game score_record_file score_record game_stats daily_goal goal_streak stats stats_file saved_stats
-   achievement achievement_recorder achievements_file achievements].each { require "dot_popper/gameplay/#{it}" }
+   achievement achievement_recorder achievements_file achievements theme setdef themes_file saved_themes
+   refresh].each { require "dot_popper/gameplay/#{it}" }
 
-%w[stats_backup theme setdef themes_file saved_themes games_log game_flow refresh groups theme_releases
+%w[stats_backup games_log game_flow groups theme_releases
    server_choice].each { require_relative "gameplay/#{it}" }
