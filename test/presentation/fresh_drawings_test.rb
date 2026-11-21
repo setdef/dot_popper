@@ -41,6 +41,8 @@ class FreshDrawingsTest < Minitest::Test
     achievements: [{ pro: true }, ->(show) { show.open_achievements }, { "a scroll" => ->(show) { show.wheel_scroll(-3) } }],
     friend_groups: [{ member: true, pro: true }, ->(show) { show.open_groups }, {
       "a group open" => ->(show) { show.group_panel.press([:group_show, show.group_panel.groups.groups.first.id], :touch, show.now) },
+      "holding Leave" => ->(show) { show.group_panel.start(:start, show.now) },
+      "letting Leave go" => ->(show) { show.group_panel.let_go(:start, show.now) }, "the next group" => ->(show) { show.group_panel.pad(:rb) },
       "back to the list" => ->(show) { show.group_panel.back }, "the keypad" => ->(show) { show.group_panel.press(:group_join_open, :touch, show.now) },
       "a digit" => ->(show) { show.group_panel.press([:code_digit, "4"], :touch, show.now) }
     }],
