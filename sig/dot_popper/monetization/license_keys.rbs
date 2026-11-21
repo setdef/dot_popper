@@ -1,8 +1,102 @@
 module DotPopper
   module Monetization
-    # License keys, the website's way to Pro (license_keys.rb; what is in
-    # license_keys/ is not typed yet).
+    # License keys, the website's way to Pro (license_keys.rb and
+    # license_keys/).
     module LicenseKeys
+      SETDEF_SIGNING_KEYS: Array[String]
+      SIGNING_KEYS: Array[String]
+
+      # A license key (license_key.rb).
+      class LicenseKey < ::Data
+        VERSION: Integer
+        LABEL: String
+        ALPHABET: String
+        PREFIX: String
+        SIZE: Integer
+        LETTERS: Integer
+        GROUP: Integer
+
+        attr_reader id: String
+
+        attr_reader signature: String
+
+        def self.new: (id: String, signature: String) -> instance
+
+        def self.parse: (untyped text) -> LicenseKey?
+
+        def bytes: () -> String
+
+        def text: () -> String
+
+        def valid?: (?Array[String] keys) -> bool
+      end
+
+      # What setdef's server signs about a license key (verdict.rb).
+      module Verdict
+        LABEL: String
+        VERDICTS: Hash[String, Integer]
+
+        def self?.of: (untyped body, String id, String nonce, ?Continuity::Pins pins) -> (:current | :moved)?
+
+        def self?.message: (String verdict, String id, String nonce) -> String
+      end
+
+      # This device's license key (license.rb).
+      class License
+        # What setdef's server is to be asked.
+        class Due < ::Data
+          attr_reader kind: :license_entry | :license_check
+
+          attr_reader body: Hash[Symbol, String?]
+
+          def self.new: (kind: :license_entry | :license_check, body: Hash[Symbol, String?]) -> instance
+        end
+
+        @file: ::DotPopper::_SaveFile
+        @pins: Continuity::Pins
+        @signing_keys: Array[String]
+        @fresh: ^() -> String
+        @lines: Hash[String, String?]
+        @checked: String?
+        @key: LicenseKey?
+
+        def self.kept_in: (boolish taken) { () -> ::DotPopper::_SaveFile } -> ::DotPopper::_SaveFile
+
+        def initialize: (::DotPopper::_SaveFile file, ?pins: Continuity::Pins, ?signing_keys: Array[String], ?fresh: ^() -> String) -> void
+
+        def key: () -> LicenseKey?
+
+        def pro?: () -> bool
+
+        def enter: (untyped text) -> (:entered | :same | :invalid)
+
+        def due: (String nonce) -> Due?
+
+        def heard: (Due due, String nonce, Network::Reply reply) -> (:current | :moved)?
+
+        def registered?: () -> bool
+
+        private
+
+        def accepted: (Due due) -> void
+
+        def moved: () -> void
+
+        def read: () -> Hash[String, String?]
+
+        def save: () -> void
+      end
+
+      # The port to setdef's server for license keys (server.rb).
+      class Server
+        REQUESTS: Hash[Symbol, Network::Request]
+
+        @link: Network::Link
+
+        def initialize: (Network::Link link) -> void
+
+        def ask: (License::Due due) -> Network::Reply
+      end
     end
   end
 end

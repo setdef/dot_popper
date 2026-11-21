@@ -40,7 +40,7 @@ module DotPopper
 
         def text
           bits = "#{bytes.unpack1("B*")}00"
-          "#{PREFIX}-#{bits.scan(/.{5}/).map { ALPHABET[it.to_i(2)] }.join.scan(/.{1,#{GROUP}}/o).join("-")}"
+          "#{PREFIX}-#{bits.chars.each_slice(5).map { ALPHABET[it.join.to_i(2)] }.join.scan(/.{1,#{GROUP}}/o).join("-")}"
         end
 
         # Whether one of the license-signing +keys+ signed it.

@@ -24,8 +24,46 @@ module DotPopper
         def self.new: () -> instance
       end
 
+      # The proof roots a build trusts (pins.rb).
+      class Pins < ::Data
+        attr_reader roots: Array[String]
+
+        def self.new: (roots: Array[String]) -> instance
+
+        def self.of: (roots: Array[String]) -> Pins
+      end
+
+      SETDEF_PINS: Pins
+      PINNED: Pins
+
+      def self.live?: (?Pins pins) -> bool
+
+      # ASCII +text+ padded to 32 zero bytes, hex and back (ed25519.rb).
+      def self.label: (String text) -> String
+
+      def self.hex: (String bytes) -> String
+
+      def self.unhex: (untyped text, Integer size) -> String?
+
+      module Ed25519
+        def self?.verify: (String public_key, String signature, String message) -> bool
+
+        def self?.available?: () -> bool
+
+        def self?.sha256: (String bytes) -> String
+      end
+
+      # setdef's signed proof and its online key (signed_answers.rb).
+      module SignedAnswers
+        def self?.fresh: () -> String
+
+        def self?.proof?: (untyped body, String nonce, ?Pins pins) -> bool
+
+        def self?.online_key: (untyped body, Pins pins) -> String?
+      end
+
       # The throwaway keys whose private seeds ship for the test build's
-      # fakes (the rest of Continuity is not typed yet).
+      # fakes (the rest of Continuity's files are not typed yet).
       module TestKeys
         LICENSE: String
       end
