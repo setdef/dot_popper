@@ -21,8 +21,8 @@ require "test_helper"
 #   ("streak", the daily one), is not looked for.
 # - EVERYDAY words have a common meaning the game uses all through its
 #   code and documents, so they are looked for only in the strings of
-#   lib/dot_popper/presentation and lib/dot_popper/privacy, which hold
-#   every word a player reads.
+#   lib/dot_popper/presentation, lib/dot_popper/privacy and each build
+#   part's offer.rb, which hold every word a player reads.
 # - OTHER_MEANINGS allows a word on a line where a pattern for its other
 #   meaning matches, and says why.
 #
@@ -42,6 +42,11 @@ class GlossaryTest < Minitest::Test
   # and the maintainer's reading list, in the books' words.
   UNCHECKED = [%r{\AGLOSSARY\.md\z}, %r{\Atest/glossary_test\.rb\z}, %r{\Adoc/adr/}, %r{\Adoc/playtests/},
                %r{\AINSIPIRATION\.md\z}].freeze
+
+  # What a build part adds to the offer of Pro, its words among it
+  # (lib/dot_popper/website/offer.rb holds a license key's): players read
+  # these strings as they do the presentation's.
+  PART_OFFER = %r{\Alib/dot_popper/[a-z_]+/offer\.rb\z}
 
   # Words looked for only in what players read, and their everyday meaning.
   EVERYDAY = {
@@ -188,7 +193,7 @@ class GlossaryTest < Minitest::Test
     files = (ruby + other).reject { |path| UNCHECKED.any? { path.match?(it) } }
     files.map do |path|
       pieces = ruby.include?(path) ? ruby_pieces(path) : plain_pieces(path)
-      [path, pieces, path.start_with?("lib/dot_popper/presentation/", "lib/dot_popper/privacy/")]
+      [path, pieces, path.start_with?("lib/dot_popper/presentation/", "lib/dot_popper/privacy/") || path.match?(PART_OFFER)]
     end
   end
 
