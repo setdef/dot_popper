@@ -11,10 +11,16 @@
 # the network client's network/, or the test build's part.
 #
 # Each area is a target of its own, which sees only its own signatures
-# and those of what it may name (test/areas_test.rb gives the rules, and
-# holds them for the Ruby Steep does not type): a name from another area
-# is then an unknown constant or type. No target loads a signature file
-# of another area: one would be a breach of the rules.
+# and those of the code the areas share (test/areas_test.rb gives the
+# rules, and holds them for the Ruby Steep does not type): a name from
+# another area is then an unknown constant or type. Steep gives each
+# target the signatures of every other target not marked unreferenced!,
+# and a signature file belongs to the first target that lists it, so
+# the areas cannot be kept apart in one project that also checks the
+# use cases against all of sig/. They are a project of their own, which
+# rake steep checks second (STEEP_PROJECT=areas): the shared code's
+# target, which every area sees and which sees only itself, and the
+# three areas, each unreferenced!, so none sees another.
 SHARED = %w[sig/core sig/dot_popper.rbs sig/dot_popper/network.rbs sig/dot_popper/platform.rbs sig/dot_popper/automation.rbs sig/dot_popper/memory_file.rbs].freeze
 LIBRARIES = %w[date socket uri].freeze
 
@@ -22,37 +28,51 @@ STRICT = lambda do |hash|
   hash[Steep::Diagnostic::Ruby::UnsupportedSyntax] = :error
 end
 
-# Gameplay and Metagame names nothing of Monetization or Release
-# Engineering.
-target :gameplay do
-  signature(*SHARED, "sig/dot_popper/gameplay")
-  LIBRARIES.each { library it }
-  check "lib/dot_popper/gameplay/**/*.rb"
-  configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)
-end
+if ENV["STEEP_PROJECT"] == "areas"
+  # The code every area may name, which names none of them.
+  target :shared do
+    signature(*SHARED)
+    LIBRARIES.each { library it }
+    check "lib/dot_popper/network.rb", "lib/dot_popper/platform.rb", "lib/dot_popper/automation.rb", "lib/dot_popper/memory_file.rb"
+    configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)
+  end
 
-# Monetization may hear Gameplay's published events (none of its typed
-# code does yet), and names nothing of Release Engineering, which has no
-# interface at run time.
-target :monetization do
-  signature(*SHARED, "sig/dot_popper/monetization")
-  LIBRARIES.each { library it }
-  check "lib/dot_popper/monetization/*.rb"
-  configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)
-end
+  # Gameplay and Metagame names nothing of Monetization or Release
+  # Engineering.
+  target :gameplay do
+    signature "sig/dot_popper/gameplay"
+    LIBRARIES.each { library it }
+    unreferenced!
+    check "lib/dot_popper/gameplay/**/*.rb"
+    configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)
+  end
 
-# Release Engineering names neither area.
-target :release_engineering do
-  signature(*SHARED, "sig/dot_popper/release_engineering")
-  LIBRARIES.each { library it }
-  check "lib/dot_popper/release_engineering/*.rb"
-  configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)
-end
+  # Monetization may hear Gameplay's published events (none of its typed
+  # code does yet), and names nothing of Release Engineering, which has no
+  # interface at run time.
+  target :monetization do
+    signature "sig/dot_popper/monetization"
+    LIBRARIES.each { library it }
+    unreferenced!
+    check "lib/dot_popper/monetization/*.rb"
+    configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)
+  end
 
-# The use cases, which need two areas, and what loads and serves them.
-target :application do
-  signature "sig"
-  LIBRARIES.each { library it }
-  check "lib/dot_popper.rb", "lib/dot_popper/*.rb", "lib/dot_popper/use_cases/*.rb"
-  configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)
+  # Release Engineering names neither area.
+  target :release_engineering do
+    signature "sig/dot_popper/release_engineering"
+    LIBRARIES.each { library it }
+    unreferenced!
+    check "lib/dot_popper/release_engineering/*.rb"
+    configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)
+  end
+else
+  # The use cases, which need two areas, and what loads and serves them,
+  # against all of sig/.
+  target :application do
+    signature "sig"
+    LIBRARIES.each { library it }
+    check "lib/dot_popper.rb", "lib/dot_popper/*.rb", "lib/dot_popper/use_cases/*.rb"
+    configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)
+  end
 end

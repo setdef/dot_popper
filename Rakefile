@@ -31,6 +31,8 @@ end
 desc "Type-check the rules core with Steep"
 task :steep do
   sh "bundle exec steep check"
+  # The areas, each kept to its own signatures (the Steepfile says why).
+  sh({ "STEEP_PROJECT" => "areas" }, "bundle exec steep check")
 end
 
 # Writes doc/privacy.json from what the game declares (lib/dot_popper/privacy).
