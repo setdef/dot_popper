@@ -35,7 +35,7 @@ Chosen: option 1, the approved proposal. The record gives these reasons for its 
 * Bad, because the game reaches setdef's server and three outside connectivity checks at each start, which must be declared ([privacy](../design/privacy.md)).
 * Bad, because "setdef is gone" is a judgment from a failed proof and a working internet, so a long, targeted outage of setdef's server alone would read as gone until it answers again.
 * Bad, because the checkout is a placeholder until a payment company is chosen.
-* Bad, for operations, because setdef's keys are pinned in the code (`Continuity::SETDEF_PINS`): keeping the signing keys safe, and keeping `GET /proof` answering, are setdef's duties for as long as it sells Pro, and a key that has to be replaced needs a new build of the game.
+* Bad, for operations, because setdef's keys are pinned in the code (the proof's roots in `Continuity::SETDEF_PINS`, the license-signing keys in `LicenseKeys::SETDEF_SIGNING_KEYS`): keeping the signing keys safe, and keeping `GET /proof` answering, are setdef's duties for as long as it sells Pro, and a key that has to be replaced needs a new build of the game.
 
 ### Confirmation
 
