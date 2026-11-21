@@ -29,7 +29,7 @@ require "prism"
 # and the like). Every constant an area's Ruby names is resolved as Ruby resolves it
 # (the module nesting, then the superclasses defined here, then the top
 # level), from the source, so this holds for code Steep does not type
-# (Monetization's continuity/ and receipt/) as for the rest. Steep holds
+# as for the rest. Steep holds
 # the same for the signatures, one target per area (Steepfile). A
 # constant reached by a name spelled at run time (const_get) is not
 # seen.

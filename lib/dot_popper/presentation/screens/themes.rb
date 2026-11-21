@@ -6,8 +6,9 @@ module DotPopper
       # Themes, over Home (ThemesLayout): a card for each theme, with a
       # controller the previous and next, and Back. A tap on a theme uses
       # it through +use_theme+ (UseCases::UseTheme), or for a Free player
-      # opens the offer of Pro leading with themes. A theme neither earned
-      # nor in season (+saved_themes+, Gameplay::SavedThemes) is drawn dimmed.
+      # opens the offer of Pro leading with themes. Every theme it shows is
+      # open to use (+saved_themes+, Gameplay::SavedThemes#choices), so none
+      # is drawn dimmed today, though a card that was not open would be.
       class Themes < Page
         def initialize(show, use_theme:, saved_themes:)
           super(show)
