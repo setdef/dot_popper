@@ -7,7 +7,7 @@
 # Steep finds in that gem's sig/ as a library.
 target :lib do
   signature "sig"
-  %w[date dot_popper-shared].each { library it }
+  %w[date uri dot_popper-shared].each { library it }
   check "lib"
   configure_code_diagnostics(Steep::Diagnostic::Ruby.strict) do |hash|
     hash[Steep::Diagnostic::Ruby::UnsupportedSyntax] = :error

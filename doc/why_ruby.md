@@ -138,7 +138,7 @@ silently `nil` until something far away does arithmetic on it.
 
 ## Testing the rules without a window
 
-Nothing in `lib/dot_popper/gameplay/` mentions Lota. The rules take a field, a
+Nothing in `gems/dot_popper-gameplay/lib/dot_popper/gameplay/` mentions Lota. The rules take a field, a
 `Random`, and taps, and report events; drawing and sound listen. So the
 tests are plain minitest, and CI runs them on an Ubuntu machine with no
 screen:

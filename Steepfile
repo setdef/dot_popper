@@ -44,10 +44,10 @@ if ENV["STEEP_PROJECT"] == "areas"
   # Gameplay and Metagame names nothing of Monetization or Release
   # Engineering.
   target :gameplay do
-    signature "sig/dot_popper/gameplay", "gems/dot_popper-gameplay/sig"
+    signature "gems/dot_popper-gameplay/sig"
     LIBRARIES.each { library it }
     unreferenced!
-    check "lib/dot_popper/gameplay/**/*.rb", "gems/dot_popper-gameplay/lib/**/*.rb"
+    check "gems/dot_popper-gameplay/lib/**/*.rb"
     configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)
   end
 

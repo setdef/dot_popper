@@ -13,5 +13,6 @@ require_relative "dot_popper/release_engineering"
 # (gems/dot_popper-shared, which the Gemfile names by its path).
 %w[platform automation network memory_file].each { require "dot_popper/#{it}" }
 require_relative "dot_popper/monetization"
-require_relative "dot_popper/gameplay"
+# Gameplay and Metagame is the gem dot_popper-gameplay.
+require "dot_popper/gameplay"
 DotPopper::ReleaseEngineering::Build::PARTS.each { require_relative "dot_popper/#{it}/core" }

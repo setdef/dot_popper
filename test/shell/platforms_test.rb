@@ -65,7 +65,7 @@ class PlatformsTest < Minitest::Test
   # or a regex, as "linux" or /darwin|ios/).
   SYSTEM_NAMES = Regexp.union(/"(?:iOS|Android|OS X|Windows|Linux)"|System\.os\b/,
                               %r{RUBY_PLATFORM|["/](?:[\w-]*\|)*(?:mingw|mswin|darwin|linux|android|ios)(?:\|[\w-]*)*["/]})
-  INSIDE = %w[lib/dot_popper.rb lib/dot_popper/**/*.rb].freeze
+  INSIDE = %w[lib/dot_popper.rb lib/dot_popper/**/*.rb gems/*/lib/**/*.rb].freeze
   ROOT = File.expand_path("../..", __dir__)
 
   def naming_a_system(files) = files.select { |file| File.readlines(file).any? { !it.lstrip.start_with?("#") && it.match?(SYSTEM_NAMES) } }

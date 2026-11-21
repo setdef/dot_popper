@@ -4,7 +4,7 @@
 -->
 # Progress: Stats, records, the daily goal and achievements
 
-What Dot Popper keeps about a player's games, and how: the games log, Stats, records and size classes, the daily goal and its streak, achievements, and clearing Stats. It is for anyone changing what is counted, saved or shown about past games. The keeping is Lota-free, in `lib/dot_popper/gameplay/`; what the screens say is in `lib/dot_popper/presentation/`, and how the screens look is in [screens.md](screens.md).
+What Dot Popper keeps about a player's games, and how: the games log, Stats, records and size classes, the daily goal and its streak, achievements, and clearing Stats. It is for anyone changing what is counted, saved or shown about past games. The keeping is Lota-free, in `gems/dot_popper-gameplay/lib/dot_popper/gameplay/`; what the screens say is in `lib/dot_popper/presentation/`, and how the screens look is in [screens.md](screens.md).
 
 ## Saved files
 

@@ -4,7 +4,7 @@
 -->
 # The rules
 
-How a game of Dot Popper plays, as the code has it: the field, the dots and their size, spawning, the score and the clock, the bonus dot, and how time reaches the rules. It is for anyone changing the rules or the code that feeds them. The rules live in `lib/dot_popper/gameplay/` and use no Lota, so their tests need no window.
+How a game of Dot Popper plays, as the code has it: the field, the dots and their size, spawning, the score and the clock, the bonus dot, and how time reaches the rules. It is for anyone changing the rules or the code that feeds them. The rules live in `gems/dot_popper-gameplay/lib/dot_popper/gameplay/` and use no Lota, so their tests need no window.
 
 ## The field and R
 

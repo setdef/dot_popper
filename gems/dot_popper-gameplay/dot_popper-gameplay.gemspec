@@ -3,12 +3,7 @@
 # Gameplay and Metagame, Dot Popper's core area, as a gem of its own
 # (PACKAGING.md, "The game's own gems"). The game takes it by its path in
 # this repository (Gemfile); it is published to no gem server. It holds
-# only part of the area so far, the rules of a game, the game and its
-# events, the score record, Stats with today's goal, the achievements,
-# the themes, clearing Stats, the games log, the flow from Home to Game
-# Over and when to ask the server again: the rest is in
-# lib/dot_popper/gameplay/, whose loader requires what this gem holds by
-# name.
+# the whole area, which the game loads by requiring dot_popper/gameplay.
 Gem::Specification.new do |spec|
   spec.name = "dot_popper-gameplay"
   spec.version = "0.0.0"

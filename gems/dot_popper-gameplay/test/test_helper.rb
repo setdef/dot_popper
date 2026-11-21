@@ -5,8 +5,7 @@ require "minitest/autorun"
 # The gem's tests load the gem alone, with nothing of the game, so a file
 # here that needs the rest of the game fails to load. Of the game's code
 # they have only the gem this one names, dot_popper-shared.
-%w[network memory_file].each { require "dot_popper/#{it}" }
-Dir[File.expand_path("../lib/dot_popper/gameplay/*.rb", __dir__)].sort.each { require it }
+require "dot_popper/gameplay"
 
 module DotPopperTest
   R = DotPopper::Gameplay::Rules::RADIUS

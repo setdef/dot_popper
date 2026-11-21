@@ -25,8 +25,8 @@ require "prism"
 # - That shared code names nothing of the three areas, so it never
 #   carries one area to another, and nothing outside it.
 #
-# An area's files are its folder and its loader (lib/dot_popper/gameplay.rb
-# and the like). Every constant an area's Ruby names is resolved as Ruby resolves it
+# An area's files are its folder and its loader (lib/dot_popper/monetization.rb
+# and the like), or its gem's lib/ (gems/dot_popper-gameplay). Every constant an area's Ruby names is resolved as Ruby resolves it
 # (the module nesting, then the superclasses defined here, then the top
 # level), from the source, so this holds for code Steep does not type
 # as for the rest. Steep holds
@@ -44,11 +44,11 @@ class AreasTest < Minitest::Test
   SHARED = %w[Network Platform Automation MemoryFile].freeze
 
   # The files of each area, and of the code the areas share, under
-  # lib/dot_popper, and in the game's own gems: the one that holds part of
-  # Gameplay (gems/dot_popper-gameplay), and the shared code's
-  # (gems/dot_popper-shared), all of which is the shared code.
+  # lib/dot_popper, and in the game's own gems: Gameplay's
+  # (gems/dot_popper-gameplay), all of which is Gameplay, and the shared
+  # code's (gems/dot_popper-shared), all of which is the shared code.
   FILES = {
-    "Gameplay" => %w[gameplay.rb gameplay/**/*.rb ../../gems/dot_popper-gameplay/lib/**/*.rb],
+    "Gameplay" => %w[../../gems/dot_popper-gameplay/lib/**/*.rb],
     "Monetization" => %w[monetization.rb monetization/**/*.rb website/license_keys.rb website/license_keys/**/*.rb website/website_store.rb
                        apple/receipt.rb play/receipt.rb microsoft/receipt.rb],
     "ReleaseEngineering" => %w[release_engineering.rb release_engineering/**/*.rb],
@@ -85,11 +85,20 @@ class AreasTest < Minitest::Test
   def test_the_check_reads_each_area_s_loader_and_the_shared_code
     files = FILES.values.flatten.flat_map { Dir[it, base: File.join(ROOT, "lib/dot_popper")] }
 
-    assert_includes files, "gameplay.rb"
+    assert_includes files, "../../gems/dot_popper-gameplay/lib/dot_popper/gameplay.rb"
     assert_includes files, "../../gems/dot_popper-shared/lib/dot_popper/network/link.rb"
     assert_includes files, "../../gems/dot_popper-gameplay/lib/dot_popper/gameplay/visibility.rb"
     assert_equal Dir["*.rb", base: File.join(ROOT, "lib/dot_popper")].sort - %w[presentation.rb shell.rb use_cases.rb],
                  files.grep_v(%r{/}).sort, "every file at the top of lib/dot_popper but the outer layers' loaders"
+  end
+
+  # A file in one of the game's own gems that no area claims would be read
+  # by nothing here.
+  def test_every_file_of_the_game_s_own_gems_is_in_an_area
+    claimed = FILES.values.flatten.flat_map { Dir[it, base: File.join(ROOT, "lib/dot_popper")] }
+                   .map { File.expand_path(it, File.join(ROOT, "lib/dot_popper")) }
+
+    assert_empty Dir[File.join(ROOT, "gems/*/lib/**/*.rb")] - claimed, "a gem's file is in no area of FILES"
   end
 
   def test_the_check_sees_a_name_written_in_any_way
