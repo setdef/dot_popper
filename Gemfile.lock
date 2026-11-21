@@ -35,9 +35,9 @@ GEM
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
     logger (1.7.0)
-    lota (0.5.5-arm64-darwin)
-    lota (0.5.5-x64-mingw-ucrt)
-    lota (0.5.5-x86_64-linux-gnu)
+    lota (0.7.1-arm64-darwin)
+    lota (0.7.1-x64-mingw-ucrt)
+    lota (0.7.1-x86_64-linux-gnu)
     minitest (6.1.0)
       drb (~> 2.0)
       prism (>= 1.5, < 3)
@@ -94,7 +94,7 @@ DEPENDENCIES
   dot_popper-gameplay!
   dot_popper-shared!
   fledge!
-  lota (~> 0.5.5)
+  lota (~> 0.7.1)
   minitest (~> 6.1)
   minitest-mock (~> 5.27)
   rake (~> 13.2)
@@ -118,9 +118,9 @@ CHECKSUMS
   language_server-protocol (3.17.0.6) sha256=5ef2c0c138f8267e1bc631d3328347d354f96724b0af22f2c79516120443b7f0
   listen (3.10.1) sha256=4c3f32855657f348747da4dd2372ff3790d90a6b1d3e4f21a3706adb2d04783c
   logger (1.7.0) sha256=196edec7cc44b66cfb40f9755ce11b392f21f7967696af15d274dde7edff0203
-  lota (0.5.5-arm64-darwin) sha256=3beb6a840907d17b4cf827a5ae049f6fc38e0676e3f6ffb13393c435d1a42e20
-  lota (0.5.5-x64-mingw-ucrt) sha256=2cd5bfac0620f56193de36505bf898a1d9f0592e7e98c0130f9206415988d8a0
-  lota (0.5.5-x86_64-linux-gnu) sha256=04a318cf018b58936c7ee790c7df4992a680282401212eec8f904e1f7218d549
+  lota (0.7.1-arm64-darwin) sha256=3d14acf7aa9376a617c9db9a5754b5e55888fad733e405c63648ad28acf7af07
+  lota (0.7.1-x64-mingw-ucrt) sha256=c16d967fadb079d71d798f498f749edadfa22a1d65aaf8afa465fadac9a71612
+  lota (0.7.1-x86_64-linux-gnu) sha256=b8e4c95d1dac85b1d810526a08660f775619f4cda2fe10702f53e6d24d9c0f74
   minitest (6.1.0) sha256=ff373595aa8888631e8a5463986a76b3845346ae6d7fa46e139c1633d418076e
   minitest-mock (5.27.0) sha256=7040ed7185417a966920987eaa6eaf1be4ea1fc5b25bb03ff4703f98564a55b0
   parser (3.3.14.0) sha256=62f8f76af7b919425ee2d811880e9dcb8011ab40bfd59970dfb583141697e58f

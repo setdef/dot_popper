@@ -2,7 +2,7 @@
 # Prints the Lota and Fledge that Gemfile.lock pins, as the tags the phone
 # builds clone and ask for, one per line:
 #
-#   LOTA_REF=v0.5.5
+#   LOTA_REF=v0.7.1
 #   FLEDGE_TAG=v0.16.0
 #
 # script/android_build.sh and script/android_check.sh take their defaults
