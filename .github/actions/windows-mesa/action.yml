@@ -23,8 +23,8 @@ runs:
     - name: Fetch, check, and unpack the pinned Mesa
       shell: bash
       run: |
-        url=https://github.com/pal1000/mesa-dist-win/releases/download/26.2.6/mesa3d-26.2.6-release-mingw.7z
-        sha256=da0f71d9181b672c1918f3c342f11118c687f6059a46b16502845160733cc388
+        url=https://github.com/pal1000/mesa-dist-win/releases/download/26.3.0/mesa3d-26.3.0-release-mingw.7z
+        sha256=7cad3ad4630ba3b2998e17045bfd826b0ac34bbce2a51628e599f2065761321f
         work=$RUNNER_TEMP/mesa-download
         mkdir -p "$work"
         curl --fail --location --silent --show-error --retry 3 -o "$work/mesa.7z" "$url"
