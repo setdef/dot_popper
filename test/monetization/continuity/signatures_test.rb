@@ -136,7 +136,19 @@ class SignaturesTest < Minitest::Test
   # with a key's label, or signs with the test build's license-signing
   # seed (TestKeys::LICENSE). (test/channel_contents_test.rb writes such
   # a line into a copy of a package, as a plant, and is not scanned.)
-  KEY_MAKING = /LicenseKey\.(?:issue|new)\(|\bsign\([^)\n]*\bLABEL\b|\bsign\(\s*(?:\w+::)*LICENSE\b/
+  # The key is the class LicenseKey itself, under any module: a class whose
+  # name only ends that way (UseCases::EnterLicenseKey) makes no key.
+  KEY_MAKING = /\bLicenseKey\.(?:issue|new)\(|\bsign\([^)\n]*\bLABEL\b|\bsign\(\s*(?:\w+::)*LICENSE\b/
+
+  def test_the_scan_tells_a_license_key_from_a_name_that_ends_like_one
+    ["LicenseKey.new(id, signature)", "L::LicenseKey.new(id, signature)", "LicenseKeys::LicenseKey.issue(seed)",
+     "Ed25519.sign(seed, LicenseKey::LABEL + id)", "Ed25519.sign(TestKeys::LICENSE, text)"].each do |maker|
+      assert_match KEY_MAKING, maker
+    end
+    ["UseCases::EnterLicenseKey.new(store:, entitlement:)", "LicenseKey.parse(text)", "LicenseKeyEntry.new(keys)"].each do |other|
+      refute_match KEY_MAKING, other
+    end
+  end
 
   def test_no_code_in_the_repository_makes_a_license_key
     root = File.expand_path("../../..", __dir__)
