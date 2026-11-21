@@ -132,10 +132,11 @@ class SignaturesTest < Minitest::Test
 
   # No code in the repository makes a license key: setdef's server alone
   # issues them, and the test build hands out a fixed list its test key
-  # signed once (TestKeys::LICENSE_KEYS). Nothing here builds a key or signs
-  # with a key's label. (test/channel_contents_test.rb writes such a line
-  # into a copy of a package, as a plant, and is not scanned.)
-  KEY_MAKING = /LicenseKey\.(?:issue|new)\(|\bsign\(\w+, LABEL\b/
+  # signed once (TestKeys::LICENSE_KEYS). Nothing here builds a key, signs
+  # with a key's label, or signs with the test build's license-signing
+  # seed (TestKeys::LICENSE). (test/channel_contents_test.rb writes such
+  # a line into a copy of a package, as a plant, and is not scanned.)
+  KEY_MAKING = /LicenseKey\.(?:issue|new)\(|\bsign\([^)\n]*\bLABEL\b|\bsign\(\s*(?:\w+::)*LICENSE\b/
 
   def test_no_code_in_the_repository_makes_a_license_key
     root = File.expand_path("../../..", __dir__)
