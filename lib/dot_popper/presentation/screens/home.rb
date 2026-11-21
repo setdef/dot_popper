@@ -11,10 +11,11 @@ module DotPopper
       class Home < Screen
         QUIT_ASK = 2.0 # seconds a second B has to quit from Home
 
-        def initialize(show, start_game:, tutorial_flag:)
+        def initialize(show, start_game:, tutorial_flag:, saved_stats:)
           super(show)
           @start_game = start_game
           @tutorial_flag = tutorial_flag
+          @saved_stats = saved_stats
           @planned = nil
           @quit_asked_at = nil
           @quit_asked_by = :b
@@ -72,6 +73,30 @@ module DotPopper
                                   window: show.window.offered?)
           @planned = [screen, screen.plan] unless @planned&.first == screen
           @planned.last
+        end
+
+        # Everything its painter draws (HomeDrawing), made again only when
+        # what it lays out, its entrance, today's goal, a button's word,
+        # value or light, the kind of input, or the quit prompt changes.
+        def drawing
+          plan = self.plan
+          words = self.words
+          hover = show.hover
+          entrance = show.home_entrance
+          gamepad = show.input == InputKind::GAMEPAD
+          notes = plan.tiles.keys.map { tile_note(it) }
+          goal = [@saved_stats.goal, @saved_stats.goal_done?, @saved_stats.streak] if plan.goal
+          quit = quit_prompt
+          drawn(plan, words, hover, entrance, gamepad, notes, goal, quit, quit_asked_by, play_word, play_note) do
+            tiles = plan.tiles.each_with_index.map do |(name, rect), i|
+              HomeTileDrawing.new(name:, rect:, word: words.tile(name), note: notes[i], hover: hover.level(name),
+                                  badge: (words.tile_badge(name) if gamepad))
+            end
+            pills = plan.pills.map { |name, rect| HomePillDrawing.new(name:, rect:, word: words.public_send(name), hover: hover.level(name)) }
+            HomeDrawing.new(entrance:, plan:, name: words.game_name, play_word:, play_note:, play_hover: hover.level(:play),
+                            goal: goal&.then { |today, done, streak| goal_drawing(words, today, done, streak) }, tiles:, pills:,
+                            quit:, quit_text: words.quit_again(quit_asked_by), safe: layout.safe)
+          end
         end
 
         # What it says of the games left, or nil where none are counted.
@@ -157,6 +182,12 @@ module DotPopper
         def announces? = true
 
         private
+
+        # Today's goal on its card (GoalDrawing).
+        def goal_drawing(words, today, done, streak)
+          GoalDrawing.new(label: words.goal_card_label, sentence: words.goal_sentence(today), done:, streak:,
+                          streak_days: words.streak_days(streak), in_a_row: words.streak_in_a_row)
+        end
 
         def quit_asked? = @quit_asked_at && now - @quit_asked_at <= QUIT_ASK
 

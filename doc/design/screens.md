@@ -13,7 +13,7 @@ Where the parts go is worked out without Lota in `lib/dot_popper/presentation/` 
 | Screen | Opened from | Back goes to | Code |
 | --- | --- | --- | --- |
 | setdef splash | launch | (ends by itself, or on any press) | `Presentation::Splash`, `Shell::SplashPainter` |
-| Home | after the splash; Back from every screen over it; Game Over's Home | (Escape twice quits on a computer; Android's Back leaves the app) | `HomeLayout`, `Shell::HomePainter` |
+| Home | after the splash; Back from every screen over it; Game Over's Home | (Escape twice quits on a computer; Android's Back leaves the app) | `HomeLayout`, `HomeDrawing`, `Shell::HomePainter` |
 | Stats | Home's Stats button | Home | `StatsLayout`, `Shell::StatsPainter` |
 | Achievements | Home's Achievements button; Game Over's new-achievement line | Home | `AchievementsLayout`, `AchievementsDrawing`, `Shell::AchievementsPainter` |
 | an achievement's dialog | a cell of Achievements | Achievements | `AchievementDialogLayout`, `AchievementDialogDrawing`, `Shell::AchievementsPainter#dialog` |

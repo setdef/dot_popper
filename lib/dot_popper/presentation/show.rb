@@ -570,11 +570,6 @@ module DotPopper
       def play_word = @screens[:home].play_word
       def play_note = @screens[:home].play_note
 
-      # A large button's name and its one value.
-      def tile_word(name) = words.tile(name)
-
-      def tile_note(name) = @screens[:home].tile_note(name)
-
       # A screen's heading's type size and middle, fitted beside Back
       # (Layout#heading_place).
       def heading_place(text) = layout.heading_place(text, @measure)

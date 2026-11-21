@@ -98,9 +98,9 @@ module DotPopper
 
       def nothing(_screen, _width, _height, _layout) = nil
 
-      def home_screen(_screen, width, height, layout)
+      def home_screen(_screen, width, height, _layout)
         veil(width, height, @context.style::HOME.dim)
-        @home.draw(@show, layout)
+        @home.draw(@show.screens.fetch(:home).drawing, @show.now)
       end
 
       def new_theme_screen(screen, width, height, layout)

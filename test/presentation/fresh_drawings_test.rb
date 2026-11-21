@@ -32,6 +32,7 @@ class FreshDrawingsTest < Minitest::Test
       show.open_change_server
     }, {}],
     new_theme: [{ new_theme: true, pro: true }, ->(_show) {}, {}],
+    home: [{}, ->(_show) {}, { "asked to quit" => ->(show) { show.screen.ask_to_quit } }],
     tutorial: [{ played: false }, ->(show) { show.screen.primary }, {}],
     themes: [{ pro: true }, ->(show) { show.open_themes }, { "using the next theme" => ->(show) { show.screen.step(1) } }],
     achievements: [{ pro: true }, ->(show) { show.open_achievements }, { "a scroll" => ->(show) { show.wheel_scroll(-3) } }],

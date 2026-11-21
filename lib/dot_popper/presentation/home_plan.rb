@@ -11,6 +11,33 @@ module DotPopper
       def play_button = play
     end
 
+    # What Home hands its painter (Shell::HomePainter), which draws it as
+    # Home comes in (+entrance+, HomeEntrance): where everything goes
+    # (+plan+, HomePlan), the game's +name+, Play's word, the note under it
+    # and its light, today's goal on its card (+goal+, GoalDrawing, or nil
+    # where the plan has no card), the large buttons (+tiles+,
+    # HomeTileDrawing) and the bottom row's (+pills+, HomePillDrawing), and
+    # "Press B again to quit" (+quit_text+), as much of it as shows
+    # (+quit+, from 0 to 1), kept inside the +safe+ area.
+    class HomeDrawing < Data.define(:entrance, :plan, :name, :play_word, :play_note, :play_hover, :goal, :tiles, :pills, :quit,
+                                    :quit_text, :safe); end
+
+    # Today's goal on Home's card: its +label+, the goal's +sentence+,
+    # whether it is +done+, and the days in a row (+streak+) with what it
+    # says under them (+streak_days+, +in_a_row+).
+    class GoalDrawing < Data.define(:label, :sentence, :done, :streak, :streak_days, :in_a_row); end
+
+    # One of Home's large buttons, +name+, at +rect+: its +word+ and its
+    # one value (+note+), as lit as the mouse over it has made it
+    # (+hover+), and with a controller the button that opens it (+badge+,
+    # nil otherwise).
+    class HomeTileDrawing < Data.define(:name, :rect, :word, :note, :hover, :badge); end
+
+    # One of the bottom row's buttons, +name+ (:how_to_play, :settings or
+    # :quit), at +rect+, saying +word+, as lit as the mouse over it has
+    # made it (+hover+).
+    class HomePillDrawing < Data.define(:name, :rect, :word, :hover); end
+
     # Today's goal on Home's card, laid out in +rect+: +pad+ in from its
     # edges, "Today's goal" at +label_size+, and the goal's whole sentence
     # in +lines+ at +text_size+, the first line's top at +top+, all left

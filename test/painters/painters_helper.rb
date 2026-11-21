@@ -16,7 +16,7 @@ module PaintersTest
                 code_box member_icon_painter group_painter settings_painter achievements_painter privacy_painter
                 server_painter home_painter stats_painter offer_painter themes_painter credits_painter share_button
                 share_preview_painter game_over_painter guide_painter tutorial_painter new_theme_card_painter
-                themed_name].freeze
+                themed_name font_measure].freeze
   PAINTING.each { require "dot_popper/shell/#{it}" }
 
   Shell = DotPopper::Shell
