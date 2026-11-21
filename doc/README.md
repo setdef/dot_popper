@@ -26,7 +26,9 @@ If you know LÖVE, [Why Ruby](why_ruby.md) sets Dot Popper's code beside the Lua
 | --- | --- |
 | `main.rb` | Hands each of Lota's callbacks to `DotPopper::Shell::App`. Its comments list every control and development setting |
 | `conf.rb` | Lota's window settings: the title, the 1200 × 800 window, the save folder's name, and which graphics renderers to allow |
-| `lib/dot_popper/` | The rules. `rules.rb` holds every number that sets how the game plays, in dot radii; `game.rb` and `stack.rb` hold a game and its dots |
+| `gems/dot_popper-gameplay/` | Gameplay and Metagame as a gem of its own: the rules (`rules.rb` holds every number that sets how the game plays, in dot radii; `game.rb` and `stack.rb` hold a game and its dots), Stats, records, achievements, themes and the flow from Home to Game Over |
+| `gems/dot_popper-shared/` | The code the areas share, as a gem of its own: the HTTP client every request goes through, what the system means for the game, and the guard on automated runs |
+| `lib/dot_popper/` | The areas' loaders, the rest of Gameplay and Metagame (`gameplay/`), Monetization, Release Engineering and the use cases |
 | `lib/dot_popper/presentation/` | How the game looks and sounds, as values. `look.rb` holds every setting, and `words.rb` writes every sentence the player reads |
 | `lib/dot_popper/gameplay/groups/` | The friend groups' client, which makes every network call on a thread of its own |
 | `lib/dot_popper/composition/` | Puts the game together for one system and one kind of build, without Lota, from what the shell hands it |

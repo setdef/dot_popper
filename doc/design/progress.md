@@ -24,7 +24,7 @@ The composition root (`Composition::Root`) makes each store, asking the engine f
 
 ## The games log
 
-`GamesLog` (`lib/dot_popper/gameplay/games_log.rb`) listens to the `GameFlow` and adds one line to `games.csv` for each finished game (`Events::GameEnded`). Its columns, `GamesLog::COLUMNS`:
+`GamesLog` (`gems/dot_popper-gameplay/lib/dot_popper/gameplay/games_log.rb`) listens to the `GameFlow` and adds one line to `games.csv` for each finished game (`Events::GameEnded`). Its columns, `GamesLog::COLUMNS`:
 
 `time seed score duration pops mistakes softened mean_time_to_pop longest_time_to_pop goal goal_met`
 
@@ -186,7 +186,7 @@ The Stats screen has **Clear my stats…**, offered while there is something to 
 
 Forgiveness, from Lidwell's *Universal Principles of Design*: an Undo serves the player better than a confirmation they learn to dismiss, and a held press is hard to make by accident yet the same with a finger, a mouse or a gamepad. The control is quiet because records aren't the point of the game (Ferrara).
 
-**What clears.** `StatsBackup` (`lib/dot_popper/gameplay/stats_backup.rb`) clears the three stores that are records: `ScoreRecord`, `SavedStats` and `Achievements`. That is every class's highest score and records, the totals, the chart, the goal streaks and today's goal met, and every achievement earned. Achievements are records of what the player did, as a highest score is. Nothing else is touched: the games log, the settings (`dot_size.txt`, `sound.txt`), what the game has taught, themes, friend groups, free games and Pro stay as they are.
+**What clears.** `StatsBackup` (`gems/dot_popper-gameplay/lib/dot_popper/gameplay/stats_backup.rb`) clears the three stores that are records: `ScoreRecord`, `SavedStats` and `Achievements`. That is every class's highest score and records, the totals, the chart, the goal streaks and today's goal met, and every achievement earned. Achievements are records of what the player did, as a highest score is. Nothing else is touched: the games log, the settings (`dot_size.txt`, `sound.txt`), what the game has taught, themes, friend groups, free games and Pro stay as they are.
 
 **Backup.** Before emptying anything, `StatsBackup#clear` copies each store's text exactly to `<name>-YYYYMMDD-HHMMSS.txt` (`score_record-…`, `stats-…`, `achievements-…`) and notes them in `cleared.txt` (`cleared=<time>`, then `score_record.txt=score_record-….txt` and so on). The next clearing first removes the backups the note names, and only names shaped like backups (`StatsBackup::BACKUP`), so the folder keeps one backup. A store never written gets no backup. Since the save folder can't rename, the copy is written before anything is lost.
 

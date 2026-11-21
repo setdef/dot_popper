@@ -23,11 +23,11 @@ end
 # rules of a game, the game and its events, a game's numbers, the score
 # record and Stats with today's goal and its streak, and the
 # achievements, each with its save file's format, the themes a player has
-# with what Gameplay hears of setdef.
+# with what Gameplay hears of setdef, clearing Stats, the games log, the
+# flow from Home to Game Over and when to ask the server again.
 %w[rules visibility field size_class dot_size dot_sizing dot touch_target spawn_check spawn spawner clock
    stack events game score_record_file score_record game_stats daily_goal goal_streak stats stats_file saved_stats
    achievement achievement_recorder achievements_file achievements theme setdef themes_file
-   saved_themes].each { require "dot_popper/gameplay/#{it}" }
+   saved_themes stats_backup games_log game_flow refresh].each { require "dot_popper/gameplay/#{it}" }
 
-%w[stats_backup games_log game_flow refresh groups theme_releases
-   server_choice].each { require_relative "gameplay/#{it}" }
+%w[groups theme_releases server_choice].each { require_relative "gameplay/#{it}" }
