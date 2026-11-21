@@ -52,12 +52,14 @@ module DotPopper
 
       # Every channel, by name: the one list of them, which the scripts and
       # the composition root take from here.
+      NO_PARTS = ([] #: Array[String]
+                 ).freeze
       CHANNELS = [
-        Channel.new(name: APP_STORE, store: true, parts: [].freeze),
-        Channel.new(name: MAC_APP_STORE, store: true, parts: [].freeze),
-        Channel.new(name: GOOGLE_PLAY, store: true, parts: [].freeze),
-        Channel.new(name: MICROSOFT_STORE, store: true, parts: [].freeze),
-        Channel.new(name: WEBSITE, store: false, parts: [].freeze)
+        Channel.new(name: APP_STORE, store: true, parts: NO_PARTS),
+        Channel.new(name: MAC_APP_STORE, store: true, parts: NO_PARTS),
+        Channel.new(name: GOOGLE_PLAY, store: true, parts: NO_PARTS),
+        Channel.new(name: MICROSOFT_STORE, store: true, parts: NO_PARTS),
+        Channel.new(name: WEBSITE, store: false, parts: NO_PARTS)
       ].to_h { [it.name, it] }.freeze
 
       # The channels of the app stores, and every channel's name.

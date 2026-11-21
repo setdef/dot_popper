@@ -22,6 +22,7 @@ module DotPopper
         def self.new: (name: String, store: bool, parts: Array[String]) -> instance
       end
 
+      NO_PARTS: Array[String]
       CHANNELS: Hash[String, Channel]
       STORES: Array[String]
       CHANNEL_NAMES: Array[String]
