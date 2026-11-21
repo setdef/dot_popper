@@ -47,7 +47,7 @@ env:
   LOTA_VERSION: "0.5.5"
   # The iOS build's Fledge, the tag Gemfile.lock pins; lota fuse takes
   # that tag from the lockfile itself (.github/actions/fuse).
-  FLEDGE_TAG: v0.15.0
+  FLEDGE_TAG: v0.16.0
   IDENTIFIER: com.setdef.DotPopper
   BUNDLE_FROZEN: "true"
 

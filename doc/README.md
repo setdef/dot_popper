@@ -57,7 +57,7 @@ The game finds the server through `Network::Server`: every build uses `SERVER_UR
 | Linux on x86_64 with glibc, and an X11 or Wayland desktop with OpenGL | `lota-0.5.5-x86_64-linux-gnu.gem` |
 
 - Dot Popper needs Ruby 4.1, which Lota 0.5 needs and which is not released yet: on macOS and Linux the preview `.ruby-version` and `mise.toml` name, 4.1.0-preview1, and on Windows, where RubyInstaller publishes no preview, RubyInstaller's head build of 2026-11-10 that `mise.toml` pins (Lota's Windows gems are built on it). The Gemfile refuses any other Ruby.
-- Bundler installs Lota 0.5.5 from `vendor/cache`, and [Fledge](https://github.com/setdef/Fledge) v0.15.0 from its Git tag. Fledge is in the `development` group, which `lota fuse` leaves out of the desktop apps. The phone apps leave it out too: Fledge 0.13 and later ship every group of the phone project's Gemfile, so the phone builds run Fledge from a Gemfile of its own, outside the phone project, and build that project by its path (Fledge's README, "Installation").
+- Bundler installs Lota 0.5.5 from `vendor/cache`, and [Fledge](https://github.com/setdef/Fledge) v0.16.0 from its Git tag. Fledge is in the `development` group, which `lota fuse` leaves out of the desktop apps. The phone apps leave it out too: Fledge 0.13 and later ship every group of the phone project's Gemfile, so the phone builds run Fledge from a Gemfile of its own, outside the phone project, and build that project by its path (Fledge's README, "Installation").
 - Other systems, such as Intel Macs, Linux on ARM, and Linux with musl, have no Lota gem in `vendor/cache`.
 
 ## Getting started

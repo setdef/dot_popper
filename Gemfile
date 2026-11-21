@@ -50,7 +50,7 @@ gem "dot_popper-gameplay", path: "gems/dot_popper-gameplay"
 # The phone builds run it from a Gemfile of their own, outside the phone
 # project, so no app carries it (Privacy::PHONE_GEMS).
 group :development do
-  gem "fledge", git: "https://github.com/setdef/Fledge", tag: "v0.15.0"
+  gem "fledge", git: "https://github.com/setdef/Fledge", tag: "v0.16.0"
 
   # Steep checks the rules core against its RBS signatures in sig/
   # (bundle exec rake steep). Only the default rake task needs it;

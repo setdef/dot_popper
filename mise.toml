@@ -11,7 +11,7 @@
 # RubyInstaller's head build of 2026-11-10 (ruby 4.1.0dev, ruby_version
 # 4.1.0+6), the copy Fledge's release inputs-rubyinstaller-head-20261110
 # keeps, on which Lota 0.5.5's Windows gems are built and which Fledge
-# v0.15.0's Windows runtime is made from: Lota's README at v0.5.5 says to
+# v0.16.0's Windows runtime is made from: Lota's README at v0.5.5 says to
 # use that build, and its .github/windows_ruby.env names this URL and
 # SHA-256. Another day's head build need not load Lota's gem. The Gemfile
 # refuses any other Windows Ruby, and .github/actions/windows-ruby gives
