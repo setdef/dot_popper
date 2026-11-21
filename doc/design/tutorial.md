@@ -33,7 +33,7 @@ The cost: the tutorial is the most tuned part of the presentation (its beats, ti
 | Whether pressing Play opens it | `Presentation::TutorialFlag` (`tutorial_flag.rb`), `tutorial.txt` |
 | The paused game | `GameFlow::Paused`, `GameFlow::Starter#paused`, `GameFlow#press_paused`, `#move_paused`, `#arrange`, `#unpause`; `Game#move_dots`, `#arrange` |
 | Opening, skipping and playing on | `Show#play`, `#how_to_play`, `#skip_tutorial`, `#follow_tutorial`; `Screens::Tutorial` (its scene while it plays, `#skip`, `#follow`); `Screens::Home#open_tutorial`; `TutorialScene.opening`; `UseCases::StartGame` |
-| Drawing | `Shell::TutorialPainter`, `Shell::GuidePainter`, `Shell::HandSprites`, `Shell::TallyPainter`, and `Shell::Renderer#tutorial` |
+| Drawing | `Shell::TutorialPainter`, from the scene and the `TutorialDrawing` the Tutorial screen hands it (the guide's input, the size of the numbers in flight, and Skip while it is on top), `Shell::GuidePainter`, `Shell::HandSprites`, `Shell::TallyPainter`, and `Shell::Renderer#tutorial` |
 
 ## When it opens
 

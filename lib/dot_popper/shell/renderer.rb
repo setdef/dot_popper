@@ -60,7 +60,7 @@ module DotPopper
         backdrop(width, height)
         state = @show.state_screen
         case state
-        when Screens::Tutorial then tutorial(width, height, layout)
+        when Screens::Tutorial then tutorial(state, width, height, layout)
         when Screens::Home, Screens::NewTheme then @dots.draw(@show.attract.dots, @at_rest, @show.now, radius)
         else game(width, height, layout)
         end
@@ -190,8 +190,8 @@ module DotPopper
       # The Tutorial, drawn as the game it opens is: its dots over their
       # glow and the effects of its taps, its HUD, never shaken, and its
       # spotlight, guide and skip button over them all.
-      def tutorial(width, height, layout)
-        scene = @show.tutorial
+      def tutorial(screen, width, height, layout)
+        scene = screen.scene
         @effects.flash(@show.effects, width, height)
         @bloom.glow do
           @dots.glow(scene.dots, scene.animations, scene.now, scene.radius)
@@ -205,7 +205,7 @@ module DotPopper
         spots = @hud.spots(hud)
         @tutorial.under_hud(scene, pill, spots)
         @hud.draw(hud)
-        @tutorial.over_hud(@show, scene, layout, pill, spots)
+        @tutorial.over_hud(screen.drawing, scene, pill, spots)
       end
 
       # How far the night and the veils must reach to cover every pixel:

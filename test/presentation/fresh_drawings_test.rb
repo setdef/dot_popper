@@ -32,6 +32,7 @@ class FreshDrawingsTest < Minitest::Test
       show.open_change_server
     }, {}],
     new_theme: [{ new_theme: true, pro: true }, ->(_show) {}, {}],
+    tutorial: [{ played: false }, ->(show) { show.screen.primary }, {}],
     share_preview: [{}, ->(show) { show.screens.fetch(:share_preview).open_with(P::ShareText.open("🟡 27 dots\n⏱ 30s", show.now)) }, {}]
   }.freeze
 

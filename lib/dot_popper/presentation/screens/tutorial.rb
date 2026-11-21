@@ -41,6 +41,19 @@ module DotPopper
 
         def controls = [button(:skip, layout.skip_button)]
 
+        # What its painter draws over the scene (TutorialDrawing): Skip
+        # only while it is on top, where a press reaches it.
+        def drawing
+          input = show.input
+          words = self.words
+          hover = show.hover
+          on_top = show.screen.equal?(self)
+          drawn(input, words, hover, on_top) do
+            TutorialDrawing.new(input:, number_size: layout.scaled(style::TYPE.floating_text), skip: (layout.skip_button if on_top),
+                                skip_word: words.button(:skip), skip_hover: hover.level(:skip))
+          end
+        end
+
         # Escape or B skips it.
         def back
           skip

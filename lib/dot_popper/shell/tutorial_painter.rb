@@ -27,20 +27,21 @@ module DotPopper
       end
 
       # What goes over the HUD: a halo on the number the spotlight is on,
-      # the numbers in flight, the guide, and the skip button.
-      def over_hud(show, scene, layout, pill, spots)
+      # the numbers in flight, the guide, and the skip button, as the
+      # Tutorial screen's +drawing+ (Presentation::TutorialDrawing) says.
+      def over_hud(drawing, scene, pill, spots)
         now = scene.now
         light = scene.spotlight
         halo(light.to.name, pill, light.strength(now), now - light.at) if light.to&.hud? && light.to.name != :dots_in_a_row
         row_ring(scene.row_notice, now, spots.fetch(:dots_in_a_row), pill, scene.hud.size) if scene.row_notice
-        font = context.fonts.bold(layout.scaled(context.style::TYPE.floating_text))
+        font = context.fonts.bold(drawing.number_size)
         scene.traveling_numbers.each { traveling_number(it, now, scene.dots, spots, scene.radius, font) }
-        GuidePainter.new(context:).draw(scene.guide_pose, show.input, scene.radius)
-        return unless show.skip_reach
+        GuidePainter.new(context:).draw(scene.guide_pose, drawing.input, scene.radius)
+        return unless drawing.skip
 
         # Skip, bottom right, its sign before its word, so it reads without English.
-        PillButton.new(context:).draw(layout.skip_button, show.words.button(:skip), hover: show.hover.level(:skip),
-                                  icon: ->(x, y, size) { Glyphs.new(context:).draw(:skip, x, y, size * 0.36) })
+        PillButton.new(context:).draw(drawing.skip, drawing.skip_word, hover: drawing.skip_hover,
+                                      icon: ->(x, y, size) { Glyphs.new(context:).draw(:skip, x, y, size * 0.36) })
       end
 
       # The clock lit as the game's first second runs (Presentation::

@@ -24,6 +24,14 @@ module DotPopper
                                      :quick, :gap, :hold, :linger, :handover, :longest, :spotlight, :guide, :clock_highlight,
                                      :notice); end
 
+    # What the Tutorial screen hands its painter (Shell::TutorialPainter)
+    # to draw over its scene: the guide drawn for the player's +input+
+    # (InputKind), the numbers in flight at +number_size+, and Skip at
+    # +skip+ (a Rect) saying +skip_word+, as lit as the mouse over it has
+    # made it (+skip_hover+, from 0 to 1), or no Skip (+skip+ nil) while
+    # another screen is over the Tutorial.
+    class TutorialDrawing < Data.define(:input, :number_size, :skip, :skip_word, :skip_hover); end
+
     # The row of dots in a row just changed, since +at+: a ring around it,
     # fading over +duration+, in +tone+, :gain as it counts a pop and
     # :alarm as a mistake empties it. It runs under the beat, and holds up
