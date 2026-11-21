@@ -17,7 +17,7 @@ module DotPopper
           json64, signature64 = text.split(":", 2)
           json = json64.to_s.unpack1("m").to_s
           signature = signature64.to_s.unpack1("m").to_s
-          return false unless trust.play_keys.any? { OpenSSL::PKey.read(it).verify("SHA1", signature, json) }
+          return false unless trust.play_keys.any? { OpenSSL::PKey.read(it).verify("SHA1", signature, json) } # steep:ignore ArgumentTypeMismatch
 
           purchase = JSON.parse(json)
           products = Array(purchase["productIds"]) + Array(purchase["productId"])
@@ -31,11 +31,12 @@ module DotPopper
       # setup, Licensing), Base64 as the Console shows it. Empty until the
       # maintainer pins it, so until then no Google Play purchase verifies;
       # script/check_build.rb fails a Google Play build while it is.
-      PLAY_KEYS = [].freeze
+      PLAY_KEYS = ([] #: Array[String]
+                  ).freeze
 
       # What the Google Play build trusts: purchases signed by the app's
       # Play key once pinned, and nothing else.
-      PLAY = Trust.new(apple_roots: [].freeze, play_keys: PLAY_KEYS.map { it.unpack1("m") }.freeze, app_id: APP_ID,
+      PLAY = Trust.new(apple_roots: NOTHING, play_keys: PLAY_KEYS.map { it.unpack1("m").to_s }.freeze, app_id: APP_ID,
                        product_id: PRODUCT_ID, windows_license: false)
     end
   end

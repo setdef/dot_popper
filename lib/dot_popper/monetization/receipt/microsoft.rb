@@ -34,7 +34,7 @@ module DotPopper
 
       # What the Microsoft Store build trusts: Windows' word for its license,
       # and nothing that is signed, since no other store sells that build.
-      MICROSOFT_STORE = Trust.new(apple_roots: [].freeze, play_keys: [].freeze, app_id: APP_ID, product_id: PRODUCT_ID,
+      MICROSOFT_STORE = Trust.new(apple_roots: NOTHING, play_keys: NOTHING, app_id: APP_ID, product_id: PRODUCT_ID,
                                   windows_license: true)
     end
   end

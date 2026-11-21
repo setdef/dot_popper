@@ -26,12 +26,12 @@ module DotPopper
           header = JSON.parse(decode(head64))
           return false unless header["alg"] == "ES256"
 
-          leaf, intermediate, = Array(header["x5c"]).map { OpenSSL::X509::Certificate.new(it.to_s.unpack1("m").to_s) }
+          leaf, intermediate, = Array(header["x5c"]).map { OpenSSL::X509::Certificate.new(it.to_s.unpack1("m").to_s) } # steep:ignore NoMethod
           return false unless leaf && intermediate && marked?(leaf, LEAF) && marked?(intermediate, INTERMEDIATE)
 
           transaction = JSON.parse(decode(body64))
           return false unless chained?(leaf, intermediate, trust, Time.at(Integer(transaction.fetch("signedDate")) / 1000r))
-          return false unless leaf.public_key.verify("SHA256", der(decode(signature64)), "#{head64}.#{body64}")
+          return false unless leaf.public_key.verify("SHA256", der(decode(signature64)), "#{head64}.#{body64}") # steep:ignore ArgumentTypeMismatch
 
           transaction["bundleId"] == trust.app_id && transaction["productId"] == trust.product_id && transaction["revocationDate"].nil?
         rescue StandardError, ScriptError
@@ -60,7 +60,7 @@ module DotPopper
       # Apple Root CA - G3, from https://www.apple.com/certificateauthority/
       # (SHA-256 63343ABF B89A6A03 EBB57E9B 3F5FA7BE 7C4F5C75 6F3017B3
       # A8C488C3 653E9179), which certifies StoreKit 2's signed transactions.
-      APPLE_ROOT_G3 = <<~BASE64.unpack1("m").freeze
+      APPLE_ROOT_G3 = <<~BASE64.unpack1("m").to_s.freeze
         MIICQzCCAcmgAwIBAgIILcX8iNLFS5UwCgYIKoZIzj0EAwMwZzEbMBkGA1UEAwwSQXBwbGUgUm9v
         dCBDQSAtIEczMSYwJAYDVQQLDB1BcHBsZSBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTETMBEGA1UE
         CgwKQXBwbGUgSW5jLjELMAkGA1UEBhMCVVMwHhcNMTQwNDMwMTgxOTA2WhcNMzkwNDMwMTgxOTA2
@@ -77,7 +77,7 @@ module DotPopper
       # What a build sold through Apple's stores trusts (the App Store's and
       # the Mac App Store's): StoreKit 2's transactions chained to Apple's
       # root, and nothing else.
-      APPLE = Trust.new(apple_roots: [APPLE_ROOT_G3].freeze, play_keys: [].freeze, app_id: APP_ID, product_id: PRODUCT_ID,
+      APPLE = Trust.new(apple_roots: [APPLE_ROOT_G3].freeze, play_keys: NOTHING, app_id: APP_ID, product_id: PRODUCT_ID,
                         windows_license: false)
     end
   end

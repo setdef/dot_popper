@@ -53,9 +53,9 @@ if ENV["STEEP_PROJECT"] == "areas"
   target :monetization do
     signature "sig/dot_popper/monetization"
     LIBRARIES.each { library it }
-    %w[digest openssl securerandom].each { library it }
+    %w[digest json openssl securerandom].each { library it }
     unreferenced!
-    check "lib/dot_popper/monetization/*.rb", "lib/dot_popper/monetization/continuity/*.rb", "lib/dot_popper/monetization/license_keys/*.rb"
+    check "lib/dot_popper/monetization/**/*.rb"
     configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)
   end
 

@@ -34,16 +34,28 @@ module DotPopper
       def self.issue: (?key: String, ?app_id: String, ?product_id: String, ?state: Integer, ?at: Time) -> String
 
       module Apple
-        def self.valid?: (String jws, Trust trust) -> bool
+        LEAF: String
+        INTERMEDIATE: String
+
+        def self?.valid?: (String jws, Trust trust) -> bool
+
+        def self?.chained?: (untyped leaf, untyped intermediate, Trust trust, Time at) -> boolish
+
+        def self?.marked?: (untyped certificate, String oid) -> bool
+
+        def self?.decode: (String? text) -> String
+
+        def self?.der: (String raw) -> String
       end
 
       module Play
-        def self.valid?: (String text, Trust trust) -> bool
+        def self?.valid?: (String text, Trust trust) -> bool
       end
 
       module Microsoft
         SKU: Regexp
-        def self.valid?: (String text, Trust trust) -> bool
+
+        def self?.valid?: (String text, Trust trust) -> bool
       end
     end
   end
