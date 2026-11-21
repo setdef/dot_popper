@@ -38,7 +38,7 @@ else
 fi
 (cd "$game" && rm -rf .github vendor android ios macos windows test doc playtest script sig server Steepfile Rakefile \
   Gemfile Gemfile.lock mise.toml mise.lock mise.android.toml mise.ios.toml .ruby-version AGENTS.md GLOSSARY.md INSIPIRATION.md PACKAGING.md README.md .gitignore .gitattributes \
-  gems/dot_popper-gameplay/sig)
+  gems/dot_popper-gameplay/sig gems/dot_popper-gameplay/test gems/dot_popper-gameplay/Rakefile gems/dot_popper-gameplay/Steepfile)
 if $worktree; then
   cp "$repo/android/android_kit" "$project/main.rb"
 else

@@ -11,7 +11,7 @@ class NoWarningsTest < Minitest::Test
   ROOT = File.expand_path("..", __dir__)
 
   def test_no_file_warns_when_compiled
-    files = Dir[File.join(ROOT, "{lib,gems/*/lib,script,test}/**/*.rb")] + Dir[File.join(ROOT, "*.rb")]
+    files = Dir[File.join(ROOT, "{lib,gems/*/lib,gems/*/test,script,test}/**/*.rb")] + Dir[File.join(ROOT, "*.rb")]
     # The files' names go in on standard input, not as arguments: a system
     # limits how long a command line may be, and Windows' limit is shorter
     # than the names of every file put end to end.

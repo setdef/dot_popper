@@ -44,4 +44,21 @@ task :privacy do
   File.write(DotPopper::Privacy::Document::PATH, DotPopper::Privacy::Document.current_json)
 end
 
+# The game's own gems (gems/, PACKAGING.md) each have their own tests and
+# Steep check, which rake test and rake steep run too, each in its gem's
+# folder, so `bundle exec rake` stays the one check.
+OWN_GEMS = FileList["gems/*/Rakefile"].map { File.dirname(it) }
+
+namespace :gems do
+  %i[test steep].each do |check|
+    desc "Run #{check} in each of the game's own gems"
+    task check do
+      OWN_GEMS.each { |gem| Dir.chdir(gem) { sh RbConfig.ruby, Gem.bin_path("rake", "rake"), check.to_s } }
+    end
+  end
+end
+
+task test: "gems:test"
+task steep: "gems:steep"
+
 task default: %i[test steep]

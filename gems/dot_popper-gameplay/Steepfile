@@ -1,0 +1,14 @@
+# frozen_string_literal: true
+
+# The gem checked against its own signatures, strictly, as the game's
+# Steepfile checks the areas. Of the game, it sees only the signatures
+# of what its own name: the number type and Platform, which belong to
+# the code the game's areas share.
+target :lib do
+  signature "sig", "../../sig/core", "../../sig/dot_popper.rbs", "../../sig/dot_popper/platform.rbs"
+  library "date"
+  check "lib"
+  configure_code_diagnostics(Steep::Diagnostic::Ruby.strict) do |hash|
+    hash[Steep::Diagnostic::Ruby::UnsupportedSyntax] = :error
+  end
+end

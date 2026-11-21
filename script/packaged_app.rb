@@ -22,7 +22,8 @@ module PackagedApp
   REPOSITORY_ONLY = %w[test doc sig script playtest android ios macos windows .github Rakefile Steepfile
                        mise.toml mise.lock mise.android.toml mise.ios.toml
                        AGENTS.md GLOSSARY.md INSIPIRATION.md PACKAGING.md README.md .gitignore .gitattributes
-                       gems/dot_popper-gameplay/sig].freeze
+                       gems/dot_popper-gameplay/sig gems/dot_popper-gameplay/test gems/dot_popper-gameplay/Rakefile
+                       gems/dot_popper-gameplay/Steepfile].freeze
 
   # Run in a Ruby of its own, with the game's folder in the app and then
   # the libraries to require: reads the game's settings as `lota fuse`

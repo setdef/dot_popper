@@ -153,7 +153,7 @@ class SignaturesTest < Minitest::Test
   def test_no_code_in_the_repository_makes_a_license_key
     root = File.expand_path("../../..", __dir__)
     plant = File.join(root, "test/channel_contents_test.rb")
-    makers = Dir["#{root}/{lib,gems/*/lib,script,test}/**/*.rb"].reject { it == File.expand_path(__FILE__) || it == plant }
+    makers = Dir["#{root}/{lib,gems/*/lib,gems/*/test,script,test}/**/*.rb"].reject { it == File.expand_path(__FILE__) || it == plant }
                                                   .select { File.read(it).match?(KEY_MAKING) }
 
     assert_empty makers.map { it.delete_prefix("#{root}/") }
