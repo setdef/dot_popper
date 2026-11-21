@@ -186,13 +186,13 @@ class ChannelContentsTest < Minitest::Test
   # too, loaded or not: only the part's own files define its classes.
   def test_check_fails_when_an_app_store_build_holds_a_copy_of_a_website_file_elsewhere
     stamp("app-store")
-    stray = File.join(@game, "lib/dot_popper/monetization/stray.rb")
+    stray = File.join(@game, "gems/dot_popper-monetization/lib/dot_popper/monetization/stray.rb")
     Dir.glob("lib/dot_popper/website/{website_store.rb,offer.rb,license_keys.rb,license_keys/*.rb}", base: ROOT).each do |file|
       FileUtils.cp(File.join(ROOT, file), stray)
       ok, out = run_script("check", "app-store", @app)
 
       refute ok, "#{file}:\n#{out}"
-      assert_match(%r{FAIL .* holds lib/dot_popper/monetization/stray\.rb, which names (the website checkout|license keys)}, out)
+      assert_match(%r{FAIL .* holds gems/dot_popper-monetization/lib/dot_popper/monetization/stray\.rb, which names (the website checkout|license keys)}, out)
     end
   end
 
@@ -227,12 +227,12 @@ class ChannelContentsTest < Minitest::Test
       assert_match(%r{FAIL .* holds lib/dot_popper/#{part} \(#{piece}\)}, out)
 
       FileUtils.rm_rf(File.join(@game, "lib/dot_popper", part))
-      FileUtils.cp(File.join(ROOT, "lib/dot_popper", part, "receipt.rb"), File.join(@game, "lib/dot_popper/monetization/stray.rb"))
+      FileUtils.cp(File.join(ROOT, "lib/dot_popper", part, "receipt.rb"), File.join(@game, "gems/dot_popper-monetization/lib/dot_popper/monetization/stray.rb"))
       ok, out = run_script("check", "app-store", @app)
 
       refute ok, out
-      assert_match(%r{FAIL .* holds lib/dot_popper/monetization/stray\.rb, which names #{piece}}, out)
-      FileUtils.rm_f(File.join(@game, "lib/dot_popper/monetization/stray.rb"))
+      assert_match(%r{FAIL .* holds gems/dot_popper-monetization/lib/dot_popper/monetization/stray\.rb, which names #{piece}}, out)
+      FileUtils.rm_f(File.join(@game, "gems/dot_popper-monetization/lib/dot_popper/monetization/stray.rb"))
     end
   end
 
@@ -285,10 +285,10 @@ class ChannelContentsTest < Minitest::Test
     _, out = run_script("list", "app-store", @app)
 
     refute_match(/^words about the test build/, out)
-    File.write(File.join(@game, "lib/dot_popper/monetization/entitlement.rb"), "# A test build has a setting of its own.\n", mode: "a")
+    File.write(File.join(@game, "gems/dot_popper-monetization/lib/dot_popper/monetization/entitlement.rb"), "# A test build has a setting of its own.\n", mode: "a")
     _, out = run_script("check", "app-store", @app)
 
-    assert_match(%r{FAIL .* holds lib/dot_popper/monetization/entitlement\.rb, which names words about the test build}, out)
+    assert_match(%r{FAIL .* holds gems/dot_popper-monetization/lib/dot_popper/monetization/entitlement\.rb, which names words about the test build}, out)
   end
 
   def test_an_unknown_channel_or_a_missing_folder_is_refused

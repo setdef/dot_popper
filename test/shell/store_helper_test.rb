@@ -18,6 +18,7 @@ class StoreHelperContractTest < Minitest::Test
   StoreHelper = DotPopper::Shell::StoreHelper
   STAND_IN = File.expand_path("../fixtures/store_helper_stand_in.rb", __dir__)
   LIB = File.expand_path("../../lib", __dir__)
+  MONETIZATION = File.expand_path("../../gems/dot_popper-monetization/lib", __dir__)
 
   # Reads as the game does, but gives the helper, a separate process, the
   # moment it needs to answer, so the contract's reads land on answers.
@@ -57,7 +58,7 @@ class StoreHelperContractTest < Minitest::Test
 
   def new_store(fails: nil, folder: nil)
     folder ||= File.join(@root, (@count += 1).to_s).tap { FileUtils.mkdir_p(it) }
-    command = fails == "refused" ? nil : [RbConfig.ruby, "-I", LIB, STAND_IN, folder, fails.to_s]
+    command = fails == "refused" ? nil : [RbConfig.ruby, "-I", LIB, "-I", MONETIZATION, STAND_IN, folder, fails.to_s]
     Polled.new(helper: StoreHelper.new(command), folder:, memo: {})
   end
 

@@ -112,7 +112,7 @@ class CheckBuildTest < Minitest::Test
     stamp("website")
     test_pins = DotPopper::Monetization::Continuity::TEST_PINS
     hexes = ->(keys) { "%w[#{keys.map { it.unpack1("H*") }.join(" ")}]" }
-    edit("lib/dot_popper/monetization/continuity/pins.rb", "PINNED = SETDEF_PINS", "PINNED = Pins.of(roots: #{hexes.(test_pins.roots)})")
+    edit("gems/dot_popper-monetization/lib/dot_popper/monetization/continuity/pins.rb", "PINNED = SETDEF_PINS", "PINNED = Pins.of(roots: #{hexes.(test_pins.roots)})")
     edit("lib/dot_popper/website/license_keys/signing_keys.rb", "SIGNING_KEYS = SETDEF_SIGNING_KEYS",
          "SIGNING_KEYS = #{hexes.(DotPopper::Monetization::LicenseKeys::TEST_SIGNING_KEYS)}.map { [it].pack(\"H*\") }")
     ok, out = check("website", "0.0.1")
@@ -223,11 +223,11 @@ class CheckBuildTest < Minitest::Test
 
   def test_a_build_naming_a_test_key_fails
     stamp("mac-app-store")
-    File.write(File.join(@game, "lib/dot_popper/monetization/store.rb"), "# Continuity::TestKeys\n", mode: "a")
+    File.write(File.join(@game, "gems/dot_popper-monetization/lib/dot_popper/monetization/store.rb"), "# Continuity::TestKeys\n", mode: "a")
     ok, out = check("mac-app-store")
 
     refute ok, out
-    assert_match(%r{FAIL .* holds lib/dot_popper/monetization/store\.rb, which names the test keys}, out)
+    assert_match(%r{FAIL .* holds gems/dot_popper-monetization/lib/dot_popper/monetization/store\.rb, which names the test keys}, out)
   end
 
   def test_a_google_play_build_needs_the_play_key

@@ -1,0 +1,78 @@
+# What the test build's part (lib/dot_popper/test_build) adds to Monetization:
+# its fakes, and the throwaway keys whose private seeds ship for them.
+module DotPopper
+  module Monetization
+    module Receipt
+      TEST: Trust
+
+      module TestKey
+        PRIVATE: String
+        PUBLIC: String
+      end
+
+      def self.issue: (?key: String, ?app_id: String, ?product_id: String, ?state: Integer, ?at: Time) -> String
+    end
+
+    class FakeStore
+      FAILS_BY: String
+      FAILURES: Array[String]
+      PRICE: String
+      READS: Integer
+      EARLIER: Receipt::Trust
+
+      @ledger: ::DotPopper::_SaveFile
+      @fails: String?
+      @reads: Integer
+      @text: String?
+      @asked: [String?, Integer]?
+      @waiting: Integer
+      @price: String
+
+      def self.failure: (untyped env) -> String?
+
+      def initialize: (::DotPopper::_SaveFile ledger, ?fails: String?, ?reads: Integer) -> void
+
+      def path: () -> String
+
+      def open: (String url) -> bool
+
+      def read: () -> String?
+
+      def remove: () -> nil
+
+      private
+
+      def settle: () -> void
+
+      def outcome: (String? action) -> String
+
+      def opened: () -> String
+
+      def bought: () -> String
+
+      def restored: () -> String
+
+      def receipt: () -> String
+
+      def owned?: () -> bool
+
+      def write: (String state, Integer number) -> void
+    end
+
+    class FakeCheckout < ::Data
+      attr_reader clipboard: WebsiteStore::_Clipboard
+
+      def self.new: (clipboard: WebsiteStore::_Clipboard) -> instance
+
+      def buy: () -> Symbol
+    end
+
+    module Continuity
+      # The throwaway keys whose private seeds ship for the test build's
+      # fakes.
+      module TestKeys
+        LICENSE: String
+      end
+    end
+  end
+end

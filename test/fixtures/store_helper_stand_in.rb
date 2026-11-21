@@ -10,7 +10,7 @@
 # record would. Its receipts are the test build's, as the fake store's
 # are. Run as:
 #
-#   ruby -Ilib store_helper_stand_in.rb FOLDER FAILS URL
+#   ruby -Ilib -Igems/dot_popper-monetization/lib store_helper_stand_in.rb FOLDER FAILS URL
 require "dot_popper/monetization/receipt"
 require "dot_popper/play/receipt"
 require "dot_popper/test_build/receipt_test_key"

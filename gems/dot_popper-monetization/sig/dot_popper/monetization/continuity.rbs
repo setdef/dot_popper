@@ -247,12 +247,6 @@ module DotPopper
 
         def join: () -> nil
       end
-
-      # The throwaway keys whose private seeds ship for the test build's
-      # fakes.
-      module TestKeys
-        LICENSE: String
-      end
     end
   end
 end

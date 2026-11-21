@@ -55,11 +55,13 @@ if ENV["STEEP_PROJECT"] == "areas"
   # code does yet), and names nothing of Release Engineering, which has no
   # interface at run time.
   target :monetization do
-    signature "sig/dot_popper/monetization"
+    # The area is the gem dot_popper-monetization, with its signatures;
+    # sig/dot_popper/monetization holds what the build parts add to it.
+    signature "gems/dot_popper-monetization/sig", "sig/dot_popper/monetization"
     LIBRARIES.each { library it }
     %w[digest json openssl securerandom].each { library it }
     unreferenced!
-    check "lib/dot_popper/monetization/**/*.rb", "lib/dot_popper/website/license_keys.rb", "lib/dot_popper/website/license_keys/*.rb",
+    check "gems/dot_popper-monetization/lib/**/*.rb", "lib/dot_popper/website/license_keys.rb", "lib/dot_popper/website/license_keys/*.rb",
           "lib/dot_popper/website/website_store.rb", "lib/dot_popper/apple/receipt.rb", "lib/dot_popper/play/receipt.rb",
           "lib/dot_popper/microsoft/receipt.rb"
     configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)
@@ -77,7 +79,7 @@ else
   # The use cases, which need two areas, and what loads and serves them,
   # against all of sig/.
   target :application do
-    signature "sig", "gems/dot_popper-gameplay/sig", *SHARED
+    signature "sig", "gems/dot_popper-gameplay/sig", "gems/dot_popper-monetization/sig", *SHARED
     LIBRARIES.each { library it }
     check "lib/dot_popper.rb", "lib/dot_popper/*.rb", "lib/dot_popper/use_cases/*.rb"
     configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)

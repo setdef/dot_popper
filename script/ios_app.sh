@@ -107,6 +107,7 @@ git archive HEAD | tar -x -C "$game"
 (cd "$game" && rm -rf .github vendor android ios macos windows test doc playtest script sig server Steepfile Rakefile \
   Gemfile Gemfile.lock mise.toml mise.lock mise.android.toml mise.ios.toml .ruby-version AGENTS.md GLOSSARY.md INSIPIRATION.md PACKAGING.md README.md .gitignore .gitattributes \
   gems/dot_popper-gameplay/sig gems/dot_popper-gameplay/test gems/dot_popper-gameplay/Rakefile gems/dot_popper-gameplay/Steepfile \
+  gems/dot_popper-monetization/sig gems/dot_popper-monetization/test gems/dot_popper-monetization/Rakefile gems/dot_popper-monetization/Steepfile \
   gems/dot_popper-shared/sig gems/dot_popper-shared/test gems/dot_popper-shared/Rakefile gems/dot_popper-shared/Steepfile)
 cp -R "$lota/tmp/phone/lota/ext/lota/phone/host" "$phone/host"
 rm -rf "$phone/host/android"
@@ -129,6 +130,7 @@ gem "lota", path: "$lota/tmp/phone/lota"
 # The game's own gems, in the game's copy (PACKAGING.md).
 gem "dot_popper-shared", path: "game/dot_popper/gems/dot_popper-shared"
 gem "dot_popper-gameplay", path: "game/dot_popper/gems/dot_popper-gameplay"
+gem "dot_popper-monetization", path: "game/dot_popper/gems/dot_popper-monetization"
 EOF
 # Fledge runs from a Gemfile of its own, outside the phone project, and
 # builds the project by its path (Fledge's README, "Installation"), so

@@ -54,15 +54,15 @@ class ProKnowledgeTest < Minitest::Test
   end
 
   KNOWS = %w[
+    gems/dot_popper-monetization/lib/dot_popper/monetization.rb
+    gems/dot_popper-monetization/lib/dot_popper/monetization/entitlement.rb
+    gems/dot_popper-monetization/lib/dot_popper/monetization/free_games.rb
+    gems/dot_popper-monetization/lib/dot_popper/monetization/store.rb
     lib/dot_popper/composition/root.rb
     lib/dot_popper/composition/use_cases.rb
-    lib/dot_popper/monetization.rb
     lib/dot_popper/website/license_keys/license.rb
     lib/dot_popper/website/offer.rb
     lib/dot_popper/website/root.rb
-    lib/dot_popper/monetization/entitlement.rb
-    lib/dot_popper/monetization/free_games.rb
-    lib/dot_popper/monetization/store.rb
     lib/dot_popper/test_build/fake_store.rb
     lib/dot_popper/test_build/root.rb
     lib/dot_popper/test_build/store.rb

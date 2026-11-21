@@ -1,0 +1,45 @@
+# Each store's receipt check, in its store's build part (lib/dot_popper/apple,
+# play and microsoft): Monetization's Receipt, which the gem dot_popper-monetization
+# declares, with what each part adds to it.
+module DotPopper
+  module Monetization
+    module Receipt
+      APPLE_ROOT_G3: String
+      PLAY_KEYS: Array[String]
+      APPLE: Trust
+      PLAY: Trust
+      MICROSOFT_STORE: Trust
+
+      module Apple
+        LEAF: String
+        INTERMEDIATE: String
+
+        def self?.name_in_receipts: () -> String
+
+        def self?.valid?: (String jws, Trust trust) -> bool
+
+        def self?.chained?: (untyped leaf, untyped intermediate, Trust trust, Time at) -> boolish
+
+        def self?.marked?: (untyped certificate, String oid) -> bool
+
+        def self?.decode: (String? text) -> String
+
+        def self?.der: (String raw) -> String
+      end
+
+      module Play
+        def self?.name_in_receipts: () -> String
+
+        def self?.valid?: (String text, Trust trust) -> bool
+      end
+
+      module Microsoft
+        SKU: Regexp
+
+        def self?.name_in_receipts: () -> String
+
+        def self?.valid?: (String text, Trust trust) -> bool
+      end
+    end
+  end
+end

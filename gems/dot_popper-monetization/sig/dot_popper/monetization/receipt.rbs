@@ -1,0 +1,30 @@
+module DotPopper
+  module Monetization
+    module Receipt
+      # The code that checks one store's receipts (Apple, Play, Microsoft).
+      interface _Store
+        def name_in_receipts: () -> String
+        def valid?: (String text, Trust trust) -> bool
+      end
+
+      class Trust
+        attr_reader store: _Store?
+        attr_reader keys: Array[String]
+        attr_reader app_id: String
+        attr_reader product_id: String
+
+        def initialize: (store: _Store?, keys: Array[String], app_id: String, product_id: String) -> void
+
+        def with: (?store: _Store?, ?keys: Array[String], ?app_id: String, ?product_id: String) -> Trust
+      end
+
+      APP_ID: String
+      PRODUCT_ID: String
+      NOTHING: Array[String]
+      NONE: Trust
+
+      def self.valid?: (untyped text, Trust trust) -> bool
+      def self.load_openssl: () -> void
+    end
+  end
+end

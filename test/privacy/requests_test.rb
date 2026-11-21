@@ -163,7 +163,8 @@ class PrivacyRequestsTest < Minitest::Test
     # automation.rb only refuses connections (Automation.guard!); it opens none.
     # monetization/continuity/ed25519.rb takes OpenSSL's signatures, and the test build's
     # signing.rb makes them, and nothing that connects.
-    signatures = %w[monetization/continuity/ed25519.rb test_build/signing.rb].map { File.join(ROOT, "lib/dot_popper", it) }
+    signatures = %w[gems/dot_popper-monetization/lib/dot_popper/monetization/continuity/ed25519.rb
+                    lib/dot_popper/test_build/signing.rb].map { File.join(ROOT, it) }
     # receipt.rb and each store's receipt.rb (its part's) check stores'
     # signatures and certificates, and
     # the test build's receipt test key signs a fake store's, and nothing
