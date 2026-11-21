@@ -26,6 +26,19 @@ class LotaPinsTest < Minitest::Test
     assert_equal ["LOTA_REF=v#{lota.fetch(0)}", "FLEDGE_TAG=#{fledge.options.fetch('tag')}"], lines
   end
 
+  # A workflow that builds a phone app names Fledge's tag itself, in the
+  # environment its steps start with, where no script has run yet: each
+  # must name the tag the lockfile pins, or that app is built by another
+  # Fledge than every other.
+  def test_the_workflows_name_the_lockfiles_fledge
+    locked = Bundler::LockfileParser.new(File.binread(File.join(ROOT, "Gemfile.lock")))
+    tag = locked.sources.find { it.is_a?(Bundler::Source::Git) && it.uri.end_with?("/Fledge") }.options.fetch("tag")
+    named = Dir[File.join(ROOT, ".github/workflows/*.yml")].to_h { [File.basename(it), File.read(it)[/^\s*FLEDGE_TAG:\s*(\S+)/, 1]] }.compact
+
+    assert_equal %w[android.yml kits.yml], named.keys.sort
+    assert_equal named.transform_values { tag }, named
+  end
+
   def test_a_lockfile_without_a_tagged_fledge_or_one_lota_is_refused
     Dir.mktmpdir do |dir|
       lock = File.join(dir, "Gemfile.lock")
