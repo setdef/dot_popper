@@ -90,6 +90,9 @@ app_version=$(ruby -ryaml -e 'print YAML.load_file("fledge.yml").fetch("version"
 # The Fledge Gemfile.lock pins, as the fuse action names it.
 LOTA_FLEDGE_REF=$(ruby -r./script/packaged_app -e 'print PackagedApp.fledge_ref')
 export LOTA_FLEDGE_REF
+# The groups of the store gems this channel.s build does not carry.
+BUNDLE_WITHOUT=$(ruby script/channel_contents.rb without "$channel")
+export BUNDLE_WITHOUT
 say "Fledge $LOTA_FLEDGE_REF"
 # lota fuse reads conf.rb in its own Ruby, with no bundle, and conf.rb
 # loads the game's code, so the game's own gems (gems/, PACKAGING.md) are

@@ -217,6 +217,24 @@ class ChannelContentsTest < Minitest::Test
   # Each store's receipt code is a part only its own store's build
   # carries: an app store's package holding another store's, at its own
   # place or copied anywhere, fails.
+  # Each store's receipt check: in its part, or in the store's own gem.
+  RECEIPTS = { "play" => "lib/dot_popper/play/receipt.rb",
+               "microsoft" => "gems/dot_popper-microsoft/lib/dot_popper/monetization/receipt/microsoft.rb" }.freeze
+
+  # The Microsoft Store's gem keeps its gemspec in every build, so that
+  # Bundler reads the Gemfile, and its code only in its own channel's.
+  def test_check_fails_when_a_build_holds_another_stores_gem
+    stamp("website")
+    lib = File.join(@game, "gems/dot_popper-microsoft/lib")
+    refute File.exist?(lib), "a website build leaves out the Microsoft Store gem's code"
+    assert File.file?(File.join(@game, "gems/dot_popper-microsoft/dot_popper-microsoft.gemspec"))
+    FileUtils.cp_r(File.join(ROOT, "gems/dot_popper-microsoft/lib"), lib)
+    ok, out = run_script("check", "website", @app)
+
+    refute ok, out
+    assert_match(%r{FAIL .* holds gems/dot_popper-microsoft/lib \(the Microsoft Store's license\)}, out)
+  end
+
   def test_check_fails_when_an_app_store_build_holds_another_stores_receipts
     stamp("app-store")
     { "play" => "Google Play's receipts", "microsoft" => "the Microsoft Store's license" }.each do |part, piece|
@@ -227,7 +245,7 @@ class ChannelContentsTest < Minitest::Test
       assert_match(%r{FAIL .* holds lib/dot_popper/#{part} \(#{piece}\)}, out)
 
       FileUtils.rm_rf(File.join(@game, "lib/dot_popper", part))
-      FileUtils.cp(File.join(ROOT, "lib/dot_popper", part, "receipt.rb"), File.join(@game, "gems/dot_popper-monetization/lib/dot_popper/monetization/stray.rb"))
+      FileUtils.cp(File.join(ROOT, RECEIPTS.fetch(part)), File.join(@game, "gems/dot_popper-monetization/lib/dot_popper/monetization/stray.rb"))
       ok, out = run_script("check", "app-store", @app)
 
       refute ok, out

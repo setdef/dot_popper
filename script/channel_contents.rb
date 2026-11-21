@@ -94,7 +94,7 @@ module ChannelContents
               files: %w[lib/dot_popper/apple], marks: [/module Apple\b/, /APPLE_ROOT_G3/],
               defined_by: [/module Apple\b/]),
     Piece.new(name: "the Microsoft Store's license", needed_by: [TEST, Build::MICROSOFT_STORE], apart: :files,
-              files: %w[lib/dot_popper/microsoft], marks: [/module Microsoft\b/, /Receipt::Microsoft\b/],
+              files: %w[lib/dot_popper/microsoft gems/dot_popper-microsoft/lib], marks: [/module Microsoft\b/, /Receipt::Microsoft\b/],
               defined_by: [/module Microsoft\b/]),
     Piece.new(name: "the computer stores' helper", needed_by: [Build::MAC_APP_STORE, Build::MICROSOFT_STORE],
               files: %w[lib/dot_popper/shell/store_helper.rb], marks: [/StoreHelper/]),
@@ -125,6 +125,13 @@ module ChannelContents
   # one, and a build for sale its channel's
   # (script/set_build_channel.rb).
   PARTS = { TEST => %w[apple play microsoft website test_build], **BuildChannel::PARTS }.freeze
+
+  # The parts whose code is a gem of its own, each in the Gemfile's group
+  # of the part's name, which a build that does not carry the part leaves
+  # out (Bundler's without, which lota fuse writes into the app).
+  GEM_PARTS = %w[microsoft].freeze
+
+  def self.without(channel) = GEM_PARTS - PARTS.fetch(channel)
 
   # Prints, as JSON, the Build::CHANNEL and Build::PARTS of the build.rb
   # it is given, in a Ruby of its own, so this repository's are untouched.
@@ -219,6 +226,10 @@ module ChannelContents
       channel = rest.first || Build::CHANNEL || TEST
       usage unless CHANNELS.include?(channel)
       puts left_out(channel)
+    when "without"
+      channel = rest.first || Build::CHANNEL || TEST
+      usage unless CHANNELS.include?(channel)
+      puts without(channel).join(":")
     when "list", "check"
       channel, folder = rest
       usage unless CHANNELS.include?(channel) && folder && File.directory?(folder)

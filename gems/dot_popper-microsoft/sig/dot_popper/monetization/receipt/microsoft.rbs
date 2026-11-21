@@ -1,0 +1,17 @@
+# The Microsoft Store's part of Monetization's Receipt, which the gem
+# dot_popper-monetization declares.
+module DotPopper
+  module Monetization
+    module Receipt
+      MICROSOFT_STORE: Trust
+
+      module Microsoft
+        SKU: Regexp
+
+        def self?.name_in_receipts: () -> String
+
+        def self?.valid?: (String text, Trust trust) -> bool
+      end
+    end
+  end
+end

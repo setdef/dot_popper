@@ -171,7 +171,7 @@ class PrivacyRequestsTest < Minitest::Test
     # that connects.
     receipts = ruby_files.select do
       it.end_with?("dot_popper/monetization/receipt.rb", "test_build/receipt_test_key.rb", "dot_popper/apple/receipt.rb",
-                   "dot_popper/play/receipt.rb", "dot_popper/microsoft/receipt.rb")
+                   "dot_popper/play/receipt.rb", "dot_popper/monetization/receipt/microsoft.rb")
     end
 
     assert_empty ruby_files.reject { it.end_with?("gems/dot_popper-shared/lib/dot_popper/network/link.rb", "gems/dot_popper-shared/lib/dot_popper/automation.rb") || signatures.include?(it) || receipts.include?(it) }.select { uncommented(it).match?(banned) }

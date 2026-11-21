@@ -27,6 +27,8 @@ module PackagedApp
                        gems/dot_popper-monetization/Rakefile gems/dot_popper-monetization/Steepfile
                        gems/dot_popper-release_engineering/sig gems/dot_popper-release_engineering/test
                        gems/dot_popper-release_engineering/Rakefile gems/dot_popper-release_engineering/Steepfile
+                       gems/dot_popper-microsoft/sig gems/dot_popper-microsoft/test gems/dot_popper-microsoft/Rakefile
+                       gems/dot_popper-microsoft/Steepfile
                        gems/dot_popper-shared/sig gems/dot_popper-shared/test gems/dot_popper-shared/Rakefile gems/dot_popper-shared/Steepfile].freeze
 
   # Run in a Ruby of its own, with the game's folder in the app and then
@@ -102,7 +104,7 @@ module PackagedApp
   # its copy of them, as in the app, and not from this repository's.
   def shipped_load_path(game = nil)
     require "lota"
-    specs = defined?(Bundler) ? Bundler.definition.specs_for([:default]).to_a : [Gem.loaded_specs.fetch("lota")]
+    specs = defined?(Bundler) ? Bundler.definition.specs_for([:default, *ChannelContents::GEM_PARTS.map(&:to_sym)]).to_a : [Gem.loaded_specs.fetch("lota")]
     paths = specs.reject { it.name == "bundler" }.flat_map(&:full_require_paths)
     return paths unless game
 

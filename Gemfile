@@ -66,3 +66,10 @@ group :development, :test do
   gem "minitest-mock", "~> 5.27"
   gem "rake", "~> 13.2"
 end
+
+# Each store's part of Monetization, a gem of its own in a group of the
+# part's name, which a build that does not carry the part leaves out
+# (script/channel_contents.rb without).
+group :microsoft do
+  gem "dot_popper-microsoft", path: "gems/dot_popper-microsoft"
+end

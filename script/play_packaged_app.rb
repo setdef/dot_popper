@@ -292,7 +292,8 @@ module PlayPackagedApp
       out = File.join(work, "fuse")
       step("Fused the app with lota fuse (once for this key)") do
         gems = File.join(work, "fuse-gems")
-        run({ "GEM_HOME" => gems, "GEM_PATH" => "#{gems}:#{home}", "LOTA_FLEDGE_REF" => PackagedApp.fledge_ref(File.join(stage, "Gemfile.lock")) },
+        run({ "GEM_HOME" => gems, "GEM_PATH" => "#{gems}:#{home}", "LOTA_FLEDGE_REF" => PackagedApp.fledge_ref(File.join(stage, "Gemfile.lock")),
+              "BUNDLE_WITHOUT" => ChannelContents.without(channel).join(":") },
             RbConfig.ruby, *own_gems(stage), File.join(home, "bin", "lota"), "fuse", stage,
             *fuse_options(stage, channel), "--out", out, what: "lota fuse", limit: FUSE_LIMIT, chdir: work)
       end

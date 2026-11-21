@@ -57,13 +57,13 @@ if ENV["STEEP_PROJECT"] == "areas"
   target :monetization do
     # The area is the gem dot_popper-monetization, with its signatures;
     # sig/dot_popper/monetization holds what the build parts add to it.
-    signature "gems/dot_popper-monetization/sig", "sig/dot_popper/monetization"
+    signature "gems/dot_popper-monetization/sig", "gems/dot_popper-microsoft/sig", "sig/dot_popper/monetization"
     LIBRARIES.each { library it }
     %w[digest json openssl securerandom].each { library it }
     unreferenced!
     check "gems/dot_popper-monetization/lib/**/*.rb", "lib/dot_popper/website/license_keys.rb", "lib/dot_popper/website/license_keys/*.rb",
           "lib/dot_popper/website/website_store.rb", "lib/dot_popper/apple/receipt.rb", "lib/dot_popper/play/receipt.rb",
-          "lib/dot_popper/microsoft/receipt.rb"
+          "gems/dot_popper-microsoft/lib/**/*.rb"
     configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)
   end
 
@@ -81,7 +81,7 @@ else
   # against all of sig/.
   target :application do
     signature "sig", "gems/dot_popper-gameplay/sig", "gems/dot_popper-monetization/sig",
-              "gems/dot_popper-release_engineering/sig", *SHARED
+              "gems/dot_popper-release_engineering/sig", "gems/dot_popper-microsoft/sig", *SHARED
     LIBRARIES.each { library it }
     check "lib/dot_popper.rb", "lib/dot_popper/*.rb", "lib/dot_popper/use_cases/*.rb"
     configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)

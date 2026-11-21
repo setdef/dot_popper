@@ -143,7 +143,7 @@ Both ask for owned purchases first (StoreKit's `Transaction.currentEntitlements`
 
 ## Receipts
 
-A receipt is a store's signed record of a purchase of Pro, which the game verifies itself, offline, at each launch (`DotPopper::Monetization::Receipt`, `gems/dot_popper-monetization/lib/dot_popper/monetization/receipt.rb`, and each store's check in a part of its own that only its store's channels and a test build carry: `lib/dot_popper/apple/receipt.rb`, `play/receipt.rb`, `microsoft/receipt.rb`). The host passes it as text after the store's name. Anything that goes wrong is a receipt that does not verify, never an error. OpenSSL and JSON load on first use.
+A receipt is a store's signed record of a purchase of Pro, which the game verifies itself, offline, at each launch (`DotPopper::Monetization::Receipt`, `gems/dot_popper-monetization/lib/dot_popper/monetization/receipt.rb`, and each store's check in a part of its own that only its store's channels and a test build carry: `lib/dot_popper/apple/receipt.rb`, `play/receipt.rb`, and the Microsoft Store's in its own gem, `gems/dot_popper-microsoft`, which its part loads). The host passes it as text after the store's name. Anything that goes wrong is a receipt that does not verify, never an error. OpenSSL and JSON load on first use.
 
 | Form | Store | What `Receipt.valid?` checks |
 | --- | --- | --- |

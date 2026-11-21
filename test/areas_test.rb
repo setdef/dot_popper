@@ -56,7 +56,7 @@ class AreasTest < Minitest::Test
   FILES = {
     "Gameplay" => %w[../../gems/dot_popper-gameplay/lib/**/*.rb],
     "Monetization" => %w[../../gems/dot_popper-monetization/lib/**/*.rb website/license_keys.rb website/license_keys/**/*.rb website/website_store.rb
-                       apple/receipt.rb play/receipt.rb microsoft/receipt.rb],
+                       apple/receipt.rb play/receipt.rb ../../gems/dot_popper-microsoft/lib/**/*.rb],
     "ReleaseEngineering" => %w[../../gems/dot_popper-release_engineering/lib/**/*.rb],
     "Shared" => %w[../../gems/dot_popper-shared/lib/**/*.rb]
   }.freeze

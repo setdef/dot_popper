@@ -5,4 +5,4 @@
 # that takes the Microsoft Store's license, Windows' word, under
 # Monetization's own names (Receipt::Microsoft, Receipt::MICROSOFT_STORE).
 # It leans on Receipt, loaded before it.
-require_relative "receipt"
+require "dot_popper/monetization/receipt/microsoft"

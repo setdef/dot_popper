@@ -1,0 +1,14 @@
+# frozen_string_literal: true
+
+# The gem checked against its own signatures, strictly, as the game's
+# Steepfile checks the areas. Besides its own, it sees only the
+# signatures of the gems it names, dot_popper-monetization and the code
+# the areas share, which Steep finds in their sig/ as libraries.
+target :lib do
+  signature "sig"
+  %w[date socket uri digest json openssl securerandom dot_popper-shared dot_popper-monetization].each { library it }
+  check "lib"
+  configure_code_diagnostics(Steep::Diagnostic::Ruby.strict) do |hash|
+    hash[Steep::Diagnostic::Ruby::UnsupportedSyntax] = :error
+  end
+end
