@@ -6,9 +6,10 @@
 # pattern matching (case/in) entirely, so that is an error here too,
 # rather than a part of the rules nobody checks. The presentation, the
 # shell and the composition root are not typed yet; the shell would also
-# need Lota's signatures. Nor are Monetization's continuity/, license_keys/
-# and receipt/,
-# the network client's network/, or the test build's part.
+# need Lota's signatures. All of Monetization is typed, with the website
+# part's license keys and store; the rest of the website part (its
+# loader and its prepends on the composition root), the network client's
+# network/ and the test build's part are not.
 #
 # Each area is a target of its own, which sees only its own signatures
 # and those of the code the areas share (test/areas_test.rb gives the
