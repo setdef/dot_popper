@@ -25,13 +25,16 @@ module DotPopper
     # Anything that goes wrong is a receipt that does not verify, never an
     # error.
     module Receipt
-      # What a build accepts a receipt from: the +apple_roots+ (DER
-      # certificates) a StoreKit transaction must chain to, the +play_keys+
-      # (DER public keys) a Play purchase must be signed by, the app's
-      # +app_id+ (its bundle ID and package name) and the +product_id+, and
-      # whether Windows' word for a Microsoft Store license is taken
-      # (+windows_license+), which only the Microsoft Store build's is.
-      Trust = Data.define(:apple_roots, :play_keys, :app_id, :product_id, :windows_license)
+      # What a build accepts a receipt from: the one +store+ whose receipts
+      # it takes (Apple, Play or Microsoft, each the code that checks its
+      # own store's receipts, or nil for none), the +keys+ that store's
+      # receipts must be proven by (Apple's: DER root certificates a
+      # StoreKit transaction must chain to; Play's: DER public keys a
+      # purchase must be signed by; the Microsoft Store's: none, since its
+      # word is Windows'), and the app's +app_id+ (its bundle ID and package
+      # name) and the +product_id+. A receipt of any other store does not
+      # verify.
+      Trust = Data.define(:store, :keys, :app_id, :product_id)
 
       APP_ID = "com.setdef.DotPopper"
       PRODUCT_ID = "com.setdef.dotpopper.pro"
@@ -41,17 +44,14 @@ module DotPopper
       # is beside its check (APPLE, PLAY, MICROSOFT_STORE).
       NOTHING = ([] #: Array[String]
                 ).freeze
-      NONE = Trust.new(apple_roots: NOTHING, play_keys: NOTHING, app_id: APP_ID, product_id: PRODUCT_ID, windows_license: false)
+      NONE = Trust.new(store: nil, keys: NOTHING, app_id: APP_ID, product_id: PRODUCT_ID)
 
-      # Whether +text+ is a receipt for Pro that +trust+ accepts.
+      # Whether +text+ is a receipt for Pro that +trust+ accepts: one of its
+      # own store's, after that store's name, which its store proves.
       def self.valid?(text, trust)
-        store, rest = text.to_s.strip.split(":", 2)
-        case store
-        when "apple" then Apple.valid?(rest.to_s, trust)
-        when "play" then Play.valid?(rest.to_s, trust)
-        when "microsoft" then Microsoft.valid?(rest.to_s, trust)
-        else false
-        end
+        store = trust.store or return false
+        name, rest = text.to_s.strip.split(":", 2)
+        name == store.name_in_receipts && store.valid?(rest.to_s, trust)
       end
 
       # OpenSSL and JSON, loaded on first use, as Continuity::Ed25519 does,

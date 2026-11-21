@@ -85,7 +85,7 @@ module ChannelContents
     Piece.new(name: "Apple's receipts", needed_by: [Build::APP_STORE, Build::MAC_APP_STORE],
               files: %w[lib/dot_popper/monetization/receipt/apple.rb], marks: [/module Apple\b/, /APPLE_ROOT_G3/]),
     Piece.new(name: "the Microsoft Store's license", needed_by: [Build::MICROSOFT_STORE],
-              files: %w[lib/dot_popper/monetization/receipt/microsoft.rb], marks: [/module Microsoft\b/, /windows_license/]),
+              files: %w[lib/dot_popper/monetization/receipt/microsoft.rb], marks: [/module Microsoft\b/, /Receipt::Microsoft\b/]),
     Piece.new(name: "the computer stores' helper", needed_by: [Build::MAC_APP_STORE, Build::MICROSOFT_STORE],
               files: %w[lib/dot_popper/shell/store_helper.rb], marks: [/StoreHelper/]),
     Piece.new(name: "Google Play Billing", needed_by: [Build::GOOGLE_PLAY], everywhere: true,

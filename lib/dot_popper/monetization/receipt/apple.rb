@@ -18,8 +18,10 @@ module DotPopper
 
         module_function
 
+        def name_in_receipts = "apple"
+
         def valid?(jws, trust)
-          return false if trust.apple_roots.empty?
+          return false if trust.keys.empty?
 
           Receipt.load_openssl
           head64, body64, signature64 = jws.split(".")
@@ -40,7 +42,7 @@ module DotPopper
 
         def chained?(leaf, intermediate, trust, at)
           store = OpenSSL::X509::Store.new
-          trust.apple_roots.each { store.add_cert(OpenSSL::X509::Certificate.new(it)) }
+          trust.keys.each { store.add_cert(OpenSSL::X509::Certificate.new(it)) }
           store.time = at
           store.verify(leaf, [intermediate])
         end
@@ -77,8 +79,7 @@ module DotPopper
       # What a build sold through Apple's stores trusts (the App Store's and
       # the Mac App Store's): StoreKit 2's transactions chained to Apple's
       # root, and nothing else.
-      APPLE = Trust.new(apple_roots: [APPLE_ROOT_G3].freeze, play_keys: NOTHING, app_id: APP_ID, product_id: PRODUCT_ID,
-                        windows_license: false)
+      APPLE = Trust.new(store: Apple, keys: [APPLE_ROOT_G3].freeze, app_id: APP_ID, product_id: PRODUCT_ID)
     end
   end
 end

@@ -44,8 +44,7 @@ module DotPopper
       end
 
       # What a test build trusts: only the fake store's test key.
-      TEST = Trust.new(apple_roots: [].freeze, play_keys: [TestKey::PUBLIC.unpack1("m")].freeze, app_id: APP_ID, product_id: PRODUCT_ID,
-                       windows_license: false)
+      TEST = Trust.new(store: Play, keys: [TestKey::PUBLIC.unpack1("m")].freeze, app_id: APP_ID, product_id: PRODUCT_ID)
 
       # A receipt for Pro in Play's form, as the test build's fake store
       # hands one over, signed by +key+ (PEM): the test key unless a test

@@ -153,7 +153,7 @@ A receipt is a store's signed record of a purchase of Pro, which the game verifi
 
 ### Whose receipts a build trusts
 
-A `Receipt::Trust` holds the Apple roots, the Play keys, the app's ID, the product ID, and whether Windows' word is taken (`windows_license`). The composition root picks one by the channel alone (`Composition::Root.receipt_trust`) and hands it to the `Entitlement`; the test build's part answers `Receipt::TEST` for a build with no channel:
+A `Receipt::Trust` holds the one store whose receipts it takes (`Receipt::Apple`, `Receipt::Play` or `Receipt::Microsoft`, each the code that proves its own store's receipts, or none), the keys that store's receipts must be proven by (Apple's roots, or the Play keys; none for Windows' word), the app's ID and the product ID. `Receipt.valid?` names no store: it takes a receipt only under its trust's store's name, and hands it to that store's code. The composition root picks one by the channel alone (`Composition::Root.receipt_trust`) and hands it to the `Entitlement`; the test build's part answers `Receipt::TEST` for a build with no channel:
 
 | Build | Trust | Accepts |
 | --- | --- | --- |

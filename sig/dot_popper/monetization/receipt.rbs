@@ -1,16 +1,21 @@
 module DotPopper
   module Monetization
     module Receipt
+      # The code that checks one store's receipts (Apple, Play, Microsoft).
+      interface _Store
+        def name_in_receipts: () -> String
+        def valid?: (String text, Trust trust) -> bool
+      end
+
       class Trust
-        attr_reader apple_roots: Array[String]
-        attr_reader play_keys: Array[String]
+        attr_reader store: _Store?
+        attr_reader keys: Array[String]
         attr_reader app_id: String
         attr_reader product_id: String
-        attr_reader windows_license: bool
 
-        def initialize: (apple_roots: Array[String], play_keys: Array[String], app_id: String, product_id: String, windows_license: bool) -> void
+        def initialize: (store: _Store?, keys: Array[String], app_id: String, product_id: String) -> void
 
-        def with: (?apple_roots: Array[String], ?play_keys: Array[String], ?app_id: String, ?product_id: String, ?windows_license: bool) -> Trust
+        def with: (?store: _Store?, ?keys: Array[String], ?app_id: String, ?product_id: String) -> Trust
       end
 
       APP_ID: String
@@ -37,6 +42,8 @@ module DotPopper
         LEAF: String
         INTERMEDIATE: String
 
+        def self?.name_in_receipts: () -> String
+
         def self?.valid?: (String jws, Trust trust) -> bool
 
         def self?.chained?: (untyped leaf, untyped intermediate, Trust trust, Time at) -> boolish
@@ -49,11 +56,15 @@ module DotPopper
       end
 
       module Play
+        def self?.name_in_receipts: () -> String
+
         def self?.valid?: (String text, Trust trust) -> bool
       end
 
       module Microsoft
         SKU: Regexp
+
+        def self?.name_in_receipts: () -> String
 
         def self?.valid?: (String text, Trust trust) -> bool
       end

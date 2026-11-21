@@ -11,13 +11,15 @@ module DotPopper
       module Play
         module_function
 
+        def name_in_receipts = "play"
+
         # +text+ is "<JSON>:<signature>", each in standard Base64.
         def valid?(text, trust)
           Receipt.load_openssl
           json64, signature64 = text.split(":", 2)
           json = json64.to_s.unpack1("m").to_s
           signature = signature64.to_s.unpack1("m").to_s
-          return false unless trust.play_keys.any? { OpenSSL::PKey.read(it).verify("SHA1", signature, json) } # steep:ignore ArgumentTypeMismatch
+          return false unless trust.keys.any? { OpenSSL::PKey.read(it).verify("SHA1", signature, json) } # steep:ignore ArgumentTypeMismatch
 
           purchase = JSON.parse(json)
           products = Array(purchase["productIds"]) + Array(purchase["productId"])
@@ -36,8 +38,7 @@ module DotPopper
 
       # What the Google Play build trusts: purchases signed by the app's
       # Play key once pinned, and nothing else.
-      PLAY = Trust.new(apple_roots: NOTHING, play_keys: PLAY_KEYS.map { it.unpack1("m").to_s }.freeze, app_id: APP_ID,
-                       product_id: PRODUCT_ID, windows_license: false)
+      PLAY = Trust.new(store: Play, keys: PLAY_KEYS.map { it.unpack1("m").to_s }.freeze, app_id: APP_ID, product_id: PRODUCT_ID)
     end
   end
 end

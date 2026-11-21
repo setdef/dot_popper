@@ -60,6 +60,13 @@ class ReceiptTest < Minitest::Test
     refute Receipt.valid?("microsoft:#{Receipt::PRODUCT_ID}:owned", Receipt::MICROSOFT_STORE)
   end
 
+  # A build takes a receipt only under its own store's name.
+  def test_windows_word_under_another_stores_name_proves_nothing
+    %w[apple play steam].each do |name|
+      refute Receipt.valid?("#{name}:#{Receipt::PRODUCT_ID}:9NBLGGH4R315/000N", Receipt::MICROSOFT_STORE), name
+    end
+  end
+
   def test_the_microsoft_store_build_takes_no_signed_receipt_from_another_store
     refute Receipt.valid?(Receipt.issue, Receipt::MICROSOFT_STORE)
     refute Receipt.valid?(apple, Receipt::MICROSOFT_STORE)
@@ -98,8 +105,7 @@ class ReceiptTest < Minitest::Test
 
   private
 
-  def trust = Receipt::Trust.new(apple_roots: [chain[:root].to_der], play_keys: [], app_id: Receipt::APP_ID, product_id: Receipt::PRODUCT_ID,
-                                     windows_license: false)
+  def trust = Receipt::Trust.new(store: Receipt::Apple, keys: [chain[:root].to_der], app_id: Receipt::APP_ID, product_id: Receipt::PRODUCT_ID)
 
   # A root, an intermediate and a leaf, as Apple's are laid out.
   def chain

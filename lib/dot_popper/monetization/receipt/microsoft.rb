@@ -12,8 +12,8 @@ module DotPopper
       # "<in-app offer token>:<SKU Store ID>", as the Microsoft Store build's
       # helper (windows/store) writes it down its pipe.
       #
-      # It proves Pro only under a Trust that takes Windows' word
-      # (+windows_license+), which only the Microsoft Store build holds, and
+      # It proves Pro only under a Trust whose store is the Microsoft Store's
+      # (Receipt.valid?), which only the Microsoft Store build holds, and
       # whose store's answers come only through that pipe
       # (Shell::StoreHelper). Every other build refuses it, so writing it
       # into a store answer file does nothing.
@@ -24,9 +24,9 @@ module DotPopper
 
         module_function
 
-        def valid?(text, trust)
-          return false unless trust.windows_license
+        def name_in_receipts = "microsoft"
 
+        def valid?(text, trust)
           token, sku = text.split(":", 2)
           token == trust.product_id && SKU.match?(sku.to_s)
         end
@@ -34,8 +34,7 @@ module DotPopper
 
       # What the Microsoft Store build trusts: Windows' word for its license,
       # and nothing that is signed, since no other store sells that build.
-      MICROSOFT_STORE = Trust.new(apple_roots: NOTHING, play_keys: NOTHING, app_id: APP_ID, product_id: PRODUCT_ID,
-                                  windows_license: true)
+      MICROSOFT_STORE = Trust.new(store: Microsoft, keys: NOTHING, app_id: APP_ID, product_id: PRODUCT_ID)
     end
   end
 end
