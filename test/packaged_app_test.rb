@@ -156,4 +156,20 @@ class PackagedAppTest < Minitest::Test
       assert_empty PackagedApp::REPOSITORY_ONLY - pruned, "#{name} leaves these in the app"
     end
   end
+
+  # lota fuse runs the Fledge Lota pins (Lota::Fuse::FLEDGE_REF) unless
+  # LOTA_FLEDGE_REF names another, so each desktop build names the one
+  # Gemfile.lock pins, which the phone builds take too
+  # (script/lota_pins.sh): every app is built by one Fledge.
+  def test_every_desktop_build_fuses_with_the_lockfiles_fledge
+    locked = Bundler::LockfileParser.new(File.binread(File.join(ROOT, "Gemfile.lock")))
+    fledge = locked.sources.find { it.is_a?(Bundler::Source::Git) && it.uri.end_with?("/Fledge") }
+
+    assert_equal fledge.options.fetch("tag"), PackagedApp.fledge_ref
+    named = "LOTA_FLEDGE_REF=$(ruby -r./script/packaged_app -e 'print PackagedApp.fledge_ref'"
+    steps = YAML.load_file(File.join(ROOT, ".github/actions/fuse/action.yml")).dig("runs", "steps")
+    assert_includes steps.find { it["name"] == "lota fuse" }.fetch("run"), named
+    assert_includes File.read(File.join(ROOT, "script/macos_app.sh")), named
+    assert_includes File.read(File.join(ROOT, "script/play_packaged_app.rb")), '"LOTA_FLEDGE_REF" => PackagedApp.fledge_ref('
+  end
 end

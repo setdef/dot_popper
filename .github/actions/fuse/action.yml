@@ -61,5 +61,9 @@ runs:
           echo "left out for the build's channel: $path"
           exclude+=(--exclude "$path")
         done
+        # The Fledge Gemfile.lock pins, which the phone builds take too.
+        LOTA_FLEDGE_REF=$(ruby -r./script/packaged_app -e 'print PackagedApp.fledge_ref' | tr -d '\r')
+        export LOTA_FLEDGE_REF
+        echo "Fledge $LOTA_FLEDGE_REF"
         ruby -S lota fuse . "${exclude[@]}" --identifier "$IDENTIFIER" --app-version "$APP_VERSION" --icon icons/icon --out "$RUNNER_TEMP/fuse"
         ls -la "$RUNNER_TEMP/fuse"

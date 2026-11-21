@@ -36,14 +36,15 @@ end
 gem "lota", "~> 0.5.5"
 
 # Fledge packages the game for people who don't have Ruby (PACKAGING.md).
-# Pinned to v0.14.0, the Fledge that Lota 0.5.5's lota fuse pins for a
-# fused app too.
+# Pinned to a tag, which the phone builds take (script/lota_pins.sh)
+# and every desktop build names to lota fuse, which would otherwise run
+# its own pin, v0.14.0 in Lota 0.5.5 (PackagedApp.fledge_ref).
 # In the development group, which lota fuse leaves out of a desktop app.
 # A phone app ships it: the phone project's own Gemfile, which
 # script/android_build.sh and script/ios_app.sh write, names it, and
 # Fledge 0.13 and later ship every group (Privacy::PHONE_GEMS).
 group :development do
-  gem "fledge", git: "https://github.com/setdef/Fledge", tag: "v0.14.0"
+  gem "fledge", git: "https://github.com/setdef/Fledge", tag: "v0.15.0"
 
   # Steep checks the rules core against its RBS signatures in sig/
   # (bundle exec rake steep). Only the default rake task needs it;

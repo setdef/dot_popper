@@ -264,7 +264,7 @@ module PlayPackagedApp
     identity, title = settings.lines.last(2).map(&:chomp)
     files = %w[Gemfile Gemfile.lock] + Dir.glob("#{ICON}*", base: stage).sort +
             Dir.glob("vendor/cache/*.gem", base: stage).sort
-    parts = ["lota #{sha}", "fledge #{ENV.fetch("LOTA_FLEDGE_REF", "")}", "ruby #{RUBY_VERSION} #{RUBY_PLATFORM}",
+    parts = ["lota #{sha}", "fledge #{PackagedApp.fledge_ref(File.join(stage, "Gemfile.lock"))}", "ruby #{RUBY_VERSION} #{RUBY_PLATFORM}",
              "identity #{identity}", "title #{title}", *fuse_options(stage, channel),
              *files.map { "#{it} #{Digest::SHA256.file(File.join(stage, it)).hexdigest}" },
              "script #{Digest::SHA256.file(__FILE__).hexdigest}"]
@@ -285,7 +285,8 @@ module PlayPackagedApp
       out = File.join(work, "fuse")
       step("Fused the app with lota fuse (once for this key)") do
         gems = File.join(work, "fuse-gems")
-        run({ "GEM_HOME" => gems, "GEM_PATH" => "#{gems}:#{home}" }, RbConfig.ruby, File.join(home, "bin", "lota"), "fuse", stage,
+        run({ "GEM_HOME" => gems, "GEM_PATH" => "#{gems}:#{home}", "LOTA_FLEDGE_REF" => PackagedApp.fledge_ref(File.join(stage, "Gemfile.lock")) },
+            RbConfig.ruby, File.join(home, "bin", "lota"), "fuse", stage,
             *fuse_options(stage, channel), "--out", out, what: "lota fuse", limit: FUSE_LIMIT, chdir: work)
       end
       archive = Dir.glob(File.join(out, "*.tar.gz")).first or raise Failure, "lota fuse made no .tar.gz"

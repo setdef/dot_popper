@@ -3,7 +3,7 @@
 # builds clone and ask for, one per line:
 #
 #   LOTA_REF=v0.5.5
-#   FLEDGE_TAG=v0.14.0
+#   FLEDGE_TAG=v0.15.0
 #
 # script/android_build.sh and script/android_check.sh take their defaults
 # from here, so a Lota or Fledge upgrade changes the Gemfile and its

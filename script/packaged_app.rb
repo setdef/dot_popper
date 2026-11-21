@@ -48,6 +48,17 @@ module PackagedApp
   # own, and what the channel's build leaves out (ChannelContents).
   def excludes(channel) = REPOSITORY_ONLY + ChannelContents.left_out(channel)
 
+  # The Fledge tag +lock+ pins. lota fuse runs the Fledge Lota pins
+  # (Lota::Fuse::FLEDGE_REF) unless LOTA_FLEDGE_REF names another, so
+  # every desktop build names this one, which the phone builds take too
+  # (script/lota_pins.sh): every app is built by one Fledge.
+  def fledge_ref(lock = File.join(ROOT, "Gemfile.lock"))
+    require "bundler"
+    locked = Bundler::LockfileParser.new(File.binread(lock))
+    fledge = locked.sources.find { it.is_a?(Bundler::Source::Git) && it.uri.end_with?("/Fledge") }
+    fledge&.options&.fetch("tag", nil) or raise "#{lock} locks no tagged Fledge"
+  end
+
   # Copies to +to+ the files git tracks in +root+, as they are in the
   # working copy: what a checkout of the commit holds, and so what CI
   # fuses. Other files in a working copy (a build's output in tmp/, say)
