@@ -73,6 +73,7 @@ class FreshDrawingsTest < Minitest::Test
   # what it sets off goes on by itself.
   OUTSIDE = {
     offer: [[{}, { "a theme released" => ->(fixture) { fixture.saved_themes.release(%w[ornament]) },
+                   "a key pressed, which Buy then names" => ->(fixture) { fixture.key(nil) },
                    "buying" => ->(fixture) { fixture.show.screen.pressed(:buy, :mouse) },
                    "pasting the key" => ->(fixture) { fixture.show.screen.pressed(:paste, :mouse) } }],
             # From an achievement's dialog, by a Free player who has earned it,
