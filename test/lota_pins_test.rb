@@ -39,6 +39,24 @@ class LotaPinsTest < Minitest::Test
     assert_equal named.transform_values { tag }, named
   end
 
+  # The workflows name Lota's version too, where no script has run yet:
+  # the release gem the desktop builds install (LOTA_VERSION) and the tag
+  # the Android build clones (LOTA_REF, and the default of the input that
+  # can name another). Each must be the Lota the lockfile pins, or that
+  # app is built on another engine than every other.
+  def test_the_workflows_name_the_lockfiles_lota
+    locked = Bundler::LockfileParser.new(File.binread(File.join(ROOT, "Gemfile.lock")))
+    lota = locked.specs.select { it.name == "lota" }.map { it.version.to_s }.uniq.fetch(0)
+    workflows = Dir[File.join(ROOT, ".github/workflows/*.yml")].to_h { [File.basename(it), File.read(it)] }
+    versions = workflows.transform_values { it[/^\s*LOTA_VERSION:\s*"?([^"\s]+)/, 1] }.compact
+    android = workflows.fetch("android.yml")
+
+    assert_equal %w[kits.yml package.yml], versions.keys.sort
+    assert_equal versions.transform_values { lota }, versions
+    assert_equal ["v#{lota}"], android.scan(/^\s*LOTA_REF: \$\{\{ inputs\.lota_ref \|\| '([^']+)' \}\}/).flatten
+    assert_equal "v#{lota}", android[/^\s*lota_ref:\n(?:\s+(?!default:)\w+:.*\n)*\s+default: "([^"]+)"/, 1]
+  end
+
   def test_a_lockfile_without_a_tagged_fledge_or_one_lota_is_refused
     Dir.mktmpdir do |dir|
       lock = File.join(dir, "Gemfile.lock")
