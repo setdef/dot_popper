@@ -21,7 +21,7 @@ Pro never changes how the game plays or scores. Join, Create, Achievements and T
 
 ### `Entitlement#pro?`
 
-Every Pro feature asks `Entitlement#pro?` (`lib/dot_popper/monetization/entitlement.rb`) and nothing else. It is true from exactly three sources:
+Every Pro feature asks `Entitlement#pro?` (`gems/dot_popper-monetization/lib/dot_popper/monetization/entitlement.rb`) and nothing else. It is true from exactly three sources:
 
 1. **A receipt that verified during this run** (`Entitlement#verify_receipt`), handed over by the store. Nothing is saved: the next launch asks the store again. A receipt already refused is not checked again, since the store's answer is read four times a second.
 2. **A license key that verifies** against the pinned keys (`LicenseKeys::License#pro?`), on a website copy.
@@ -59,7 +59,7 @@ Tests: `test/release_engineering/build_test.rb`, `test/composition/root_test.rb`
 
 ### Which store each build gets
 
-`Store.for(platform, native:, entitlement:, channel:, website:)` (`lib/dot_popper/monetization/store.rb`) chooses once for a channel, called only from the composition root (`Composition::Root#store_for`), which gives it `website:` only for the `website` channel. A test build (no channel) never asks it: the test build's part puts its own choice in its place, `Store.of_test_build(platform, fake:, entitlement:, website:)` (`lib/dot_popper/test_build/store.rb`), so a build for sale holds no branch for a build with no channel. `platform` is the game's `Platform`, which the shell makes from `Lota::System.os` (`Shell::Platforms`); the table names each system as Lota does.
+`Store.for(platform, native:, entitlement:, channel:, website:)` (`gems/dot_popper-monetization/lib/dot_popper/monetization/store.rb`) chooses once for a channel, called only from the composition root (`Composition::Root#store_for`), which gives it `website:` only for the `website` channel. A test build (no channel) never asks it: the test build's part puts its own choice in its place, `Store.of_test_build(platform, fake:, entitlement:, website:)` (`lib/dot_popper/test_build/store.rb`), so a build for sale holds no branch for a build with no channel. `platform` is the game's `Platform`, which the shell makes from `Lota::System.os` (`Shell::Platforms`); the table names each system as Lota does.
 
 | Channel | iOS | Android | macOS (`OS X`) | Windows | Linux |
 | --- | --- | --- | --- | --- | --- |
@@ -79,7 +79,7 @@ Pro is sold through five channels, and none can be reached from a test: no autom
 
 What it costs: a build for sale must be stamped with its channel, or it is a test build with the fakes; and playtests never touch a real store, so a sandbox purchase on a real phone has to be tried by hand before a store release.
 
-`Store` (`lib/dot_popper/monetization/store.rb`, Monetization's, in the core, which Steep checks strictly) is the game's half of every store purchase: the offer, Buy, Restore, the thanks, and proving Pro. Its only way to a store is a port: `open(url)`, answering whether the request was taken, and `read`, `remove` and `path` for the answer.
+`Store` (`gems/dot_popper-monetization/lib/dot_popper/monetization/store.rb`, Monetization's, in the core, which Steep checks strictly) is the game's half of every store purchase: the offer, Buy, Restore, the thanks, and proving Pro. Its only way to a store is a port: `open(url)`, answering whether the request was taken, and `read`, `remove` and `path` for the answer.
 
 **The request.** A URL in the scheme `dotpopper-store` (`Store::SCHEME`): `dotpopper-store://ACTION?n=NUMBER&product=com.setdef.dotpopper.pro&file=PATH`, where ACTION is `open`, `buy` or `restore`, NUMBER counts up with each request, and PATH is where to answer (`-` for a store helper's standard output). The scheme is registered with no system, so no other app can send one.
 
@@ -143,7 +143,7 @@ Both ask for owned purchases first (StoreKit's `Transaction.currentEntitlements`
 
 ## Receipts
 
-A receipt is a store's signed record of a purchase of Pro, which the game verifies itself, offline, at each launch (`DotPopper::Monetization::Receipt`, `lib/dot_popper/monetization/receipt.rb`, and each store's check in a part of its own that only its store's channels and a test build carry: `lib/dot_popper/apple/receipt.rb`, `play/receipt.rb`, `microsoft/receipt.rb`). The host passes it as text after the store's name. Anything that goes wrong is a receipt that does not verify, never an error. OpenSSL and JSON load on first use.
+A receipt is a store's signed record of a purchase of Pro, which the game verifies itself, offline, at each launch (`DotPopper::Monetization::Receipt`, `gems/dot_popper-monetization/lib/dot_popper/monetization/receipt.rb`, and each store's check in a part of its own that only its store's channels and a test build carry: `lib/dot_popper/apple/receipt.rb`, `play/receipt.rb`, `microsoft/receipt.rb`). The host passes it as text after the store's name. Anything that goes wrong is a receipt that does not verify, never an error. OpenSSL and JSON load on first use.
 
 | Form | Store | What `Receipt.valid?` checks |
 | --- | --- | --- |
@@ -197,7 +197,7 @@ GUI galleries: `test/gui/scenarios/offer_gallery.rb`, `website_gallery.rb`.
 
 ## Free games
 
-`FreeGames` (`lib/dot_popper/monetization/free_games.rb`, Lota-free) counts the games a Free player may still start.
+`FreeGames` (`gems/dot_popper-monetization/lib/dot_popper/monetization/free_games.rb`, Lota-free) counts the games a Free player may still start.
 
 Free play was unlimited in the brief, with Pro adding achievements, themes and friend groups, which gave a player who enjoys the game no reason tied to playing it to buy. The maintainer decided instead on your first 20 games, then 3 a day; he calls both numbers provisional, and no playtest has tested them. The limit is meant to be visible and fair: nothing hides it, nags, expires bought play, or sells a way around it (no dark patterns, `INSIPIRATION.md`), and it applies only where Pro can be bought, since a limit with no way past it is a dead end. It trusts the player's clock and files, as the other saves do, so a changed date or a deleted `games.txt` gives more games; and every way into a game must spend one in one place, since a gap there gives unlimited games.
 
@@ -236,7 +236,7 @@ Ed25519 comes from OpenSSL in every build, with no pure-Ruby fallback (`Continui
 
 A build's keys are 32-byte Ed25519 public keys pinned in its code, each a main one and a sealed backup, and nothing a server sends can add to them. They are kept in two places, each beside the code that checks with it:
 
-- `Continuity::Pins` (`lib/dot_popper/monetization/continuity/pins.rb`) holds the proof roots that certify the server's online key, which signs the proof and the answers about license keys. `SETDEF_PINS` are setdef's own two (ids `8336ad85d326749b` and `ad88ca8070d052b7`); `PINNED = SETDEF_PINS`, which a store build trusts.
+- `Continuity::Pins` (`gems/dot_popper-monetization/lib/dot_popper/monetization/continuity/pins.rb`) holds the proof roots that certify the server's online key, which signs the proof and the answers about license keys. `SETDEF_PINS` are setdef's own two (ids `8336ad85d326749b` and `ad88ca8070d052b7`); `PINNED = SETDEF_PINS`, which a store build trusts.
 - `LicenseKeys::SIGNING_KEYS` (`lib/dot_popper/website/license_keys/signing_keys.rb`) are the license-signing keys a store build trusts: `SETDEF_SIGNING_KEYS`, setdef's own two. `LicenseKey#valid?` checks a key against them, and `License` takes both the pins (for the answers) and the signing keys (for the key).
 - `TEST_PINS` and `LicenseKeys::TEST_SIGNING_KEYS` are throwaway keys whose private seeds ship in `Continuity::TestKeys`, for the fakes, in the test build's own part (`lib/dot_popper/test_build/test_keys.rb`, loaded only when `Build::PARTS` names `test_build`). A test build trusts them, and nothing they sign verifies against setdef's (tested). A build for sale carries neither: `script/set_build_channel.rb` stamps its `Build::PARTS` empty, and its package leaves the folder out (`script/channel_contents.rb`).
 - The composition root gives a build `PINNED` and `SIGNING_KEYS` (`Composition::Root.pins`, `Root.license_signing_keys`); the test build's part prepends its own answers, the test keys for no channel.
@@ -244,7 +244,7 @@ A build's keys are 32-byte Ed25519 public keys pinned in its code, each a main o
 
 ## When setdef is gone
 
-**The one test** (`Continuity::Watch`, `Continuity::Gone`, `setdef.txt`, `lib/dot_popper/monetization/continuity/watch.rb`): setdef is gone when its server gives no valid signed answer to `GET /proof` and at least one connectivity check answers as expected. The checks (`Continuity::Connectivity::CHECKS`) are Apple's, Google's and Microsoft's, asked only after the proof fails, one at a time, stopping at the first that answers: `http://captive.apple.com/hotspot-detect.html` (200, "Success"), `http://connectivitycheck.gstatic.com/generate_204` (204, empty) and `http://www.msftconnecttest.com/connecttest.txt` (200, "Microsoft Connect Test"). With no internet nothing changes. A device found gone stays gone, and `setdef.txt` keeps the day it was first found gone, until setdef's server proves itself again. A runtime that cannot verify Ed25519 never finds setdef gone.
+**The one test** (`Continuity::Watch`, `Continuity::Gone`, `setdef.txt`, `gems/dot_popper-monetization/lib/dot_popper/monetization/continuity/watch.rb`): setdef is gone when its server gives no valid signed answer to `GET /proof` and at least one connectivity check answers as expected. The checks (`Continuity::Connectivity::CHECKS`) are Apple's, Google's and Microsoft's, asked only after the proof fails, one at a time, stopping at the first that answers: `http://captive.apple.com/hotspot-detect.html` (200, "Success"), `http://connectivitycheck.gstatic.com/generate_204` (204, empty) and `http://www.msftconnecttest.com/connecttest.txt` (200, "Microsoft Connect Test"). With no internet nothing changes. A device found gone stays gone, and `setdef.txt` keeps the day it was first found gone, until setdef's server proves itself again. A runtime that cannot verify Ed25519 never finds setdef gone.
 
 The watch runs once each start (`Composition::Root#start`) and again when a key is entered, on a thread at priority -2, and its result is taken up on the game's thread (`Watch#update`, each frame). `Continuity::Gone` announces each answer it takes up to its listeners: `SetdefHere` when setdef's server proved itself, which makes `ServerChoice` forget a chosen server and stop offering Change Server, and `SetdefGone` (with the day it was first found gone and today) whenever a check leaves setdef gone, which makes `ServerChoice` offer Change Server and `SavedThemes` open themes by their dates once it has been gone long enough. Gameplay hears them through a port of its own: the composition root subscribes `Composition::SetdefAdapter`, which tells `ServerChoice` and `SavedThemes` each as Gameplay's own value (`Gameplay::SetdefGone`, `Gameplay::SetdefHere`), and tells `ServerChoice` as it is made whether setdef was already gone. At launch, before any check, the composition root (`Composition::Root`) opens them by date once. While setdef answers it also sends what the license owes.
 
