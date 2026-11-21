@@ -21,8 +21,8 @@
 # GitHub's runners do.
 set -euo pipefail
 
-TOOLS_URL=https://dl.google.com/android/repository/commandlinetools-linux-14742923_latest.zip # cmdline-tools 20.0
-TOOLS_SHA256=04453066b540409d975c676d781da1477479dde3761310f1a7eb92a1dfb15af7
+TOOLS_URL=https://dl.google.com/android/repository/commandlinetools-linux-16111833_latest.zip # cmdline-tools 23.0
+TOOLS_SHA256=0877a1d048fe4a24efe2eff536ca4223f7adeb58648bb81909d33c446918cfa8
 # Each package and the revision its source.properties must name. The NDK is
 # the one Lota's rake android:deps and Fledge's runtime are built with.
 PACKAGES=(
@@ -31,8 +31,8 @@ PACKAGES=(
   "ndk;30.0.16248370=30.0.16248370"
 )
 EMULATOR_PACKAGES=(
-  "platform-tools=37.0.1"
-  "emulator=37.2.13"
+  "platform-tools=37.0.3"
+  "emulator=37.3.10"
   "system-images;android-33;google_apis;x86_64=17"
 )
 
