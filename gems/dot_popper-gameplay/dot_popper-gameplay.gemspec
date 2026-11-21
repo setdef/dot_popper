@@ -4,7 +4,7 @@
 # (PACKAGING.md, "The game's own gems"). The game takes it by its path in
 # this repository (Gemfile); it is published to no gem server. It holds
 # only part of the area so far, the rules of a game, the game and its
-# events, the achievements and the goal streak: the rest is in
+# events, Stats with today's goal, and the achievements: the rest is in
 # lib/dot_popper/gameplay/, whose loader requires what this gem holds by
 # name.
 Gem::Specification.new do |spec|

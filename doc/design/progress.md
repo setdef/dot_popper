@@ -36,13 +36,13 @@ The log is rewritten whole each time, which is fine for the few hundred lines a 
 
 ## One game's numbers: `GameStats`
 
-`GameStats` (`lib/dot_popper/gameplay/game_stats.rb`) is built from the rules' events by `GameStats::Recorder`, and decides nothing. It counts dots popped, mistakes, softened mistakes, each pop's time to pop (from the bright dot appearing to its pop), the game's duration (`Game#elapsed`, clock time only, as `Events::GameEnded#elapsed` carries it), the score, `dots_in_a_row` and `most_dots_in_a_row`, and `bonuses`. From these it gives `longest_time_to_pop`, `shortest_time_to_pop`, `mean_time_to_pop` and `dots_popped_within(seconds)`.
+`GameStats` (`gems/dot_popper-gameplay/lib/dot_popper/gameplay/game_stats.rb`) is built from the rules' events by `GameStats::Recorder`, and decides nothing. It counts dots popped, mistakes, softened mistakes, each pop's time to pop (from the bright dot appearing to its pop), the game's duration (`Game#elapsed`, clock time only, as `Events::GameEnded#elapsed` carries it), the score, `dots_in_a_row` and `most_dots_in_a_row`, and `bonuses`. From these it gives `longest_time_to_pop`, `shortest_time_to_pop`, `mean_time_to_pop` and `dots_popped_within(seconds)`.
 
 A game the tutorial played over (`GameStats.opening`) begins play with a pop for each of its popped dots, its score, and its dots in a row (1 at the tutorial's end); those dots have no time to pop, and the guide's mistake is not counted. `AchievementRecorder` starts the game's row at the same count. It is the same whether the tutorial ended or was skipped.
 
 ## Stats
 
-`Stats` (`lib/dot_popper/gameplay/stats.rb`) is every game this device has played, added up. `SavedStats` (`lib/dot_popper/gameplay/saved_stats.rb`) keeps it in `stats.txt` and adds each finished game (`SavedStats#record`, called as the game is finished, `UseCases::FinishGame`).
+`Stats` (`gems/dot_popper-gameplay/lib/dot_popper/gameplay/stats.rb`) is every game this device has played, added up. `SavedStats` (`lib/dot_popper/gameplay/saved_stats.rb`) keeps it in `stats.txt` and adds each finished game (`SavedStats#record`, called as the game is finished, `UseCases::FinishGame`).
 
 Across every screen:
 
@@ -114,7 +114,7 @@ The rest of the Stats screen's layout (`StatsSheet`, `StatsLayout`) is in [scree
 
 ## The daily goal and its streak
 
-**The goal.** Each local date picks one goal from `DailyGoal::LIST` (`lib/dot_popper/gameplay/daily_goal.rb`), by a 32-bit FNV-1a hash of the ISO date (`DailyGoal.fnv("2026-11-05")`) modulo the list's length, so the goal is the same all day, on every device and in every run. (Ruby's `String#hash` changes from run to run.) Changing the hash, or the list's order or length, changes which goal every date gets. `DOT_POPPER_TODAY` pretends a date, for testing.
+**The goal.** Each local date picks one goal from `DailyGoal::LIST` (`gems/dot_popper-gameplay/lib/dot_popper/gameplay/daily_goal.rb`), by a 32-bit FNV-1a hash of the ISO date (`DailyGoal.fnv("2026-11-05")`) modulo the list's length, so the goal is the same all day, on every device and in every run. (Ruby's `String#hash` changes from run to run.) Changing the hash, or the list's order or length, changes which goal every date gets. `DOT_POPPER_TODAY` pretends a date, for testing.
 
 A goal is met within one game, judged from that game's `GameStats` when it ends (`DailyGoal#met?`):
 
@@ -166,7 +166,7 @@ Names, figures and sentences are in `Presentation::AchievementWords`. Each has a
 
 **Sharpshooter's 10%** was measured with `Visibility`, the share of a dot's disc no dot above it covers (400 sample points in a sunflower spiral, within about half a percent). With the real rules, a model player that taps the moment a fingertip-sized (44-unit) target fits pops with 31% to 50% showing, never under 10%; one that taps any sliver, which no person can aim, does so on over half the dots it pops. Under a tenth is a crescent a few units wide: a deliberate tap. The other thresholds were set against a model player of about 0.5 s a pop that never loses, and are constants in `Achievement`.
 
-**Detection** is Lota-free. `AchievementRecorder` (`lib/dot_popper/gameplay/achievement_recorder.rb`), which `UseCases::FinishGame` keeps, listens to the `GameFlow`'s events and reads the dots, the clock and the time played from each event, which carries them as they stood when it was told; it keeps no game, and decides nothing. A "covered" spawn for Patience is one where `TouchTarget#clear_on?` finds no room among the dots above, and any tap, a miss included, spoils the wait.
+**Detection** is Lota-free. `AchievementRecorder` (`gems/dot_popper-gameplay/lib/dot_popper/gameplay/achievement_recorder.rb`), which `UseCases::FinishGame` keeps, listens to the `GameFlow`'s events and reads the dots, the clock and the time played from each event, which carries them as they stood when it was told; it keeps no game, and decides nothing. A "covered" spawn for Patience is one where `TouchTarget#clear_on?` finds no room among the dots above, and any tap, a miss included, spoils the wait.
 
 **Saving.** At each Game Over, `UseCases::FinishGame` gives the recorder's finds to `Achievements#award`, which keeps the ones not earned before with today's date and writes `achievements.txt`. Achievements are earned and saved whether or not the player has Pro. An id a newer version saved and this one doesn't know is dropped on reading.
 
