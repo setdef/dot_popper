@@ -49,6 +49,8 @@ group :development do
 end
 
 group :development, :test do
-  gem "minitest", "~> 5.25"
+  gem "minitest", "~> 6.1"
+  # Minitest 6 keeps Minitest::Mock and #stub in a gem of their own.
+  gem "minitest-mock", "~> 5.27"
   gem "rake", "~> 13.2"
 end
