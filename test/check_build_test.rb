@@ -154,6 +154,31 @@ class CheckBuildTest < Minitest::Test
     end
   end
 
+  # A build for sale trusts its own store's receipts, and the website's
+  # trusts none. A store's part whose root never answers for it would
+  # leave Pro unbuyable there with every other check passed.
+  def test_each_build_for_sale_trusts_its_own_stores_receipts
+    { "app-store" => "apple", "mac-app-store" => "apple", "google-play" => "play", "microsoft-store" => "microsoft", "website" => nil }
+      .each do |channel, part|
+        lay_out_app
+        stamp(channel)
+        _, out = check_from_stamped_checkout(channel)
+        trusted = part ? "its store's receipts alone (#{part})" : "no store's receipts"
+        assert_match(/^ok   it trusts #{Regexp.escape(trusted)}/, out, channel)
+
+        if part
+          edit("lib/dot_popper/#{part}/root.rb", "singleton_class.prepend(#{part.capitalize}Choices)", "")
+        else
+          edit("lib/dot_popper/composition/root.rb", "def self.receipt_trust(_settings) = Monetization::Receipt::NONE",
+               "def self.receipt_trust(_settings) = Monetization::Receipt::NONE.with(product_id: 'another')")
+        end
+        ok, out = check_from_stamped_checkout(channel)
+
+        refute ok, out
+        assert_match(/^FAIL it trusts #{Regexp.escape(trusted)}/, out, channel)
+      end
+  end
+
   def lay_out_app
     FileUtils.rm_rf(@game)
     FileUtils.mkdir_p(@game)

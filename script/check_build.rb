@@ -125,6 +125,14 @@ check.call("it loads no other store's receipt code (#{own.empty? ? "none" : own.
     !DotPopper::Monetization::Receipt.const_defined?(receipts.fetch(part), false) && $LOADED_FEATURES.none? { it.include?("/dot_popper/#{part}/") }
   end
 end
+# And trusts its own store's receipts, or none where it sells through no
+# store: a part whose root never answers for its channel would leave Pro
+# unbuyable in its build.
+check.call("it trusts #{own.one? ? "its store's receipts alone (#{own.first})" : "no store's receipts"} (Root.receipt_trust)") do
+  trust = root.receipt_trust(settings)
+  receipt = DotPopper::Monetization::Receipt
+  own.one? ? trust.store == receipt.const_get(receipts.fetch(own.first), false) : own.empty? && trust == receipt::NONE
+end
 check.call("it loads the website's store and license keys only if it carries the website part") do
   website || (!defined?(DotPopper::Monetization::LicenseKeys) && !defined?(DotPopper::Monetization::WebsiteStore) &&
               $LOADED_FEATURES.none? { it.include?("/dot_popper/website/") } && signing_keys.empty?)
