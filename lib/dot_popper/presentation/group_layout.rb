@@ -205,6 +205,26 @@ module DotPopper
     # at +text_y+, +line_height+ apart), the link to the privacy policy
     # (+policy+, its words +policy_text+ in type +link_size+), Not now (+later+) and the button
     # that goes on (+go+).
+    # What the friend groups' screen hands its painter (Shell::GroupPainter):
+    # where the open page's parts go (+plan+, GroupPlan), its heading's
+    # type size, Back at +back+ saying +back_word+ and its light, the page's
+    # middle (+center_x+), the group whose crest heads it (+crest+, or nil),
+    # the code (+code+: a group's code as its row shows it where +code_row+,
+    # otherwise the digits typed so far), whether those are all there
+    # (+code_complete+), each action's light in the plan's order
+    # (+action_hovers+) and each row's (+row_hovers+, 0 for a row that opens
+    # nothing), what a long press held now will do (+holding+, or nil),
+    # set at +holding_size+ above +holding_bottom+, and the notice of a
+    # first Join or Create over it all (+notice+, GroupNoticeDrawing, or nil).
+    class GroupsDrawing < Data.define(:plan, :heading_size, :back, :back_word, :back_hover, :center_x, :crest, :code, :code_row,
+                                      :code_complete, :action_hovers, :row_hovers, :holding, :holding_size, :holding_bottom,
+                                      :notice); end
+
+    # The notice of a first Join or Create: where its parts go (+plan+,
+    # GroupNoticePlan), the +veil+ over the page under it, Not now's and
+    # the button that goes on's words and light, and the policy link's light.
+    class GroupNoticeDrawing < Data.define(:plan, :veil, :later_word, :go_word, :later_hover, :go_hover, :policy_hover); end
+
     class GroupNoticePlan < Data.define(:card, :lines, :size, :text_y, :line_height, :policy, :policy_text, :link_size, :later, :go)
       def controls = [[:policy, policy], [:notice_later, later], [:notice_go, go]]
     end

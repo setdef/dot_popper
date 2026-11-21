@@ -9,32 +9,33 @@ module DotPopper
     class GroupPainter < Data.define(:context, :icons)
       def initialize(context:, icons: MemberIconPainter.new(context:)) = super
 
-      def draw(show, layout)
-        plan = show.group_plan
+      # The open page as its +drawing+ (Presentation::GroupsDrawing) says.
+      def draw(drawing)
+        plan = drawing.plan
         palette = context.palette
-        heading = context.fonts.bold(show.heading_place(plan.heading).first)
+        heading = context.fonts.bold(drawing.heading_size)
         context.text(plan.heading, heading, plan.heading_x, plan.heading_y, palette.cream)
-        PillButton.new(context:).draw(layout.back_button, show.words.go_back, hover: show.hover.level(:back),
-                                  icon: ->(x, y, size) { Glyphs.new(context:).draw(:chevron_left, x, y, size * 0.38) })
-        context.text(plan.subheading, context.fonts.semibold(15), layout.center_x, plan.heading_y + (heading.height * 0.62), palette.soft) if plan.subheading
-        icons.crest(layout.center_x, plan.crest_y, 22.0, show.group_panel.group_id) if plan.crest_y && show.group_panel.group_id
-        lines(plan, layout)
-        show.group_panel.page == :group ? code_row(show, plan) : code_box(show, plan)
-        buttons(show, plan)
-        rows(show, plan)
-        hold(show, layout) if show.group_panel.hold.held?
-        notice(show, layout)
+        PillButton.new(context:).draw(drawing.back, drawing.back_word, hover: drawing.back_hover,
+                                      icon: ->(x, y, size) { Glyphs.new(context:).draw(:chevron_left, x, y, size * 0.38) })
+        context.text(plan.subheading, context.fonts.semibold(15), drawing.center_x, plan.heading_y + (heading.height * 0.62), palette.soft) if plan.subheading
+        icons.crest(drawing.center_x, plan.crest_y, 22.0, drawing.crest) if plan.crest_y && drawing.crest
+        lines(plan, drawing.center_x)
+        drawing.code_row ? code_row(drawing) : code_box(drawing)
+        buttons(drawing)
+        rows(drawing)
+        hold(drawing) if drawing.holding
+        notice(drawing.notice) if drawing.notice
       end
 
       # The notice of a first Join or Create, over the screen it was asked
       # from, dimmed: who keeps the scores, the link to the policy with the
       # external-link sign, Not now, and the button that goes on.
-      def notice(show, layout)
-        plan = show.group_notice_plan or return
+      def notice(notice)
+        plan = notice.plan
         palette = context.palette
-        safe = layout.safe
+        veil = notice.veil
         context.color(palette.ink_edge, 0.72)
-        context.rectangle(:fill, safe.x - 400, safe.y - 400, safe.width + 800, safe.height + 800)
+        context.rectangle(:fill, veil.x, veil.y, veil.width, veil.height)
         card = plan.card
         context.color(palette.ink_top)
         context.rectangle(:fill, card.x, card.y, card.width, card.height, 22, 22, 32)
@@ -43,18 +44,18 @@ module DotPopper
         context.rectangle(:line, card.x, card.y, card.width, card.height, 22, 22, 32)
         font = context.fonts.bold(plan.size)
         plan.lines.each_with_index { |line, i| context.text(line, font, plan.card.center_x, plan.text_y + (plan.line_height * i), palette.cream) }
-        link(show, plan)
-        words = Presentation::GroupWords
-        PillButton.new(context:).draw(plan.later, show.group_word(words.notice_later), hover: show.hover.level(:notice_later))
-        PrimaryButton.new(context:).draw(plan.go, show.group_word(words.notice_go(show.group_panel.asking)), hover: show.hover.level(:notice_go))
+        link(plan, notice.policy_hover)
+        PillButton.new(context:).draw(plan.later, notice.later_word, hover: notice.later_hover)
+        PrimaryButton.new(context:).draw(plan.go, notice.go_word, hover: notice.go_hover)
       end
 
       # The rows, clipped to the window they scroll in.
-      def rows(show, plan)
+      def rows(drawing)
+        plan = drawing.plan
         window = plan.window
         pixels = context.pixels
         context.scissor = pixels.snap(window.x - 4), pixels.snap(window.y), pixels.snap(window.width + 8), pixels.snap(window.height) if window
-        plan.rows.each { row(show, plan, it) }
+        plan.rows.each_with_index { |row, i| row(plan, row, drawing.row_hovers[i]) }
         context.scissor = nil
       end
 
@@ -81,20 +82,20 @@ module DotPopper
 
       private
 
-      def lines(plan, layout)
+      def lines(plan, center_x)
         palette = context.palette
         font = context.fonts.semibold(plan.size)
         colors = { text: palette.cream, note: palette.soft, alert: palette.alarm }
-        plan.lines.each { context.text(it.text, font, layout.center_x, it.y, colors.fetch(it.kind)) }
+        plan.lines.each { context.text(it.text, font, center_x, it.y, colors.fetch(it.kind)) }
       end
 
       # The code tapped so far, one box for each of its seven places, a
       # hyphen after the third, as a code is shared: 482-1073. The next
       # place to fill is outlined, and a place still to come shows a dash.
-      def code_box(show, plan)
-        rect = plan.code_box or return
-        panel = show.group_panel
-        places = Presentation::CodeText.places(panel.code, Gameplay::Groups::JoinCode::LENGTH)
+      def code_box(drawing)
+        rect = drawing.plan.code_box or return
+        code = drawing.code
+        places = Presentation::CodeText.places(code, Gameplay::Groups::JoinCode::LENGTH)
         gap = 6.0
         hyphen = rect.height * 0.35
         width = [(rect.width - hyphen - (gap * places.size)) / places.size, rect.height * 0.85].min
@@ -106,7 +107,7 @@ module DotPopper
             x += hyphen + gap
           end
           box = Presentation::Rect.new(x:, y: rect.y, width:, height: rect.height)
-          Card.new(context:).draw(box, corner: 10.0, edge: (context.palette.cream if i == panel.code.size))
+          Card.new(context:).draw(box, corner: 10.0, edge: (context.palette.cream if i == code.size))
           context.text(digit || "–", font, box.center_x, box.center_y, digit ? context.palette.cream : context.palette.soft)
           x += width + gap
         end
@@ -116,29 +117,30 @@ module DotPopper
       # keys as keys, and the code's Show or Copy in its row.
       SIGNS = { group_join_open: :keypad, group_create: :plus, group_history: :history, group_leave: :leave, group_code: nil }.freeze
 
-      def buttons(show, plan)
-        plan.actions.each do |action|
+      def buttons(drawing)
+        drawing.plan.actions.each_with_index do |action, i|
           next if !action.text || action.name == :back
-          next key(show, action) if key?(action.name)
-          next step(show, action) if %i[group_prev group_next].include?(action.name)
+
+          hover = drawing.action_hovers[i]
+          next key(action, hover, drawing.code_complete) if key?(action.name)
+          next step(action, hover) if %i[group_prev group_next].include?(action.name)
 
           sign = SIGNS[action.name]
           leave = action.name == :group_leave
           color = leave ? context.palette.alarm : context.palette.cream
           icon = (->(x, y, size) { Glyphs.new(context:).draw(sign, x, y, size * 0.4, color:) } if sign)
-          PillButton.new(context:).draw(action.rect, action.text, hover: show.hover.level(action.name), color:, icon:, edge: (context.palette.alarm if leave))
+          PillButton.new(context:).draw(action.rect, action.text, hover:, color:, icon:, edge: (context.palette.alarm if leave))
         end
       end
 
       # The group's code, hidden until Show is pressed: "Code", the code or
       # its dots, and Show or Copy at the row's end.
-      def code_row(show, plan)
-        rect = plan.code_box or return
-        panel = show.group_panel
+      def code_row(drawing)
+        rect = drawing.plan.code_box or return
         Card.new(context:).draw(rect)
         small = context.fonts.semibold(15)
         context.text("Code", small, rect.x + 18 + (small.width("Code") / 2.0), rect.center_y, context.palette.soft)
-        code = panel.code_shown? ? Presentation::CodeText.hyphenated(panel.group.join_code) : Presentation::GroupWords.hidden_code
+        code = drawing.code
         font = context.fonts.bold(24)
         context.text(code, font, rect.center_x, rect.center_y, context.palette.cream)
       end
@@ -147,10 +149,10 @@ module DotPopper
 
       # A key of the keypad: a digit, Delete with its sign, or Join, which
       # looks disabled until all seven digits are in.
-      def key(show, action)
+      def key(action, hover, complete)
         rect = action.rect
-        open = action.name != :code_submit || show.group_panel.code_complete?
-        hover = open ? show.hover.level(action.name) : 0.0
+        open = action.name != :code_submit || complete
+        hover = 0.0 unless open
         Card.new(context:).draw(rect, corner: [rect.height * 0.22, 14.0].min, alpha: open ? 1.0 : 0.5, lit: hover)
         digit = action.name.is_a?(Array)
         font = digit ? context.fonts.bold((rect.height * 0.42).round) : context.fonts.semibold((rect.height * 0.3).round)
@@ -164,19 +166,19 @@ module DotPopper
       end
 
       # LB or RB, the previous or the next group, with its chevron.
-      def step(show, action)
+      def step(action, hover)
         back = action.name == :group_prev
-        PillButton.new(context:).draw(action.rect, action.text, hover: show.hover.level(action.name),
-                                  icon: ->(x, y, size) { Glyphs.new(context:).draw(back ? :chevron_left : :chevron_right, x, y, size * 0.36) })
+        PillButton.new(context:).draw(action.rect, action.text, hover:,
+                                      icon: ->(x, y, size) { Glyphs.new(context:).draw(back ? :chevron_left : :chevron_right, x, y, size * 0.36) })
       end
 
       # "Read the privacy policy", underlined in the bright dot's gold, with
       # the external-link sign after it, brighter under the mouse.
-      def link(show, plan)
+      def link(plan, hover)
         rect = plan.policy
         font = context.fonts.semibold(plan.link_size)
         text = plan.policy_text
-        color = context.palette.bright_body.mix(context.palette.bright_light, 0.6 * show.hover.level(:policy))
+        color = context.palette.bright_body.mix(context.palette.bright_light, 0.6 * hover)
         left = rect.center_x - ((font.width(text) + 26) / 2.0)
         context.text(text, font, left + (font.width(text) / 2.0), rect.center_y, color)
         Glyphs.new(context:).draw(:external, left + font.width(text) + 14, rect.center_y - 1, font.height * 0.8, color:)
@@ -187,9 +189,9 @@ module DotPopper
 
       def quiet?(name) = name == :group_leave
 
-      def row(show, plan, row)
+      def row(plan, row, hover)
         case row
-        in Presentation::GroupListRow then list_row(show, plan, row)
+        in Presentation::GroupListRow then list_row(plan, row, hover)
         in Presentation::GroupStandingRow then standing_row(plan, row)
         in Presentation::GroupHistoryRow then history_row(plan, row)
         end
@@ -197,10 +199,10 @@ module DotPopper
 
       # A group's crest and name, the crown glyph where the player holds its
       # title, its top score, and the arrow that opens it.
-      def list_row(show, plan, row)
+      def list_row(plan, row, hover)
         rect = row.rect
         group = row.group
-        Card.new(context:).draw(rect, lit: show.hover.level([:group_show, group.id]))
+        Card.new(context:).draw(rect, lit: hover)
         radius = rect.height * 0.32
         icons.crest(rect.x + 14 + radius, rect.center_y, radius, group.id)
         font = context.fonts.bold(plan.size)
@@ -304,10 +306,10 @@ module DotPopper
       end
 
       # While a long press is held, what it will do.
-      def hold(show, layout)
-        font = context.fonts.semibold(layout.scaled(context.style::GROUPS.text))
-        y = layout.page.bottom - layout.control_height - (font.height * 1.2)
-        context.text(show.group_panel.holding_words, font, layout.center_x, y, context.palette.cream)
+      def hold(drawing)
+        font = context.fonts.semibold(drawing.holding_size)
+        y = drawing.holding_bottom - (font.height * 1.2)
+        context.text(drawing.holding, font, drawing.center_x, y, context.palette.cream)
       end
     end
   end

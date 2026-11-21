@@ -35,6 +35,30 @@ module DotPopper
                                 later_text: word(GroupWords.notice_later), go_text: word(GroupWords.notice_go(panel.asking))).plan
         end
 
+        # Everything its painter draws (GroupsDrawing), made again only when
+        # the page's plan, the panel's code or hold, the notice, the words or
+        # a button's light changes.
+        def drawing
+          plan = self.plan
+          notice = notice_plan
+          panel = show.group_panel
+          words = self.words
+          hover = show.hover
+          page = panel.page
+          code = page == :group ? (panel.code_shown? ? CodeText.hyphenated(panel.group.join_code) : GroupWords.hidden_code) : panel.code
+          holding = panel.holding_words if panel.hold.held?
+          asking = panel.asking
+          drawn(plan, notice, words, hover, panel.group_id, page, code, panel.code_complete?, holding, asking) do
+            GroupsDrawing.new(plan:, heading_size: layout.heading_place(plan.heading, measure).first, back: layout.back_button,
+                              back_word: words.go_back, back_hover: hover.level(:back), center_x: layout.center_x, crest: panel.group_id,
+                              code:, code_row: page == :group, code_complete: panel.code_complete?,
+                              action_hovers: plan.actions.map { hover.level(it.name) },
+                              row_hovers: plan.rows.map { it.is_a?(GroupListRow) ? hover.level([:group_show, it.group.id]) : 0.0 },
+                              holding:, holding_size: layout.scaled(style::GROUPS.text), holding_bottom: layout.page.bottom - layout.control_height,
+                              notice: notice&.then { notice_drawing(it, asking, hover) })
+          end
+        end
+
         # Each frame, the panel hears the friend groups' server, and shows
         # a title change's announcement where the screen on top shows one.
         def update(_seconds) = show.group_panel.update(now, quiet: !show.playing?, showing: show.screen.announces?)
@@ -53,6 +77,15 @@ module DotPopper
         def word(byinput) = byinput.for(show.input)
 
         def controls = (notice_plan || plan).controls.map { |name, frame| button(name, frame) }
+
+        # The notice of a first Join or Create (GroupNoticeDrawing), asked
+        # by +asking+.
+        def notice_drawing(plan, asking, hover)
+          safe = layout.safe
+          GroupNoticeDrawing.new(plan:, veil: Rect.new(x: safe.x - 400, y: safe.y - 400, width: safe.width + 800, height: safe.height + 800),
+                                 later_word: word(GroupWords.notice_later), go_word: word(GroupWords.notice_go(asking)),
+                                 later_hover: hover.level(:notice_later), go_hover: hover.level(:notice_go), policy_hover: hover.level(:policy))
+        end
 
         def primary = show.group_panel.primary
 
