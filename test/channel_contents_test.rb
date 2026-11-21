@@ -15,12 +15,12 @@ class ChannelContentsTest < Minitest::Test
   SCRIPT = File.join(ROOT, "script", "channel_contents.rb")
   require SCRIPT
   require_relative "../script/set_build_channel"
+  require_relative "../script/packaged_app"
 
   def setup
     @app = Dir.mktmpdir("dot_popper_app")
     @game = File.join(@app, "Dot Popper", "app", "game", "dot_popper")
-    FileUtils.mkdir_p(@game)
-    FileUtils.cp_r(File.join(ROOT, "lib"), @game)
+    lay_out_game
     # Ruby's own files may say anything; only the game's are read for Ruby's pieces.
     ruby = File.join(@app, "Dot Popper", "app", "ruby", "lib")
     FileUtils.mkdir_p(ruby)
@@ -28,6 +28,15 @@ class ChannelContentsTest < Minitest::Test
   end
 
   def teardown = FileUtils.rm_rf(@app)
+
+  # The game's copy in the app: lib/ and the game's own gems, less what
+  # every app leaves out of them (PackagedApp::REPOSITORY_ONLY).
+  def lay_out_game
+    FileUtils.rm_rf(@game)
+    FileUtils.mkdir_p(@game)
+    FileUtils.cp_r(%w[lib gems].map { File.join(ROOT, it) }, @game)
+    PackagedApp::REPOSITORY_ONLY.grep(%r{\Agems/}).each { FileUtils.rm_rf(File.join(@game, it)) }
+  end
 
   # Stamps the app's copy for +channel+ as script/set_build_channel.rb
   # stamps a build, and leaves out what that channel's build leaves out.
@@ -109,13 +118,12 @@ class ChannelContentsTest < Minitest::Test
   # of what that channel leaves out.
   def test_no_build_for_sale_loads_what_it_leaves_out
     DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES.each do |channel|
-      FileUtils.rm_rf(File.join(@game, "lib"))
-      FileUtils.cp_r(File.join(ROOT, "lib"), @game)
+      lay_out_game
       build = File.join(@game, "lib/dot_popper/release_engineering/build.rb")
       File.write(build, BuildChannel.stamp(File.read(build), channel))
       ChannelContents.left_out(channel).each { FileUtils.rm_rf(File.join(@game, it)) }
       load = 'require "lota"; require "dot_popper"; require "dot_popper/shell"; puts DotPopper::ReleaseEngineering::Build::CHANNEL'
-      out, status = Open3.capture2e(RbConfig.ruby, "-I", File.join(@game, "lib"), "-e", load)
+      out, status = Open3.capture2e(CopyRuby::ENV_WITHOUT_BUNDLER, RbConfig.ruby, *CopyRuby.arguments(@game), "-e", load)
       skip "Lota isn't installed here (#{out.lines.first})" if !status.success? && out.include?("lota (LoadError)")
 
       assert status.success?, "#{channel}: #{out}"

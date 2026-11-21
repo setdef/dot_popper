@@ -10,7 +10,8 @@ require_relative "../script/set_build_channel"
 require_relative "../script/channel_contents"
 
 # What each build for sale answers as it is built: the game put together
-# (Composition::Root, with the fake engine) from a copy of lib/ stamped
+# (Composition::Root, with the fake engine) from a copy of lib/ and the
+# game's own gems (in a Ruby that loads only that copy's, CopyRuby), stamped
 # for the channel by script/set_build_channel.rb, with what that channel
 # leaves out removed, in a Ruby of its own. Every other test loads the
 # test build's part, whose answers stand in front of the shared code's,
@@ -83,11 +84,11 @@ class BuildForSaleTest < Minitest::Test
     "with the test build's part loaded by mistake and every setting let through" => :mistaken
   }.freeze
 
-  # What +channel+'s build of +kind+ answers, built from a copy of lib/
-  # stamped as the release stamps it.
+  # What +channel+'s build of +kind+ answers, built from a copy of lib/ and
+  # the gems, stamped as the release stamps it.
   def self.answers(channel, kind)
     Dir.mktmpdir("dot_popper_#{channel}") do |dir|
-      FileUtils.cp_r(File.join(ROOT, "lib"), dir)
+      FileUtils.cp_r(%w[lib gems].map { File.join(ROOT, it) }, dir)
       build = File.join(dir, "lib/dot_popper/release_engineering/build.rb")
       source = BuildChannel.stamp(File.read(build), channel)
       if kind == :mistaken
@@ -97,7 +98,7 @@ class BuildForSaleTest < Minitest::Test
         ChannelContents.left_out(channel).each { FileUtils.rm_rf(File.join(dir, it)) }
       end
       File.write(build, source)
-      out, status = Open3.capture2e(RbConfig.ruby, "-I", File.join(dir, "lib"), "-I", File.join(ROOT, "test"), "-e", PROBE,
+      out, status = Open3.capture2e(CopyRuby::ENV_WITHOUT_BUNDLER, RbConfig.ruby, *CopyRuby.arguments(dir), "-I", File.join(ROOT, "test"), "-e", PROBE,
                                     "--", *proofs, JSON.generate(EVERY_SETTING))
       raise "#{channel}'s build #{KINDS.key(kind)} did not answer:\n#{out}" unless status.success?
 
