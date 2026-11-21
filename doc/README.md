@@ -28,7 +28,9 @@ If you know LÖVE, [Why Ruby](why_ruby.md) sets Dot Popper's code beside the Lua
 | `conf.rb` | Lota's window settings: the title, the 1200 × 800 window, the save folder's name, and which graphics renderers to allow |
 | `gems/dot_popper-gameplay/` | Gameplay and Metagame as a gem of its own, all of it: the rules (`rules.rb` holds every number that sets how the game plays, in dot radii; `game.rb` and `stack.rb` hold a game and its dots), Stats, records, achievements, themes and the flow from Home to Game Over |
 | `gems/dot_popper-shared/` | The code the areas share, as a gem of its own: the HTTP client every request goes through, what the system means for the game, and the guard on automated runs |
-| `lib/dot_popper/` | Monetization and Release Engineering with their loaders, the use cases, the presentation, the composition root, the shell and the build parts |
+| `gems/dot_popper-monetization/` | Monetization as a gem of its own: free games, Pro, the stores and their receipts, and proof that setdef is there. What only some builds carry of it is in the build parts under `lib/dot_popper/` |
+| `gems/dot_popper-release_engineering/` | Release Engineering as a gem of its own: what a build is (`Build`), stamped for its channel in each build for sale |
+| `lib/dot_popper/` | The use cases, the presentation, the composition root, the shell and the build parts |
 | `lib/dot_popper/presentation/` | How the game looks and sounds, as values. `look.rb` holds every setting, and `words.rb` writes every sentence the player reads |
 | `gems/dot_popper-gameplay/lib/dot_popper/gameplay/groups/` | The friend groups' client, which makes every network call on a thread of its own |
 | `lib/dot_popper/composition/` | Puts the game together for one system and one kind of build, without Lota, from what the shell hands it |
