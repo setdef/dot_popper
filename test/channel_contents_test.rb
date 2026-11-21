@@ -55,7 +55,7 @@ class ChannelContentsTest < Minitest::Test
     assert ok, out
     assert_match %r{^the test build's part .*\n  file lib/dot_popper/test_build$}, out
     assert_match %r{  text lib/dot_popper/test_build/receipt_test_key\.rb: BEGIN PRIVATE KEY x1}, out
-    assert_match %r{^the website checkout .*\n  file lib/dot_popper/monetization/website_store\.rb$}, out
+    assert_match %r{^the website checkout .*\n  file lib/dot_popper/website$}, out
     assert_match(/^the Microsoft Store's license /, out)
     refute_match(/^Apple's receipts/, out)
     refute_match(/openssl_doc/, out)
@@ -139,6 +139,24 @@ class ChannelContentsTest < Minitest::Test
     assert_match(/its Build::CHANNEL is "microsoft-store", where a website build's is "website"/, out)
   end
 
+  # An app store's build holds no license key and no website checkout:
+  # the website's part is left out of it, and its check fails if the
+  # part's files are there.
+  def test_check_fails_when_an_app_store_build_holds_the_website_part
+    stamp("app-store")
+    ok, out = run_script("check", "app-store", @app)
+
+    assert ok, out
+    refute_path_exists File.join(@game, "lib/dot_popper/website")
+
+    FileUtils.cp_r(File.join(ROOT, "lib/dot_popper/website"), File.join(@game, "lib/dot_popper/website"))
+    ok, out = run_script("check", "app-store", @app)
+
+    refute ok, out
+    assert_match(%r{FAIL .* holds lib/dot_popper/website \(the website checkout\)}, out)
+    assert_match(%r{FAIL .* holds lib/dot_popper/website/license_keys}, out)
+  end
+
   def test_check_fails_when_a_build_for_sale_names_the_test_builds_part
     stamp("app-store")
     edit_build("PARTS = %w[].freeze", "PARTS = %w[test_build].freeze")
@@ -176,10 +194,10 @@ class ChannelContentsTest < Minitest::Test
     _, out = run_script("list", "website", @app)
 
     refute_match(/^signing/, out)
-    File.write(File.join(@game, "lib/dot_popper/monetization/license_keys/license_key.rb"), "def self.issue(seed) = Ed25519.sign(seed, LABEL)\n", mode: "a")
+    File.write(File.join(@game, "lib/dot_popper/website/license_keys/license_key.rb"), "def self.issue(seed) = Ed25519.sign(seed, LABEL)\n", mode: "a")
     _, out = run_script("check", "website", @app)
 
-    assert_match(%r{FAIL .* holds lib/dot_popper/monetization/license_keys/license_key\.rb, which names signing}, out)
+    assert_match(%r{FAIL .* holds lib/dot_popper/website/license_keys/license_key\.rb, which names signing}, out)
   end
 
   # Nor any prose about the test build, which has other ways to Pro.

@@ -39,12 +39,13 @@ class BuildForSaleTest < Minitest::Test
     require "composition/fake_engine"
     receipt, key, every = ARGV
     c = DotPopper::Monetization::Continuity
-    l = DotPopper::Monetization::LicenseKeys
+    l = (DotPopper::Monetization::LicenseKeys if defined?(DotPopper::Monetization::LicenseKeys))
+    signing = DotPopper::Composition::Root.license_signing_keys(DotPopper::Composition::DeveloperSettings.new)
     answers = { "channel" => DotPopper::ReleaseEngineering::Build::CHANNEL, "parts" => DotPopper::ReleaseEngineering::Build::PARTS,
                 "part loaded" => $LOADED_FEATURES.grep(%r{/test_build/}),
+                "website part loaded" => $LOADED_FEATURES.grep(%r{/dot_popper/website/}).any? || !l.nil?,
                 "pins are setdef's" => DotPopper::Composition::Root.pins(DotPopper::Composition::DeveloperSettings.new).equal?(c::PINNED) && c::PINNED == c::SETDEF_PINS &&
-                  DotPopper::Composition::Root.license_signing_keys(DotPopper::Composition::DeveloperSettings.new).equal?(l::SIGNING_KEYS) &&
-                  l::SIGNING_KEYS == l::SETDEF_SIGNING_KEYS,
+                  (l ? signing.equal?(l::SIGNING_KEYS) && l::SIGNING_KEYS == l::SETDEF_SIGNING_KEYS : signing.empty?),
                 "builds" => [] }
     #{SYSTEMS.inspect}.product({ "no setting" => {}, "every setting" => JSON.parse(every) }.to_a).each do |system, (label, env)|
       engine = FakeEngine.new(system)
@@ -73,7 +74,8 @@ class BuildForSaleTest < Minitest::Test
 
   # How each build is made: as the release makes it, or with the test
   # build's part loaded by mistake (stamped, but the part named in
-  # Build::PARTS and its folder kept) and the filter on developer
+  # Build::PARTS, with the website's part it needs, and their folders
+  # kept) and the filter on developer
   # settings letting every one through, so only the part's own deference
   # to the shared answers keeps it out.
   KINDS = {
@@ -89,7 +91,7 @@ class BuildForSaleTest < Minitest::Test
       build = File.join(dir, "lib/dot_popper/release_engineering/build.rb")
       source = BuildChannel.stamp(File.read(build), channel)
       if kind == :mistaken
-        source = source.sub("PARTS = %w[]", "PARTS = %w[test_build]")
+        source = source.sub(/PARTS = %w\[[a-z_ ]*\]/, "PARTS = %w[website test_build]")
                        .sub("HARMLESS = %w[", "HARMLESS = %w[#{EVERY_SETTING.keys.map { it.delete_prefix(B::PREFIX) }.join(" ")} ")
       else
         ChannelContents.left_out(channel).each { FileUtils.rm_rf(File.join(dir, it)) }
@@ -123,7 +125,8 @@ class BuildForSaleTest < Minitest::Test
     B::CHANNEL_NAMES.each do |channel|
       answers = all_answers[[channel, :right]]
       assert_equal channel, answers["channel"]
-      assert_empty answers["parts"], channel
+      assert_equal B::CHANNELS.fetch(channel).parts, answers["parts"], channel
+      refute_includes answers["parts"], "test_build", channel
       assert_empty answers["part loaded"], channel
       assert answers["pins are setdef's"], channel
       mistaken = all_answers[[channel, :mistaken]]
@@ -148,6 +151,14 @@ class BuildForSaleTest < Minitest::Test
   # store's never reads license.txt.
   def test_only_the_website_build_takes_license_keys
     each_build { |channel, built, where| assert_equal channel == B::WEBSITE, built["takes license keys"], where }
+  end
+
+  # Only the website's build carries the website's part: an app store's
+  # holds no license key and no website checkout, and loads neither.
+  def test_only_the_website_build_carries_the_website_part
+    B::CHANNEL_NAMES.each do |channel|
+      assert_equal channel == B::WEBSITE, all_answers[[channel, :right]]["website part loaded"], channel
+    end
   end
 
   def test_a_build_for_sale_releases_no_theme_and_uses_the_ordinary_one

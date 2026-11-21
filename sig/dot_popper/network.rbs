@@ -51,6 +51,8 @@ module DotPopper
 
       attr_reader retry_after: Integer?
 
+      def self.offline: () -> Reply
+
       def ok?: () -> bool
 
       def offline?: () -> bool

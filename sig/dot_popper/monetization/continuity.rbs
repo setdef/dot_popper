@@ -221,6 +221,15 @@ module DotPopper
         def check: (untyped due, String nonce) -> Result
       end
 
+      # The license of a build that keeps none (watch.rb).
+      module NoLicense
+        def self?.due: (String nonce) -> nil
+
+        def self?.heard: (untyped due, String nonce, Network::Reply reply) -> nil
+
+        def self?.ask: (untyped due) -> Network::Reply
+      end
+
       # No watch (watch.rb).
       class NoWatch
         @gone: Gone

@@ -18,7 +18,7 @@ module DotPopper
       # loaded by lib/dot_popper.rb: in the repository every one; in a build
       # for sale only its own channel's, set with CHANNEL
       # by script/set_build_channel.rb, so it holds none of another's.
-      PARTS = %w[test_build].freeze
+      PARTS = %w[website test_build].freeze
 
       # The names of the channels a build can be sold through (CHANNELS).
       APP_STORE = "app-store"
@@ -59,7 +59,7 @@ module DotPopper
         Channel.new(name: MAC_APP_STORE, store: true, parts: NO_PARTS),
         Channel.new(name: GOOGLE_PLAY, store: true, parts: NO_PARTS),
         Channel.new(name: MICROSOFT_STORE, store: true, parts: NO_PARTS),
-        Channel.new(name: WEBSITE, store: false, parts: NO_PARTS)
+        Channel.new(name: WEBSITE, store: false, parts: %w[website].freeze)
       ].to_h { [it.name, it] }.freeze
 
       # The channels of the app stores, and every channel's name.

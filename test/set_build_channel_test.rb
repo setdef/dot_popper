@@ -54,7 +54,7 @@ class SetBuildChannelTest < Minitest::Test
 
       refute ok, channel.inspect
       assert_includes source, "    CHANNEL = nil\n"
-      assert_includes source, "    PARTS = %w[test_build].freeze\n"
+      assert_includes source, "    PARTS = %w[website test_build].freeze\n"
     end
   end
 

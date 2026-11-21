@@ -69,11 +69,11 @@ module ChannelContents
               marks: [/\.sign\(/, /PRIVATE_DER/, /def self\.issue\b/]),
     Piece.new(name: "the test build's settings that grant Pro or skip the free-game limit", needed_by: [TEST], apart: :all,
               marks: [/DOT_POPPER_PRO\b/, /DOT_POPPER_FREE_GAMES/, /DOT_POPPER_TODAY/, /DOT_POPPER_THEME_UNLOCKS/]),
-    Piece.new(name: "the website checkout", needed_by: [TEST, Build::WEBSITE],
-              files: %w[lib/dot_popper/monetization/website_store.rb],
+    Piece.new(name: "the website checkout", needed_by: [TEST, Build::WEBSITE], apart: :files,
+              files: %w[lib/dot_popper/website],
               marks: [/WebsiteStore/, /BrowserCheckout/, %r{dot-popper\.setdef\.com/buy}]),
-    Piece.new(name: "license keys", needed_by: [TEST, Build::WEBSITE],
-              files: %w[lib/dot_popper/monetization/license_keys/license_key.rb lib/dot_popper/monetization/license_keys/license.rb],
+    Piece.new(name: "license keys", needed_by: [TEST, Build::WEBSITE], apart: :files,
+              files: %w[lib/dot_popper/website/license_keys.rb lib/dot_popper/website/license_keys],
               marks: [/LicenseKey/, /license\.txt/, /license_checks/, /Paste license key/, /comes by email/]),
     Piece.new(name: "Google Play's receipts", needed_by: [TEST, Build::GOOGLE_PLAY],
               files: %w[lib/dot_popper/monetization/receipt/play.rb], marks: [/module Play\b/, /Receipt::Play\b/, /PLAY_KEYS/]),
@@ -107,8 +107,9 @@ module ChannelContents
   end.freeze
 
   # The parts (lib/dot_popper/PART) each build carries: a test build its
-  # own, and a build for sale its channel's (script/set_build_channel.rb).
-  PARTS = { TEST => %w[test_build], **BuildChannel::PARTS }.freeze
+  # own and the website's, and a build for sale its channel's
+  # (script/set_build_channel.rb).
+  PARTS = { TEST => %w[website test_build], **BuildChannel::PARTS }.freeze
 
   # Prints, as JSON, the Build::CHANNEL and Build::PARTS of the build.rb
   # it is given, in a Ruby of its own, so this repository's are untouched.

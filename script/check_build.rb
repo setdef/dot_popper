@@ -110,11 +110,17 @@ check.call("the app was built for #{channel.inspect} (Build::CHANNEL is #{build:
 
 pins = root.pins(settings)
 signing_keys = root.license_signing_keys(settings)
-license_keys = DotPopper::Monetization::LicenseKeys
+website = build::PARTS.include?("website")
 hex = ->(bytes) { bytes.unpack1("H*") }
+check.call("it carries its channel's parts alone (Build::CHANNELS)") { build::PARTS == build::CHANNELS[channel]&.parts }
+check.call("it loads the website's store and license keys only if it carries the website part") do
+  website || (!defined?(DotPopper::Monetization::LicenseKeys) && !defined?(DotPopper::Monetization::WebsiteStore) &&
+              $LOADED_FEATURES.none? { it.include?("/dot_popper/website/") } && signing_keys.empty?)
+end
 check.call("it trusts setdef's own keys (Continuity::SETDEF_PINS, LicenseKeys::SETDEF_SIGNING_KEYS)") do
+  license_keys = DotPopper::Monetization::LicenseKeys if website
   pins.equal?(c::PINNED) && c::PINNED == c::SETDEF_PINS && c.live?(pins) &&
-    signing_keys.equal?(license_keys::SIGNING_KEYS) && license_keys::SIGNING_KEYS == license_keys::SETDEF_SIGNING_KEYS
+    (!website || (signing_keys.equal?(license_keys::SIGNING_KEYS) && license_keys::SIGNING_KEYS == license_keys::SETDEF_SIGNING_KEYS))
 end
 check.call("it trusts no test key") do
   (pins.roots.map(&hex) & proofs.fetch("roots")).empty? && (signing_keys.map(&hex) & proofs.fetch("license_keys")).empty?

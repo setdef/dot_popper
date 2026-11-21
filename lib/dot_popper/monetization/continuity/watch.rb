@@ -142,6 +142,17 @@ module DotPopper
         end
       end
 
+      # The license of a build that keeps no license key, for the watch: it
+      # owes setdef's server nothing, so the server is never asked about a
+      # key (#ask answers as if offline), and it hears nothing.
+      module NoLicense
+        module_function
+
+        def due(_nonce) = nil
+        def heard(_due, _nonce, _reply) = nil
+        def ask(_due) = Network::Reply.offline
+      end
+
       # No watch: a build with no server to check, as a store build before
       # setdef's real keys exist. setdef is never gone, and a key is never
       # moved.

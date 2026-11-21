@@ -28,6 +28,25 @@ class CheckBuildTest < Minitest::Test
 
   def teardown = @app && FileUtils.rm_rf(@app)
 
+  # An app store's build carries no website part and is checked without
+  # it; one that carries the part fails.
+  def test_an_app_store_build_is_checked_without_the_website_part
+    stamp("mac-app-store")
+    _, out = check("mac-app-store")
+
+    assert_match(/^ok   it carries its channel's parts alone/, out)
+    assert_match(/^ok   it loads the website's store and license keys only if it carries the website part$/, out)
+    assert_match(/^ok   it trusts setdef's own keys/, out)
+
+    FileUtils.rm_rf(File.join(@game, "lib/dot_popper/website"))
+    FileUtils.cp_r(File.join(ROOT, "lib/dot_popper/website"), File.join(@game, "lib/dot_popper/website"))
+    edit("lib/dot_popper/release_engineering/build.rb", "PARTS = %w[].freeze", "PARTS = %w[website].freeze")
+    ok, out = check("mac-app-store")
+
+    refute ok, out
+    assert_match(/^FAIL it carries its channel's parts alone/, out)
+  end
+
   # Stamps the copy as script/set_build_channel.rb stamps a build, and
   # leaves out what the channel's build leaves out.
   def stamp(channel)
@@ -76,7 +95,7 @@ class CheckBuildTest < Minitest::Test
     test_pins = DotPopper::Monetization::Continuity::TEST_PINS
     hexes = ->(keys) { "%w[#{keys.map { it.unpack1("H*") }.join(" ")}]" }
     edit("lib/dot_popper/monetization/continuity/pins.rb", "PINNED = SETDEF_PINS", "PINNED = Pins.of(roots: #{hexes.(test_pins.roots)})")
-    edit("lib/dot_popper/monetization/license_keys/signing_keys.rb", "SIGNING_KEYS = SETDEF_SIGNING_KEYS",
+    edit("lib/dot_popper/website/license_keys/signing_keys.rb", "SIGNING_KEYS = SETDEF_SIGNING_KEYS",
          "SIGNING_KEYS = #{hexes.(DotPopper::Monetization::LicenseKeys::TEST_SIGNING_KEYS)}.map { [it].pack(\"H*\") }")
     ok, out = check("website", "0.0.1")
 
@@ -129,7 +148,7 @@ class CheckBuildTest < Minitest::Test
     assert_match(%r{FAIL .* holds lib/dot_popper/test_build \(the test build's part\)}, out)
     assert_match(/^ok   it loads none of the test build's part$/, out)
 
-    edit("lib/dot_popper/release_engineering/build.rb", "PARTS = %w[].freeze", "PARTS = %w[test_build].freeze")
+    edit("lib/dot_popper/release_engineering/build.rb", "PARTS = %w[website].freeze", "PARTS = %w[website test_build].freeze")
     ok, out = check("website")
 
     refute ok, out

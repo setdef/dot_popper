@@ -66,10 +66,12 @@ module DotPopper
       def self.pins(_settings) = Monetization::Continuity::PINNED
 
       # The keys whose signature on a license key a build with +settings+
-      # trusts, by its channel alone (ADR-0010): setdef's own.
-      # script/check_build.rb asks this too. A part answers for its own
-      # builds.
-      def self.license_signing_keys(_settings) = Monetization::LicenseKeys::SIGNING_KEYS
+      # trusts, by its channel alone (ADR-0010): none, without the website
+      # part, which answers setdef's own for its builds.
+      # script/check_build.rb asks this too.
+      def self.license_signing_keys(_settings) = NO_SIGNING_KEYS
+
+      NO_SIGNING_KEYS = [].freeze
 
       # Whose receipts it trusts, by its channel alone (ADR-0010): only its
       # own store's. The App Store's and the Mac App Store's build Apple's,
@@ -191,8 +193,7 @@ module DotPopper
         # What this build trusts, and where it keeps a license key, by the
         # channel alone (ADR-0010).
         pins = self.class.pins(settings)
-        kept = Monetization::LicenseKeys::License.kept_in(self.class.license_keys?(settings)) { file("license.txt") }
-        license = Monetization::LicenseKeys::License.new(kept, pins:, signing_keys: self.class.license_signing_keys(settings))
+        license = license_for(pins)
         @watch = watch_for(license, pins)
         @entitlement = Monetization::Entitlement.new(forced: self.class.forced_pro?(settings, platform), license:,
                                                      trust: self.class.receipt_trust(settings))
@@ -249,10 +250,15 @@ module DotPopper
       # The store for this build, as Store.for chooses it by the channel,
       # which the website's build sells through its own.
       def store_for(clipboard)
-        website = -> { website_store(clipboard, Monetization::BrowserCheckout.new(opener: @engine.opener)) }
-        Monetization::Store.for(platform, entitlement:, channel: settings.channel, native: native_store,
-                                website: (website if settings.channel == ReleaseEngineering::Build::WEBSITE))
+        Monetization::Store.for(platform, entitlement:, channel: settings.channel, native: native_store, website: website_for(clipboard))
       end
+
+      # The license key this build keeps, and what makes the website's
+      # store: in a build without the website part, none
+      # (lib/dot_popper/website/root.rb answers for its builds).
+      def license_for(_pins) = nil
+      def website_for(_clipboard) = nil
+      def license_server_for(_link) = Monetization::Continuity::NoLicense
 
       # A build for sale releases no theme here and has no stand-in for
       # setdef; a part (Build::PARTS) may answer these, and #store_for,
@@ -281,20 +287,15 @@ module DotPopper
       # pinned (Continuity.live?), never in an automated run; and else
       # nothing.
       def watch_for(license, pins)
+        license ||= Monetization::Continuity::NoLicense
         watch = test_watch(license, pins) and return watch
         if Monetization::Continuity.live? && !settings.automated?
           link = Network::Link.new(Network::Server::SERVER_URL)
           return Monetization::Continuity::Watch.new(server: Monetization::Continuity::SetdefServer.new(link), connectivity: Monetization::Continuity::Connectivity.new,
-                                                     gone: @gone, license:, license_server: Monetization::LicenseKeys::Server.new(link), today: settings.today, pins:)
+                                                     gone: @gone, license:, license_server: license_server_for(link), today: settings.today, pins:)
         end
 
         Monetization::Continuity::NoWatch.new(gone: @gone, license:)
-      end
-
-      # The website's store, with +checkout+: in the browser, in a build
-      # for sale.
-      def website_store(clipboard, checkout)
-        Monetization::WebsiteStore.new(checkout:, entitlement:, gone: @gone, clipboard:, entered: -> { @watch.start })
       end
 
       # What asks the server which themes are released, if the game has a

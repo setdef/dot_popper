@@ -6,7 +6,8 @@ require_relative "memory_file"
 
 module DotPopper
   # Monetization: Free and Pro, free games, the stores and their
-  # receipts, license keys, and proof that setdef is there. It hears
+  # receipts, license keys (the website's, in the website part,
+  # lib/dot_popper/website), and proof that setdef is there. It hears
   # Gameplay's published events and names nothing else of Gameplay, and
   # nothing of Release Engineering: the composition root reads the build's
   # channel and hands Monetization what it means. Of the code the areas
@@ -16,4 +17,4 @@ module DotPopper
   end
 end
 
-%w[receipt entitlement store website_store free_games continuity license_keys].each { require_relative "monetization/#{it}" }
+%w[receipt entitlement store free_games continuity].each { require_relative "monetization/#{it}" }

@@ -57,7 +57,8 @@ class ProKnowledgeTest < Minitest::Test
     lib/dot_popper/composition/root.rb
     lib/dot_popper/composition/use_cases.rb
     lib/dot_popper/monetization.rb
-    lib/dot_popper/monetization/license_keys/license.rb
+    lib/dot_popper/website/license_keys/license.rb
+    lib/dot_popper/website/root.rb
     lib/dot_popper/monetization/entitlement.rb
     lib/dot_popper/monetization/free_games.rb
     lib/dot_popper/monetization/store.rb
@@ -71,7 +72,7 @@ class ProKnowledgeTest < Minitest::Test
     lib/dot_popper/use_cases/start_game.rb
     lib/dot_popper/use_cases/use_theme.rb
     lib/dot_popper/use_cases/view_achievements.rb
-    lib/dot_popper/monetization/website_store.rb
+    lib/dot_popper/website/website_store.rb
   ].freeze
 
   # "pro?" with anything before it (has_pro?), or the Entitlement or the
