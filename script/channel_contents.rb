@@ -46,9 +46,12 @@ module ChannelContents
   # +everywhere+ whether to look in the whole package, not only the game;
   # +apart+ how far the game's code keeps it apart already: :files, so a
   # build for sale that doesn't need it leaves its files out (LEFT_OUT);
-  # :all, so such a build holds none of its marks either; nil, not yet.
-  Piece = Data.define(:name, :needed_by, :files, :marks, :everywhere, :apart) do
-    def initialize(name:, needed_by:, marks:, files: [], everywhere: false, apart: nil) = super
+  # :all, so such a build holds none of its marks either; nil, not yet;
+  # +defined_by+, for a piece apart by its files, the text only its own
+  # files hold (what defines it), which such a build holds nowhere, so a
+  # copy of one of its files at another path fails too.
+  Piece = Data.define(:name, :needed_by, :files, :marks, :everywhere, :apart, :defined_by) do
+    def initialize(name:, needed_by:, marks:, files: [], everywhere: false, apart: nil, defined_by: []) = super
   end
 
   PIECES = [
@@ -71,10 +74,12 @@ module ChannelContents
               marks: [/DOT_POPPER_PRO\b/, /DOT_POPPER_FREE_GAMES/, /DOT_POPPER_TODAY/, /DOT_POPPER_THEME_UNLOCKS/]),
     Piece.new(name: "the website checkout", needed_by: [TEST, Build::WEBSITE], apart: :files,
               files: %w[lib/dot_popper/website],
-              marks: [/WebsiteStore/, /BrowserCheckout/, %r{dot-popper\.setdef\.com/buy}]),
+              marks: [/WebsiteStore/, /BrowserCheckout/, %r{dot-popper\.setdef\.com/buy}],
+              defined_by: [/class WebsiteStore\b/, /class BrowserCheckout\b/, %r{dot-popper\.setdef\.com/buy}]),
     Piece.new(name: "license keys", needed_by: [TEST, Build::WEBSITE], apart: :files,
               files: %w[lib/dot_popper/website/license_keys.rb lib/dot_popper/website/license_keys],
-              marks: [/LicenseKey/, /license\.txt/, /license_checks/, /Paste license key/, /comes by email/]),
+              marks: [/LicenseKey/, /license\.txt/, /license_checks/, /Paste license key/, /comes by email/],
+              defined_by: [/module LicenseKeys\b/]),
     Piece.new(name: "Google Play's receipts", needed_by: [TEST, Build::GOOGLE_PLAY],
               files: %w[lib/dot_popper/monetization/receipt/play.rb], marks: [/module Play\b/, /Receipt::Play\b/, /PLAY_KEYS/]),
     Piece.new(name: "Apple's receipts", needed_by: [Build::APP_STORE, Build::MAC_APP_STORE],
@@ -143,7 +148,7 @@ module ChannelContents
       present = game ? piece.files.select { File.exist?(File.join(game, it)) } : []
       named = (piece.everywhere ? every : ours).each_with_object({}) do |path, hits|
         text = texts[path] ||= File.binread(path)
-        counts = piece.marks.to_h { [shown(it), text.scan(it).size] }.reject { _2.zero? }
+        counts = (piece.marks | piece.defined_by).to_h { [shown(it), text.scan(it).size] }.reject { _2.zero? }
         hits[label.call(path)] = counts unless counts.empty?
       end
       [piece, present, named] unless present.empty? && named.empty?
@@ -172,7 +177,10 @@ module ChannelContents
     game_in(folder) or abort("#{folder} holds no game to check")
     pieces = left_out_pieces(channel)
     found(channel, folder).select { |piece, _, _| pieces.include?(piece) }.flat_map do |piece, present, named|
-      named = {} unless piece.apart == :all
+      unless piece.apart == :all
+        defining = piece.defined_by.map { shown(it) }
+        named = named.select { |_, counts| counts.keys.intersect?(defining) }
+      end
       present.map { "#{it} (#{piece.name})" } + named.map { |path, counts| "#{path}, which names #{piece.name} (#{counts.keys.join(", ")})" }
     end
   end

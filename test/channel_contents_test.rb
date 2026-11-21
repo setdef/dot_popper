@@ -157,6 +157,20 @@ class ChannelContentsTest < Minitest::Test
     assert_match(%r{FAIL .* holds lib/dot_popper/website/license_keys}, out)
   end
 
+  # A copy of one of the part's files at another path fails the check
+  # too, loaded or not: only the part's own files define its classes.
+  def test_check_fails_when_an_app_store_build_holds_a_copy_of_a_website_file_elsewhere
+    stamp("app-store")
+    stray = File.join(@game, "lib/dot_popper/monetization/stray.rb")
+    Dir.glob("lib/dot_popper/website/{website_store.rb,license_keys.rb,license_keys/*.rb}", base: ROOT).each do |file|
+      FileUtils.cp(File.join(ROOT, file), stray)
+      ok, out = run_script("check", "app-store", @app)
+
+      refute ok, "#{file}:\n#{out}"
+      assert_match(%r{FAIL .* holds lib/dot_popper/monetization/stray\.rb, which names (the website checkout|license keys)}, out)
+    end
+  end
+
   def test_check_fails_when_a_build_for_sale_names_the_test_builds_part
     stamp("app-store")
     edit_build("PARTS = %w[].freeze", "PARTS = %w[test_build].freeze")
