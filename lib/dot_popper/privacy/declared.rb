@@ -22,9 +22,24 @@ module DotPopper
 
     ENGINE = "It is the game's own engine, and reaches no outside service."
 
-    # The gems that ship in a built app: Gemfile.lock, less the development
-    # and test groups, which Fledge leaves out.
-    SHIPPED_GEMS = { "lota" => Item.new(note: "the game engine: draws, plays sound, reads input", record_only: ENGINE) }.freeze
+    LOTA = Item.new(note: "the game engine: draws, plays sound, reads input", record_only: ENGINE)
+
+    # The gems a desktop app ships: Gemfile.lock's default group, which
+    # lota fuse keeps, leaving out the development and test groups.
+    DESKTOP_GEMS = { "lota" => LOTA }.freeze
+
+    # The gems a phone app ships: every group of the phone project's own
+    # Gemfile, which script/android_build.sh and script/ios_app.sh write.
+    # Fledge 0.13 and later ship its development group too, which holds
+    # Fledge itself, for the phone project's own fledge build.
+    PHONE_GEMS = {
+      "lota" => LOTA,
+      "fledge" => Item.new(note: "the phone apps' build tool, which a phone app carries and a desktop app does not",
+                           record_only: "The game never loads it, so it reaches no outside service.")
+    }.freeze
+
+    # Every gem any app ships, as the record lists them.
+    SHIPPED_GEMS = DESKTOP_GEMS.merge(PHONE_GEMS).freeze
 
     # Android build.gradle's dependencies. Billing's version is exact on
     # purpose: a new one can merge in new permissions (ANDROID_MERGED).

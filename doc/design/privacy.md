@@ -61,7 +61,8 @@ Each part of the game that makes requests declares its own, as `REQUESTS`, where
 
 | Declaration | Compared with |
 | --- | --- |
-| `Privacy::SHIPPED_GEMS` | `Gemfile.lock`'s default group (Fledge leaves out development and test) |
+| `Privacy::DESKTOP_GEMS` | `Gemfile.lock`'s default group, which a desktop app ships (`lota fuse` leaves out development and test) |
+| `Privacy::PHONE_GEMS` | The gems named in the phone project's `Gemfile`, which `script/android_build.sh` and `script/ios_app.sh` write alike, with their dependencies as `Gemfile.lock` resolves them. Fledge 0.13 and later ship every group of it, so a phone app also carries Fledge, which the game never loads. `Privacy::SHIPPED_GEMS`, the record's `sdks.ruby_gems`, is the two together; no player reads it. |
 | `Privacy::ANDROID_DEPENDENCIES` | `android/host/build.gradle`'s dependencies. Billing is pinned to its exact version, `com.android.billingclient:billing:9.1.0`, so a bump makes someone re-read its manifest. |
 | `Privacy::ANDROID_PERMISSIONS` | `android/host/src/main/AndroidManifest.xml`'s permissions: INTERNET and VIBRATE |
 | `Privacy::IOS_USAGE_STRINGS` | `NS*UsageDescription` keys in `ios/host/Host/Info.plist`: none |

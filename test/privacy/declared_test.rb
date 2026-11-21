@@ -16,10 +16,39 @@ class PrivacyDeclaredTest < Minitest::Test
 
   def read(path) = File.read(File.join(ROOT, path)).gsub(/<!--.*?-->/m, "")
 
-  def test_the_gems_shipped_are_declared
+  # A desktop app ships Gemfile.lock's default group: lota fuse leaves out
+  # the development and test groups.
+  def test_the_gems_a_desktop_app_ships_are_declared
     shipped = Bundler.definition.specs_for([:default]).map(&:name).uniq - ["bundler"]
 
-    assert_equal Privacy::SHIPPED_GEMS.keys.sort, shipped.sort
+    assert_equal Privacy::DESKTOP_GEMS.keys.sort, shipped.sort
+  end
+
+  # A phone app ships every group of the phone project's own Gemfile, which
+  # the phone build scripts write, and Fledge (0.13 and later) ships the
+  # development group too, with Fledge in it. Each gem's dependencies are
+  # as this repository's Gemfile.lock resolves them, at the same versions.
+  def test_the_gems_a_phone_app_ships_are_declared
+    named = %w[script/android_build.sh script/ios_app.sh].to_h { [it, phone_gemfile_gems(it)] }
+    specs = Bundler.definition.specs.to_h { [it.name, it] }
+    shipped = named.values.first.flat_map { with_dependencies(it, specs) }.uniq - ["bundler"]
+
+    assert_equal 1, named.values.uniq.size, "the phone build scripts write different Gemfiles: #{named}"
+    assert_equal Privacy::PHONE_GEMS.keys.sort, shipped.sort
+  end
+
+  def test_the_record_lists_every_gem_any_app_ships
+    assert_equal (Privacy::DESKTOP_GEMS.keys | Privacy::PHONE_GEMS.keys).sort, Privacy::SHIPPED_GEMS.keys.sort
+  end
+
+  def phone_gemfile_gems(script)
+    gemfile = File.read(File.join(ROOT, script))[/^cat > "\$phone\/Gemfile" <<\s*'?EOF'?\n(.*?)^EOF$/m, 1] or flunk("#{script} writes no phone Gemfile")
+    gemfile.scan(/^\s*gem\s+"([^"]+)"/).flatten.sort
+  end
+
+  def with_dependencies(name, specs)
+    spec = specs.fetch(name) { flunk("Gemfile.lock has no #{name}") }
+    [name, *spec.dependencies.select { it.type == :runtime }.flat_map { with_dependencies(it.name, specs) }]
   end
 
   def test_the_android_dependencies_are_declared
