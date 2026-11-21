@@ -254,7 +254,7 @@ module PlayPackagedApp
   # `lota fuse` but the game's own folder.
   def key(stage, lota, channel)
     sha, home = lota
-    settings, ok = bare(home, "-e", <<~RUBY, stage)
+    settings, ok = bare(home, *own_gems(stage), "-e", <<~RUBY, stage)
       require "lota"
       settings = Lota::Boot.new(ARGV[0]).read_settings
       puts settings.identity, settings.window.title
@@ -273,6 +273,11 @@ module PlayPackagedApp
     [Digest::SHA256.hexdigest(parts.join("\n"))[0, 32], identity]
   end
 
+  # conf.rb loads the game's code, the game's own gems among it (gems/,
+  # PACKAGING.md), which a Ruby with Lota alone and no bundle, as lota fuse
+  # reads conf.rb in, finds by their folders: -I for each.
+  def own_gems(stage) = Dir[File.join(stage, "gems", "*", "lib")].sort.flat_map { ["-I", it] }
+
   def fuse_options(stage, channel)
     version = YAML.load_file(File.join(stage, "fledge.yml")).fetch("version").to_s
     excludes = PackagedApp.excludes(channel).flat_map { ["--exclude", it] }
@@ -288,7 +293,7 @@ module PlayPackagedApp
       step("Fused the app with lota fuse (once for this key)") do
         gems = File.join(work, "fuse-gems")
         run({ "GEM_HOME" => gems, "GEM_PATH" => "#{gems}:#{home}", "LOTA_FLEDGE_REF" => PackagedApp.fledge_ref(File.join(stage, "Gemfile.lock")) },
-            RbConfig.ruby, File.join(home, "bin", "lota"), "fuse", stage,
+            RbConfig.ruby, *own_gems(stage), File.join(home, "bin", "lota"), "fuse", stage,
             *fuse_options(stage, channel), "--out", out, what: "lota fuse", limit: FUSE_LIMIT, chdir: work)
       end
       archive = Dir.glob(File.join(out, "*.tar.gz")).first or raise Failure, "lota fuse made no .tar.gz"

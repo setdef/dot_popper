@@ -91,7 +91,12 @@ app_version=$(ruby -ryaml -e 'print YAML.load_file("fledge.yml").fetch("version"
 LOTA_FLEDGE_REF=$(ruby -r./script/packaged_app -e 'print PackagedApp.fledge_ref')
 export LOTA_FLEDGE_REF
 say "Fledge $LOTA_FLEDGE_REF"
-ruby "$GEM_HOME/bin/lota" fuse . "${excludes[@]}" --identifier "$identifier" --app-version "$app_version" \
+# lota fuse reads conf.rb in its own Ruby, with no bundle, and conf.rb
+# loads the game's code, so the game's own gems (gems/, PACKAGING.md) are
+# put on that Ruby's load path by their folders, as the fuse action does.
+own_gems=()
+for lib in gems/*/lib; do own_gems+=(-I "$lib"); done
+ruby "${own_gems[@]}" "$GEM_HOME/bin/lota" fuse . "${excludes[@]}" --identifier "$identifier" --app-version "$app_version" \
   --icon icons/icon --out "$fuse"
 ls -l "$fuse"
 say "fused"

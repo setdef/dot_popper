@@ -65,5 +65,10 @@ runs:
         LOTA_FLEDGE_REF=$(ruby -r./script/packaged_app -e 'print PackagedApp.fledge_ref' | tr -d '\r')
         export LOTA_FLEDGE_REF
         echo "Fledge $LOTA_FLEDGE_REF"
-        ruby -S lota fuse . "${exclude[@]}" --identifier "$IDENTIFIER" --app-version "$APP_VERSION" --icon icons/icon --out "$RUNNER_TEMP/fuse"
+        # lota fuse reads conf.rb in its own Ruby, with no bundle, and
+        # conf.rb loads the game's code, so the game's own gems (gems/,
+        # PACKAGING.md) are put on that Ruby's load path by their folders.
+        own_gems=()
+        for lib in gems/*/lib; do own_gems+=(-I "$lib"); done
+        ruby "${own_gems[@]}" -S lota fuse . "${exclude[@]}" --identifier "$IDENTIFIER" --app-version "$APP_VERSION" --icon icons/icon --out "$RUNNER_TEMP/fuse"
         ls -la "$RUNNER_TEMP/fuse"
