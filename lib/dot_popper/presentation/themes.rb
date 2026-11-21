@@ -11,6 +11,21 @@ module DotPopper
     # One theme on the Themes screen, where it is drawn.
     class ThemeCard < Data.define(:theme, :rect); end
 
+    # What the Themes screen hands its painter (Shell::ThemesPainter): its
+    # +header+ (HeaderDrawing), a ThemeCardDrawing for each theme, and,
+    # with a controller, LB and RB (+steps+, ThemeStepDrawings; none
+    # otherwise).
+    class ThemesDrawing < Data.define(:header, :cards, :steps); end
+
+    # A +theme+'s card at +rect+, saying its +name+: whether it is the
+    # theme in use (+chosen+) and open to use (+open+), and as lit as the
+    # mouse over it has made it (+hover+, from 0 to 1).
+    class ThemeCardDrawing < Data.define(:theme, :rect, :name, :chosen, :open, :hover); end
+
+    # LB (+name+ :theme_prev) or RB (:theme_next) at +rect+, as lit as the
+    # mouse over it has made it (+hover+).
+    class ThemeStepDrawing < Data.define(:name, :rect, :hover); end
+
     # The Themes screen laid out under its heading (Layout#heading_y), over
     # Back: one card for each theme, in as few rows of equal count as
     # give each card room for its name (one row while they fit), and

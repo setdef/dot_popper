@@ -11,38 +11,37 @@ module DotPopper
     # LooksLayout decides where each card goes; this only draws, on whole
     # device pixels.
     class ThemesPainter < Data.define(:context, :dots)
-      def draw(show, layout)
-        plan = show.themes_layout
-        Header.new(context:).draw(show, layout, show.words.themes.fetch(:heading))
-        plan.cards.each { card(it, show) }
-        steps(show, plan) if show.input == Presentation::InputKind::GAMEPAD
+      # The screen as its +drawing+ (Presentation::ThemesDrawing) says.
+      def draw(drawing)
+        Header.new(context:).draw(drawing.header)
+        drawing.cards.each { card(it) }
+        steps(drawing.steps)
       end
 
       # LB and RB, labeled with their arrows, at the top right.
-      def steps(show, plan)
+      def steps(steps)
         glyphs = Glyphs.new(context:)
-        plan.steps.each do |name, rect|
-          back = name == :theme_prev
-          PillButton.new(context:).draw(rect, back ? "LB" : "RB", hover: show.hover.level(name),
-                                    icon: ->(x, y, size) { glyphs.draw(back ? :chevron_left : :chevron_right, x, y, size * 0.36) })
+        steps.each do |step|
+          back = step.name == :theme_prev
+          PillButton.new(context:).draw(step.rect, back ? "LB" : "RB", hover: step.hover,
+                                        icon: ->(x, y, size) { glyphs.draw(back ? :chevron_left : :chevron_right, x, y, size * 0.36) })
         end
       end
 
       private
 
-      def card(card, show)
+      def card(card)
         theme = card.theme
         palette = theme.palette
         rect = snapped(card.rect)
         corner = [rect.height * 0.12, 6.0].max
-        chosen = theme == show.in_use
-        hover = show.hover.level(theme)
+        chosen = card.chosen
         context.color(palette.ink_top)
         context.rectangle(:fill, rect.x, rect.y, rect.width, rect.height, corner, corner, 32)
         pair(rect, theme)
-        name(show.words.themes.fetch(theme.key), rect, theme)
-        shade(rect, corner, palette) unless show.theme_open?(theme)
-        outline(rect, corner, chosen, hover)
+        name(card.name, rect, theme)
+        shade(rect, corner, palette) unless card.open
+        outline(rect, corner, chosen, card.hover)
         tick(rect, palette) if chosen
       end
 

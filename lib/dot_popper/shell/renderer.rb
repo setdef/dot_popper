@@ -133,9 +133,9 @@ module DotPopper
         @stats.draw(@show, layout)
       end
 
-      def themes_screen(_screen, width, height, layout)
+      def themes_screen(screen, width, height, _layout)
         page_veil(width, height)
-        @themes.draw(@show, layout)
+        @themes.draw(screen.drawing)
       end
 
       def achievements_screen(_screen, width, height, layout)

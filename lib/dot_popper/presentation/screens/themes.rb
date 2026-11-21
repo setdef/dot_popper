@@ -6,15 +6,39 @@ module DotPopper
       # Themes, over Home (ThemesLayout): a card for each theme, with a
       # controller the previous and next, and Back. A tap on a theme uses
       # it through +use_theme+ (UseCases::UseTheme), or for a Free player
-      # opens the offer of Pro leading with themes.
+      # opens the offer of Pro leading with themes. A theme neither earned
+      # nor in season (+saved_themes+, Gameplay::SavedThemes) is drawn dimmed.
       class Themes < Page
-        def initialize(show, use_theme:)
+        def initialize(show, use_theme:, saved_themes:)
           super(show)
           @use_theme = use_theme
+          @saved_themes = saved_themes
         end
 
         # Where its cards go (ThemesLayout).
         def plan = ThemesLayout.new(layout:, themes: show.themes, style: style::THEMES_LAYOUT)
+
+        # Everything its painter draws (ThemesDrawing), made again only when
+        # the window, the plan, the theme in use, a theme's opening, the
+        # words, a button's light or the kind of input changes.
+        def drawing
+          plan = self.plan
+          words = self.words
+          hover = show.hover
+          in_use = show.in_use
+          open = plan.themes.to_h { [it.key, @saved_themes.open?(it.key)] }
+          gamepad = show.input == InputKind::GAMEPAD
+          drawn(plan, words, hover, in_use, open, gamepad) do
+            names = words.themes
+            cards = plan.cards.map do |card|
+              theme = card.theme
+              ThemeCardDrawing.new(theme:, rect: card.rect, name: names.fetch(theme.key), chosen: theme == in_use,
+                                   open: open.fetch(theme.key), hover: hover.level(theme))
+            end
+            steps = gamepad ? plan.steps.map { |name, rect| ThemeStepDrawing.new(name:, rect:, hover: hover.level(name)) } : []
+            ThemesDrawing.new(header: HeaderDrawing.for(names.fetch(:heading), layout:, measure:, words:, hover:), cards:, steps:)
+          end
+        end
 
         # Uses +theme+ from now on, and the whole screen takes its colors at
         # once, so the choice is seen before it is left.
