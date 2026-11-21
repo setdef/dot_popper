@@ -72,7 +72,7 @@ Tests: `test/gameplay/stats_test.rb`, `test/gameplay/saved_stats_test.rb`, `test
 
 ## Size classes
 
-A game's records count only among games of its size class (`SizeClass`, `lib/dot_popper/gameplay/size_class.rb`), the class of the screen it started on. A game keeps its class if the window changes size during it.
+A game's records count only among games of its size class (`SizeClass`, `gems/dot_popper-gameplay/lib/dot_popper/gameplay/size_class.rb`), the class of the screen it started on. A game keeps its class if the window changes size during it.
 
 | Class | Which games | Rule |
 | --- | --- | --- |

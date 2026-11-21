@@ -10,7 +10,7 @@ tutorials.
 
 ## A dot is a value
 
-Here is a dot, from `lib/dot_popper/gameplay/dot.rb`:
+Here is a dot, from `gems/dot_popper-gameplay/lib/dot_popper/gameplay/dot.rb`:
 
 ```ruby
 class Dot < Data.define(:id, :x, :y, :velocity_x, :velocity_y, :radius, :popped)
