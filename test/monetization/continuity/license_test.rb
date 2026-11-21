@@ -182,6 +182,16 @@ class LicenseTest < Minitest::Test
     assert_equal 0, gone.days(TODAY + 10)
   end
 
+  # setdef.txt holds the day setdef was first found gone. Anything else in
+  # it, a line too long for Ruby's Date to read among it, reads as not
+  # gone, and the game starts as it would with no file.
+  def test_a_setdef_txt_that_holds_no_day_reads_as_not_gone
+    assert_equal TODAY, C::Gone.new(Memory.new("#{TODAY.iso8601}\n")).since
+    ["", "gone", "2026-13-40", "2026-11-09#{" " * 200}x", "9" * 200].each do |text|
+      refute_predicate C::Gone.new(Memory.new(text)), :gone?, text
+    end
+  end
+
   def test_while_setdef_is_gone_a_key_works_at_once_and_registers_once_it_answers
     ledger_server = C::FakeSetdef.new(@ledger, mode: :gone)
     watch = device(ledger_server)
