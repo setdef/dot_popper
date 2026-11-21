@@ -170,7 +170,7 @@ module DotPopper
         @effects.scene(@show.effects, dots)
         veil(width, height, @show.game_over&.dim(@show.now).to_f) unless @show.playing?
         @effects.words(@show.effects, layout)
-        @game_over.draw(@show, layout) unless @show.playing?
+        @game_over.draw(@show.screens.fetch(:game_over).drawing, @show.now) unless @show.playing?
         highlight = @show.clock_highlight
         shown = !@show.game_over&.then { it.entrance(@show.now) >= 1.0 }
         hud = hud_drawing(@show.hud, layout) if highlight || shown

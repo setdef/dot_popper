@@ -80,6 +80,27 @@ module DotPopper
           @planned.last
         end
 
+        # Everything its painter draws (GameOverDrawing), or nil before a
+        # game has finished, made again only when what it lays out (the
+        # window, the result, its lines, the words) or a button's light
+        # changes.
+        def drawing
+          screen = screen_layout or return
+          hover = show.hover
+          drawn(screen, hover) do
+            plan = self.plan
+            over = screen.game_over
+            chips = screen.chips
+            GameOverDrawing.new(over:, plan:, time_up: words.time_up, facts: Words.facts(over.stats),
+                                record: (words.record(over.record) if over.record),
+                                score_record_line: (screen.score_record_line(plan.size(:score_record)) if plan[:score_record]),
+                                chips:, chip_hovers: chips.map { it.opens ? hover.level(it.name) : 0.0 },
+                                home_word: words.button(:home), home_hover: hover.level(:home), share_word: words.share,
+                                share_hover: hover.level(:share), play_word: screen.play_word, play_note: screen.play_note,
+                                play_hover: hover.level(:play_again), ui: layout.ui)
+          end
+        end
+
         # Share my score: offers the game's result to share, which in the
         # game opens the share preview, and copies nothing yet; on a phone
         # it opens the system's share sheet, and no preview.

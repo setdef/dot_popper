@@ -8,6 +8,20 @@ module DotPopper
     # +glyph+ the mark before its words (:check, :achievement, :crown).
     class GameOverChip < Data.define(:name, :text, :glyph, :opens); end
 
+    # What the Game Over screen hands its painter (Shell::GameOverPainter),
+    # which draws it as the game's result (+over+, GameOverResult) arrives
+    # and counts up: where everything goes (+plan+, GameOverPlan), "Time's
+    # up!" (+time_up+), the game's +facts+ (Words.facts), the +record+ it
+    # set or nil, the score record's line as [face, size, text] or nil
+    # (GameOverLayout#score_record_line), its +chips+ (GameOverChip) each
+    # as lit as the mouse over it has made it (+chip_hovers+, from 0 to 1;
+    # 0 for one that opens nothing), Home, Share my score and Play again,
+    # each with its word and light, Play again's +play_note+, and the
+    # +ui+ scale Share my score is drawn at.
+    class GameOverDrawing < Data.define(:over, :plan, :time_up, :facts, :record, :score_record_line, :chips, :chip_hovers,
+                                        :home_word, :home_hover, :share_word, :share_hover, :play_word, :play_note, :play_hover,
+                                        :ui); end
+
     # Where Game Over's parts go, worked out by GameOverLayout#plan: each
     # block's Rect by name (Stacked), the font size each is set in, the
     # backing behind the result, and Play again, Home and Share my score.

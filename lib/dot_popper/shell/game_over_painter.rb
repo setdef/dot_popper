@@ -12,53 +12,58 @@ module DotPopper
     # as the mocks draw it, with no backing of their own. The stacking
     # rule is taught on the pile itself, with no word (Show#replay_mistake).
     class GameOverPainter < Data.define(:context, :dots)
-      def draw(show, layout)
-        game_over = show.game_over or return
-        plan = show.game_over_plan
-        now = show.now
+      # Game Over as its +drawing+ (Presentation::GameOverDrawing) says, as
+      # its result stands at +now+; nothing before a game has finished.
+      def draw(drawing, now)
+        return unless drawing
+
+        game_over = drawing.over
+        plan = drawing.plan
         palette = context.palette
-        words = show.words
         entrance = game_over.entrance(now)
         shown = entrance.clamp(0.0, 1.0)
         if (heading = plan[:heading])
-          context.text(words.time_up, context.fonts.bold(plan.size(:heading)), heading.center_x,
-                   heading.center_y - ((1 - entrance) * 30), palette.soft, shown)
+          context.text(drawing.time_up, context.fonts.bold(plan.size(:heading)), heading.center_x,
+                       heading.center_y - ((1 - entrance) * 30), palette.soft, shown)
         end
         score = context.fonts.bold(plan.size(:score))
         Lettering.new(context:).candy(game_over.shown_score(now).to_s, score, plan[:score].center_x,
-                                  plan[:score].y + (score.height / 2.0), shown)
-        score_record_line(show, plan, now, shown)
-        facts(show, plan, shown)
-        line(plan, :record, words.record(game_over.record), palette.gain, game_over.afterword(now)) if game_over.record && game_over.counted?(now)
-        chips(show, plan, game_over.afterword(now)) if game_over.counted?(now)
-        buttons(show, plan, game_over, now, shown, layout)
+                                      plan[:score].y + (score.height / 2.0), shown)
+        score_record_line(drawing, now, shown)
+        facts(drawing, shown)
+        line(plan, :record, drawing.record, palette.gain, game_over.afterword(now)) if drawing.record && game_over.counted?(now)
+        chips(drawing, game_over.afterword(now)) if game_over.counted?(now)
+        buttons(drawing, now, shown)
       end
 
       private
 
-      def buttons(show, plan, game_over, now, shown, layout)
-        words = show.words
+      def buttons(drawing, now, shown)
+        plan = drawing.plan
+        game_over = drawing.over
         if (home = plan.home_button)
-          PillButton.new(context:).draw(home, words.button(:home), alpha: shown, hover: show.hover.level(:home),
-                                    icon: ->(x, y, size) { Glyphs.new(context:).draw(:home, x, y, size * 0.42, alpha: shown) })
+          PillButton.new(context:).draw(home, drawing.home_word, alpha: shown, hover: drawing.home_hover,
+                                        icon: ->(x, y, size) { Glyphs.new(context:).draw(:home, x, y, size * 0.42, alpha: shown) })
         end
         if (button = plan.share_button)
-          ShareButton.new(context:).draw(button, words.share, entrance: game_over.share_button_entrance(now), ui: layout.ui, hover: show.hover.level(:share))
+          ShareButton.new(context:).draw(button, drawing.share_word, entrance: game_over.share_button_entrance(now), ui: drawing.ui,
+                                         hover: drawing.share_hover)
         end
         play = plan.play_button or return
-        PrimaryButton.new(context:).draw(play, show.game_over_layout.play_word, alpha: [shown * 0.35, game_over.prompt(now)].max,
-                                     hover: show.hover.level(:play_again), note: show.game_over_layout.play_note)
+        PrimaryButton.new(context:).draw(play, drawing.play_word, alpha: [shown * 0.35, game_over.prompt(now)].max,
+                                         hover: drawing.play_hover, note: drawing.play_note)
       end
 
       # Each of the game's lines in a pill: its mark, its words, and an
       # arrow where a press opens what it names.
-      def chips(show, plan, alpha)
+      def chips(drawing, alpha)
         return unless alpha.positive?
 
+        plan = drawing.plan
         font = context.fonts.semibold(plan.size(:chip))
-        show.game_over_chips.each_with_index do |chip, i|
+        drawing.chips.each_with_index do |chip, i|
           rect = plan[[:chip, i]] or next
-          hover = chip.opens ? show.hover.level(chip.name) : 0.0
+          hover = drawing.chip_hovers[i]
           Card.new(context:).draw(rect, corner: rect.height / 2.0, alpha:, lit: hover)
           mark = rect.height * 0.42
           room = rect.width - (rect.height * (chip.opens ? 1.9 : 1.4))
@@ -88,8 +93,9 @@ module DotPopper
       # The game's facts, each its sign and its number: a bright dot, a
       # popped one, and the game's stopwatch (TallyPainter), in a row or one
       # under another, as the plan put them.
-      def facts(show, plan, alpha)
-        list = Presentation::Words.facts(show.game_over.stats)
+      def facts(drawing, alpha)
+        plan = drawing.plan
+        list = drawing.facts
         font = context.fonts.bold(plan.size(:facts))
         screen = Presentation::GameOverLayout
         if (row = plan[:summary])
@@ -123,12 +129,12 @@ module DotPopper
 
       # A new record, glowing, once the score has counted up, or how far
       # short of the score record the game fell.
-      def score_record_line(show, plan, now, alpha)
-        rect = plan[:score_record] or return
-        game_over = show.game_over
+      def score_record_line(drawing, now, alpha)
+        rect = drawing.plan[:score_record] or return
+        game_over = drawing.over
         return if game_over.new_score_record? && !game_over.counted?(now)
 
-        face, size, text = show.game_over_layout.score_record_line(plan.size(:score_record))
+        face, size, text = drawing.score_record_line
         color = game_over.new_score_record? ? context.palette.gain : context.palette.soft
         alpha = 0.85 + (0.15 * Math.sin(now * 6)) if game_over.new_score_record?
         context.text(text, context.fonts.public_send(face, size), rect.center_x, rect.center_y, color, alpha)
