@@ -59,22 +59,59 @@ class FreshDrawingsTest < Minitest::Test
   GOAL_MET = DotPopper::Gameplay::GameStats.start.with(most_dots_in_a_row: 15, times_to_pop: [3.0] + ([0.5] * 9), duration: 50.0, mistakes: 0,
                                                       score: 30)
 
-  # What changes under each open screen from outside it, each a name and
-  # what makes it, given the fixture: a purchase, the day, a game recorded
-  # elsewhere, an achievement earned. Each is checked on every frame for a
-  # while after, as what it sets off goes on by itself.
+  # What changes under an open screen from outside it, in order: for each
+  # screen, the fixtures to open it on (as OPENED opens it), each with the
+  # changes to make, each a name and what makes it, given the fixture. A
+  # purchase, the day, a game recorded elsewhere, an achievement earned,
+  # Pro arriving. After each, every frame for two seconds is checked, as
+  # what it sets off goes on by itself.
   OUTSIDE = {
-    offer: { "buying" => ->(fixture) { fixture.show.screen.pressed(:buy, :mouse) } },
-    home: { "the next day" => ->(fixture) { fixture.day += 1 },
-            "the day's goal met" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) },
-            "an achievement earned" => ->(fixture) { fixture.achievements.award([:steady], day: fixture.day) },
-            "Pro bought" => ->(fixture) { fixture.store.buy } },
-    themes: { "a new season" => ->(fixture) { fixture.day = Date.new(2026, 12, 20) } },
-    achievements: { "an achievement earned" => ->(fixture) { fixture.achievements.award([:steady], day: fixture.day) } },
-    achievement_dialog: { "it earned" => ->(fixture) { fixture.achievements.award([:steady], day: fixture.day) },
-                          "a record nearer it" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) } },
-    stats: { "a game recorded" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) } }
+    offer: [[{}, { "buying" => ->(fixture) { fixture.show.screen.pressed(:buy, :mouse) },
+                   "pasting the key" => ->(fixture) { fixture.show.screen.pressed(:paste, :mouse) } }],
+            # From an achievement's dialog, by a Free player who has earned it,
+            # whose thank-you hands it earned (OfferPainterTest).
+            [{}, { "it earned" => ->(fixture) { fixture.achievements.award([:steady], day: fixture.day) },
+                   "buying" => ->(fixture) { fixture.show.screen.pressed(:buy, :mouse) },
+                   "pasting the key" => ->(fixture) { fixture.show.screen.pressed(:paste, :mouse) } }, lambda { |show|
+                     show.open_achievements
+                     show.open_achievement(:steady)
+                     show.achievement_pro
+                   }],
+            # Closed, and opened again from another achievement's dialog.
+            [{}, { "opened again for another" => lambda { |fixture|
+              fixture.show.back
+              fixture.show.open_achievement(:unshaken)
+              fixture.show.achievement_pro
+            } }, lambda { |show|
+              show.open_achievements
+              show.open_achievement(:steady)
+              show.achievement_pro
+            }]],
+    home: [[{}, { "the next day" => ->(fixture) { fixture.day += 1 },
+                  "the day's goal met" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) },
+                  "a game spent elsewhere" => ->(fixture) { fixture.games.spend! },
+                  "Pro arriving" => ->(fixture) { FreshDrawingsTest.pro(fixture) },
+                  "an achievement earned" => ->(fixture) { fixture.achievements.award([:steady], day: fixture.day) } }]],
+    themes: [[{ pro: true }, { "a new season" => ->(fixture) { fixture.day = Date.new(2026, 12, 20) } }]],
+    achievements: [[{}, { "Pro arriving" => ->(fixture) { FreshDrawingsTest.pro(fixture) } }],
+                   [{ pro: true }, { "an achievement earned" => ->(fixture) { fixture.achievements.award([:steady], day: fixture.day) } }]],
+    achievement_dialog: [[{ pro: true }, {
+      "a record nearer it" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) },
+      "it earned" => ->(fixture) { fixture.achievements.award([:steady], day: fixture.day) }
+    }]],
+    share_preview: [[{}, { "copied" => ->(fixture) { fixture.show.screen.pressed(:copy, :mouse) } }]],
+    stats: [[{}, { "a game recorded" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) } }]],
+    # No press of a player's opens a screen over the Tutorial today, but its
+    # drawing says Skip is drawn only while it is on top.
+    tutorial: [[{ played: false }, { "the offer opened over it" => ->(fixture) { fixture.show.open_offer_for(:themes) } }]]
   }.freeze
+
+  # Pro, bought on the website and its key entered, as from another screen.
+  def self.pro(fixture)
+    fixture.store.buy
+    fixture.entitlement.enter(fixture.clipboard.paste)
+    raise "Pro did not arrive" unless fixture.entitlement.pro?
+  end
 
   # Sizes a desktop window is dragged to, one after another: some change
   # only the height, which moves Back and the page but may leave a plan
@@ -120,12 +157,7 @@ class FreshDrawingsTest < Minitest::Test
       check.call("the mouse gone")
       changes.each do |what, change|
         change.call(show)
-        fixture.tick(0.3)
-        check.call(what)
-      end
-      OUTSIDE.fetch(name, {}).each do |what, change|
-        change.call(fixture)
-        40.times do |frame|
+        6.times do |frame|
           fixture.tick(0.05)
           check.call("#{what} (frame #{frame})")
         end
@@ -134,6 +166,32 @@ class FreshDrawingsTest < Minitest::Test
       kept = screen.drawing
       fixture.tick(0.05)
       assert_same kept, screen.drawing, "a frame that changes nothing makes nothing"
+    end
+  end
+
+  OUTSIDE.each do |name, cases|
+    cases.each_with_index do |(given, changes, open), n|
+      define_method("test_#{name}_draws_what_a_fresh_drawing_would_as_things_change_outside_it_#{n}") do
+        fixture = Inputs::Fixture.new(os: "Linux", width: 1200, height: 800, **given)
+        show = fixture.show
+        show.pointer_gone # so that no change of hover hides one of what changes
+        (open || OPENED.fetch(name)[1]).call(show)
+        screen = show.screens.fetch(name)
+        stale = []
+        20.times do |frame| # as it comes in, each frame kept as a frame keeps it
+          fixture.tick(0.05)
+          stale << "opening (frame #{frame})" unless screen.drawing == fresh(screen)
+        end
+        assert_same screen, show.screen, "#{name} opens"
+        changes.each do |what, change|
+          change.call(fixture)
+          40.times do |frame|
+            fixture.tick(0.05)
+            stale << "#{what} (frame #{frame})" unless screen.drawing == fresh(screen)
+          end
+        end
+        assert_empty stale, "#{name} drew a stale drawing after #{stale.first(5).join(", ")}"
+      end
     end
   end
 
