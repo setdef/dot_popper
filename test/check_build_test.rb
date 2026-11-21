@@ -19,8 +19,7 @@ class CheckBuildTest < Minitest::Test
     require "lota"
     @app = Dir.mktmpdir("dot_popper_app")
     @game = File.join(@app, "Dot Popper", "app", "game", "dot_popper")
-    FileUtils.mkdir_p(@game)
-    FileUtils.cp_r(%w[lib fledge.yml].map { File.join(ROOT, it) }, @game)
+    lay_out_app
     @version = YAML.load_file(File.join(ROOT, "fledge.yml")).fetch("version").to_s
   rescue LoadError => e
     skip "Lota isn't installed here (#{e.message})"
@@ -121,17 +120,35 @@ class CheckBuildTest < Minitest::Test
     assert_match(/^ok   no license key signed by a test key unlocks it$/, out)
   end
 
-  # CI runs the script in a checkout stamped for the channel, which no
-  # longer loads the test build's part by itself.
-  def test_the_check_runs_from_a_checkout_stamped_for_the_channel
-    stamp("website")
+  # CI's Package jobs stamp the checkout itself for the channel before
+  # they check, and a checkout stamped for a channel loads none of the
+  # parts that channel leaves out. The check still makes the test build's
+  # proofs there, for every channel a build is sold through.
+  def test_the_check_runs_from_a_checkout_stamped_for_each_channel
+    DotPopper::ReleaseEngineering::Build::CHANNEL_NAMES.each do |channel|
+      lay_out_app
+      stamp(channel)
+      ok, out = check_from_stamped_checkout(channel)
+
+      refute_match(/could not make the test build's proofs/, out, channel)
+      expected = channel != DotPopper::ReleaseEngineering::Build::GOOGLE_PLAY || DotPopper::Monetization::Receipt::PLAY_KEYS.any?
+      assert_equal expected, ok, "#{channel}:\n#{out}"
+    end
+  end
+
+  def lay_out_app
+    FileUtils.rm_rf(@game)
+    FileUtils.mkdir_p(@game)
+    FileUtils.cp_r(%w[lib fledge.yml].map { File.join(ROOT, it) }, @game)
+  end
+
+  def check_from_stamped_checkout(channel)
     Dir.mktmpdir("dot_popper_checkout") do |checkout|
       FileUtils.cp_r(%w[lib script].map { File.join(ROOT, it) }, checkout)
       build = File.join(checkout, "lib/dot_popper/release_engineering/build.rb")
-      File.write(build, BuildChannel.stamp(File.read(build), "website"))
-      out, status = Open3.capture2e(RbConfig.ruby, File.join(checkout, "script", "check_build.rb"), "website", @version, @app)
-
-      assert status.success?, out
+      File.write(build, BuildChannel.stamp(File.read(build), channel))
+      out, status = Open3.capture2e(RbConfig.ruby, File.join(checkout, "script", "check_build.rb"), channel, @version, @app)
+      [status.success?, out]
     end
   end
 
