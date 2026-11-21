@@ -35,13 +35,16 @@ game = File.realpath(games.first)
 puts "Checking the game in #{game}"
 
 # The test build's proofs, made by this repository's code: the test
-# build's own part, loaded by name, since a checkout stamped for a channel
-# (script/set_build_channel.rb) no longer loads it. Each is checked there
-# against the test build's own trust: the controls, so a Ruby that
-# verifies nothing cannot pass the checks below.
+# build's own part and the website's, whose license keys its test keys
+# sign, each loaded by name, since a checkout stamped for a channel
+# (script/set_build_channel.rb) no longer loads the parts that channel
+# leaves out. Each is checked there against the test build's own trust:
+# the controls, so a Ruby that verifies nothing cannot pass the checks
+# below.
 MAKE_PROOFS = <<~RUBY
   require "json"
   require "dot_popper"
+  require "dot_popper/website/core"
   require "dot_popper/test_build/core"
   c = DotPopper::Monetization::Continuity
   l = DotPopper::Monetization::LicenseKeys
