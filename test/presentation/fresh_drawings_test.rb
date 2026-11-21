@@ -59,6 +59,10 @@ class FreshDrawingsTest < Minitest::Test
   GOAL_MET = DotPopper::Gameplay::GameStats.start.with(most_dots_in_a_row: 15, times_to_pop: [3.0] + ([0.5] * 9), duration: 50.0, mistakes: 0,
                                                       score: 30)
 
+  # A small window, where the list scrolls, and a scroll there.
+  SCROLLED = { "a small window" => ->(fixture) { FreshDrawingsTest.resize(fixture, 400, 360) },
+               "a scroll" => ->(fixture) { fixture.show.wheel_scroll(-3) } }.freeze
+
   # What changes under an open screen from outside it, in order: for each
   # screen, the fixtures to open it on (as OPENED opens it), each with the
   # changes to make, each a name and what makes it, given the fixture. A
@@ -94,13 +98,15 @@ class FreshDrawingsTest < Minitest::Test
                   "an achievement earned" => ->(fixture) { fixture.achievements.award([:steady], day: fixture.day) } }]],
     themes: [[{ pro: true }, { "a new season" => ->(fixture) { fixture.day = Date.new(2026, 12, 20) } }]],
     achievements: [[{}, { "Pro arriving" => ->(fixture) { FreshDrawingsTest.pro(fixture) } }],
+                   [{ pro: true }, SCROLLED],
                    [{ pro: true }, { "an achievement earned" => ->(fixture) { fixture.achievements.award([:steady], day: fixture.day) } }]],
     achievement_dialog: [[{ pro: true }, {
       "a record nearer it" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) },
       "it earned" => ->(fixture) { fixture.achievements.award([:steady], day: fixture.day) }
     }]],
     share_preview: [[{}, { "copied" => ->(fixture) { fixture.show.screen.pressed(:copy, :mouse) } }]],
-    stats: [[{}, { "a game recorded" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) } }]],
+    credits: [[{}, SCROLLED]],
+    stats: [[{}, SCROLLED], [{}, { "a game recorded" => ->(fixture) { fixture.saved_stats.record(GOAL_MET, fixture.game_flow.size_class) } }]],
     # No press of a player's opens a screen over the Tutorial today, but its
     # drawing says Skip is drawn only while it is on top.
     tutorial: [[{ played: false }, { "the offer opened over it" => ->(fixture) { fixture.show.open_offer_for(:themes) } }]]
@@ -111,6 +117,12 @@ class FreshDrawingsTest < Minitest::Test
     fixture.store.buy
     fixture.entitlement.enter(fixture.clipboard.paste)
     raise "Pro did not arrive" unless fixture.entitlement.pro?
+  end
+
+  def self.resize(fixture, width, height)
+    sizes = new("sizes")
+    fixture.game_flow.screen = sizes.field(width, height)
+    fixture.show.resize(sizes.layout(width, height), sizes.field(width, height))
   end
 
   # Sizes a desktop window is dragged to, one after another: some change
