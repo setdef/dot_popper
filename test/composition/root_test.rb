@@ -355,6 +355,8 @@ class RootTest < Minitest::Test
     game = root(engine:, env: SETTINGS.merge("DOT_POPPER_TODAY" => "2030-12-01"))
 
     assert_includes game.show.themes.map(&:key), :ghost, "opened at launch, with no check yet"
+    assert game.show.change_server_offered?, "Change Server offered at launch, with no check yet"
+    refute root.show.change_server_offered?, "nor where setdef was never found gone"
   end
 
   # The game flow's Starter is UseCases::StartGame's, which the root makes,
