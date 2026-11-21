@@ -62,8 +62,8 @@ module DotPopper
 
         # Pro arrived (a ProGranted, which the composition root subscribes
         # it to hear): a tick marks a store's purchase landing while
-        # it is open. A license key entered has had its own tick as it was
-        # pressed.
+        # it is open. Pro that arrives by the second action has had the
+        # second action's own tick as it was pressed.
         def call(granted)
           sounds.play(:tick, pitch: 1.3) if opened? && granted.by == :receipt
         end

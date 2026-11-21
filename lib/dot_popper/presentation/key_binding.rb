@@ -7,7 +7,8 @@ module DotPopper
     # modifier keys of which one must be held, and no other (none: the
     # key alone, with no modifier key held, since a chord is no press of
     # the plain key); +held_or_not+, true where the key is the same with
-    # any modifier keys held or none (a license key's letters); and
+    # any modifier keys held or none (Backspace, Delete and Enter, where
+    # a key is typed into the offer of Pro); and
     # +does+, the name of what it does: a method of the screen (or, for
     # the keys every screen takes, of the InputHandler) given the key,
     # which says whether it took it. A key it does not take goes on to
