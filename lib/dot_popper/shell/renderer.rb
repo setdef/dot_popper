@@ -138,9 +138,9 @@ module DotPopper
         @themes.draw(screen.drawing)
       end
 
-      def achievements_screen(_screen, width, height, layout)
+      def achievements_screen(screen, width, height, _layout)
         page_veil(width, height)
-        @achievements.draw(@show, layout)
+        @achievements.draw(screen.drawing)
       end
 
       def achievement_dialog_screen(_screen, _width, _height, layout) = @achievements.dialog(@show, layout)

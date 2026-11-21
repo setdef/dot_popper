@@ -6,16 +6,16 @@ module DotPopper
     # dialog over it: name, how it is earned, and for Pro the day or the
     # progress.
     class AchievementsPainter < Data.define(:context)
-      def draw(show, layout)
-        words = show.words
-        Header.new(context:).draw(show, layout, words.button(:achievements_heading))
-        context.text(Presentation::AchievementWords.count(show.achievement_count), context.fonts.semibold(16), layout.center_x, layout.heading_y + (layout.heading_size * 0.72), context.palette.soft) if show.achievement_count
-        window = show.achievements_layout.window
+      # The grid as its +drawing+ (Presentation::AchievementsDrawing) says.
+      def draw(drawing)
+        Header.new(context:).draw(drawing.header)
+        context.text(drawing.count, context.fonts.semibold(16), drawing.count_x, drawing.count_y, context.palette.soft) if drawing.count
+        window = drawing.window
         pixels = context.pixels
         context.scissor = pixels.snap(window.x), pixels.snap(window.y), pixels.snap(window.width), pixels.snap(window.height)
-        show.achievement_cells.each { cell(show, it) }
+        drawing.cells.each { cell(it) }
         context.scissor = nil
-        how_to_earn(show, layout) if words.input == Presentation::InputKind::GAMEPAD
+        PillButton.new(context:).draw(drawing.how_to_earn, drawing.how_to_earn_word) if drawing.how_to_earn
       end
 
       def dialog(show, layout)
@@ -59,10 +59,11 @@ module DotPopper
 
       private
 
-      def cell(show, cell)
-        earned = show.achievement_earned?(cell.id)
-        emblem(cell.id, cell.x, cell.y, cell.radius, earned, lit: show.hover.level([:achievement, cell.id]))
-        name = Presentation::AchievementWords.name(cell.id)
+      def cell(drawn)
+        cell = drawn.cell
+        earned = drawn.earned
+        emblem(cell.id, cell.x, cell.y, cell.radius, earned, lit: drawn.hover)
+        name = drawn.name
         lines = Presentation::Words.wrap(name, cell.radius * 2.8) { context.fonts.semibold(15).width(it) }
         font = context.fonts.semibold(15)
         lines.each_with_index { |line, i| context.text(line, font, cell.x, cell.name_y + (font.height * i), earned ? context.palette.cream : context.palette.soft) }
@@ -124,11 +125,6 @@ module DotPopper
       def step(show, name, rect, glyph, word)
         PillButton.new(context:).draw(rect, word, hover: show.hover.level(name),
                                   icon: ->(x, y, size) { Glyphs.new(context:).draw(glyph, x, y, size * 0.34) })
-      end
-
-      def how_to_earn(show, layout)
-        rect = layout.clear_stats_button
-        PillButton.new(context:).draw(rect, show.words.button(:how_to_earn))
       end
 
       def shade(layout)

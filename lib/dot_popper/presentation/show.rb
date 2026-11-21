@@ -595,7 +595,6 @@ module DotPopper
       def open_policy = @links.open(PRIVACY_URL)
 
       def open_achievements = push_page(:achievements)
-      def achievements_layout = @screens[:achievements].grid
       # How many achievements are earned, or nil where that is Pro's.
       def achievement_count = @view_achievements.count
 

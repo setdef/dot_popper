@@ -15,7 +15,7 @@ Where the parts go is worked out without Lota in `lib/dot_popper/presentation/` 
 | setdef splash | launch | (ends by itself, or on any press) | `Presentation::Splash`, `Shell::SplashPainter` |
 | Home | after the splash; Back from every screen over it; Game Over's Home | (Escape twice quits on a computer; Android's Back leaves the app) | `HomeLayout`, `Shell::HomePainter` |
 | Stats | Home's Stats button | Home | `StatsLayout`, `Shell::StatsPainter` |
-| Achievements | Home's Achievements button; Game Over's new-achievement line | Home | `AchievementsLayout`, `Shell::AchievementsPainter` |
+| Achievements | Home's Achievements button; Game Over's new-achievement line | Home | `AchievementsLayout`, `AchievementsDrawing`, `Shell::AchievementsPainter` |
 | an achievement's dialog | a cell of Achievements | Achievements | `AchievementDialogLayout` |
 | Themes | Home's Themes button | Home | [look-and-sound.md](look-and-sound.md) |
 | Friend groups | Home's Friend groups button; Game Over's title line | Home | [friend-groups.md](friend-groups.md) |

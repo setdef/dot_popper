@@ -84,6 +84,19 @@ module DotPopper
       def rect = Rect.new(x: x - (radius * 1.3), y: y - radius, width: radius * 2.6, height: name_y - y + radius + 12)
     end
 
+    # What the Achievements screen hands its painter (Shell::
+    # AchievementsPainter#draw): its +header+ (HeaderDrawing), how many are
+    # earned (+count+, said at +count_x+, +count_y+; nil where that is
+    # Pro's), the grid's +window+, which cuts off what is scrolled out of
+    # it, its +cells+ (AchievementCellDrawing), and with a controller How
+    # to earn at +how_to_earn+ saying +how_to_earn_word+ (nil otherwise).
+    class AchievementsDrawing < Data.define(:header, :count, :count_x, :count_y, :window, :cells, :how_to_earn, :how_to_earn_word); end
+
+    # A +cell+ (AchievementCell) of the grid, its achievement's +name+,
+    # whether it is +earned+, and as lit as the mouse over it has made it
+    # (+hover+, from 0 to 1).
+    class AchievementCellDrawing < Data.define(:cell, :name, :earned, :hover); end
+
     # The grid of achievements: as many columns as fit, a short last row
     # centered, as tall as it needs, in a window that scrolls.
     class AchievementsLayout < Data.define(:layout, :ids)

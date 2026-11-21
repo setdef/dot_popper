@@ -8,6 +8,12 @@ module DotPopper
       class Achievements < Page
         include Scrolling
 
+        # How many are earned, and which (UseCases::ViewAchievements).
+        def initialize(show, view_achievements:)
+          super(show)
+          @view_achievements = view_achievements
+        end
+
         # Where the grid goes (AchievementsLayout).
         def grid = AchievementsLayout.new(layout:, ids: DotPopper::Gameplay::Achievement::IDS)
 
@@ -17,6 +23,28 @@ module DotPopper
           grid = self.grid
           fit(grid.height, grid.window.height)
           grid.cells(scroll.offset)
+        end
+
+        # Everything its painter draws (AchievementsDrawing), made again
+        # only when the window, the scroll, what is earned, the words, a
+        # cell's light or the kind of input changes.
+        def drawing
+          cells = self.cells
+          words = self.words
+          hover = show.hover
+          count = @view_achievements.count
+          earned = cells.map { @view_achievements.earned?(it.id) }
+          drawn(cells, words, hover, count, earned) do
+            gamepad = words.input == InputKind::GAMEPAD
+            AchievementsDrawing.new(header: HeaderDrawing.for(words.button(:achievements_heading), layout:, measure:, words:, hover:),
+                                    count: (AchievementWords.count(count) if count), count_x: layout.center_x,
+                                    count_y: layout.heading_y + (layout.heading_size * 0.72), window: grid.window,
+                                    cells: cells.each_with_index.map do |cell, i|
+                                      AchievementCellDrawing.new(cell:, name: AchievementWords.name(cell.id), earned: earned[i],
+                                                                 hover: hover.level([:achievement, cell.id]))
+                                    end,
+                                    how_to_earn: (layout.clear_stats_button if gamepad), how_to_earn_word: words.button(:how_to_earn))
+          end
         end
 
         def controls
