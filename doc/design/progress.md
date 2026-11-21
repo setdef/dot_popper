@@ -42,7 +42,7 @@ A game the tutorial played over (`GameStats.opening`) begins play with a pop for
 
 ## Stats
 
-`Stats` (`gems/dot_popper-gameplay/lib/dot_popper/gameplay/stats.rb`) is every game this device has played, added up. `SavedStats` (`lib/dot_popper/gameplay/saved_stats.rb`) keeps it in `stats.txt` and adds each finished game (`SavedStats#record`, called as the game is finished, `UseCases::FinishGame`).
+`Stats` (`gems/dot_popper-gameplay/lib/dot_popper/gameplay/stats.rb`) is every game this device has played, added up. `SavedStats` (`gems/dot_popper-gameplay/lib/dot_popper/gameplay/saved_stats.rb`) keeps it in `stats.txt` and adds each finished game (`SavedStats#record`, called as the game is finished, `UseCases::FinishGame`).
 
 Across every screen:
 

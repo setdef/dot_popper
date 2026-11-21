@@ -20,13 +20,12 @@ end
 
 # The part of the area that is a gem already, dot_popper-gameplay
 # (gems/dot_popper-gameplay, which the Gemfile names by its path): the
-# rules of a game, the game and its events, a game's numbers and Stats
-# with today's goal and its streak, and the achievements and their
-# recorder.
+# rules of a game, the game and its events, a game's numbers, the score
+# record and Stats with today's goal and its streak, and the
+# achievements, each with its save file's format.
 %w[rules visibility field size_class dot_size dot_sizing dot touch_target spawn_check spawn spawner clock
-   stack events game game_stats daily_goal goal_streak stats stats_file achievement
-   achievement_recorder].each { require "dot_popper/gameplay/#{it}" }
+   stack events game score_record_file score_record game_stats daily_goal goal_streak stats stats_file saved_stats
+   achievement achievement_recorder achievements_file achievements].each { require "dot_popper/gameplay/#{it}" }
 
-%w[score_record_file score_record saved_stats achievements_file achievements
-   stats_backup theme setdef themes_file saved_themes games_log game_flow refresh groups theme_releases
+%w[stats_backup theme setdef themes_file saved_themes games_log game_flow refresh groups theme_releases
    server_choice].each { require_relative "gameplay/#{it}" }
