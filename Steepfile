@@ -22,7 +22,10 @@
 # rake steep checks second (STEEP_PROJECT=areas): the shared code's
 # target, which every area sees and which sees only itself, and the
 # three areas, each unreferenced!, so none sees another.
-SHARED = %w[sig/core sig/dot_popper.rbs sig/dot_popper/network.rbs sig/dot_popper/platform.rbs sig/dot_popper/automation.rbs sig/dot_popper/memory_file.rbs].freeze
+# The code the areas share is the gem dot_popper-shared, with its
+# signatures (the number type and Data's among them) in its own sig/.
+SHARED_GEM = "gems/dot_popper-shared"
+SHARED = ["#{SHARED_GEM}/sig"].freeze
 LIBRARIES = %w[date socket uri].freeze
 
 STRICT = lambda do |hash|
@@ -34,7 +37,7 @@ if ENV["STEEP_PROJECT"] == "areas"
   target :shared do
     signature(*SHARED)
     LIBRARIES.each { library it }
-    check "lib/dot_popper/network.rb", "lib/dot_popper/platform.rb", "lib/dot_popper/automation.rb", "lib/dot_popper/memory_file.rb"
+    check(*%w[network platform automation memory_file].map { "#{SHARED_GEM}/lib/dot_popper/#{it}.rb" })
     configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)
   end
 
@@ -74,7 +77,7 @@ else
   # The use cases, which need two areas, and what loads and serves them,
   # against all of sig/.
   target :application do
-    signature "sig", "gems/dot_popper-gameplay/sig"
+    signature "sig", "gems/dot_popper-gameplay/sig", *SHARED
     LIBRARIES.each { library it }
     check "lib/dot_popper.rb", "lib/dot_popper/*.rb", "lib/dot_popper/use_cases/*.rb"
     configure_code_diagnostics(Steep::Diagnostic::Ruby.strict, &STRICT)

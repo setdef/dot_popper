@@ -173,7 +173,7 @@ class PrivacyRequestsTest < Minitest::Test
                    "dot_popper/play/receipt.rb", "dot_popper/microsoft/receipt.rb")
     end
 
-    assert_empty ruby_files.reject { it.end_with?("network/link.rb", "dot_popper/automation.rb") || signatures.include?(it) || receipts.include?(it) }.select { uncommented(it).match?(banned) }
+    assert_empty ruby_files.reject { it.end_with?("gems/dot_popper-shared/lib/dot_popper/network/link.rb", "gems/dot_popper-shared/lib/dot_popper/automation.rb") || signatures.include?(it) || receipts.include?(it) }.select { uncommented(it).match?(banned) }
     signatures.each { assert_empty uncommented(it).gsub(/OpenSSL::PKey\b|require "openssl"/, "").scan(banned), it }
     receipts.each { assert_empty uncommented(it).gsub(/OpenSSL::(?:PKey|X509|ASN1|BN)\b|require "openssl"/, "").scan(banned), it }
     assert_empty native_files.select { File.read(it).match?(/URLSession|NSURLConnection|HttpURLConnection|OkHttp|Volley/) }

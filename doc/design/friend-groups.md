@@ -14,7 +14,7 @@ Only a game that counts is sent: one played by a member of a group, not the tuto
 
 ## The server's address
 
-`Network::Server` (`lib/dot_popper/network/server.rb`) is the one place it is set, for friend groups, themes and setdef's own checks alike:
+`Network::Server` (`gems/dot_popper-shared/lib/dot_popper/network/server.rb`) is the one place it is set, for friend groups, themes and setdef's own checks alike:
 
 - `Server::SERVER_URL` is `https://server.dot-popper.setdef.com`, for every build.
 - `DOT_POPPER_SERVER` names another server, to try one out; empty means none, and then the game offers no friend groups and makes no connection for them. A store build ignores it (`Build.settings`, [store-and-pro.md](store-and-pro.md)).
@@ -36,7 +36,7 @@ The composition root (`Composition::Root`) builds the session with `Groups::Sess
 
 ### The low-priority thread
 
-`Network::Worker` (`lib/dot_popper/network/worker.rb`) runs a `Link`'s requests in order on a thread of its own at priority -2 (`Worker::PRIORITY`), so a frame never waits on the network. The thread starts with its first job, so a player with no group has no thread. `Network::Link` (`lib/dot_popper/network/link.rb`) makes one HTTPS request at a time with `Net::HTTP`, OpenSSL's default certificate store, a 5-second open and 8-second read timeout, and a bearer token when the job sends one. It requires `net/http` and `json` on first use, on the worker's thread, so the game starts as fast as ever. `Network` is the game's HTTP client, which the request for theme releases and setdef's checks use too ([privacy.md](privacy.md#requests)).
+`Network::Worker` (`gems/dot_popper-shared/lib/dot_popper/network/worker.rb`) runs a `Link`'s requests in order on a thread of its own at priority -2 (`Worker::PRIORITY`), so a frame never waits on the network. The thread starts with its first job, so a player with no group has no thread. `Network::Link` (`lib/dot_popper/network/link.rb`) makes one HTTPS request at a time with `Net::HTTP`, OpenSSL's default certificate store, a 5-second open and 8-second read timeout, and a bearer token when the job sends one. It requires `net/http` and `json` on first use, on the worker's thread, so the game starts as fast as ever. `Network` is the game's HTTP client, which the request for theme releases and setdef's checks use too ([privacy.md](privacy.md#requests)).
 
 **Nothing is handed to the worker during a game.** `Session#update(quiet:)` takes up finished replies every frame but starts waiting jobs only when `quiet` is true; `Show#update` passes `quiet: !playing?`.
 
@@ -154,4 +154,4 @@ The Privacy screen, opened from Settings, says "In a friend group, Dot Popper ke
 
 ## Tests
 
-`test/gameplay/groups/session_test.rb`, `test/gameplay/groups/jobs_test.rb`, `test/gameplay/groups/unsent_test.rb`, `test/gameplay/groups/known_groups_test.rb`, `test/gameplay/groups/group_file_test.rb`, `test/gameplay/groups/group_stub_test.rb`, `test/server_exchanges_test.rb`, which replays the server's published exchanges through `Session`, `test/gameplay/refresh_test.rb`, `test/network/link_test.rb`, `test/presentation/group_panel_test.rb`, `test/presentation/member_icon_test.rb`, `test/presentation/names_test.rb`, and `test/privacy/requests_test.rb`, which plays every request through a real `Session` and `Link` against a local server.
+`test/gameplay/groups/session_test.rb`, `test/gameplay/groups/jobs_test.rb`, `test/gameplay/groups/unsent_test.rb`, `test/gameplay/groups/known_groups_test.rb`, `test/gameplay/groups/group_file_test.rb`, `test/gameplay/groups/group_stub_test.rb`, `test/server_exchanges_test.rb`, which replays the server's published exchanges through `Session`, `test/gameplay/refresh_test.rb`, `gems/dot_popper-shared/test/dot_popper/network/link_test.rb`, `test/presentation/group_panel_test.rb`, `test/presentation/member_icon_test.rb`, `test/presentation/names_test.rb`, and `test/privacy/requests_test.rb`, which plays every request through a real `Session` and `Link` against a local server.

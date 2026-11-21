@@ -44,14 +44,15 @@ class AreasTest < Minitest::Test
   SHARED = %w[Network Platform Automation MemoryFile].freeze
 
   # The files of each area, and of the code the areas share, under
-  # lib/dot_popper, and in the gem that holds part of Gameplay
-  # (gems/dot_popper-gameplay).
+  # lib/dot_popper, and in the game's own gems: the one that holds part of
+  # Gameplay (gems/dot_popper-gameplay), and the shared code's
+  # (gems/dot_popper-shared), all of which is the shared code.
   FILES = {
     "Gameplay" => %w[gameplay.rb gameplay/**/*.rb ../../gems/dot_popper-gameplay/lib/**/*.rb],
     "Monetization" => %w[monetization.rb monetization/**/*.rb website/license_keys.rb website/license_keys/**/*.rb website/website_store.rb
                        apple/receipt.rb play/receipt.rb microsoft/receipt.rb],
     "ReleaseEngineering" => %w[release_engineering.rb release_engineering/**/*.rb],
-    "Shared" => %w[network.rb network/**/*.rb platform.rb automation.rb memory_file.rb]
+    "Shared" => %w[../../gems/dot_popper-shared/lib/**/*.rb]
   }.freeze
 
   # What each may name besides itself, as DotPopper::<name> and
@@ -85,7 +86,7 @@ class AreasTest < Minitest::Test
     files = FILES.values.flatten.flat_map { Dir[it, base: File.join(ROOT, "lib/dot_popper")] }
 
     assert_includes files, "gameplay.rb"
-    assert_includes files, "network/link.rb"
+    assert_includes files, "../../gems/dot_popper-shared/lib/dot_popper/network/link.rb"
     assert_includes files, "../../gems/dot_popper-gameplay/lib/dot_popper/gameplay/visibility.rb"
     assert_equal Dir["*.rb", base: File.join(ROOT, "lib/dot_popper")].sort - %w[presentation.rb shell.rb use_cases.rb],
                  files.grep_v(%r{/}).sort, "every file at the top of lib/dot_popper but the outer layers' loaders"

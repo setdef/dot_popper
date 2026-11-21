@@ -17,4 +17,6 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 4.1.0.a"
   spec.files = Dir["lib/**/*.rb", base: __dir__]
   spec.require_paths = ["lib"]
+  # The code the game's areas share, the game's own gem too.
+  spec.add_dependency "dot_popper-shared", "0.0.0"
 end

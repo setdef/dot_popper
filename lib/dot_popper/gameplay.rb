@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 require "date"
-require_relative "network"
-require_relative "memory_file"
+require "dot_popper/network"
+require "dot_popper/memory_file"
 
 module DotPopper
   # Gameplay and Metagame, the core of the domain: playing and learning

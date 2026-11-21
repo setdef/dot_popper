@@ -54,7 +54,8 @@ runs:
         exclude=()
         for path in test doc sig script playtest android ios macos windows .github Rakefile Steepfile mise.toml mise.lock mise.android.toml mise.ios.toml \
           AGENTS.md GLOSSARY.md INSIPIRATION.md PACKAGING.md README.md .gitignore .gitattributes \
-          gems/dot_popper-gameplay/sig gems/dot_popper-gameplay/test gems/dot_popper-gameplay/Rakefile gems/dot_popper-gameplay/Steepfile; do
+          gems/dot_popper-gameplay/sig gems/dot_popper-gameplay/test gems/dot_popper-gameplay/Rakefile gems/dot_popper-gameplay/Steepfile \
+          gems/dot_popper-shared/sig gems/dot_popper-shared/test gems/dot_popper-shared/Rakefile gems/dot_popper-shared/Steepfile; do
           exclude+=(--exclude "$path")
         done
         channel_excludes=$(ruby script/channel_contents.rb excludes | tr -d '\r')

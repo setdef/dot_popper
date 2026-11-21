@@ -1,0 +1,13 @@
+# frozen_string_literal: true
+
+# The gem checked against its own signatures alone, strictly, as the
+# game's Steepfile checks the areas. network/ is not typed: its
+# signatures say what the typed code uses of it.
+target :lib do
+  signature "sig"
+  %w[date socket uri].each { library it }
+  check "lib/dot_popper/network.rb", "lib/dot_popper/platform.rb", "lib/dot_popper/automation.rb", "lib/dot_popper/memory_file.rb"
+  configure_code_diagnostics(Steep::Diagnostic::Ruby.strict) do |hash|
+    hash[Steep::Diagnostic::Ruby::UnsupportedSyntax] = :error
+  end
+end

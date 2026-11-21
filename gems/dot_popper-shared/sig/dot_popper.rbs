@@ -1,0 +1,3 @@
+module DotPopper
+  type number = Integer | Float
+end

@@ -9,10 +9,9 @@ module DotPopper
 end
 
 require_relative "dot_popper/release_engineering"
-require_relative "dot_popper/platform"
-require_relative "dot_popper/automation"
-require_relative "dot_popper/network"
-require_relative "dot_popper/memory_file"
+# The code the areas share is a gem of its own, dot_popper-shared
+# (gems/dot_popper-shared, which the Gemfile names by its path).
+%w[platform automation network memory_file].each { require "dot_popper/#{it}" }
 require_relative "dot_popper/monetization"
 require_relative "dot_popper/gameplay"
 DotPopper::ReleaseEngineering::Build::PARTS.each { require_relative "dot_popper/#{it}/core" }
