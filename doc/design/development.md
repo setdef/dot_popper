@@ -24,7 +24,7 @@ How Dot Popper is tested and worked on: what each test tier checks and how to ru
 
 Every test task runs with Ruby's warnings on (`t.warning = true`), and `test/no_warnings_test.rb` compiles every file in `lib/`, `script/`, `test/` and the top folder with `-w` and fails on any warning, since a key written twice in one hash only warns.
 
-To run one file: `bundle exec ruby -Ilib -Itest test/gameplay/rules_fuzz_test.rb`.
+To run one file: `bundle exec ruby -Ilib -Itest test/use_cases/start_game_test.rb`, or one of a gem's, from the gem's folder: `cd gems/dot_popper-gameplay && bundle exec ruby -Ilib -Itest test/dot_popper/gameplay/rules_fuzz_test.rb`.
 
 Before a push, run the narrowest check that shows the change broke nothing: the tests it reaches, Steep if it touches typed code, and the one GUI scenario for a screen it changes ([AGENTS.md](../../AGENTS.md), which also says where heavy work runs). Then push: every tier above that names a workflow runs in CI after the push, and a red trunk is fixed or reverted at once. Tests are fast and reliable, and none reaches the real internet (see [Automated runs stay off the internet](#automated-runs-stay-off-the-internet)).
 
@@ -59,7 +59,7 @@ Pattern matching is fine wherever Steep does not look: the tests (the fuzz test 
 
 ## The seeded fuzz test
 
-`test/gameplay/rules_fuzz_test.rb` plays random games against the real rules and checks, after every step, what must always be true. It needs no extra gem.
+`gems/dot_popper-gameplay/test/dot_popper/gameplay/rules_fuzz_test.rb` plays random games against the real rules and checks, after every step, what must always be true. It needs no extra gem.
 
 `test_random_play_keeps_every_rule` plays `ROUNDS` (2,000) games of up to `STEPS` (40) steps each, every one on a random field from 40 to 3,000 units wide and 40 to 1,800 high, with dots of radius `Rules::RADIUS`: from a sliver narrower than a dot to a large monitor. Each step is one of:
 
@@ -86,7 +86,7 @@ After each step it checks that:
 Both tests start from seed 20,261,105. Every failure message names the seed and the game (`seed 20261105, game 512`). To try other seeds, or replay one that failed:
 
 ```console
-$ RULES_FUZZ_SEED=12345 bundle exec ruby -Ilib -Itest test/gameplay/rules_fuzz_test.rb
+$ cd gems/dot_popper-gameplay && RULES_FUZZ_SEED=12345 bundle exec ruby -Ilib -Itest test/dot_popper/gameplay/rules_fuzz_test.rb
 ```
 
 ## Ractors

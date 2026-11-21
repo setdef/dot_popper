@@ -7,43 +7,5 @@ require "dot_popper"
 ENV["DOT_POPPER_AUTOMATED"] = "1"
 DotPopper::Automation.guard!
 
-module DotPopperTest
-  R = DotPopper::Gameplay::Rules::RADIUS
-
-  def field(width = 800, height = 600) = DotPopper::Gameplay::Field.new(width, height, R)
-
-  def dot(x, y, velocity_x: 0, velocity_y: 0, popped: false, bonus: false, id: (@ids = (@ids || 100) + 1))
-    DotPopper::Gameplay::Dot.new(id:, x:, y:, velocity_x:, velocity_y:, radius: R, popped:, bonus:)
-  end
-
-  # A game whose dots are exactly the ones given, top first, in place of
-  # the one it would spawn.
-  def game_with(*dots, random: Random.new(1))
-    DotPopper::Gameplay::Game.new(field, random:, dots: DotPopper::Gameplay::Stack.new(dots:))
-  end
-
-  # Each game flow's one Starter (GameFlow#starter), taken by the first start
-  # a test makes on it, as UseCases::StartGame takes it in the game.
-  STARTERS = ObjectSpace::WeakKeyMap.new
-
-  # Starts a game on +game_flow+, in play at once, or paused with +dots+
-  # first for the tutorial; answers the game flow.
-  def start!(game_flow, seed = nil) = starter_of(game_flow).game(seed)
-  def start_paused!(game_flow, dots, seed = nil) = starter_of(game_flow).paused(dots, seed)
-  def starter_of(game_flow) = DotPopperTest.starter_of(game_flow)
-  def self.starter_of(game_flow) = (STARTERS[game_flow] ||= game_flow.starter)
-
-  # The game +game_flow+ holds itself, which nothing in the game can reach
-  # (GameFlow#game is its read-only Game::View): for a test that sets up a
-  # position by hand.
-  def live(game_flow) = game_flow.instance_variable_get(:@game)
-
-  # Sets a game's score as if earlier taps had earned it.
-  def score!(game, points) = game.instance_variable_set(:@score, points)
-
-  # Moves every dot of the game but +keep+ far out of the way.
-  def clear_around!(game, keep)
-    moved = game.dots.map_dots { it.id == keep.id ? it : it.with(x: -1000.0) }
-    game.instance_variable_set(:@dots, moved)
-  end
-end
+# Gameplay's test helpers are its gem's (gems/dot_popper-gameplay).
+require_relative "../gems/dot_popper-gameplay/test/gameplay_helpers"

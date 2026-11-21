@@ -32,7 +32,7 @@ The composition root (`Composition::Root`) makes each store, asking the engine f
 
 **A header change.** When the log's first line is not the current header, because an older version wrote it, the old log is copied whole to `games-YYYYMMDD-HHMMSS.csv` and a new `games.csv` starts under the current header. A CSV whose rows disagree with its header would mislead anyone comparing playtests, and keeping the old file loses nothing.
 
-The log is rewritten whole each time, which is fine for the few hundred lines a playtest makes. The game prints the log's path at launch. Clearing Stats never touches it. Tests: `test/gameplay/games_log_test.rb`.
+The log is rewritten whole each time, which is fine for the few hundred lines a playtest makes. The game prints the log's path at launch. Clearing Stats never touches it. Tests: `gems/dot_popper-gameplay/test/dot_popper/gameplay/games_log_test.rb`.
 
 ## One game's numbers: `GameStats`
 
@@ -68,7 +68,7 @@ Why keep all this: a player who comes back wants to see that they are improving,
 
 **Older files.** A `score_record.txt` holding one bare number, or a `stats.txt` whose records have no class name, gives those records to the class of the screen the game opens on (`legacy:`, `SizeClass.of(screen)` in `Composition::Root`), and is saved again in the new form at once, so they stay in that class whichever screen the game opens on next.
 
-Tests: `test/gameplay/stats_test.rb`, `test/gameplay/saved_stats_test.rb`, `test/gameplay/score_record_test.rb`, `test/gameplay/game_stats_test.rb`.
+Tests: `gems/dot_popper-gameplay/test/dot_popper/gameplay/stats_test.rb`, `gems/dot_popper-gameplay/test/dot_popper/gameplay/saved_stats_test.rb`, `gems/dot_popper-gameplay/test/dot_popper/gameplay/score_record_test.rb`, `gems/dot_popper-gameplay/test/dot_popper/gameplay/game_stats_test.rb`.
 
 ## Size classes
 
@@ -142,7 +142,7 @@ Home's goal card shows the current streak beside the goal, as a number over "day
 
 Home shows the goal card only once a game has finished, or Stats have been cleared (below), so a first-time player's Home says only how to play. On the smallest windows the card is left out; Stats shows the streak too.
 
-Tests: `test/gameplay/daily_goal_test.rb`, `test/gameplay/goal_streak_test.rb`, `test/gameplay/saved_stats_test.rb`.
+Tests: `gems/dot_popper-gameplay/test/dot_popper/gameplay/daily_goal_test.rb`, `gems/dot_popper-gameplay/test/dot_popper/gameplay/goal_streak_test.rb`, `gems/dot_popper-gameplay/test/dot_popper/gameplay/saved_stats_test.rb`.
 
 ## Achievements
 
@@ -172,7 +172,7 @@ Names, figures and sentences are in `Presentation::AchievementWords`. Each has a
 
 **Showing.** Nothing shows during a game. For a Pro player, Game Over adds "New achievement: Sharpshooter" (or "New achievements: …") for the ones first earned that game, and friend groups hear of them. A Free player sees how each is earned on the Achievements screen but no earned marks, dates, count or progress; what they earned is kept, shown once Pro is bought, and then reported to their friend groups. What the screen may show is `UseCases::ViewAchievements`'s to say (`#earned?`, `#day`, `#count`, `#progress`, all held back while `#locked?`), so the `Show` and the painters only draw it. See [store-and-pro.md](store-and-pro.md) and [screens.md](screens.md).
 
-Tests: `test/gameplay/achievement_recorder_test.rb`, `test/gameplay/achievements_test.rb`, `test/gameplay/visibility_test.rb`, `test/presentation/achievements_test.rb`.
+Tests: `gems/dot_popper-gameplay/test/dot_popper/gameplay/achievement_recorder_test.rb`, `gems/dot_popper-gameplay/test/dot_popper/gameplay/achievements_test.rb`, `gems/dot_popper-gameplay/test/dot_popper/gameplay/visibility_test.rb`, `test/presentation/achievements_test.rb`.
 
 ## Clearing Stats
 
@@ -196,7 +196,7 @@ Forgiveness, from Lidwell's *Universal Principles of Design*: an Undo serves the
 
 Why one act and not a choice, decided by the books in `INSIPIRATION.md`: the prompt says what will go before anything does (Podmajersky, *Strategic Writing for UX*; Yifrah, *Microcopy*); the hold makes the wrong act hard to make by accident (Lee, Wickens, Liu and Boyle, *Designing for People*); Undo and the backup make it reversible (Nystrom, *Game Programming Patterns*, the command pattern; Engelstein, *Achievement Relocked*, on loss aversion); and one fresh start, rather than a choice of what to clear, keeps the decision to one (Lidwell, Holden and Butler, *Universal Principles of Design*, Hick's law).
 
-Tests: `test/gameplay/stats_backup_test.rb`, `test/presentation/clearing_stats_test.rb`, `test/presentation/hold_to_confirm_test.rb`.
+Tests: `gems/dot_popper-gameplay/test/dot_popper/gameplay/stats_backup_test.rb`, `test/presentation/clearing_stats_test.rb`, `test/presentation/hold_to_confirm_test.rb`.
 
 ## Home after clearing
 

@@ -192,6 +192,6 @@ Failure is the moment a player is ready to learn (Juul), and showing the consequ
 - `test/presentation/tutorial_beats_test.rb`: frame by frame on three screens, each beat, the HUD's numbers as they land, the sounds, the traveling numbers, the spotlight, the guide and the first two dots' places, and the game that follows.
 - `test/presentation/show_tutorial_test.rb`: opening on a first Play and by How to play, never again after Stats are cleared, never for a player who has played, play beginning on the same game, the game counting as any game, Skip by button, Escape and B at several beats, every input on the guide's demonstration, and resizing.
 - `test/presentation/games_test.rb`: the free game spent as the tutorial opens, and nothing more at its end or at Skip.
-- `test/gameplay/game_flow_test.rb`: the paused game.
+- `gems/dot_popper-gameplay/test/dot_popper/gameplay/game_flow_test.rb`: the paused game.
 - `test/presentation/tutorial_flag_test.rb`, `test/presentation/tutor_test.rb`, `test/presentation/pointing_hand_test.rb`.
 - GUI scenarios, which play the real game ([development.md](development.md)): `test/gui/scenarios/tutorial.rb` (with the mouse, `DOT_POPPER_GUI_INPUT=touch` or `gamepad`), `tutorial_skip.rb` and `how_to_play.rb`.

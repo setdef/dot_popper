@@ -45,7 +45,7 @@ The default size, Standard, is worked out from the screen, so every screen is ab
 
 On an upright phone the floor applies: the exact fit would be about 29.6, so the field is 373 R² rather than 384.
 
-**Saving.** The choice is kept in `dot_size.txt`. It is written only when the player picks a size. `DotSizing.parse` reads `fitted` (Standard) or `standard` (the bigger or smaller size), and `same`, the bigger or smaller size's name in saves from before that (`DotSizing::EARLIER_NAMES`). These are the words builds in players' hands wrote, so they never change, whatever the screens and the code call the sizes (`test/gameplay/saved_dot_size_words_test.rb`); a missing, empty or unreadable file means the player never chose, and gets `DEFAULT`.
+**Saving.** The choice is kept in `dot_size.txt`. It is written only when the player picks a size. `DotSizing.parse` reads `fitted` (Standard) or `standard` (the bigger or smaller size), and `same`, the bigger or smaller size's name in saves from before that (`DotSizing::EARLIER_NAMES`). These are the words builds in players' hands wrote, so they never change, whatever the screens and the code call the sizes (`gems/dot_popper-gameplay/test/dot_popper/gameplay/saved_dot_size_words_test.rb`); a missing, empty or unreadable file means the player never chose, and gets `DEFAULT`.
 
 **When it applies.** `GameFlow#field` gives a new game `sizing.fit(screen)`. A game keeps its radius until it ends. `GameFlow#sizing=` changes the choice only on Home, so a game in play is never resized by it. Speeds are in radii per second, so they scale with R. Buttons and their reaches do not, since they are sized for a finger, not for the field.
 
@@ -119,7 +119,7 @@ A dot too small to hold a target (under 44 units across, smaller than the rules 
 
 A spawn happens once per pop. On a packed phone screen the rule does real work: it finds the gaps that are left and puts the new dot in one when it can. Where no gap exists, the dot spawns as it would have.
 
-Tests: `test/gameplay/spawner_test.rb`, `test/gameplay/touch_target_test.rb`.
+Tests: `gems/dot_popper-gameplay/test/dot_popper/gameplay/spawner_test.rb`, `gems/dot_popper-gameplay/test/dot_popper/gameplay/touch_target_test.rb`.
 
 ## Score and clock
 
@@ -154,7 +154,7 @@ How the bonus dot and the row of eight look and sound is in [look-and-sound.md](
 
 **How the numbers were chosen** (measured with `bundle exec ruby script/simulate.rb bonus`, 400 games a cell, three devices, standard dots). Without a bonus dot the model player scores about 23 points in 34 s on the 24 × 16 R window. A row of 6 lifted scores 30 to 70%, too much of a game being bonus; a row of 10 was a small bump a player might not see in their first games. 8/3/3 gave 29.5 points (+30%), 40 s (+20%), a 90th percentile of 52 s, and no endless games on any device. Seconds beyond 3 lengthened games but barely raised scores, because crowding, not the clock, ends a long game.
 
-Tests: `test/gameplay/bonus_test.rb`.
+Tests: `gems/dot_popper-gameplay/test/dot_popper/gameplay/bonus_test.rb`.
 
 ## Seeds
 
@@ -236,11 +236,11 @@ On every device but one, fewer than 1 spawn in 70 is redrawn, and a new place is
 
 | What | Where |
 | --- | --- |
-| Every rule, over thousands of random games with random resizes | `test/gameplay/rules_fuzz_test.rb` |
-| A game: popping, mistakes, the floor, the clock, resuming from the tutorial | `test/gameplay/game_test.rb`, `test/gameplay/game_flow_test.rb`, `test/gameplay/clock_test.rb` |
-| Dots, bounces, refitting | `test/gameplay/dot_test.rb`, `test/gameplay/field_test.rb`, `test/gameplay/stack_test.rb` |
-| Dot size and the choice | `test/gameplay/dot_size_test.rb`, `test/gameplay/dot_sizing_test.rb`, `test/presentation/sizing_preview_test.rb` |
-| The spawn check | `test/gameplay/spawner_test.rb`, `test/gameplay/touch_target_test.rb` |
-| The bonus dot | `test/gameplay/bonus_test.rb` |
+| Every rule, over thousands of random games with random resizes | `gems/dot_popper-gameplay/test/dot_popper/gameplay/rules_fuzz_test.rb` |
+| A game: popping, mistakes, the floor, the clock, resuming from the tutorial | `gems/dot_popper-gameplay/test/dot_popper/gameplay/game_test.rb`, `gems/dot_popper-gameplay/test/dot_popper/gameplay/game_flow_test.rb`, `gems/dot_popper-gameplay/test/dot_popper/gameplay/clock_test.rb` |
+| Dots, bounces, refitting | `gems/dot_popper-gameplay/test/dot_popper/gameplay/dot_test.rb`, `gems/dot_popper-gameplay/test/dot_popper/gameplay/field_test.rb`, `gems/dot_popper-gameplay/test/dot_popper/gameplay/stack_test.rb` |
+| Dot size and the choice | `gems/dot_popper-gameplay/test/dot_popper/gameplay/dot_size_test.rb`, `gems/dot_popper-gameplay/test/dot_popper/gameplay/dot_sizing_test.rb`, `test/presentation/sizing_preview_test.rb` |
+| The spawn check | `gems/dot_popper-gameplay/test/dot_popper/gameplay/spawner_test.rb`, `gems/dot_popper-gameplay/test/dot_popper/gameplay/touch_target_test.rb` |
+| The bonus dot | `gems/dot_popper-gameplay/test/dot_popper/gameplay/bonus_test.rb` |
 | The frame clock | `test/presentation/frame_clock_test.rb` |
 | The rules' values are shareable, and a game plays in a Ractor | `test/ractor_test.rb` |
