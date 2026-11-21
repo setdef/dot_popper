@@ -117,7 +117,20 @@ cat > "$phone/Gemfile" <<EOF
 source "https://rubygems.org"
 
 gem "lota", path: "$LOTA_GEM"
-gem "fledge", git: "https://github.com/setdef/Fledge", tag: "$FLEDGE_TAG", group: :development
+EOF
+# Fledge runs from a Gemfile of its own, outside the phone project, and
+# builds the project by its path (Fledge's README, "Installation"): an
+# app ships every group of its project's Gemfile, so one that named
+# Fledge would carry it.
+tools=$work/fledge
+rm -rf "$tools" && mkdir -p "$tools"
+cat > "$tools/Gemfile" <<EOF
+# frozen_string_literal: true
+
+# Written by script/android_build.sh: Fledge alone, to build the phone project.
+source "https://rubygems.org"
+
+gem "fledge", git: "https://github.com/setdef/Fledge", tag: "$FLEDGE_TAG"
 EOF
 APP_NAME=$APP_NAME ruby -ryaml -e '
   source = YAML.load_file(ARGV[1])
@@ -144,7 +157,9 @@ APP_NAME=$APP_NAME ruby -ryaml -e '
     "--with-lota-source=$LOTA_SOURCE --with-lota-android-deps=$LOTA_SOURCE/tmp/android/deps --with-rice-dir=$RICE_DIR"
   bundle lock --add-platform ruby > /dev/null
   bundle install --quiet
-  bundle exec fledge build android > "$out/fledge.log" 2>&1 || { tail -60 "$out/fledge.log"; exit 1; }
+  BUNDLE_GEMFILE=$tools/Gemfile bundle install --quiet
+  BUNDLE_GEMFILE=$tools/Gemfile bundle exec fledge build android --out "$phone/dist" "$phone" > "$out/fledge.log" 2>&1 ||
+    { tail -60 "$out/fledge.log"; exit 1; }
   cd "dist/$APP_NAME-android"
   # The SDK is script/android_sdk.sh's, pinned: Gradle may not add to it.
   gradle=(./gradlew --no-daemon --quiet -Pandroid.builder.sdkDownload=false)

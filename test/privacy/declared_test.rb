@@ -25,11 +25,12 @@ class PrivacyDeclaredTest < Minitest::Test
   end
 
   # A phone app ships every group of the phone project's own Gemfile, which
-  # the phone build scripts write, and Fledge (0.13 and later) ships the
-  # development group too, with Fledge in it. Each gem's dependencies are
-  # as this repository's Gemfile.lock resolves them, at the same versions.
+  # the phone builds write (Fledge 0.13 and later ship the development
+  # group too), and Fledge runs from a Gemfile of its own. Each gem's
+  # dependencies are as this repository's Gemfile.lock resolves them, at
+  # the same versions.
   def test_the_gems_a_phone_app_ships_are_declared
-    named = %w[script/android_build.sh script/ios_app.sh].to_h { [it, phone_gemfile_gems(it)] }
+    named = %w[script/android_build.sh script/ios_app.sh .github/workflows/kits.yml].to_h { [it, phone_gemfile_gems(it)] }
     specs = Bundler.definition.specs.to_h { [it.name, it] }
     shipped = named.values.first.flat_map { with_dependencies(it, specs) }.uniq - ["bundler"]
 
@@ -42,7 +43,7 @@ class PrivacyDeclaredTest < Minitest::Test
   end
 
   def phone_gemfile_gems(script)
-    gemfile = File.read(File.join(ROOT, script))[/^cat > "\$phone\/Gemfile" <<\s*'?EOF'?\n(.*?)^EOF$/m, 1] or flunk("#{script} writes no phone Gemfile")
+    gemfile = File.read(File.join(ROOT, script))[/^ *cat > "\$phone\/Gemfile" <<\s*'?EOF'?\n(.*?)^ *EOF$/m, 1] or flunk("#{script} writes no phone Gemfile")
     gemfile.scan(/^\s*gem\s+"([^"]+)"/).flatten.sort
   end
 

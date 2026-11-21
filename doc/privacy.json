@@ -467,11 +467,6 @@
         "note": "the game engine: draws, plays sound, reads input",
         "plain": null,
         "record_only": "It is the game's own engine, and reaches no outside service."
-      },
-      "fledge": {
-        "note": "the phone apps' build tool, which a phone app carries and a desktop app does not",
-        "plain": null,
-        "record_only": "The game never loads it, so it reaches no outside service."
       }
     },
     "android_dependencies": {

@@ -124,7 +124,19 @@ cat > "$phone/Gemfile" << EOF
 source "https://rubygems.org"
 
 gem "lota", path: "$lota/tmp/phone/lota"
-gem "fledge", git: "https://github.com/setdef/Fledge", tag: "$fledge_tag", group: :development
+EOF
+# Fledge runs from a Gemfile of its own, outside the phone project, and
+# builds the project by its path (Fledge's README, "Installation"), so
+# the app carries no Fledge.
+tools=$work/fledge
+mkdir -p "$tools"
+cat > "$tools/Gemfile" << EOF
+# frozen_string_literal: true
+
+# Written by script/ios_app.sh: Fledge alone, to build the phone project.
+source "https://rubygems.org"
+
+gem "fledge", git: "https://github.com/setdef/Fledge", tag: "$fledge_tag"
 EOF
 APP_NAME=$app_name ruby -ryaml -e '
   source = YAML.load_file("fledge.yml")
@@ -146,7 +158,9 @@ say "laid out the phone project"
   bundle config set --local build.lota "--with-lota-source=$lota --with-lota-sdl3=$lota/tmp/ios/sdl3 --with-rice-dir=$rice" > /dev/null
   bundle lock --add-platform ruby > /dev/null
   bundle install --quiet
-  bundle exec fledge build ios > "$work/fledge.log" 2>&1 || { tail -60 "$work/fledge.log"; exit 1; }
+  BUNDLE_GEMFILE=$tools/Gemfile bundle install --quiet
+  BUNDLE_GEMFILE=$tools/Gemfile bundle exec fledge build ios --out "$phone/dist" "$phone" > "$work/fledge.log" 2>&1 ||
+    { tail -60 "$work/fledge.log"; exit 1; }
 )
 project=$phone/dist/$app_name-ios
 say "fledge build ios wrote $project"

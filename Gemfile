@@ -40,9 +40,8 @@ gem "lota", "~> 0.5.5"
 # and every desktop build names to lota fuse, which would otherwise run
 # its own pin, v0.14.0 in Lota 0.5.5 (PackagedApp.fledge_ref).
 # In the development group, which lota fuse leaves out of a desktop app.
-# A phone app ships it: the phone project's own Gemfile, which
-# script/android_build.sh and script/ios_app.sh write, names it, and
-# Fledge 0.13 and later ship every group (Privacy::PHONE_GEMS).
+# The phone builds run it from a Gemfile of their own, outside the phone
+# project, so no app carries it (Privacy::PHONE_GEMS).
 group :development do
   gem "fledge", git: "https://github.com/setdef/Fledge", tag: "v0.15.0"
 

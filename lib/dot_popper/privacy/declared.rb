@@ -29,14 +29,10 @@ module DotPopper
     DESKTOP_GEMS = { "lota" => LOTA }.freeze
 
     # The gems a phone app ships: every group of the phone project's own
-    # Gemfile, which script/android_build.sh and script/ios_app.sh write.
-    # Fledge 0.13 and later ship its development group too, which holds
-    # Fledge itself, for the phone project's own fledge build.
-    PHONE_GEMS = {
-      "lota" => LOTA,
-      "fledge" => Item.new(note: "the phone apps' build tool, which a phone app carries and a desktop app does not",
-                           record_only: "The game never loads it, so it reaches no outside service.")
-    }.freeze
+    # Gemfile, which script/android_build.sh, script/ios_app.sh and the
+    # Kits workflow write. Fledge runs from a Gemfile of its own, outside
+    # the phone project, so it is none of the app's gems.
+    PHONE_GEMS = { "lota" => LOTA }.freeze
 
     # Every gem any app ships, as the record lists them.
     SHIPPED_GEMS = DESKTOP_GEMS.merge(PHONE_GEMS).freeze

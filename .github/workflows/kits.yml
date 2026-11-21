@@ -392,7 +392,18 @@ jobs:
           source "https://rubygems.org"
 
           gem "lota", path: "$LOTA_GEM"
-          gem "fledge", git: "https://github.com/setdef/Fledge", tag: "$FLEDGE_TAG", group: :development
+          EOF
+          # Fledge runs from a Gemfile of its own, outside the phone
+          # project, and builds it by its path (Fledge's README,
+          # "Installation"), so the app carries no Fledge.
+          mkdir -p "$RUNNER_TEMP/fledge"
+          cat > "$RUNNER_TEMP/fledge/Gemfile" <<EOF
+          # frozen_string_literal: true
+
+          # Written by kits.yml: Fledge alone, to build the phone project.
+          source "https://rubygems.org"
+
+          gem "fledge", git: "https://github.com/setdef/Fledge", tag: "$FLEDGE_TAG"
           EOF
           # The tag's version, as the fuse action stamps it for the desktop
           # kits (script/release_version.rb).
@@ -424,8 +435,10 @@ jobs:
             "--with-lota-source=$LOTA_SOURCE --with-lota-sdl3=$LOTA_SOURCE/tmp/ios/sdl3 --with-rice-dir=$RICE_DIR"
           bundle lock --add-platform ruby
           bundle install
+          export BUNDLE_GEMFILE=$RUNNER_TEMP/fledge/Gemfile
+          bundle install
           bundle exec fledge --version
-          time bundle exec fledge build ios
+          time bundle exec fledge build ios --out "$RUNNER_TEMP/phone/dist" "$RUNNER_TEMP/phone"
           ls -la "dist/$APP_NAME-ios"
 
       - name: Check the project stands on its own, and assemble the kit
